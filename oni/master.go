@@ -26,6 +26,7 @@ func (m *Master) Run() {
 
 	// run http server
 	http.Handle("/", m)
+	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
 	err := http.ListenAndServe(m.addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
