@@ -36,16 +36,14 @@ graphics.path = function (points, color) {
 
 	this.endFill();
 }
-graphics.getContext = function() {
-	return this;
-}
 
-var iso = new Isomer(graphics);
+var iso = new Isomer(renderer.view);
 iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
 iso.colorDifference = 0.2;
 iso.canvas = graphics;
 
-var avatar = new Avatar();
+var avatars = {4661: new Avatar()};
+var player = 4661;
 var map = new Map(iso);
 map.objects = require('./test-map').objects;
 
@@ -60,7 +58,6 @@ iso.reorigin = function(point) {
 	this.originY = + xMap.y + yMap.y + (point.z * this.scale) + (iso.canvas.height / 2.0);
 }
 
-
 window.onresize = resize;
 resize();
 function resize() {
@@ -71,60 +68,28 @@ function resize() {
 	graphics.height = h;
 
 	renderer.resize(w, h);
-	iso.reorigin(avatar.position);
-}
-
-function move(path) {
-	avatar.move(path);
-
-	iso.reorigin(avatar.position);
+	iso.reorigin(avatars[player].position);
 }
 
 var listener = new window.keypress.Listener();
 
-var move_combos_view = [
-	{keys:'w',   on_keyup: function() { move('NW'); }, },
-	{keys:'a',   on_keyup: function() { move('SW'); }, },
-	{keys:'s',   on_keyup: function() { move('SE'); }, },
-	{keys:'d',   on_keyup: function() { move('NE'); }, },
-	{keys:'w a', on_keyup: function() {  move('W'); }, },
-	{keys:'w d', on_keyup: function() {  move('N'); }, },
-	{keys:'s a', on_keyup: function() {  move('S'); }, },
-	{keys:'s d', on_keyup: function() {  move('E'); }, },
+var dir=[' ', ' '];
+
+var move_combos = [
+	{keys:'w', on_keydown: function() { dir[0]='N'; }, on_keyup: function() { dir[0]=' '; }, },
+	{keys:'a', on_keydown: function() { dir[1]='W'; }, on_keyup: function() { dir[1]=' '; }, },
+	{keys:'s', on_keydown: function() { dir[0]='S'; }, on_keyup: function() { dir[0]=' '; }, },
+	{keys:'d', on_keydown: function() { dir[1]='E'; }, on_keyup: function() { dir[1]=' '; }, },
+
+	{keys:'e', on_keydown: function() { avatars[player].velocity.z=1; }, on_keyup: function() { avatars[player].velocity.z=0; }, },
+	{keys:'q', on_keydown: function() { avatars[player].velocity.z=-1; }, on_keyup: function() { avatars[player].velocity.z=0; }, },
 ];
 
-var move_combos_iso = [
-	{keys:'w',   on_keyup: function() {  move('N'); }, },
-	{keys:'a',   on_keyup: function() {  move('W'); }, },
-	{keys:'s',   on_keyup: function() {  move('S'); }, },
-	{keys:'d',   on_keyup: function() {  move('E'); }, },
-	{keys:'w a', on_keyup: function() { move('NW'); }, },
-	{keys:'w d', on_keyup: function() { move('NE'); }, },
-	{keys:'s a', on_keyup: function() { move('SW'); }, },
-	{keys:'s d', on_keyup: function() { move('SE'); }, },
-];
-
-for(var i=0, l=move_combos_iso.length; i<l; i++) {
-	var combo = move_combos_iso[i];
-	combo['is_exclusive'] = true;
-	combo['is_unordered'] = true;
-}
-for(var i=0, l=move_combos_view.length; i<l; i++) {
-	var combo = move_combos_view[i];
-	combo['is_exclusive'] = true;
-	combo['is_unordered'] = true;
-}
-
-listener.register_many(move_combos_view);
+listener.register_many(move_combos);
 
 requestAnimFrame(render);
 function render() {
-	renderer.render(stage);
 	requestAnimFrame(render);
-}
-
-setInterval(animate, 1000.0 / 60);
-function animate() {
 	graphics.clear();
 
 	map.render(iso);
@@ -133,6 +98,21 @@ function animate() {
 	iso.add(Stairs(new Point(0, 3, 1)).rotateZ(new Point(0.5, 3.5, 1), -Math.PI / 2));
 	iso.add(Stairs(new Point(2, 0, 2)).rotateZ(new Point(2.5, 0.5, 0), -Math.PI / 2));
 
-	avatar.draw(iso);
+	for(var i in avatars) {
+		avatars[i].draw(iso);
+	}
+
+	renderer.render(stage);
+}
+
+setInterval(animate, 1000.0 / 30);
+function animate() {
+	avatars[player].move(dir.join(''));
+
+	for(var i in avatars) {
+		avatars[i].update(1.0/30);
+	}
+
+	iso.reorigin(avatars[player].position);
 }
 
