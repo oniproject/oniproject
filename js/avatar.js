@@ -1,3 +1,5 @@
+'use strict';
+
 var Isomer = require('isomer');
 
 var Octahedron = require('./octahedron');
