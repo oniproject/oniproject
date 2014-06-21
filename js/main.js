@@ -4,6 +4,7 @@ console.log("fuck");
 
 var Isomer = require('isomer');
 var Map = require('./map');
+var Avatar = require('./avatar');
 
 /* Some convenient renames */
 var Point = Isomer.Point;
@@ -15,11 +16,6 @@ var Stairs = require('./stairs');
 var Octahedron = require('./octahedron');
 var Knot = require('./knot');
 
-
-var angle = 0;
-var position = new Point(3, 2, 3.2);
-var velocity = 1.0;
-
 var w = window.innerWidth,
 	h = window.innerHeight,
 	stage = new PIXI.Stage(0xFFFFFF, true),
@@ -28,7 +24,6 @@ document.body.appendChild(renderer.view);
 
 var graphics = new PIXI.Graphics();
 stage.addChild(graphics);
-
 
 graphics.path = function (points, color) {
 	var c = color.r * 256 * 256 + color.g * 256 + color.b;
@@ -49,6 +44,10 @@ var iso = new Isomer(graphics);
 iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
 iso.colorDifference = 0.2;
 iso.canvas = graphics;
+
+var avatar = new Avatar();
+var map = new Map(iso);
+map.objects = require('./test-map').objects;
 
 iso.reorigin = function(point) {
 	var xMap = new Point(point.x * this.transformation[0][0],
@@ -72,31 +71,14 @@ function resize() {
 	graphics.height = h;
 
 	renderer.resize(w, h);
-	iso.reorigin(position);
+	iso.reorigin(avatar.position);
 }
 
 function move(path) {
-	for(var i=0, l=path.length; i<l; i++) {
-		var dir = path[i];
-		switch(dir) {
-		case 'N':
-			position.x += velocity;
-			break;
-		case 'W':
-			position.y += velocity;
-			break;
-		case 'S':
-			position.x -= velocity;
-			break;
-		case 'E':
-			position.y -= velocity;
-			break;
-		}
-	}
+	avatar.move(path);
 
-	iso.reorigin(position);
+	iso.reorigin(avatar.position);
 }
-
 
 var listener = new window.keypress.Listener();
 
@@ -135,67 +117,22 @@ for(var i=0, l=move_combos_view.length; i<l; i++) {
 
 listener.register_many(move_combos_view);
 
-function scene() {
+requestAnimFrame(render);
+function render() {
+	renderer.render(stage);
+	requestAnimFrame(render);
+}
+
+setInterval(animate, 1000.0 / 60);
+function animate() {
 	graphics.clear();
 
-	/* Add some levels */
+	map.render(iso);
 
-	iso.add(Shape.Prism(new Point(1, 0, 0), 4, 4, 2));
-	iso.add(Shape.Prism(new Point(0, 0, 0), 1, 4, 1));
-	iso.add(Shape.Prism(new Point(-1, 1, 0), 1, 3, 1));
-
-	/* Some stair cases */
 	iso.add(Stairs(new Point(-1, 0, 0)));
-
-	/* Rotate this one */
 	iso.add(Stairs(new Point(0, 3, 1)).rotateZ(new Point(0.5, 3.5, 1), -Math.PI / 2));
-
-	/* Some more levels and stairs */
-	iso.add(Shape.Prism(new Point(3, 0, 2), 2, 4, 1));
-	iso.add(Shape.Prism(new Point(2, 1, 2), 1, 3, 1));
-
 	iso.add(Stairs(new Point(2, 0, 2)).rotateZ(new Point(2.5, 0.5, 0), -Math.PI / 2));
 
-	/* Add some colorful pyramids */
-	iso.add(Shape.Pyramid(new Point(2, 3, 3))
-		.scale(new Point(2, 4, 3), 0.5),
-	new Color(180, 180, 0));
-	iso.add(Shape.Pyramid(new Point(4, 3, 3))
-		.scale(new Point(5, 4, 3), 0.5),
-	new Color(180, 0, 180));
-	iso.add(Shape.Pyramid(new Point(4, 1, 3))
-		.scale(new Point(5, 1, 3), 0.5),
-	new Color(0, 180, 180));
-	iso.add(Shape.Pyramid(new Point(2, 1, 3))
-		.scale(new Point(2, 1, 3), 0.5),
-	new Color(40, 180, 40));
-
-	/* Add a knot with a short platform */
-	iso.add(Shape.Prism(new Point(3, 2, 3), 1, 1, 0.2), new Color(50, 50, 50));
-
-	/* Draw a spinning octahedron as our centerpiece */
-	iso.add(Octahedron(position)
-		.rotateZ(new Point(position.x +0.5, position.y +0.5, position.z +0.5), angle), new Color(0, 180, 180));
-
-	var pos = new Point(position.x, position.y);
-	iso.add(Knot(pos), new Color(0xCC, 0, 0));
-
-	//iso.add(Shape.Prism(new Point(0, 0, 0), 2, 1, 1), new Color(0, 0, 255));
-	iso.add(Shape.Prism(new Point(0, 0, 0), 1, 2, 1), new Color(0, 0, 255));
-	//iso.add(Shape.Prism(new Point(0, 0, 0), 1, 1, 2), new Color(0, 0, 255));
-	iso.add(Shape.Prism(new Point(0, 0, 0), 1, 1, 1), new Color(0, 0, 255));
-
-	angle += 2 * Math.PI / 60;
+	avatar.draw(iso);
 }
 
-setInterval(scene, 100);
-
-
-/*  utils end */
-
-requestAnimFrame(animate);
-
-function animate() {
-	renderer.render(stage);
-	requestAnimFrame(animate);
-}
