@@ -1,19 +1,21 @@
 package oni
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 )
 
 type Master struct {
-	Addr, Rpc string
-	homeTempl *template.Template
+	Addr, Rpc             string
+	homeTempl, loginTempl *template.Template
 }
 
 func NewMaster() *Master {
 	return &Master{
-		homeTempl: template.Must(template.ParseFiles("templates/index.html")),
+		homeTempl:  template.Must(template.ParseFiles("templates/index.html")),
+		loginTempl: template.Must(template.ParseFiles("templates/login.html")),
 	}
 }
 
@@ -40,6 +42,17 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		m.homeTempl.Execute(w, m)
+	case "/login":
+		if r.Method == "GET" {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			m.loginTempl.Execute(w, m)
+		} else if r.Method == "POST" {
+			r.ParseForm()
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			fmt.Fprintln(w, "POST", r.PostFormValue("login"), r.PostFormValue("password"))
+		} else {
+			http.Error(w, "Method nod allowed", 405)
+		}
 	default:
 		http.Error(w, "Not found", 404)
 	}
