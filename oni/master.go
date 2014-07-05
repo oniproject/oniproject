@@ -1,33 +1,31 @@
 package oni
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 )
 
-var homeTempl = template.Must(template.ParseFiles("templates/index.html"))
-
 type Master struct {
-	addr, rpc string
+	Addr, Rpc string
+	homeTempl *template.Template
 }
 
-func NewMaster(addr string, rpc string) *Master {
+func NewMaster() *Master {
 	return &Master{
-		addr: addr,
-		rpc:  rpc,
+		homeTempl: template.Must(template.ParseFiles("templates/index.html")),
 	}
 }
 
 func (m *Master) Run() {
-	log.Println("run MASTER:", m.addr, "rpc:", m.rpc)
+	log.Println("run MASTER:", m.Addr, "rpc:", m.Rpc)
 
-	// init RPC
+	// TODO: init RPC
 
 	// run http server
 	http.Handle("/", m)
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
-	err := http.ListenAndServe(m.addr, nil)
+	err := http.ListenAndServe(m.Addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
@@ -41,7 +39,7 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		homeTempl.Execute(w, m)
+		m.homeTempl.Execute(w, m)
 	default:
 		http.Error(w, "Not found", 404)
 	}
