@@ -2,18 +2,18 @@
   "name": "oniproject",
   "version": "0.0.0",
   "description": "",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "isomer": "git+https://github.com/jdan/isomer.git",
-    "gulp-livereload": "~1.5.0",
     "browserify": "~4.1.6",
+    "cbor": "^0.3.10",
+    "connect": "~2.18.0",
+    "filesaver.js": "~0.1.0",
     "gulp": "~3.7.0",
     "gulp-buffer": "0.0.2",
-    "vinyl-source-stream": "~0.1.1",
+    "gulp-livereload": "~1.5.0",
     "gulp-watch": "~0.6.5",
-    "connect": "~2.18.0",
-    "filesaver.js": "~0.1.0"
+    "isomer": "git+https://github.com/jdan/isomer.git",
+    "vinyl-source-stream": "~0.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
