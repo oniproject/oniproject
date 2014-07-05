@@ -5,7 +5,6 @@
   "dependencies": {},
   "devDependencies": {
     "browserify": "~4.1.6",
-    "cbor": "^0.3.10",
     "connect": "~2.18.0",
     "filesaver.js": "~0.1.0",
     "gulp": "~3.7.0",

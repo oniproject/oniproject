@@ -1,6 +1,7 @@
 'use strict';
 
 console.log("fuck");
+var Net = require('./net');
 
 var Isomer = require('isomer');
 var Map = require('./map');
