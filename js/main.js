@@ -2,6 +2,10 @@
 
 console.log("fuck");
 var Net = require('./net');
+var net = new Net('ws://localhost:2000/');
+net.on('message', function(obj) {
+	//console.log('message', obj);
+});
 
 var Isomer = require('isomer');
 var Map = require('./map');

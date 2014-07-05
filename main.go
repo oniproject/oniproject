@@ -23,14 +23,19 @@ func main() {
 	}
 	switch {
 	case *master:
-		m := oni.NewMaster()
+		module := oni.NewMaster()
 		// configure
-		if err := yaml.Unmarshal(conf, &m); err != nil {
+		if err := yaml.Unmarshal(conf, &module); err != nil {
 			log.Panicln("[master] Fail unmarshal config file", err)
 		}
-		m.Run()
+		module.Run()
 	case *game:
-		// TODO run game
+		module := oni.NewGame()
+		// configure
+		if err := yaml.Unmarshal(conf, &module); err != nil {
+			log.Panicln("[game] Fail unmarshal config file", err)
+		}
+		module.Run()
 		//log.Println("run GAME:", *addr, "rpc:", *rpc)
 	case *database:
 		// TODO run database

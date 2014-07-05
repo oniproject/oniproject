@@ -47,6 +47,14 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			m.loginTempl.Execute(w, m)
 		} else if r.Method == "POST" {
+			auth, err := store.New(r, "auth")
+			if err != nil {
+				http.Error(w, http.StatusText(504), 504)
+				log.Println(err)
+				return
+			}
+			auth.Values["id"] = uint64(1)
+			auth.Save(r, w)
 			r.ParseForm()
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			fmt.Fprintln(w, "POST", r.PostFormValue("login"), r.PostFormValue("password"))
