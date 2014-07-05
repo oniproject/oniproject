@@ -1,3 +1,5 @@
+'use strict';
+
 var EventEmitter = require('events').EventEmitter;
 
 function Net(url) {
@@ -18,7 +20,12 @@ function Net(url) {
 		that.emit("close", event);
 	};
 	websocket.onmessage = function(event) {
-		that.emit("message", CBOR.decode(event.data), event);
+		var message = CBOR.decode(event.data);
+		if (typeof message == "number") {
+			that.emit("tick", message);
+		} else {
+			that.emit("message", message, event);
+		}
 	};
 }
 Net.prototype = EventEmitter.prototype;

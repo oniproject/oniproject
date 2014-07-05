@@ -58,6 +58,7 @@ func (gm *Game) replication() {
 		st.State = *state
 		st.Lag = avatar.Lag
 		st.Tick = gm.tick
+		log.Println(st)
 
 		gm.broadcast <- st
 	}
@@ -106,6 +107,7 @@ func (gm *Game) Run() {
 			break
 		case c := <-gm.register:
 			gm.avatars[c] = false
+			send(c, gm.tick)
 			log.Println("register", c)
 		case c := <-gm.unregister:
 			if gm.avatars[c] {

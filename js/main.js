@@ -4,7 +4,7 @@ console.log("fuck");
 var Net = require('./net');
 var net = new Net('ws://localhost:2000/');
 net.on('message', function(obj) {
-	//console.log('message', obj);
+	console.log('message', obj);
 });
 
 var Isomer = require('isomer');
@@ -113,6 +113,10 @@ function render() {
 setInterval(animate, 1000.0 / 30);
 function animate() {
 	avatars[player].move(dir.join(''));
+	//net.send(new Float32Array([avatars[player].velocity.x, avatars[player].velocity.y]));
+	net.send([avatars[player].velocity.x, avatars[player].velocity.y]);
+	//net.send(avatars[player].velocity);
+
 
 	for(var i in avatars) {
 		avatars[i].update(1.0/30);
