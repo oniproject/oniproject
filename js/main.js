@@ -129,6 +129,20 @@ function render() {
 	iso.add(Stairs(new Point(0, 3, 1)).rotateZ(new Point(0.5, 3.5, 1), -Math.PI / 2));
 	iso.add(Stairs(new Point(2, 0, 2)).rotateZ(new Point(2.5, 0.5, 0), -Math.PI / 2));
 
+	var xx = [
+		[1,1,1,1],
+		[1,0,0,1],
+		[1,1,1,1],
+	];
+
+	for(var y=0,yl=xx.length;y<yl;y++) {
+		for(var x=0,xl=xx[y].length;x<xl;x++) {
+			if(xx[y][x] != 0) {
+				iso.add(Shape.Prism(new Point(x, y,  0), 1,1,0.1));
+			}
+		}
+	}
+
 	for(var i in avatars) {
 		avatars[i].draw(iso);
 	}

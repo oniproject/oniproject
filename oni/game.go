@@ -32,25 +32,18 @@ func NewGame() (gm *Game) {
 			broadcast:  make(chan interface{}),
 		},
 	}
+	w, h := 4, 3
+	gm.Map.Grid.Init(w, h)
+	for _, line := range gm.Map.Grid.cells {
+		line[0] = true
+		line[w-1] = true
+	}
+	for i := range gm.Map.Grid.cells[0] {
+		gm.Map.Grid.cells[0][i] = true
+		gm.Map.Grid.cells[h-1][i] = true
+	}
 	return
 }
-
-/*func (gm *Game) replication() {
-	var states []interface{}
-	for avatar := range gm.avatars {
-		if avatar == nil {
-			continue
-		}
-
-		state := avatar.Update(gm.tick, TickRate)
-		if state == nil {
-			continue
-		}
-
-		states = append(states, state)
-	}
-	gm.broadcast <- states
-}*/
 
 func (gm *Game) Run() {
 	log.Println("run GAME:", gm.Addr, "rpc:", gm.Rpc)
@@ -97,5 +90,5 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gm.Map.RunAvatar(ws, AvatarData{Id: Id(id)})
+	gm.Map.RunAvatar(ws, AvatarData{Id: Id(id), Position: Point{1, 1}})
 }

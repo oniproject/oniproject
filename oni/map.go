@@ -11,17 +11,16 @@ type Map struct {
 	avatars              map[*Avatar]bool
 	register, unregister chan *Avatar
 	broadcast            chan interface{}
+	Grid                 Grid
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
-	// TODO load data
 	conn := AvatarConnection{
-		game:        m,
 		ws:          ws,
 		sendMessage: make(chan interface{}, 256),
 		ping_pong:   time.Now(),
 	}
-	c := &Avatar{data, conn}
+	c := &Avatar{data, conn, m}
 
 	m.register <- c
 	go c.writePump()
@@ -67,19 +66,6 @@ func (gm *Map) Run() {
 			}
 		}
 	}()
-
-	// TODO: init RPC
-
-	/*end := make(chan bool)
-	// run http server
-	go func() {
-		http.Handle("/", gm)
-		err := http.ListenAndServe(gm.Addr, nil)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-		end <- true
-	}()*/
 
 	for {
 		select {

@@ -32,6 +32,7 @@ type AvatarData struct {
 type Avatar struct {
 	AvatarData
 	AvatarConnection
+	game *Map
 }
 
 func (a *Avatar) GetState(typ uint8, tick uint) *State {
@@ -40,10 +41,14 @@ func (a *Avatar) GetState(typ uint8, tick uint) *State {
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
 	if a.Veloctity[0] != 0 || a.Veloctity[1] != 0 {
+		pos := Point{a.Position[0], a.Position[1]}
 		for i := range a.Position {
 			delta := a.Veloctity[i] * t.Seconds()
-			a.Position[i] += delta
+			pos[i] += delta
 			a.lastvel[i] = a.Veloctity[i]
+		}
+		if !a.game.Grid.IsWall(pos) {
+			a.Position = pos
 		}
 		state = a.GetState(STATE_MOVE, tick)
 		return
