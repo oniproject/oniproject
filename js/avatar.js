@@ -16,6 +16,7 @@ function Avatar() {
 	this.velocity = new Point(0, 0, 0);
 	this.speed = 1.0;
 	this.angle = 0;
+	this.rot = 1;
 	var c = new Color();
 	c.h = Math.random();
 	c.s = 0.8;
@@ -32,7 +33,7 @@ Avatar.prototype.draw = function(iso) {
 }
 
 Avatar.prototype.update = function(time) {
-	this.angle += 1 * Math.PI * time;
+	this.angle += this.rot * Math.PI * time;
 	this.position.x += this.velocity.x * time;
 	this.position.y += this.velocity.y * time;
 	this.position.z += this.velocity.z * time;
