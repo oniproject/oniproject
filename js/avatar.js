@@ -16,13 +16,19 @@ function Avatar() {
 	this.velocity = new Point(0, 0, 0);
 	this.speed = 1.0;
 	this.angle = 0;
+	var c = new Color();
+	c.h = Math.random();
+	c.s = 0.8;
+	c.l = 0.3;
+	c.loadRGB();
+	this.color = c;
 }
 
 Avatar.prototype.draw = function(iso) {
 	var pos = this.position;
-	//iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)), new Color(0xCC, 0, 0));
+	//iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)), this.color);
 	iso.add(Octahedron(new Point(pos.x-0.5, pos.y-0.5, pos.z))
-		.rotateZ(new Point(pos.x, pos.y, pos.z+0.5), this.angle), new Color(0, 180, 180));
+		.rotateZ(new Point(pos.x, pos.y, pos.z+0.5), this.angle), this.color);
 }
 
 Avatar.prototype.update = function(time) {
