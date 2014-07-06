@@ -70,9 +70,12 @@ func (gm *Map) Run() {
 	for {
 		select {
 		case c := <-gm.register:
-			gm.avatars[c] = false
 			send(c, gm.tick)
-			send(c, c.GetState(STATE_CREATE, gm.tick))
+			for ava := range gm.avatars {
+				send(c, ava.GetState(STATE_CREATE, gm.tick))
+			}
+			gm.avatars[c] = false
+			go func() { gm.broadcast <- c.GetState(STATE_CREATE, gm.tick) }()
 			log.Println("register", c)
 		case c := <-gm.unregister:
 			delete(gm.avatars, c)

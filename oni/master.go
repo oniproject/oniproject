@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Master struct {
@@ -63,16 +64,24 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			m.loginTempl.Execute(w, m)
 		} else if r.Method == "POST" {
+			r.ParseForm()
 			auth, err := store.New(r, "auth")
 			if err != nil {
 				http.Error(w, http.StatusText(504), 504)
 				log.Println(err)
 				return
 			}
-			auth.Values["id"] = uint64(1)
+			if n, err := strconv.ParseUint(r.PostFormValue("login"), 16, 64); err != nil {
+				http.Error(w, http.StatusText(504), 504)
+				log.Println(err)
+				return
+			} else {
+				auth.Values["id"] = n
+			}
 			auth.Save(r, w)
-			r.ParseForm()
+
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			http.Redirect(w, r, "/game", 301)
 			fmt.Fprintln(w, "POST", r.PostFormValue("login"), r.PostFormValue("password"))
 		} else {
 			http.Error(w, http.StatusText(405), 405)
