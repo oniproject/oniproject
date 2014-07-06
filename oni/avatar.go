@@ -28,7 +28,7 @@ func (a *Avatar) GetState() *State {
 }
 
 func (a *Avatar) Update(t time.Duration) (state *State) {
-	if a.Veloctity[0] != 0 || a.Veloctity[0] != 0 {
+	if a.Veloctity[0] != 0 || a.Veloctity[1] != 0 {
 		for i := range a.Position {
 			delta := a.Veloctity[i] * t.Seconds()
 			a.Position[i] += delta
