@@ -3,30 +3,45 @@ package main
 import (
 	"./oni"
 	"flag"
+	"fmt"
+	"gopkg.in/yaml.v1"
+	"io/ioutil"
 	"log"
 )
 
-var addr = flag.String("addr", ":8000", "http address")
-var rpc = flag.String("rpc", ":7000", "rpc address for connect to master")
+var config = flag.String("conf", "default", "config file")
 var master = flag.Bool("master", false, "this is a master")
 var game = flag.Bool("game", false, "this is a game mechanic")
 var database = flag.Bool("db", false, "this is a database")
 
 func main() {
 	flag.Parse()
+	fname := fmt.Sprintf("config/%s.yml", *config)
+	conf, err := ioutil.ReadFile(fname)
+	if err != nil {
+		log.Panicln("Fail load config file", err)
+	}
 	switch {
 	case *master:
-		m := oni.NewMaster(*addr, *rpc)
+		module := oni.NewMaster()
 		// configure
-		m.Run()
+		if err := yaml.Unmarshal(conf, &module); err != nil {
+			log.Panicln("[master] Fail unmarshal config file", err)
+		}
+		module.Run()
 	case *game:
-		// TODO run game
-		log.Println("run GAME:", *addr, "rpc:", *rpc)
+		module := oni.NewGame()
+		// configure
+		if err := yaml.Unmarshal(conf, &module); err != nil {
+			log.Panicln("[game] Fail unmarshal config file", err)
+		}
+		module.Run()
+		//log.Println("run GAME:", *addr, "rpc:", *rpc)
 	case *database:
 		// TODO run database
-		log.Println("run DATABASE:", *addr, "rpc:", *rpc)
+		//log.Println("run DATABASE:", *addr, "rpc:", *rpc)
 	default:
 		// TODO run all
-		log.Println("run ALL:", *addr, "rpc:", *rpc)
+		//log.Println("run ALL:", *addr, "rpc:", *rpc)
 	}
 }

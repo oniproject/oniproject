@@ -1,0 +1,22 @@
+{
+  "name": "oniproject",
+  "version": "0.0.0",
+  "description": "",
+  "dependencies": {},
+  "devDependencies": {
+    "browserify": "~4.1.6",
+    "connect": "~2.18.0",
+    "filesaver.js": "~0.1.0",
+    "gulp": "~3.7.0",
+    "gulp-buffer": "0.0.2",
+    "gulp-livereload": "~1.5.0",
+    "gulp-watch": "~0.6.5",
+    "isomer": "git+https://github.com/jdan/isomer.git",
+    "vinyl-source-stream": "~0.1.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lain-dono",
+  "license": "MIT"
+}
