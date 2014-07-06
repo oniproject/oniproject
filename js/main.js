@@ -5,24 +5,37 @@ console.log("fuck");
 var Isomer = require('isomer');
 var Map = require('./map');
 var Avatar = require('./avatar');
-var avatars = {1: new Avatar()};
+var avatars = {};
 var player = 1;
 
 var Net = require('./net');
 var net = new Net('ws://localhost:2000/');
-net.on('message', function(message) {
-	if(Array.isArray(message)) {
-		for(var i=0, l=message.length; i<l; i++) {
-			var state = message[i];
-			if (state.hasOwnProperty('Id')) {
+function state_msg(state) {
+	if (state.hasOwnProperty('Id')) {
+		switch(state.Type) {
+			case 2: // destroy
+				delete avatars[state.Id];
+				break;
+			case 1: // create
+				avatars[state.Id] = new Avatar(state.Position, state.Veloctity)
+			case 0: // idle
+			case 3: // move
 				var avatar = avatars[state.Id];
 				avatar.position.x = state.Position[0];
 				avatar.position.y = state.Position[1];
 				avatar.velocity.x = state.Veloctity[0];
 				avatar.velocity.y = state.Veloctity[1];
-			}
+				break;
+		}
+	}
+}
+net.on('message', function(message) {
+	if(Array.isArray(message)) {
+		for(var i=0, l=message.length; i<l; i++) {
+			state_msg(message[i]);
 		}
 	} else {
+		state_msg(message);
 		console.log('message', message, Array.isArray(message));
 	}
 });
@@ -84,7 +97,9 @@ function resize() {
 	iso.canvas.height = h;
 
 	renderer.resize(w, h);
-	iso.reorigin(avatars[player].position);
+	if(avatars.hasOwnProperty(player)) {
+		iso.reorigin(avatars[player].position);
+	}
 }
 
 var listener = new window.keypress.Listener();
@@ -121,15 +136,17 @@ function render() {
 	renderer.render(stage);
 }
 
-setInterval(animate, 1000.0 / 30);
+setInterval(animate, 50);
 function animate() {
-	avatars[player].move(dir.join(''));
-	net.send([avatars[player].velocity.x, avatars[player].velocity.y]);
-
-	for(var i in avatars) {
-		avatars[i].update(1.0/30);
+	if(avatars.hasOwnProperty(player)) {
+		avatars[player].move(dir.join(''));
 	}
-
-	iso.reorigin(avatars[player].position);
+	for(var i in avatars) {
+		avatars[i].update(0.05);
+	}
+	if(avatars.hasOwnProperty(player)) {
+		net.send([avatars[player].velocity.x, avatars[player].velocity.y]);
+		iso.reorigin(avatars[player].position);
+	}
 }
 

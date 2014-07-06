@@ -6,7 +6,15 @@ import (
 
 type Point [2]float64
 
+const (
+	STATE_IDLE = iota
+	STATE_CREATE
+	STATE_DESTROY
+	STATE_MOVE
+)
+
 type State struct {
+	Type      uint8
 	Id        uint64        `json:"id"`
 	Tick      uint          `json:"tick"`
 	Lag       time.Duration `json:"lag"`
@@ -26,8 +34,8 @@ type Avatar struct {
 	AvatarConnection
 }
 
-func (a *Avatar) GetState(tick uint) *State {
-	return &State{uint64(a.Id), tick, a.Lag, a.Position, a.Veloctity}
+func (a *Avatar) GetState(typ uint8, tick uint) *State {
+	return &State{typ, uint64(a.Id), tick, a.Lag, a.Position, a.Veloctity}
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
@@ -37,13 +45,13 @@ func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
 			a.Position[i] += delta
 			a.lastvel[i] = a.Veloctity[i]
 		}
-		state = a.GetState(tick)
+		state = a.GetState(STATE_MOVE, tick)
 		return
 	}
 
-	if a.lastvel[0] != 0 || a.lastvel[0] != 0 {
+	if a.lastvel[0] != 0 || a.lastvel[1] != 0 {
 		a.lastvel = [2]float64{0, 0}
-		state = a.GetState(tick)
+		state = a.GetState(STATE_IDLE, tick)
 	}
 
 	return

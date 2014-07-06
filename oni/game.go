@@ -97,12 +97,12 @@ func (gm *Game) Run() {
 		case c := <-gm.register:
 			gm.avatars[c] = false
 			send(c, gm.tick)
+			send(c, c.GetState(STATE_CREATE, gm.tick))
 			log.Println("register", c)
 		case c := <-gm.unregister:
-			if gm.avatars[c] {
-				delete(gm.avatars, c)
-				close(c.sendMessage)
-			}
+			delete(gm.avatars, c)
+			close(c.sendMessage)
+			go func() { gm.broadcast <- c.GetState(STATE_DESTROY, gm.tick) }()
 			log.Println("unregister", c)
 		case m := <-gm.broadcast:
 			for c := range gm.avatars {

@@ -11,10 +11,10 @@ var Path = Isomer.Path;
 var Shape = Isomer.Shape;
 var Color = Isomer.Color;
 
-function Avatar(pos, speed) {
-	this.position = pos || new Point(3, 2, 3.2);
+function Avatar() {
+	this.position = new Point(0, 0, 0);
 	this.velocity = new Point(0, 0, 0);
-	this.speed = speed || 1.0;
+	this.speed = 1.0;
 	this.angle = 0;
 }
 
