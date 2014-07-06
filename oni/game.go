@@ -19,24 +19,23 @@ var store = sessions.NewCookieStore(
 type Id uint64
 
 type Game struct {
-	Addr, Rpc            string
-	tick                 uint
-	avatars              map[*Avatar]bool
-	register, unregister chan *Avatar
-	broadcast            chan interface{}
+	Addr, Rpc string
+	Map       Map
 }
 
 func NewGame() (gm *Game) {
 	gm = &Game{
-		register:   make(chan *Avatar),
-		unregister: make(chan *Avatar),
-		avatars:    make(map[*Avatar]bool),
-		broadcast:  make(chan interface{}),
+		Map: Map{
+			register:   make(chan *Avatar),
+			unregister: make(chan *Avatar),
+			avatars:    make(map[*Avatar]bool),
+			broadcast:  make(chan interface{}),
+		},
 	}
 	return
 }
 
-func (gm *Game) replication() {
+/*func (gm *Game) replication() {
 	var states []interface{}
 	for avatar := range gm.avatars {
 		if avatar == nil {
@@ -51,64 +50,19 @@ func (gm *Game) replication() {
 		states = append(states, state)
 	}
 	gm.broadcast <- states
-}
+}*/
 
 func (gm *Game) Run() {
 	log.Println("run GAME:", gm.Addr, "rpc:", gm.Rpc)
-	send := func(c *Avatar, m interface{}) {
-		select {
-		case c.sendMessage <- m:
-		default:
-			delete(gm.avatars, c)
-			close(c.sendMessage)
-		}
-	}
-
-	go func() {
-		t := time.NewTicker(TickRate)
-		for {
-			select {
-			case <-t.C:
-				gm.tick++
-				gm.broadcast <- gm.tick
-
-				gm.replication()
-			}
-		}
-	}()
 
 	// TODO: init RPC
 
-	end := make(chan bool)
+	go gm.Map.Run()
 	// run http server
-	go func() {
-		http.Handle("/", gm)
-		err := http.ListenAndServe(gm.Addr, nil)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-		end <- true
-	}()
-
-	for {
-		select {
-		case <-end:
-			break
-		case c := <-gm.register:
-			gm.avatars[c] = false
-			send(c, gm.tick)
-			send(c, c.GetState(STATE_CREATE, gm.tick))
-			log.Println("register", c)
-		case c := <-gm.unregister:
-			delete(gm.avatars, c)
-			close(c.sendMessage)
-			go func() { gm.broadcast <- c.GetState(STATE_DESTROY, gm.tick) }()
-			log.Println("unregister", c)
-		case m := <-gm.broadcast:
-			for c := range gm.avatars {
-				send(c, m)
-			}
-		}
+	http.Handle("/", gm)
+	err := http.ListenAndServe(gm.Addr, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
 	}
 }
 
@@ -143,17 +97,5 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO load data
-	data := AvatarData{Id: Id(id)}
-	conn := AvatarConnection{
-		game:        gm,
-		ws:          ws,
-		sendMessage: make(chan interface{}, 256),
-		ping_pong:   time.Now(),
-	}
-	c := &Avatar{data, conn}
-
-	gm.register <- c
-	go c.writePump()
-	c.readPump()
+	gm.Map.RunAvatar(ws, AvatarData{Id: Id(id)})
 }

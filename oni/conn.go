@@ -23,7 +23,7 @@ var upgrader = websocket.Upgrader{
 }
 
 type AvatarConnection struct {
-	game        *Game
+	game        *Map
 	ws          *websocket.Conn
 	sendMessage chan interface{}
 	ping_pong   time.Time

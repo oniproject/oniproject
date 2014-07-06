@@ -140,12 +140,12 @@ setInterval(animate, 50);
 function animate() {
 	if(avatars.hasOwnProperty(player)) {
 		avatars[player].move(dir.join(''));
+		net.send([avatars[player].velocity.x, avatars[player].velocity.y]);
 	}
 	for(var i in avatars) {
 		avatars[i].update(0.05);
 	}
 	if(avatars.hasOwnProperty(player)) {
-		net.send([avatars[player].velocity.x, avatars[player].velocity.y]);
 		iso.reorigin(avatars[player].position);
 	}
 }

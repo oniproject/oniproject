@@ -15,11 +15,11 @@ const (
 
 type State struct {
 	Type      uint8
-	Id        uint64        `json:"id"`
-	Tick      uint          `json:"tick"`
-	Lag       time.Duration `json:"lag"`
-	Position  Point         `json:"x"`
-	Veloctity Point         `json:"v"`
+	Id        uint64
+	Tick      uint
+	Lag       time.Duration
+	Position  Point
+	Veloctity Point
 }
 type AvatarData struct {
 	Id        Id
