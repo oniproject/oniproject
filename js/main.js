@@ -135,8 +135,8 @@ function render() {
 		[1,1,1,1],
 	];
 
-	for(var y=0,yl=xx.length;y<yl;y++) {
-		for(var x=0,xl=xx[y].length;x<xl;x++) {
+	for(var y=xx.length-1;y>=0;y--) {
+		for(var x=xx[y].length-1;x>=0;x--) {
 			if(xx[y][x] != 0) {
 				iso.add(Shape.Prism(new Point(x, y,  0), 1,1,0.1));
 			}
