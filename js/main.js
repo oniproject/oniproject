@@ -43,10 +43,12 @@ var w = window.innerWidth,
 	renderer = PIXI.autoDetectRenderer(w, h);
 document.body.appendChild(renderer.view);
 
-var graphics = new PIXI.Graphics();
-stage.addChild(graphics);
-
-graphics.path = function (points, color) {
+var iso = new Isomer(renderer.view);
+iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
+iso.colorDifference = 0.2;
+iso.canvas = new PIXI.Graphics();
+stage.addChild(iso.canvas);
+iso.canvas.path = function (points, color) {
 	var c = color.r * 256 * 256 + color.g * 256 + color.b;
 	this.beginFill(c, color.a);
 	this.moveTo(points[0].x, points[0].y);
@@ -57,11 +59,6 @@ graphics.path = function (points, color) {
 
 	this.endFill();
 }
-
-var iso = new Isomer(renderer.view);
-iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
-iso.colorDifference = 0.2;
-iso.canvas = graphics;
 
 var map = new Map(iso);
 map.objects = require('./test-map').objects;
@@ -83,8 +80,8 @@ function resize() {
 	w = window.innerWidth;
 	h = window.innerHeight;
 
-	graphics.width = w;
-	graphics.height = h;
+	iso.canvas.width = w;
+	iso.canvas.height = h;
 
 	renderer.resize(w, h);
 	iso.reorigin(avatars[player].position);
@@ -109,7 +106,7 @@ listener.register_many(move_combos);
 requestAnimFrame(render);
 function render() {
 	requestAnimFrame(render);
-	graphics.clear();
+	iso.canvas.clear();
 
 	map.render(iso);
 
