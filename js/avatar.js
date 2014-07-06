@@ -14,7 +14,7 @@ var Color = Isomer.Color;
 function Avatar(pos, speed) {
 	this.position = pos || new Point(3, 2, 3.2);
 	this.velocity = new Point(0, 0, 0);
-	this.speed = speed || 4.0;
+	this.speed = speed || 1.0;
 	this.angle = 0;
 }
 

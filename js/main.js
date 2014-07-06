@@ -1,15 +1,31 @@
 'use strict';
 
 console.log("fuck");
-var Net = require('./net');
-var net = new Net('ws://localhost:2000/');
-net.on('message', function(obj) {
-	console.log('message', obj);
-});
 
 var Isomer = require('isomer');
 var Map = require('./map');
 var Avatar = require('./avatar');
+var avatars = {1: new Avatar()};
+var player = 1;
+
+var Net = require('./net');
+var net = new Net('ws://localhost:2000/');
+net.on('message', function(message) {
+	if(Array.isArray(message)) {
+		for(var i=0, l=message.length; i<l; i++) {
+			var state = message[i];
+			if (state.hasOwnProperty('Id')) {
+				var avatar = avatars[state.Id];
+				avatar.position.x = state.Position[0];
+				avatar.position.y = state.Position[1];
+				avatar.velocity.x = state.Veloctity[0];
+				avatar.velocity.y = state.Veloctity[1];
+			}
+		}
+	} else {
+		console.log('message', message, Array.isArray(message));
+	}
+});
 
 /* Some convenient renames */
 var Point = Isomer.Point;
@@ -47,8 +63,6 @@ iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
 iso.colorDifference = 0.2;
 iso.canvas = graphics;
 
-var avatars = {4661: new Avatar()};
-var player = 4661;
 var map = new Map(iso);
 map.objects = require('./test-map').objects;
 
@@ -113,10 +127,7 @@ function render() {
 setInterval(animate, 1000.0 / 30);
 function animate() {
 	avatars[player].move(dir.join(''));
-	//net.send(new Float32Array([avatars[player].velocity.x, avatars[player].velocity.y]));
 	net.send([avatars[player].velocity.x, avatars[player].velocity.y]);
-	//net.send(avatars[player].velocity);
-
 
 	for(var i in avatars) {
 		avatars[i].update(1.0/30);

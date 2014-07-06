@@ -6,25 +6,27 @@ function Net(url) {
 	var websocket = new WebSocket(url);
 	this.ws = websocket;
 	var that = this;
-	websocket.binaryType = "arraybuffer";
+	websocket.binaryType = 'arraybuffer';
 	websocket.onopen = function(event) {
-		console.info("Net open", url);
-		that.emit("open", event);
+		console.info('Net open', url);
+		that.emit('open', event);
 	};
 	websocket.onerror = function(event) {
-		console.info("Net error", event);
-		that.emit("error", event);
+		console.info('Net error', event);
+		that.emit('error', event);
 	};
 	websocket.onclose = function(event) {
-		console.info("Net close");
-		that.emit("close", event);
+		console.info('Net close');
+		that.emit('close', event);
 	};
 	websocket.onmessage = function(event) {
 		var message = CBOR.decode(event.data);
-		if (typeof message == "number") {
-			that.emit("tick", message);
-		} else {
-			that.emit("message", message, event);
+		switch (typeof message) {
+		case 'number':
+			that.emit('tick', message);
+			break;
+		default:
+			that.emit('message', message, event);
 		}
 	};
 }

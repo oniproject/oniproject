@@ -44,6 +44,7 @@ func (c *Avatar) readPump() {
 		return nil
 	})
 
+Loop:
 	for {
 		op, message, err := c.ws.ReadMessage()
 		if err != nil {
@@ -56,23 +57,24 @@ func (c *Avatar) readPump() {
 		case websocket.BinaryMessage:
 			buf := bytes.NewBuffer(message)
 			decoder := cbor.NewDecoder(buf)
-			var vel interface{}
+			var vel []interface{}
 			if err := decoder.Decode(&vel); err != nil {
 				// TODO add time limit
 				//c.game.broadcast <- string(message)
-				continue
+				continue Loop
 			}
-			switch vl := vel.(type) {
-			case []float64:
-				for i := range c.Veloctity {
-					c.Veloctity[i] = float64(vl[i])
-				}
-			case []uint:
-				for i := range c.Veloctity {
-					c.Veloctity[i] = float64(vl[i])
+			for i := range c.Veloctity {
+				switch vl := vel[i].(type) {
+				case float64:
+					c.Veloctity[i] = float64(vl)
+				case int64:
+					c.Veloctity[i] = float64(vl)
+				case uint64:
+					c.Veloctity[i] = float64(vl)
+				case uint:
+					c.Veloctity[i] = float64(vl)
 				}
 			}
-
 		}
 	}
 }

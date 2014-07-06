@@ -37,31 +37,20 @@ func NewGame() (gm *Game) {
 }
 
 func (gm *Game) replication() {
-	type state_msg struct {
-		Id    uint64        `json:"id"`
-		Lag   time.Duration `json:"lag"`
-		State State         `json:"state"`
-		Tick  uint          `json:"tick"`
-	}
+	var states []interface{}
 	for avatar := range gm.avatars {
 		if avatar == nil {
 			continue
 		}
 
-		state := avatar.Update(TickRate)
+		state := avatar.Update(gm.tick, TickRate)
 		if state == nil {
 			continue
 		}
 
-		var st state_msg
-		st.Id = uint64(avatar.Id)
-		st.State = *state
-		st.Lag = avatar.Lag
-		st.Tick = gm.tick
-		log.Println(st)
-
-		gm.broadcast <- st
+		states = append(states, state)
 	}
+	gm.broadcast <- states
 }
 
 func (gm *Game) Run() {
