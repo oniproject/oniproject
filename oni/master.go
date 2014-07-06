@@ -36,12 +36,28 @@ func (m *Master) Run() {
 func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprintln(w, "index")
+	case "/game":
 		if r.Method != "GET" {
-			http.Error(w, "Method nod allowed", 405)
+			http.Error(w, http.StatusText(405), 405)
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		m.homeTempl.Execute(w, m)
+	case "/logout":
+		if r.Method != "GET" {
+			http.Error(w, "Method nod allowed", 405)
+			return
+		}
+		auth, err := store.Get(r, "auth")
+		if err != nil {
+			http.Error(w, http.StatusText(504), 504)
+			log.Println(err)
+			return
+		}
+		delete(auth.Values, "id")
+		auth.Save(r, w)
 	case "/login":
 		if r.Method == "GET" {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -59,7 +75,7 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			fmt.Fprintln(w, "POST", r.PostFormValue("login"), r.PostFormValue("password"))
 		} else {
-			http.Error(w, "Method nod allowed", 405)
+			http.Error(w, http.StatusText(405), 405)
 		}
 	default:
 		http.Error(w, "Not found", 404)
