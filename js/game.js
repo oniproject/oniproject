@@ -33,14 +33,16 @@ function Game(renderer, stage, player, url, map) {
 	stage.addChild(iso.canvas);
 	iso.canvas.path = function (points, color) {
 		var c = color.r * 256 * 256 + color.g * 256 + color.b;
-		this.beginFill(c, color.a);
-		this.moveTo(points[0].x, points[0].y);
-
+		var graphics = this; // for moar speed
+		graphics.beginFill(c, color.a).moveTo(points[0].x, points[0].y);
 		for (var i = 1; i < points.length; i++) {
-			this.lineTo(points[i].x, points[i].y);
+			graphics.lineTo(points[i].x, points[i].y);
 		}
-
-		this.endFill();
+		// XXX hack for pixi v1.6.0
+		if (points.length % 2) {
+			graphics.lineTo(points[0].x, points[0].y);
+		}
+		graphics.endFill();
 	}
 	this.iso = iso;
 
@@ -49,8 +51,8 @@ function Game(renderer, stage, player, url, map) {
 }
 
 Game.prototype.resize = function(w, h) {
-	this.iso.canvas.width = w;
-	this.iso.canvas.height = h;
+	this.iso.canvas.x = w/4;
+	this.iso.canvas.y = h/4;
 
 	if(this.avatars.hasOwnProperty(this.player)) {
 		this.iso.reorigin(this.avatars[this.player].position);
