@@ -3,6 +3,7 @@ package oni
 import (
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
+	"github.com/lain-dono/jps.go"
 	"log"
 	"net/http"
 	"time"
@@ -24,23 +25,17 @@ type Game struct {
 }
 
 func NewGame() (gm *Game) {
+	s := `XXXX
+X..X
+XXXX`
 	gm = &Game{
 		Map: Map{
 			register:   make(chan *Avatar),
 			unregister: make(chan *Avatar),
 			avatars:    make(map[*Avatar]bool),
 			broadcast:  make(chan interface{}),
+			Grid:       jps.FromString(s, 8, 6),
 		},
-	}
-	w, h := 4, 3
-	gm.Map.Grid.Init(w, h)
-	for _, line := range gm.Map.Grid.cells {
-		line[0] = true
-		line[w-1] = true
-	}
-	for i := range gm.Map.Grid.cells[0] {
-		gm.Map.Grid.cells[0][i] = true
-		gm.Map.Grid.cells[h-1][i] = true
 	}
 	return
 }

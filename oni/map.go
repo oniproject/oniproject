@@ -2,6 +2,7 @@ package oni
 
 import (
 	"github.com/gorilla/websocket"
+	"github.com/lain-dono/jps.go"
 	"log"
 	"time"
 )
@@ -11,7 +12,7 @@ type Map struct {
 	avatars              map[*Avatar]bool
 	register, unregister chan *Avatar
 	broadcast            chan interface{}
-	Grid                 Grid
+	Grid                 *jps.Grid
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {

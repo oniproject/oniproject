@@ -47,7 +47,8 @@ func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
 			pos[i] += delta
 			a.lastvel[i] = a.Veloctity[i]
 		}
-		if !a.game.Grid.IsWall(pos) {
+		// XXX {nil} for testing
+		if a.game == nil || a.game.Grid.Walkable(int(pos[0]), int(pos[1])) {
 			a.Position = pos
 		}
 		state = a.GetState(STATE_MOVE, tick)
