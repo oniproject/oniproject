@@ -9,7 +9,7 @@ var w = window.innerWidth,
 document.body.appendChild(renderer.view);
 
 var Game = require('./game');
-window.game = new Game(renderer, stage, 1, 'ws://localhost:2000', require('./test-map'));
+window.game = new Game(renderer, stage, 1, 'ws://' +window.location.hostname+ ':2000', require('./test-map'));
 
 window.onresize = resize;
 resize();

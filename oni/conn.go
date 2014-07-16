@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"code.google.com/p/cbor/go"
 	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
 	"time"
 )
@@ -43,7 +44,6 @@ func (c *Avatar) readPump() {
 		return nil
 	})
 
-Loop:
 	for {
 		op, message, err := c.ws.ReadMessage()
 		if err != nil {
@@ -57,23 +57,28 @@ Loop:
 			buf := bytes.NewBuffer(message)
 			decoder := cbor.NewDecoder(buf)
 			var vel []interface{}
-			if err := decoder.Decode(&vel); err != nil {
-				// TODO add time limit
-				//c.game.broadcast <- string(message)
-				continue Loop
+			if err := decoder.Decode(&vel); err == nil {
+				c.parseVel(vel)
 			}
-			for i := range c.Veloctity {
-				switch vl := vel[i].(type) {
-				case float64:
-					c.Veloctity[i] = float64(vl)
-				case int64:
-					c.Veloctity[i] = float64(vl)
-				case uint64:
-					c.Veloctity[i] = float64(vl)
-				case uint:
-					c.Veloctity[i] = float64(vl)
-				}
+			var iii interface{}
+			if err := decoder.Decode(&iii); err == nil {
+				log.Printf("%T %v", iii, iii)
 			}
+		}
+	}
+}
+
+func (c *Avatar) parseVel(vel []interface{}) {
+	for i := range c.Veloctity {
+		switch vl := vel[i].(type) {
+		case float64:
+			c.Veloctity[i] = float64(vl)
+		case int64:
+			c.Veloctity[i] = float64(vl)
+		case uint64:
+			c.Veloctity[i] = float64(vl)
+		case uint:
+			c.Veloctity[i] = float64(vl)
 		}
 	}
 }

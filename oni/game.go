@@ -3,7 +3,6 @@ package oni
 import (
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
-	"github.com/lain-dono/jps.go"
 	"log"
 	"net/http"
 	"time"
@@ -13,31 +12,22 @@ const (
 	TickRate = 50 * time.Millisecond
 )
 
-var store = sessions.NewCookieStore(
+var store = sessions.NewFilesystemStore(
+	"./tmp",
 	[]byte("auth"),
+	nil,
+	//[]byte("1111111111111111"),
 )
 
 type Id uint64
 
 type Game struct {
 	Addr, Rpc string
-	Map       Map
+	Map       *Map
 }
 
-func NewGame() (gm *Game) {
-	s := `XXXX
-X..X
-XXXX`
-	gm = &Game{
-		Map: Map{
-			register:   make(chan *Avatar),
-			unregister: make(chan *Avatar),
-			avatars:    make(map[*Avatar]bool),
-			broadcast:  make(chan interface{}),
-			Grid:       jps.FromString(s, 8, 6),
-		},
-	}
-	return
+func NewGame() *Game {
+	return &Game{Map: NewMap()}
 }
 
 func (gm *Game) Run() {
@@ -59,16 +49,16 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	auth, err := store.Get(r, "auth")
 	if err != nil {
 		http.Error(w, http.StatusText(401), 401)
-		log.Println(err)
-		log.Println("Unauthorized (fail session)")
+		log.Println("Unauthorized (fail session)", err)
 		return
 	}
 	var id uint64
-	ok := false
-	if id, ok = auth.Values["id"].(uint64); !ok {
+	if n, ok := auth.Values["id"].(uint64); !ok {
 		http.Error(w, http.StatusText(401), 401)
-		log.Println("Unauthorized fail id", id, auth.Values["id"])
+		log.Println("Unauthorized fail id", n, auth.Values["id"])
 		return
+	} else {
+		id = n
 	}
 
 	if r.Method != "GET" {

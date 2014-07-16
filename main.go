@@ -4,6 +4,7 @@ import (
 	"./oni"
 	"flag"
 	"fmt"
+	//"github.com/gocircuit/circuit/client"
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"log"
@@ -14,13 +15,17 @@ var master = flag.Bool("master", false, "this is a master")
 var game = flag.Bool("game", false, "this is a game mechanic")
 var database = flag.Bool("db", false, "this is a database")
 
+var circuit = flag.String("c", "", "circuit address")
+
 func main() {
+	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)
 	flag.Parse()
-	fname := fmt.Sprintf("config/%s.yml", *config)
-	conf, err := ioutil.ReadFile(fname)
+
+	conf, err := ioutil.ReadFile(fmt.Sprintf("config/%s.yml", *config))
 	if err != nil {
 		log.Panicln("Fail load config file", err)
 	}
+
 	switch {
 	case *master:
 		module := oni.NewMaster()

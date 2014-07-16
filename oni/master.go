@@ -2,6 +2,7 @@ package oni
 
 import (
 	"fmt"
+	"github.com/gorilla/sessions"
 	"html/template"
 	"log"
 	"net/http"
@@ -38,7 +39,8 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprintln(w, "index")
+		auth, _ := store.Get(r, "auth")
+		fmt.Fprintln(w, "index", auth.Values)
 	case "/game":
 		if r.Method != "GET" {
 			http.Error(w, http.StatusText(405), 405)
@@ -58,31 +60,32 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		delete(auth.Values, "id")
-		auth.Save(r, w)
+		sessions.Save(r, w)
 	case "/login":
 		if r.Method == "GET" {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			m.loginTempl.Execute(w, m)
 		} else if r.Method == "POST" {
 			r.ParseForm()
-			auth, err := store.New(r, "auth")
+			login := r.PostFormValue("login")
+			pass := r.PostFormValue("password")
+			auth, err := store.Get(r, "auth")
 			if err != nil {
 				http.Error(w, http.StatusText(504), 504)
 				log.Println(err)
 				return
 			}
-			if n, err := strconv.ParseUint(r.PostFormValue("login"), 16, 64); err != nil {
+			if id, err := strconv.ParseUint(login, 16, 64); err != nil {
 				http.Error(w, http.StatusText(504), 504)
 				log.Println(err)
 				return
 			} else {
-				auth.Values["id"] = n
+				auth.Values["id"] = id
 			}
-			auth.Save(r, w)
-
+			sessions.Save(r, w)
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			http.Redirect(w, r, "/game", 301)
-			fmt.Fprintln(w, "POST", r.PostFormValue("login"), r.PostFormValue("password"))
+			fmt.Fprintln(w, "POST", login, pass)
 		} else {
 			http.Error(w, http.StatusText(405), 405)
 		}

@@ -15,6 +15,20 @@ type Map struct {
 	Grid                 *jps.Grid
 }
 
+func NewMap() *Map {
+	// TODO remove it
+	s := `XXXX
+X..X
+XXXX`
+	return &Map{
+		register:   make(chan *Avatar),
+		unregister: make(chan *Avatar),
+		avatars:    make(map[*Avatar]bool),
+		broadcast:  make(chan interface{}),
+		Grid:       jps.FromString(s, 8, 6),
+	}
+}
+
 func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 	conn := AvatarConnection{
 		ws:          ws,

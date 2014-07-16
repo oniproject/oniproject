@@ -1,3 +1,7 @@
+'use strict';
+
+var EventEmitter = require('events').EventEmitter;
+
 var Isomer = require('isomer');
 Isomer.prototype.reorigin = function(point) {
 	var xMap = new Point(point.x * this.transformation[0][0],
@@ -6,8 +10,8 @@ Isomer.prototype.reorigin = function(point) {
 	var yMap = new Point(point.y * this.transformation[1][0],
 					   point.y * this.transformation[1][1]);
 
-	this.originX = - xMap.x - yMap.x + (this.canvas.width / 2.0);
-	this.originY = + xMap.y + yMap.y + (point.z * this.scale) + (this.canvas.height / 2.0);
+	this.originX = - xMap.x - yMap.x + (this.canvas._width / 2.0);
+	this.originY = + xMap.y + yMap.y + (point.z * this.scale) + (this.canvas._height / 2.0);
 }
 
 var Point = Isomer.Point;
@@ -50,9 +54,12 @@ function Game(renderer, stage, player, url, map) {
 	this.map.objects = map.objects;
 }
 
+Game.prototype = EventEmitter.prototype;
+Game.prototype.constructor = Game;
+
 Game.prototype.resize = function(w, h) {
-	this.iso.canvas.x = w/4;
-	this.iso.canvas.y = h/4;
+	this.iso.canvas._width = w;
+	this.iso.canvas._height = h;
 
 	if(this.avatars.hasOwnProperty(this.player)) {
 		this.iso.reorigin(this.avatars[this.player].position);
