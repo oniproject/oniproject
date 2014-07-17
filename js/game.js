@@ -26,6 +26,7 @@ function Game(renderer, stage, player, url, map) {
 	this.stage = stage;
 	this.dir = [' ', ' '];
 	this.player = player;
+	this.target = 0;
 	this.avatars = {};
 
 	var net = new Net(url);
@@ -33,6 +34,7 @@ function Game(renderer, stage, player, url, map) {
 	net.on('message', this.onmessage.bind(this));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
+	net.on('SetTargetMsg', this.ontarget.bind(this));
 
 	var iso = new Isomer(renderer.view);
 	this.iso = iso;
@@ -174,6 +176,11 @@ Game.prototype.onmessage = function(message) {
 
 Game.prototype.onevent = function(type, message) {
 	console.log('event', type, message);
+}
+
+Game.prototype.ontarget = function(message) {
+	console.log('target', message);
+	this.target = message.Target;
 }
 
 Game.prototype.onfire = function(message) {

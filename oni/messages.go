@@ -37,26 +37,6 @@ func WrapMessage(message interface{}) interface{} {
 }
 
 func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
-	var md mapstructure.Metadata
-	config := &mapstructure.DecoderConfig{
-		Metadata:         &md,
-		WeaklyTypedInput: true,
-	}
-
-	decode := func() error {
-		decoder, err := mapstructure.NewDecoder(config)
-		if err != nil {
-			return err
-		}
-		if err := decoder.Decode(value); err != nil {
-			return err
-		}
-		if len(md.Unused) != 0 {
-			log.Println(md.Unused)
-		}
-		return nil
-	}
-
 	var message Message
 	switch _type {
 	case M_SetVelocityMsg:
@@ -71,8 +51,29 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 	default:
 		return nil, errors.New("fail type")
 	}
-	config.Result = message
-	return message, decode()
+
+	var md mapstructure.Metadata
+	config := &mapstructure.DecoderConfig{
+		Metadata:         &md,
+		WeaklyTypedInput: true,
+		Result:           message,
+	}
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		return nil, err
+	}
+
+	// init message form value
+	if err := decoder.Decode(value); err != nil {
+		return nil, err
+	}
+
+	// XXX debug
+	if len(md.Unused) != 0 {
+		log.Println("have unused", md.Unused, value)
+	}
+
+	return message, nil
 }
 
 type SetVelocityMsg struct {
