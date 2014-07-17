@@ -10,6 +10,12 @@ type Message interface {
 	Run(interface{})
 }
 
+const (
+	_ = iota
+	// Client -> Server only
+	M_SetVelocityMsg
+)
+
 func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 	var md mapstructure.Metadata
 	config := &mapstructure.DecoderConfig{
@@ -29,7 +35,7 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 	}
 
 	switch _type {
-	case 1:
+	case M_SetVelocityMsg:
 		var mm SetVelocityMsg
 		config.Result = &mm
 		return &mm, decode()

@@ -99,7 +99,7 @@ Game.prototype.animate = function(time) {
 	if(this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
 		player.move(this.dir.join(''));
-		this.net.send({T:1, V: player.velocity});
+		this.net.SetVelocityMsg(player.velocity);
 	}
 	for(var i in this.avatars) {
 		this.avatars[i].update(0.05);

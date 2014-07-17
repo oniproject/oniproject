@@ -39,4 +39,12 @@ Net.prototype.send = function(message) {
 	this.ws.send(CBOR.encode(message));
 }
 
+/*
+ * MESSAGES
+ */
+
+Net.prototype.SetVelocityMsg = function(data) {
+	this.send({T:1, V: data});
+}
+
 module.exports = Net;
