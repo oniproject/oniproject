@@ -27,21 +27,7 @@ function Net(url) {
 			break;
 		case 'object':
 			if(message.hasOwnProperty('T')) {
-				var type = message.T|0;
-				var value = message.V;
-				switch(type) {
-					case 1:
-						that.emit('SetVelocityMsg', value, event);
-						break;
-					case 2:
-						that.emit('SetTargetMsg', value, event);
-						break;
-					case 3:
-						that.emit('FireMsg', value, event);
-						break;
-					default:
-						that.emit('event', type, value, event);
-				}
+				that._ParseMessages(message.T|0, message.V, event);
 				break;
 			}
 		default:
@@ -61,6 +47,22 @@ Net.prototype.send = function(message) {
 /*
  * MESSAGES
  */
+
+Net.prototype._ParseMessages = function(type, value, event) {
+	switch(type) {
+		case 1:
+			this.emit('SetVelocityMsg', value);
+			break;
+		case 2:
+			this.emit('SetTargetMsg', value);
+			break;
+		case 3:
+			this.emit('FireMsg', value);
+			break;
+		default:
+			this.emit('event', type, value, event);
+	}
+}
 
 Net.prototype.SetVelocityMsg = function(data) {
 	this.send({T:1, V: data});
