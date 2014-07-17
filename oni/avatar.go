@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-type Point [2]float64
-
 const (
 	STATE_IDLE = iota
 	STATE_CREATE
