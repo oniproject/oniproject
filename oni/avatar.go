@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-type Point [2]float64
-
 const (
 	STATE_IDLE = iota
 	STATE_CREATE
@@ -32,7 +30,8 @@ type AvatarData struct {
 type Avatar struct {
 	AvatarData
 	AvatarConnection
-	game *Map
+	Target Id
+	game   *Map
 }
 
 func (a *Avatar) GetState(typ uint8, tick uint) *State {

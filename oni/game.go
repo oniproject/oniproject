@@ -18,8 +18,6 @@ var store = sessions.NewFilesystemStore(
 	nil,
 )
 
-type Id uint64
-
 type Game struct {
 	Addr, Rpc string
 	Map       *Map

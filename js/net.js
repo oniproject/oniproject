@@ -25,6 +25,11 @@ function Net(url) {
 		case 'number':
 			that.emit('tick', message);
 			break;
+		case 'object':
+			if(message.hasOwnProperty('T')) {
+				that._ParseMessages(message.T|0, message.V, event);
+				break;
+			}
 		default:
 			that.emit('message', message, event);
 		}
@@ -43,8 +48,30 @@ Net.prototype.send = function(message) {
  * MESSAGES
  */
 
+Net.prototype._ParseMessages = function(type, value, event) {
+	switch(type) {
+		case 1:
+			this.emit('SetVelocityMsg', value);
+			break;
+		case 2:
+			this.emit('SetTargetMsg', value);
+			break;
+		case 3:
+			this.emit('FireMsg', value);
+			break;
+		default:
+			this.emit('event', type, value, event);
+	}
+}
+
 Net.prototype.SetVelocityMsg = function(data) {
 	this.send({T:1, V: data});
+}
+Net.prototype.SetTargetMsg = function(data) {
+	this.send({T:2, V: data});
+}
+Net.prototype.FireMsg = function(data) {
+	this.send({T:3, V: data});
 }
 
 module.exports = Net;

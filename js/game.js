@@ -26,11 +26,18 @@ function Game(renderer, stage, player, url, map) {
 	this.stage = stage;
 	this.dir = [' ', ' '];
 	this.player = player;
+	this.target = 0;
 	this.avatars = {};
-	this.net = new Net(url);
-	this.net.on('message', this.onmessage.bind(this));
+
+	var net = new Net(url);
+	this.net = net;
+	net.on('message', this.onmessage.bind(this));
+	net.on('event', this.onevent.bind(this));
+	net.on('FireMsg', this.onfire.bind(this));
+	net.on('SetTargetMsg', this.ontarget.bind(this));
 
 	var iso = new Isomer(renderer.view);
+	this.iso = iso;
 	iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
 	iso.colorDifference = 0.2;
 	iso.canvas = new PIXI.Graphics();
@@ -48,7 +55,24 @@ function Game(renderer, stage, player, url, map) {
 		}
 		graphics.endFill();
 	}
-	this.iso = iso;
+
+	var game = this;
+	iso.canvas.setInteractive(true);
+	iso.canvas.click = function(event) {
+		for(var id in game.avatars) {
+			if(game.avatars.hasOwnProperty(id)) {
+				var a = game.avatars[id];
+				var pos = iso._translatePoint(a.position);
+				var x = event.global.x - pos.x;
+				var y = event.global.y - pos.y;
+				var d = Math.sqrt(x*x + y*y);
+				if(d < 50) {
+					net.SetTargetMsg({id: id});
+					console.log("xxx", id, d, pos, event.global);
+				}
+			}
+		}
+	}
 
 	this.map = new Map(this.iso);
 	this.map.objects = map.objects;
@@ -60,6 +84,8 @@ Game.prototype.constructor = Game;
 Game.prototype.resize = function(w, h) {
 	this.iso.canvas._width = w;
 	this.iso.canvas._height = h;
+
+	this.iso.canvas.hitArea = new PIXI.Rectangle(0,0, w,h);
 
 	if(this.avatars.hasOwnProperty(this.player)) {
 		this.iso.reorigin(this.avatars[this.player].position);
@@ -146,6 +172,19 @@ Game.prototype.onmessage = function(message) {
 			console.log('message', message);
 		}
 	}
+}
+
+Game.prototype.onevent = function(type, message) {
+	console.log('event', type, message);
+}
+
+Game.prototype.ontarget = function(message) {
+	console.log('target', message);
+	this.target = message.Target;
+}
+
+Game.prototype.onfire = function(message) {
+	console.log('fire', message);
 }
 
 module.exports = Game;
