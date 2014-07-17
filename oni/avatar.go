@@ -32,7 +32,8 @@ type AvatarData struct {
 type Avatar struct {
 	AvatarData
 	AvatarConnection
-	game *Map
+	Target Id
+	game   *Map
 }
 
 func (a *Avatar) GetState(typ uint8, tick uint) *State {
