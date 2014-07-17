@@ -16,7 +16,6 @@ var store = sessions.NewFilesystemStore(
 	"./tmp",
 	[]byte("auth"),
 	nil,
-	//[]byte("1111111111111111"),
 )
 
 type Id uint64

@@ -44,6 +44,7 @@ func (c *Avatar) readPump() {
 		return nil
 	})
 
+Loop:
 	for {
 		op, message, err := c.ws.ReadMessage()
 		if err != nil {
@@ -54,15 +55,18 @@ func (c *Avatar) readPump() {
 		switch op {
 		case websocket.TextMessage:
 		case websocket.BinaryMessage:
-			buf := bytes.NewBuffer(message)
-			decoder := cbor.NewDecoder(buf)
-			var vel []interface{}
-			if err := decoder.Decode(&vel); err == nil {
-				c.parseVel(vel)
+			var val struct {
+				T uint8
+				V map[string]interface{}
 			}
-			var iii interface{}
-			if err := decoder.Decode(&iii); err == nil {
-				log.Printf("%T %v", iii, iii)
+
+			buf := bytes.NewBuffer(message)
+			if err := cbor.NewDecoder(buf).Decode(&val); err != nil {
+				log.Println(err)
+				continue Loop
+			}
+			if m, err := ParseMessage(val.T, val.V); err == nil {
+				m.Run(c)
 			}
 		}
 	}
