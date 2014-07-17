@@ -10,7 +10,7 @@ func TestAvatarUpdateNil(t *testing.T) {
 		[2]float64{0, 0},
 		[2]float64{0, 0},
 		[2]float64{0, 0}}}
-	state := avatar.Update(0)
+	state := avatar.Update(1, 0)
 
 	if state != nil {
 		t.Fail()
@@ -22,7 +22,7 @@ func TestAvatarUpdateSimple(t *testing.T) {
 		[2]float64{0, 0},
 		[2]float64{1, 2},
 		[2]float64{0, 0}}}
-	state := avatar.Update(1 * time.Second)
+	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
 	if state == nil {
@@ -38,7 +38,7 @@ func TestAvatarUpdateOnlyX(t *testing.T) {
 		[2]float64{0, 0},
 		[2]float64{2, 0},
 		[2]float64{0, 0}}}
-	state := avatar.Update(1 * time.Second)
+	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
 	if state == nil {
@@ -54,7 +54,7 @@ func TestAvatarUpdateOnlyY(t *testing.T) {
 		[2]float64{0, 0},
 		[2]float64{0, 2},
 		[2]float64{0, 0}}}
-	state := avatar.Update(1 * time.Second)
+	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
 	if state == nil {
@@ -70,7 +70,7 @@ func TestAvatarUpdateZero(t *testing.T) {
 		[2]float64{0, 1},
 		[2]float64{0, 0},
 		[2]float64{1, 0}}}
-	state := avatar.Update(1 * time.Second)
+	state := avatar.Update(1, 1*time.Second)
 
 	if state == nil {
 		t.Fail()
