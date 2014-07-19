@@ -4,7 +4,6 @@ import (
 	"./oni"
 	"flag"
 	"fmt"
-	//"github.com/gocircuit/circuit/client"
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"log"
