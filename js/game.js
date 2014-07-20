@@ -22,6 +22,8 @@ var Avatar = require('./avatar');
 var Net = require('./net');
 
 function Game(renderer, stage, player, url, map) {
+	this.initKeyboard();
+
 	this.renderer = renderer;
 	this.stage = stage;
 	this.dir = [' ', ' '];
@@ -81,6 +83,30 @@ function Game(renderer, stage, player, url, map) {
 Game.prototype = EventEmitter.prototype;
 Game.prototype.constructor = Game;
 
+Game.prototype.initKeyboard = function() {
+	var listener = new window.keypress.Listener();
+	this.listener = listener;
+
+	var move_combos = [
+		{keys:'w', on_keydown: function() { this.dir[0]='N'; }, on_keyup: function() { this.dir[0]=' '; }, },
+		{keys:'a', on_keydown: function() { this.dir[1]='W'; }, on_keyup: function() { this.dir[1]=' '; }, },
+		{keys:'s', on_keydown: function() { this.dir[0]='S'; }, on_keyup: function() { this.dir[0]=' '; }, },
+		{keys:'d', on_keydown: function() { this.dir[1]='E'; }, on_keyup: function() { this.dir[1]=' '; }, },
+
+		{keys:'e', on_keydown: function() { this.avatars[this.player].velocity.z=1; }, on_keyup: function() { this.avatars[this.player].velocity.z=0; }, },
+		{keys:'q', on_keydown: function() { this.avatars[this.player].velocity.z=-1; }, on_keyup: function() { this.avatars[this.player].velocity.z=0; }, },
+	];
+	this.move_combos = move_combos;
+
+	for(var i=0,l=move_combos.length;i<l;i++) {
+		var combo = move_combos[i];
+		combo.on_keyup = combo.on_keyup.bind(this);
+		combo.on_keydown = combo.on_keydown.bind(this);
+	}
+
+	listener.register_many(move_combos);
+}
+
 Game.prototype.resize = function(w, h) {
 	this.iso.canvas._width = w;
 	this.iso.canvas._height = h;
@@ -103,9 +129,12 @@ Game.prototype.render = function(time) {
 	iso.add(Stairs(new Point(2, 0, 2)).rotateZ(new Point(2.5, 0.5, 0), -Math.PI / 2));
 
 	var xx = [
-		[1,1,1,1],
-		[1,0,0,1],
-		[1,1,1,1],
+		[1,1,1,1,1,1],
+		[1,0,0,0,0,1],
+		[1,0,0,0,0,1],
+		[1,0,0,1,0,1],
+		[1,0,0,0,0,1],
+		[1,1,1,1,1,1],
 	];
 
 	for(var y=xx.length-1;y>=0;y--) {

@@ -45,7 +45,13 @@ func main() {
 		// TODO run database
 		//log.Println("run DATABASE:", *addr, "rpc:", *rpc)
 	default:
-		// TODO run all
-		//log.Println("run ALL:", *addr, "rpc:", *rpc)
+		module := oni.NewMaster()
+		// configure
+		if err := yaml.Unmarshal(conf, &module); err != nil {
+			log.Panicln("[master] Fail unmarshal config file", err)
+		}
+		balancer := oni.NewBalancer("")
+		go module.Run()
+		balancer.Game.Run()
 	}
 }

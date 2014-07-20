@@ -17,9 +17,12 @@ type Map struct {
 
 func NewMap() *Map {
 	// TODO remove it
-	s := `XXXX
-X..X
-XXXX`
+	s := `XXXXXX
+X....X
+X....X
+X..X.X
+X....X
+XXXXXX`
 	return &Map{
 		register:   make(chan *Avatar),
 		unregister: make(chan *Avatar),

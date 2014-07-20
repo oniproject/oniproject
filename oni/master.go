@@ -1,6 +1,7 @@
 package oni
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"html/template"
@@ -68,24 +69,38 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if r.Method == "POST" {
 			r.ParseForm()
 			login := r.PostFormValue("login")
-			pass := r.PostFormValue("password")
+			//pass := r.PostFormValue("password")
+
+			// TODO auth
+
 			auth, err := store.Get(r, "auth")
 			if err != nil {
 				http.Error(w, http.StatusText(504), 504)
 				log.Println(err)
 				return
 			}
+
+			var x struct {
+				Id   uint64
+				Host string
+			}
+			x.Host = "localhost:2000"
+
 			if id, err := strconv.ParseUint(login, 16, 64); err != nil {
 				http.Error(w, http.StatusText(504), 504)
 				log.Println(err)
 				return
 			} else {
 				auth.Values["id"] = id
+				x.Id = id
 			}
 			sessions.Save(r, w)
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			http.Redirect(w, r, "/game", 301)
-			fmt.Fprintln(w, "POST", login, pass)
+			//http.Redirect(w, r, "/game", 301)
+
+			s, _ := json.Marshal(x)
+			//fmt.Fprint(w, "POST", login, pass)
+			fmt.Fprint(w, string(s))
 		} else {
 			http.Error(w, http.StatusText(405), 405)
 		}
