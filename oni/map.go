@@ -2,7 +2,7 @@ package oni
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/lain-dono/jps.go"
+	"jps"
 	"log"
 	"time"
 )
