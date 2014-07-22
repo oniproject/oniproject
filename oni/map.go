@@ -7,9 +7,14 @@ import (
 	"time"
 )
 
+type GameObject interface {
+	Update(tick uint, t time.Duration) *State
+	GetState(typ uint8, tick uint) *State
+}
+
 type Map struct {
 	tick                 uint
-	avatars              map[*Avatar]bool
+	objects              map[GameObject]bool
 	register, unregister chan *Avatar
 	broadcast            chan interface{}
 	Grid                 *jps.Grid
@@ -26,7 +31,7 @@ XXXXXX`
 	return &Map{
 		register:   make(chan *Avatar),
 		unregister: make(chan *Avatar),
-		avatars:    make(map[*Avatar]bool),
+		objects:    make(map[GameObject]bool),
 		broadcast:  make(chan interface{}),
 		Grid:       jps.FromString(s, 8, 6),
 	}
@@ -54,12 +59,12 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 
 func (gm *Map) replication() {
 	var states []interface{}
-	for avatar := range gm.avatars {
-		if avatar == nil {
+	for obj := range gm.objects {
+		if obj == nil {
 			continue
 		}
 
-		state := avatar.Update(gm.tick, TickRate)
+		state := obj.Update(gm.tick, TickRate)
 		if state == nil {
 			continue
 		}
@@ -74,7 +79,7 @@ func (gm *Map) Run() {
 		select {
 		case c.sendMessage <- m:
 		default:
-			delete(gm.avatars, c)
+			delete(gm.objects, c)
 			close(c.sendMessage)
 		}
 	}
@@ -96,20 +101,22 @@ func (gm *Map) Run() {
 		select {
 		case c := <-gm.register:
 			send(c, gm.tick)
-			for ava := range gm.avatars {
+			for ava := range gm.objects {
 				send(c, ava.GetState(STATE_CREATE, gm.tick))
 			}
-			gm.avatars[c] = false
+			gm.objects[c] = false
 			go func() { gm.broadcast <- c.GetState(STATE_CREATE, gm.tick) }()
 			log.Println("register", c)
 		case c := <-gm.unregister:
-			delete(gm.avatars, c)
+			delete(gm.objects, c)
 			close(c.sendMessage)
 			go func() { gm.broadcast <- c.GetState(STATE_DESTROY, gm.tick) }()
 			log.Println("unregister", c)
 		case m := <-gm.broadcast:
-			for c := range gm.avatars {
-				send(c, m)
+			for c := range gm.objects {
+				if ava, ok := c.(*Avatar); ok {
+					send(ava, m)
+				}
 			}
 		}
 	}
