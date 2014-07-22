@@ -15,7 +15,7 @@ type GameObject interface {
 type Map struct {
 	tick                 uint
 	objects              map[GameObject]bool
-	register, unregister chan *Avatar
+	register, unregister chan GameObject
 	broadcast            chan interface{}
 	Grid                 *jps.Grid
 }
@@ -29,8 +29,8 @@ X..X.X
 X....X
 XXXXXX`
 	return &Map{
-		register:   make(chan *Avatar),
-		unregister: make(chan *Avatar),
+		register:   make(chan GameObject),
+		unregister: make(chan GameObject),
 		objects:    make(map[GameObject]bool),
 		broadcast:  make(chan interface{}),
 		Grid:       jps.FromString(s, 8, 6),
@@ -99,19 +99,23 @@ func (gm *Map) Run() {
 
 	for {
 		select {
-		case c := <-gm.register:
-			send(c, gm.tick)
-			for ava := range gm.objects {
-				send(c, ava.GetState(STATE_CREATE, gm.tick))
+		case obj := <-gm.register:
+			if c, ok := obj.(*Avatar); ok {
+				send(c, gm.tick)
+				for ava := range gm.objects {
+					send(c, ava.GetState(STATE_CREATE, gm.tick))
+				}
 			}
-			gm.objects[c] = false
-			go func() { gm.broadcast <- c.GetState(STATE_CREATE, gm.tick) }()
-			log.Println("register", c)
-		case c := <-gm.unregister:
-			delete(gm.objects, c)
-			close(c.sendMessage)
-			go func() { gm.broadcast <- c.GetState(STATE_DESTROY, gm.tick) }()
-			log.Println("unregister", c)
+			gm.objects[obj] = false
+			go func() { gm.broadcast <- obj.GetState(STATE_CREATE, gm.tick) }()
+			log.Println("register", obj)
+		case obj := <-gm.unregister:
+			delete(gm.objects, obj)
+			if c, ok := obj.(*Avatar); ok {
+				close(c.sendMessage)
+			}
+			go func() { gm.broadcast <- obj.GetState(STATE_DESTROY, gm.tick) }()
+			log.Println("unregister", obj)
 		case m := <-gm.broadcast:
 			for c := range gm.objects {
 				if ava, ok := c.(*Avatar); ok {
