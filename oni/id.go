@@ -12,7 +12,7 @@ func NewAvatarId(v uint64) (id Id) {
 
 // FIXME string is to long
 func (id Id) String() string {
-	return strconv.FormatUint(uint64(id), 16)
+	return strconv.FormatUint(uint64(id), 10)
 }
 
 func (id Id) IsAvatar() bool {

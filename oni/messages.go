@@ -84,7 +84,7 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
-	a.Veloctity = Point{m.X, m.Y}
+	a.data.Veloctity = Point{m.X, m.Y}
 }
 
 type SetTargetMsg struct {
@@ -108,9 +108,22 @@ func (m *FireMsg) Run(obj interface{}) {
 		log.Println("fire FAIL: zero target", m)
 		return
 	}
-	if a.Target == a.Id {
+	if a.Target == a.Id() {
 		log.Println("fire FAIL: is you id", m)
 		return
 	}
+
+	if m.Type == 0 {
+		a.game.Send(Id(a.Target), &CloseMsg{})
+	}
+
 	log.Println("fire OK", m)
+}
+
+type CloseMsg struct{}
+
+func (m *CloseMsg) Run(obj interface{}) {
+	log.Println("UnregisterMsg", obj)
+	a := obj.(*Avatar)
+	a.ws.Close()
 }

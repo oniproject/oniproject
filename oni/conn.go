@@ -66,7 +66,9 @@ Loop:
 				continue Loop
 			}
 			if m, err := ParseMessage(val.T, val.V); err == nil {
-				m.Run(c)
+				c.Send(m)
+			} else {
+				log.Println(err)
 			}
 		}
 	}

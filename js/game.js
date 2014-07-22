@@ -34,6 +34,7 @@ function Game(renderer, stage, player, url, map) {
 	var net = new Net(url);
 	this.net = net;
 	net.on('message', this.onmessage.bind(this));
+	net.on('close', alert.bind(null, "close WS"));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
