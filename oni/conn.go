@@ -72,21 +72,6 @@ Loop:
 	}
 }
 
-func (c *Avatar) parseVel(vel []interface{}) {
-	for i := range c.Veloctity {
-		switch vl := vel[i].(type) {
-		case float64:
-			c.Veloctity[i] = float64(vl)
-		case int64:
-			c.Veloctity[i] = float64(vl)
-		case uint64:
-			c.Veloctity[i] = float64(vl)
-		case uint:
-			c.Veloctity[i] = float64(vl)
-		}
-	}
-}
-
 func (c *Avatar) writeMessage(message interface{}) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteJSON(message)
