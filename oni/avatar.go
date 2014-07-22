@@ -44,8 +44,8 @@ func (a *Avatar) GetState(typ uint8, tick uint) *State {
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
-	if a.Veloctity[0] != 0 || a.Veloctity[1] != 0 {
-		pos := Point{a.Position[0], a.Position[1]}
+	if a.Veloctity.X() != 0 || a.Veloctity.Y() != 0 {
+		pos := Point{a.Position.X(), a.Position.Y()}
 		for i := range a.Position {
 			delta := a.Veloctity[i] * t.Seconds()
 			pos[i] += delta
