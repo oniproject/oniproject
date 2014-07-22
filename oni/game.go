@@ -5,11 +5,6 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
-	"time"
-)
-
-const (
-	TickRate = 50 * time.Millisecond
 )
 
 var store = sessions.NewFilesystemStore(
@@ -34,7 +29,7 @@ func (gm *Game) Run() {
 
 	go gm.Map.Run()
 	// run http server
-	http.Handle("/", gm)
+	http.Handle("/ws", gm)
 	err := http.ListenAndServe(gm.Addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

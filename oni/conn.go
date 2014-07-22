@@ -32,7 +32,7 @@ type AvatarConnection struct {
 
 func (c *Avatar) readPump() {
 	defer func() {
-		c.game.unregister <- c
+		c.game.Unregister(c)
 		c.ws.Close()
 	}()
 
@@ -66,23 +66,10 @@ Loop:
 				continue Loop
 			}
 			if m, err := ParseMessage(val.T, val.V); err == nil {
-				m.Run(c)
+				c.Send(m)
+			} else {
+				log.Println(err)
 			}
-		}
-	}
-}
-
-func (c *Avatar) parseVel(vel []interface{}) {
-	for i := range c.Veloctity {
-		switch vl := vel[i].(type) {
-		case float64:
-			c.Veloctity[i] = float64(vl)
-		case int64:
-			c.Veloctity[i] = float64(vl)
-		case uint64:
-			c.Veloctity[i] = float64(vl)
-		case uint:
-			c.Veloctity[i] = float64(vl)
 		}
 	}
 }

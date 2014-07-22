@@ -1,32 +1,66 @@
 package oni
 
 import (
-	"./jps"
 	"github.com/gorilla/websocket"
 	"log"
+	"oniproject/oni/jps"
 	"time"
 )
 
+const (
+	TickRate     = 50 * time.Millisecond
+	SpeedOfLight = 2
+	ReplicRange  = 4
+)
+
+type GameObject interface {
+	Update(tick uint, t time.Duration) *State
+	GetState(typ uint8, tick uint) *State
+	Position() Point
+	Send(Message)
+	Id() Id
+}
+
+// for message system
+type sender struct {
+	id Id
+	m  Message
+}
+
 type Map struct {
 	tick                 uint
-	avatars              map[*Avatar]bool
-	register, unregister chan *Avatar
-	broadcast            chan interface{}
+	objects              map[Id]GameObject
+	register, unregister chan GameObject
+	sendTo               chan sender
 	Grid                 *jps.Grid
 }
 
 func NewMap() *Map {
 	// TODO remove it
-	s := `XXXX
-X..X
-XXXX`
+	s := `XXXXXX
+X....X
+X....X
+X..X.X
+X....X
+XXXXXX`
 	return &Map{
-		register:   make(chan *Avatar),
-		unregister: make(chan *Avatar),
-		avatars:    make(map[*Avatar]bool),
-		broadcast:  make(chan interface{}),
+		register:   make(chan GameObject),
+		unregister: make(chan GameObject),
+		objects:    make(map[Id]GameObject),
+		sendTo:     make(chan sender),
 		Grid:       jps.FromString(s, 8, 6),
 	}
+}
+
+func (m *Map) Walkable(x, y int) bool {
+	return m.Grid.Walkable(x, y)
+}
+func (m *Map) Unregister(a *Avatar) {
+	go func() { m.unregister <- a }()
+}
+func (gm *Map) Send(id Id, m Message) {
+	go func() { gm.sendTo <- sender{id, m} }()
+	log.Println("Send: ", id, m)
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
@@ -35,28 +69,11 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 		sendMessage: make(chan interface{}, 256),
 		ping_pong:   time.Now(),
 	}
-	c := &Avatar{data, conn, 0, m}
+	c := &Avatar{data, conn, 0, m, Point{}}
 
 	m.register <- c
 	go c.writePump()
 	c.readPump()
-}
-
-func (gm *Map) replication() {
-	var states []interface{}
-	for avatar := range gm.avatars {
-		if avatar == nil {
-			continue
-		}
-
-		state := avatar.Update(gm.tick, TickRate)
-		if state == nil {
-			continue
-		}
-
-		states = append(states, state)
-	}
-	gm.broadcast <- states
 }
 
 func (gm *Map) Run() {
@@ -64,42 +81,77 @@ func (gm *Map) Run() {
 		select {
 		case c.sendMessage <- m:
 		default:
-			delete(gm.avatars, c)
-			close(c.sendMessage)
+			//delete(gm.objects, c.Id())
+			//close(c.sendMessage)
+			go func() { gm.unregister <- c }()
 		}
 	}
 
-	go func() {
-		t := time.NewTicker(TickRate)
-		for {
-			select {
-			case <-t.C:
-				gm.tick++
-				gm.broadcast <- gm.tick
-
-				gm.replication()
+	broadcast := func(m interface{}) {
+		for _, c := range gm.objects {
+			if ava, ok := c.(*Avatar); ok {
+				send(ava, m)
 			}
 		}
-	}()
+	}
+	broadcastMsg := func(m Message) {
+		for _, c := range gm.objects {
+			c.Send(m)
+		}
+	}
+
+	t := time.NewTicker(TickRate)
 
 	for {
 		select {
-		case c := <-gm.register:
-			send(c, gm.tick)
-			for ava := range gm.avatars {
-				send(c, ava.GetState(STATE_CREATE, gm.tick))
+		// replication
+		case <-t.C:
+			// send tick
+			gm.tick++
+			broadcast(gm.tick)
+
+			for _, obj := range gm.objects {
+				if state := obj.Update(gm.tick, TickRate); state != nil {
+					for _, c := range gm.objects {
+						if avatar, ok := c.(*Avatar); ok {
+							r := state.Position.SqrtDistance(avatar.Position())
+							switch {
+							case r < ReplicRange:
+								send(avatar, state)
+							// XXX for not send double messages
+							case r < ReplicRange+float64(SpeedOfLight*0.05):
+								avatar.Send(&DestroyMsg{state.Id, gm.tick})
+							}
+						}
+					}
+				}
 			}
-			gm.avatars[c] = false
-			go func() { gm.broadcast <- c.GetState(STATE_CREATE, gm.tick) }()
-			log.Println("register", c)
-		case c := <-gm.unregister:
-			delete(gm.avatars, c)
-			close(c.sendMessage)
-			go func() { gm.broadcast <- c.GetState(STATE_DESTROY, gm.tick) }()
-			log.Println("unregister", c)
-		case m := <-gm.broadcast:
-			for c := range gm.avatars {
-				send(c, m)
+
+		// create/destroy GameObject's
+		case obj := <-gm.register:
+			if c, ok := obj.(*Avatar); ok {
+				send(c, gm.tick)
+				for _, ava := range gm.objects {
+					send(c, ava.GetState(STATE_CREATE, gm.tick))
+				}
+			}
+			gm.objects[obj.Id()] = obj
+			broadcast(obj.GetState(STATE_IDLE, gm.tick))
+			log.Println("register", obj)
+		case obj := <-gm.unregister:
+			delete(gm.objects, obj.Id())
+			if c, ok := obj.(*Avatar); ok {
+				close(c.sendMessage)
+			}
+			broadcastMsg(&DestroyMsg{obj.Id().String(), gm.tick})
+			log.Println("unregister", obj)
+
+		// message system
+		case s := <-gm.sendTo:
+			if obj, ok := gm.objects[s.id]; ok {
+				obj.Send(s.m)
+			} else {
+				log.Printf("fail sendTo: broken ID %v %T", s, s.m)
 			}
 		}
 	}

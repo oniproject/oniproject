@@ -1,6 +1,7 @@
 package oni
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"html/template"
@@ -62,34 +63,55 @@ func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		delete(auth.Values, "id")
 		sessions.Save(r, w)
 	case "/login":
-		if r.Method == "GET" {
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			m.loginTempl.Execute(w, m)
-		} else if r.Method == "POST" {
-			r.ParseForm()
-			login := r.PostFormValue("login")
-			pass := r.PostFormValue("password")
-			auth, err := store.Get(r, "auth")
-			if err != nil {
-				http.Error(w, http.StatusText(504), 504)
-				log.Println(err)
-				return
-			}
-			if id, err := strconv.ParseUint(login, 16, 64); err != nil {
-				http.Error(w, http.StatusText(504), 504)
-				log.Println(err)
-				return
-			} else {
-				auth.Values["id"] = id
-			}
-			sessions.Save(r, w)
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			http.Redirect(w, r, "/game", 301)
-			fmt.Fprintln(w, "POST", login, pass)
-		} else {
-			http.Error(w, http.StatusText(405), 405)
-		}
+		m.login(w, r)
 	default:
 		http.Error(w, "Not found", 404)
+	}
+}
+
+func (m *Master) login(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		m.loginTempl.Execute(w, m)
+	} else if r.Method == "POST" {
+		r.ParseForm()
+		login := r.PostFormValue("login")
+		//pass := r.PostFormValue("password")
+
+		// TODO auth
+
+		auth, err := store.Get(r, "auth")
+		if err != nil {
+			http.Error(w, http.StatusText(504), 504)
+			log.Println(err)
+			return
+		}
+
+		var x struct {
+			//Id   uint64
+			Id   string
+			Host string
+		}
+		x.Host = "localhost:2000"
+
+		if id, err := strconv.ParseUint(login, 16, 64); err != nil {
+			http.Error(w, http.StatusText(504), 504)
+			log.Println(err)
+			return
+		} else {
+			id_ := NewAvatarId(id)
+			log.Printf("%b", id_)
+			auth.Values["id"] = uint64(id_)
+			x.Id = id_.String()
+		}
+		sessions.Save(r, w)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		//http.Redirect(w, r, "/game", 301)
+
+		s, _ := json.Marshal(x)
+		//fmt.Fprint(w, "POST", login, pass)
+		fmt.Fprint(w, string(s))
+	} else {
+		http.Error(w, http.StatusText(405), 405)
 	}
 }

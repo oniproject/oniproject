@@ -59,6 +59,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case 3:
 			this.emit('FireMsg', value);
 			break;
+		case 4:
+			this.emit('DestroyMsg', value);
+			break;
 		default:
 			this.emit('event', type, value, event);
 	}

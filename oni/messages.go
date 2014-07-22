@@ -17,8 +17,10 @@ const (
 	M_SetVelocityMsg
 	M_SetTargetMsg
 	M_FireMsg
+	M_DestroyMsg
 )
 
+// to client
 func WrapMessage(message interface{}) interface{} {
 	type MessageWraper struct {
 		T uint8
@@ -31,11 +33,14 @@ func WrapMessage(message interface{}) interface{} {
 		return &MessageWraper{M_SetTargetMsg, message}
 	case *FireMsg:
 		return &MessageWraper{M_FireMsg, message}
+	case *DestroyMsg:
+		return &MessageWraper{M_DestroyMsg, message}
 	}
 	log.Printf("fail type %T %v", message, message)
 	return message
 }
 
+// form client
 func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 	var message Message
 	switch _type {
@@ -84,7 +89,7 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
-	a.Veloctity = Point{m.X, m.Y}
+	a.data.Veloctity = Point{m.X, m.Y}
 }
 
 type SetTargetMsg struct {
@@ -103,14 +108,36 @@ type FireMsg struct {
 
 func (m *FireMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
-	a.sendMessage <- WrapMessage(m)
 	if a.Target == 0 {
 		log.Println("fire FAIL: zero target", m)
 		return
 	}
-	if a.Target == a.Id {
+	if a.Target == a.Id() {
 		log.Println("fire FAIL: is you id", m)
 		return
 	}
+
+	if m.Type == 0 {
+		a.game.Send(Id(a.Target), &CloseMsg{})
+	}
+
 	log.Println("fire OK", m)
+}
+
+type CloseMsg struct{}
+
+func (m *CloseMsg) Run(obj interface{}) {
+	log.Println("UnregisterMsg", obj)
+	a := obj.(*Avatar)
+	a.ws.Close()
+}
+
+type DestroyMsg struct {
+	Id string
+	T  uint // tick
+}
+
+func (m *DestroyMsg) Run(obj interface{}) {
+	a := obj.(*Avatar)
+	a.sendMessage <- WrapMessage(m)
 }
