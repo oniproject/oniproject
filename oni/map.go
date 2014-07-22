@@ -1,9 +1,9 @@
 package oni
 
 import (
-	"./jps"
 	"github.com/gorilla/websocket"
 	"log"
+	"oniproject/oni/jps"
 	"time"
 )
 

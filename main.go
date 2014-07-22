@@ -1,12 +1,12 @@
 package main
 
 import (
-	"./oni"
 	"flag"
 	"fmt"
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"log"
+	"oniproject/oni"
 )
 
 var config = flag.String("conf", "default", "config file")

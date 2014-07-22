@@ -13,7 +13,7 @@ const (
 
 type State struct {
 	Type      uint8
-	Id        uint64
+	Id        string
 	Tick      uint
 	Lag       time.Duration
 	Position  Point
@@ -35,7 +35,7 @@ type Avatar struct {
 }
 
 func (a *Avatar) GetState(typ uint8, tick uint) *State {
-	return &State{typ, uint64(a.Id), tick, a.Lag, a.Position, a.Veloctity}
+	return &State{typ, a.Id.String(), tick, a.Lag, a.Position, a.Veloctity}
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
