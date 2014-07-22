@@ -32,6 +32,13 @@ XXXXXX`
 	}
 }
 
+func (m *Map) Walkable(x, y int) bool {
+	return m.Grid.Walkable(x, y)
+}
+func (m *Map) Unregister(a *Avatar) {
+	m.unregister <- a
+}
+
 func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 	conn := AvatarConnection{
 		ws:          ws,

@@ -32,7 +32,7 @@ type AvatarConnection struct {
 
 func (c *Avatar) readPump() {
 	defer func() {
-		c.game.unregister <- c
+		c.game.Unregister(c)
 		c.ws.Close()
 	}()
 

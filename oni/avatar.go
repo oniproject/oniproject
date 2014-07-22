@@ -27,11 +27,16 @@ type AvatarData struct {
 	lastvel   Point
 }
 
+type Mapper interface {
+	Walkable(int, int) bool
+	Unregister(*Avatar)
+}
+
 type Avatar struct {
 	AvatarData
 	AvatarConnection
 	Target Id
-	game   *Map
+	game   Mapper
 }
 
 func (a *Avatar) GetState(typ uint8, tick uint) *State {
@@ -47,7 +52,7 @@ func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
 			a.lastvel[i] = a.Veloctity[i]
 		}
 		// XXX {nil} for testing
-		if a.game == nil || a.game.Grid.Walkable(int(pos[0]), int(pos[1])) {
+		if a.game == nil || a.game.Walkable(int(pos[0]), int(pos[1])) {
 			a.Position = pos
 		}
 		state = a.GetState(STATE_MOVE, tick)
