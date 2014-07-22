@@ -5,23 +5,21 @@ import (
 	"time"
 )
 
-func TestAvatarUpdateNil(t *testing.T) {
-	avatar := &Avatar{AvatarData: AvatarData{0, 0,
-		[2]float64{0, 0},
+func TestAvatarUpdateIDLE(t *testing.T) {
+	avatar := &Avatar{data: AvatarData{0, 0,
 		[2]float64{0, 0},
 		[2]float64{0, 0}}}
 	state := avatar.Update(1, 0)
 
-	if state != nil {
+	if state.Type != STATE_IDLE {
 		t.Fail()
 	}
 }
 
 func TestAvatarUpdateSimple(t *testing.T) {
-	avatar := &Avatar{AvatarData: AvatarData{0, 0,
+	avatar := &Avatar{data: AvatarData{0, 0,
 		[2]float64{0, 0},
-		[2]float64{1, 2},
-		[2]float64{0, 0}}}
+		[2]float64{1, 2}}}
 	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
@@ -34,10 +32,9 @@ func TestAvatarUpdateSimple(t *testing.T) {
 }
 
 func TestAvatarUpdateOnlyX(t *testing.T) {
-	avatar := &Avatar{AvatarData: AvatarData{0, 0,
+	avatar := &Avatar{data: AvatarData{0, 0,
 		[2]float64{0, 0},
-		[2]float64{2, 0},
-		[2]float64{0, 0}}}
+		[2]float64{2, 0}}}
 	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
@@ -50,10 +47,9 @@ func TestAvatarUpdateOnlyX(t *testing.T) {
 }
 
 func TestAvatarUpdateOnlyY(t *testing.T) {
-	avatar := &Avatar{AvatarData: AvatarData{0, 0,
+	avatar := &Avatar{data: AvatarData{0, 0,
 		[2]float64{0, 0},
-		[2]float64{0, 2},
-		[2]float64{0, 0}}}
+		[2]float64{0, 2}}}
 	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
@@ -66,10 +62,9 @@ func TestAvatarUpdateOnlyY(t *testing.T) {
 }
 
 func TestAvatarUpdateZero(t *testing.T) {
-	avatar := &Avatar{AvatarData: AvatarData{0, 0,
+	avatar := &Avatar{data: AvatarData{0, 0,
 		[2]float64{0, 1},
-		[2]float64{0, 0},
-		[2]float64{1, 0}}}
+		[2]float64{0, 0}}}
 	state := avatar.Update(1, 1*time.Second)
 
 	if state == nil {

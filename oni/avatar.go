@@ -77,5 +77,7 @@ func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
 		state = a.GetState(STATE_IDLE, tick)
 	}
 
+	// XXX for normal replication
+	state = a.GetState(STATE_IDLE, tick)
 	return
 }

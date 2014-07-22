@@ -12,7 +12,9 @@ func (p *Point) Y() float64 {
 }
 
 func (p *Point) SquareDistance(to Point) float64 {
-	return p.X()*to.X() + p.Y()*to.Y()
+	x := p.X() - to.X()
+	y := p.Y() - to.Y()
+	return x*x + y*y
 }
 
 func (p *Point) SqrtDistance(to Point) float64 {

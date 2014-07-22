@@ -37,6 +37,7 @@ function Game(renderer, stage, player, url, map) {
 	net.on('close', alert.bind(null, "close WS"));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
+	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 
 	var iso = new Isomer(renderer.view);
@@ -174,9 +175,17 @@ Game.prototype.state_msg = function(state) {
 			case 1: // create
 				this.avatars[state.Id] = new Avatar(state.Position, state.Veloctity)
 			case 0: // idle
+				if(!this.avatars.hasOwnProperty(state.Id)) {
+					state.Type = 1;
+					return this.state_msg(state);
+				}
 				var avatar = this.avatars[state.Id];
 				avatar.rot = 0;
 			case 3: // move
+				if(!this.avatars.hasOwnProperty(state.Id)) {
+					state.Type = 1;
+					return this.state_msg(state);
+				}
 				var avatar = this.avatars[state.Id];
 				if(state.Type == 3) {
 					avatar.rot = 3;
@@ -215,6 +224,9 @@ Game.prototype.ontarget = function(message) {
 
 Game.prototype.onfire = function(message) {
 	console.log('fire', message);
+}
+Game.prototype.ondestroy = function(message) {
+	delete this.avatars[message.Id];
 }
 
 module.exports = Game;

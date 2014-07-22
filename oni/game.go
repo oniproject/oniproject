@@ -5,11 +5,6 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
-	"time"
-)
-
-const (
-	TickRate = 50 * time.Millisecond
 )
 
 var store = sessions.NewFilesystemStore(
