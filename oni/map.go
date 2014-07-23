@@ -13,14 +13,6 @@ const (
 	ReplicRange  = 4
 )
 
-type GameObject interface {
-	Update(tick uint, t time.Duration) *State
-	GetState(typ uint8, tick uint) *State
-	Position() Point
-	Send(Message)
-	Id() Id
-}
-
 // for message system
 type sender struct {
 	id Id
