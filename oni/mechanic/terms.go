@@ -2,18 +2,24 @@ package mechanic
 
 // *Id resolver
 type Terms struct {
-	Elements     []Element
-	Parameters   []Parameter
-	ExParameters []ExParameter
-	SpParameters []SpParameter
-	WeaponTypes  []WeaponType
-	SkillTypes   []SkillType
-	ArmorTypes   []ArmorType
-	DamageTypes  []DamageType
+	Elements     []string
+	Parameters   []string
+	ExParameters []string
+	SpParameters []string
+	WeaponTypes  []string
+	SkillTypes   []string
+	ArmorTypes   []string
+	DamageTypes  []string
+	EquipTypes   []string
+	Abilities    []string
 }
 
-type Element string
 type ElementId int
+type EquipTypeId int
+type SlotTypeId int
+type SlotTypeId int
+type AbilityId int
+type AnimationId int
 
 /*
 	MPM Maximum Hit Points
@@ -25,7 +31,6 @@ type ElementId int
 	AGI AGIlity
 	LUK LUcK
 */
-type Parameter string
 type ParameterId id
 
 /*
@@ -39,7 +44,6 @@ type ParameterId id
 	MRG Mp ReGeneration rate
 	TRG Tp ReGeneration rate
 */
-type ExParameter string
 type ExParameterId id
 
 /*
@@ -54,19 +58,4 @@ type ExParameterId id
 	FDR Floor Damage Rate
 	EXP EXperience Rate
 */
-type SpParameter string
 type SpParameterId id
-
-type EquipType string
-type EquipTypeId int
-
-type SlotType string
-type SlotTypeId int
-
-type SlotType string
-type SlotTypeId int
-
-type Ability string
-type AbilityId int
-
-type AnimationId int
