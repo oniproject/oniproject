@@ -1,9 +1,13 @@
 package mechanic
 
+type StateId int
+
 type State struct {
 	// Basic settings
 	Name        string
 	Icon        string
+	Description string
+
 	Restriction int
 	Priority    int
 

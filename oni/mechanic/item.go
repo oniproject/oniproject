@@ -12,26 +12,15 @@ type Item struct {
 	Icon        string
 	Description string
 
+	Price int
+
 	ItemType ItemTypeId
-	Price    int
 	Consume  bool
 	Scope    int
 	Occasion int
 
-	// Invocation
-	Speed     int
-	Success   int // %
-	Repeats   int
-	TPGain    int
-	HitType   int
-	Animation int
-
-	// Damage
-	DamageType int
-	Element    int
-	Formula    string
-	Variance   int
-	Critical   bool
+	Invocation Invocation
+	Damage     Damage
 
 	Effects EffectList
 

@@ -9,44 +9,44 @@ type Feature interface {
 // Rate
 
 type ElementRate struct {
-	Element int
+	Element ElementId
 	Value   int // * %
 }
 type DebuffRate struct {
-	Parameter int
+	Parameter ParameterId
 	Value     int // * %
 }
 type StateRate struct {
-	State int
+	State StateId
 	Value int // * %
 }
 type StateResist struct {
-	State int
+	State StateId
 	Value int // * %
 }
 
 // Param
 
 type Parameter struct {
-	Parameter int
+	Parameter ParameterId
 	Value     int // * %
 }
 type ExParameter struct {
-	ExParameter int
+	ExParameter ExParameterId
 	Value       int // + %
 }
 type SpParameter struct {
-	ExParameter int
+	SpParameter SpParameterId
 	Value       int // * %
 }
 
 // Attack
 
 type AtkElement struct {
-	Element int
+	Element ElementId
 }
 type AtkState struct {
-	State int
+	State ElementId
 	Value int // + %
 }
 type AtkSpeed struct {
@@ -59,34 +59,34 @@ type AtkTimes struct {
 // Skill
 
 type AddSkillType struct {
-	SkillType int
+	SkillType SkillTypeId
 }
 type SealSkillType struct {
-	SkillType int
+	SkillType SkillType
 }
 type AddSkill struct {
-	Skill int
+	Skill SkillId
 }
 type SealSkill struct {
-	Skill int
+	Skill SkillId
 }
 
 // Equip
 
 type EquipWeapon struct {
-	Weapon int
+	Weapon WeaponId
 }
 type EquipArmor struct {
-	Armor int
+	Armor ArmorId
 }
 type FixEquip struct {
-	Equip int
+	Equip EquipTypeId
 }
 type SealEquip struct {
-	Equip int
+	Equip EquipTypeId
 }
 type SlotType struct {
-	Slot int
+	Slot SlotTypeId
 }
 
 // Other
@@ -101,5 +101,5 @@ type CollapseEffect struct {
 	Effect int
 }
 type PatyAbility struct {
-	Ability int
+	Ability AbilityId
 }

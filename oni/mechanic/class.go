@@ -2,28 +2,17 @@ package mechanic
 
 type ClassId int
 
+type Level int
+
 type Class struct {
 	// Basic settings
-	Name  string
-	Curve ExpCurve
+	Name        string
+	Icon        string
+	Description string
 
-	// Parameter Curves
-
-	// Maximum HP
-	MHP ParamCurve
-	// Maximum MP
-	MMP ParamCurve
-	// Maximum SP
-	MSP ParamCurve
-
-	//ATK ParamCurve
-	//DEF ParamCurve
-	//MAT ParamCurve
-	//MDF ParamCurve
-	//AGI ParamCurve
-	//LUK ParamCurve
-
-	Skills SkillList
+	Curve           ExpCurve
+	ParameterCurves map[ParameterId]ParamCurve
+	Skills          map[Level]Skill
 
 	Features FeatureList
 

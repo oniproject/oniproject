@@ -12,20 +12,11 @@ type Armor struct {
 	Icon        string
 	Description string
 
-	ArmorType ArmorTypeId
-	Price     int
-	EquipType string
+	Price int
 
-	// Parameter Changes
-	ATK int
-	DEF int
-	MAT int
-	MDF int
-	AGI int
-	LUK int
-	MHP int
-	MMP int
-	MSP int
+	ArmorType        ArmorTypeId
+	EquipType        EquipTypeId
+	ParameterChanges map[ParameterId]int
 
 	Features FeatureList
 

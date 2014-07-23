@@ -23,29 +23,29 @@ type GainTP struct {
 // State
 
 type AddState struct {
-	State  int
+	State  StateId
 	Chance int // %
 }
 type RemoveState struct {
-	State  int
+	State  StateId
 	Chance int // %
 }
 
 // Param
 
 type AddBuff struct {
-	Parameter int
+	Parameter ParameterId
 	Turns     int
 }
 type AddDebuff struct {
-	Parameter int
+	Parameter ParameterId
 	Turns     int
 }
 type RemoveBuff struct {
-	Parameter int
+	Parameter ParameterId
 }
 type RemoveDebuff struct {
-	Parameter int
+	Parameter ParameterId
 }
 
 // Other
@@ -53,11 +53,11 @@ type SpecialEffect struct {
 	Effect int
 }
 type Grow struct {
-	Parameter int
+	Parameter ParameterId
 	Value     int // +
 }
 type LearnSkill struct {
-	Skill int
+	Skill SkillId
 }
 type CommonEvent struct {
 	Event int

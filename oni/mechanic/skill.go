@@ -16,26 +16,14 @@ type Skill struct {
 	MPCost    int
 	TPCost    int
 	Scope     int
-	Ossacion  int
+	Occacion  int
 
-	// Invocation
-	Speed     int
-	Success   int // %
-	Repeats   int
-	TPGain    int
-	HitType   int
-	Animation int
+	Invocation Invocation
+	Damage     Damage
 
 	UsignMessage    string
 	RequiredWeapon1 int
 	RequiredWeapon2 int
-
-	// Damage
-	DamageType int
-	Element    int
-	Formula    string
-	Variance   int
-	Critical   bool
 
 	Effects EffectList
 

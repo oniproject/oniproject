@@ -12,20 +12,11 @@ type Weapon struct {
 	Icon        string
 	Description string
 
-	WeaponType WeaponTypeId
-	Price      int
-	Animation  string
+	Price int
 
-	// Parameter Changes
-	ATK int
-	DEF int
-	MAT int
-	MDF int
-	AGI int
-	LUK int
-	MHP int
-	MMP int
-	MSP int
+	WeaponType       WeaponTypeId
+	Animation        AnimationId
+	ParameterChanges map[ParameterId]int
 
 	Features FeatureList
 
