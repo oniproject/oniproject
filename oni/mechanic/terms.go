@@ -17,7 +17,6 @@ type Terms struct {
 type ElementId int
 type EquipTypeId int
 type SlotTypeId int
-type SlotTypeId int
 type AbilityId int
 type AnimationId int
 
@@ -28,10 +27,10 @@ type AnimationId int
 	DEF DEFense power
 	MAT Magic ATtack power
 	MDF Magic DeFense power
-	AGI AGIlity
-	LUK LUcK
+	//AGI AGIlity
+	//LUK LUcK
 */
-type ParameterId id
+type ParameterId int
 
 /*
 	HIT HIT rate
@@ -44,7 +43,7 @@ type ParameterId id
 	MRG Mp ReGeneration rate
 	TRG Tp ReGeneration rate
 */
-type ExParameterId id
+type ExParameterId int
 
 /*
 	TGR TarGet Rate
@@ -58,4 +57,4 @@ type ExParameterId id
 	FDR Floor Damage Rate
 	EXP EXperience Rate
 */
-type SpParameterId id
+type SpParameterId int
