@@ -5,6 +5,14 @@ var gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     watch = require('gulp-watch');
 
+gulp.task('js-redactor', function() {
+  var bundleStream = browserify('./js/main-redactor.js').bundle();
+
+  bundleStream
+    .pipe(source('redactor.js'))
+    .pipe(gulp.dest('./public'));
+});
+
 gulp.task('js', function() {
   var bundleStream = browserify('./js/main.js').bundle();
 
@@ -13,8 +21,8 @@ gulp.task('js', function() {
     .pipe(gulp.dest('./public'));
 });
 
-gulp.task('watch', ['js'], function() {
-  gulp.watch('js/**', ['js'])
+gulp.task('watch', ['js', 'js-redactor'], function() {
+  gulp.watch('js/**', ['js', 'js-redactor'])
 });
 
 gulp.task('server', function(next) {
