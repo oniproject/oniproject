@@ -109,7 +109,7 @@ redactor.run(new commands.Delete(2));
 redactor.run(new commands.Resize(1, [1,3,1]));
 redactor.run(new commands.Modificator(1, {type: 'rotateZ', point:[1/2,3/2,1/2], yaw:Math.PI/8}));
 
-redactor.run(new commands.AddCylinder([0, 2, 0], [1,30,2]));
+redactor.run(new commands.AddCylinder([0, 2, 0], [1,1,2], 30));
 
 redactor.run(new commands.AddPrism([0,0,0], [3,3,1]));
 redactor.run(new commands.AddPath([
@@ -117,13 +117,13 @@ redactor.run(new commands.AddPath([
   [2, 1, 1],
   [2, 2, 1],
   [1, 2, 1],
-], [50, 160, 60, 0]));
+], [0,0,0], [1,1,1], [50, 160, 60, 0]));
 
 redactor.run(new commands.AddShape([
   [1, 1, 1],
   [2, 1, 1],
   [2, 3, 1],
-], 0.3, [50, 160, 60, 0]));
+], 0.3, [0,0,0], [1,1,1], [50, 160, 60, 0]));
 
 
 requestAnimFrame(animate);

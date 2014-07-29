@@ -129,6 +129,13 @@ function Redactor(map) {
 				$('#modificators-list').append('<p>'+JSON.stringify(mod)+'</p>');
 				// add 
 			}
+
+			$('#pos #x').val(obj.pos[0]);
+			$('#pos #y').val(obj.pos[1]);
+			$('#pos #z').val(obj.pos[2]);
+			$('#size #x').val(obj.size[0]);
+			$('#size #y').val(obj.size[1]);
+			$('#size #z').val(obj.size[2]);
 			switch(obj.type) {
 			case 'pyramid':
 			case 'prism':
@@ -136,29 +143,20 @@ function Redactor(map) {
 				$('#size').show();
 				$('#color').show();
 				$('#modificators').show();
-				$('#pos #x').val(obj.pos[0]);
-				$('#pos #y').val(obj.pos[1]);
-				$('#pos #z').val(obj.pos[2]);
-				$('#size #x').val(obj.dx);
-				$('#size #y').val(obj.dy);
-				$('#size #z').val(obj.dz);
+				$('#size #v').hide();
 				break;
 			case 'cylinder':
 				$('#pos').show();
 				$('#size').show();
 				$('#color').show();
 				$('#modificators').show();
-				$('#pos #x').val(obj.pos[0]);
-				$('#pos #y').val(obj.pos[1]);
-				$('#pos #z').val(obj.pos[2]);
-				$('#size #x').val(obj.radius);
-				$('#size #y').val(obj.vertices);
-				$('#size #z').val(obj.height);
+
+				$('#size #v').show();
+				$('#size #v').val(obj.vertices);
 				break;
 			case 'path':
 			case 'shape':
-				$('#pos').hide();
-				$('#size').hide();
+				$('#size #v').hide();
 				$('#color').show();
 				$('#modificators').show();
 			}
@@ -312,9 +310,10 @@ Redactor.prototype._initUI = function() {
 	$('#Resize').click(function() {
 		var x = $('#size #x').val(),
 			y = $('#size #y').val(),
-			z = $('#size #z').val();
+			z = $('#size #z').val(),
+			v = $('#size #v').val();
 		if(that.map.objects[that.active]) {
-			that.run(new commands.Resize(that.active, [+x, +y, +z]));
+			that.run(new commands.Resize(that.active, [+x, +y, +z], v));
 		}
 	});
 
@@ -342,10 +341,12 @@ Redactor.prototype._initUI = function() {
 		var x = $('#AddCylinderModal #x').val(),
 			y = $('#AddCylinderModal #y').val(),
 			z = $('#AddCylinderModal #z').val(),
-			radius = $('#AddCylinderModal #radius').val(),
+			dx = $('#AddPyramidModal #dx').val(),
+			dy = $('#AddPyramidModal #dy').val(),
+			dz = $('#AddPyramidModal #dz').val();
+
 			vertices = $('#AddCylinderModal #vertices').val(),
-			height = $('#AddCylinderModal #height').val();
-		that.run(new commands.AddCylinder([+x, +y, +z], [+radius, +vertices, +height]));
+		that.run(new commands.AddCylinder([+x, +y, +z], [+dx, +dy, +dz], +vertices));
 	});
 
 	$('#AddShape').click(function() {

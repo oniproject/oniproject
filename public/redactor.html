@@ -43,9 +43,11 @@ html, body {
 				<legend>Size</legend>
 
 				<div class="uk-form-row">
-					<input data-uk-tooltip="{pos:'right'}" title="X or Radius" id="x" value="0" class="uk-width-1-1 uk-form-small" type="number">
-					<input data-uk-tooltip="{pos:'right'}" title="Y or Vertices" id="y" value="0" class="uk-width-1-1 uk-form-small" type="number">
-					<input data-uk-tooltip="{pos:'right'}" title="Z or Height" id="z" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="X" id="x" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Y" id="y" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Z" id="z" value="0" class="uk-width-1-1 uk-form-small" type="number">
+
+					<input data-uk-tooltip="{pos:'right'}" title="Vertices" id="v" value="0" class="uk-width-1-1 uk-form-small" type="number">
 
 					<a id="Resize" class="uk-button uk-button-primary uk-width-1-1">Resize</a>
 				</div>
@@ -256,13 +258,23 @@ html, body {
 					</div>
 				</div>
 
+
 				<div class="uk-form-row">
 					<span class="uk-form-label" for="">Size</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="radius">Radius</label> <input id="radius" value="1" class="uk-form-width-small uk-form-small" type="number">
+							<label for="dx">X</label> <input id="dx" value="1" class="uk-form-width-small uk-form-small" type="number">
+							<label for="dy">Y</label> <input id="dy" value="1" class="uk-form-width-small uk-form-small" type="number">
+							<label for="dz">Z</label> <input id="dz" value="1" class="uk-form-width-small uk-form-small" type="number">
+						</p>
+					</div>
+				</div>
+
+				<div class="uk-form-row">
+					<span class="uk-form-label" for="">Size</span>
+					<div class="uk-form-controls uk-form-controls-text">
+						<p class="uk-form-controls-condensed">
 							<label for="vertices">Vertices</label> <input id="vertices" value="30" class="uk-form-width-small uk-form-small" type="number">
-							<label for="height">Height</label> <input id="height" value="1" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>

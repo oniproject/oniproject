@@ -16,11 +16,9 @@ function AddPrism(pos, size, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'prism',
-			pos:  pos    || [0,0,0],
-			dx: size[0],
-			dy: size[1],
-			dz: size[2],
-			color:color  || [0,0,0,0],
+			pos:  pos     || [0,0,0],
+			size: size    || [1,1,1],
+			color:color   || [0,0,0,0],
 			modificators: [],
 		});
 	};
@@ -34,9 +32,7 @@ function AddPyramid(pos, size, color) {
 		map.objects.push({
 			type: 'pyramid',
 			pos:  pos     || [0,0,0],
-			dx: size[0],
-			dy: size[1],
-			dz: size[2],
+			size: size    || [1,1,1],
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -46,14 +42,13 @@ function AddPyramid(pos, size, color) {
 	};
 }
 
-function AddCylinder(pos, size, color) {
+function AddCylinder(pos, size, vertices, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'cylinder',
 			pos:  pos     || [0,0,0],
-			radius: size[0],
-			vertices: size[1],
-			height: size[2],
+			size: size    || [1,1,1],
+			vertices: vertices || 30,
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -63,11 +58,13 @@ function AddCylinder(pos, size, color) {
 	};
 }
 
-function AddPath(path, color) {
+function AddPath(path, pos, size, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'path',
 			path: path,
+			pos:  pos     || [0,0,0],
+			size: size    || [1,1,1],
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -77,12 +74,14 @@ function AddPath(path, color) {
 	};
 }
 
-function AddShape(path, height, color) {
+function AddShape(path, height, pos, size, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'shape',
 			path: path,
 			height: height,
+			pos:  pos     || [0,0,0],
+			size: size    || [1,1,1],
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -105,46 +104,28 @@ function SetColor(id, color) {
 	};
 }
 
-function Resize(id, size) {
-	var dx, dy, dz;
-	var radius, vertices, height;
+function Resize(id, size, vertices) {
+	var old;
+	var old_vertices;
 	this.redo = function(map) {
 		var obj = map.objects[id];
-		if(obj.dx !== undefined) {
-			dx = obj.dx;
-			dy = obj.dy;
-			dz = obj.dz;
-			obj.dx = size[0];
-			obj.dy = size[1];
-			obj.dz = size[2];
-			return
+		if(obj.size !== undefined) {
+			old = obj.size;
+			obj.size = size;
 		}
 		if(obj.vertices !== undefined) {
-			vertices = obj.vertices;
-			radius = obj.radius;
-			height = obj.height;
-			obj.radius = size[0];
-			obj.vertices = size[1];
-			obj.height = size[2];
-			return
+			old_vertices = obj.vertices;
+			obj.vertices = vertices;
 		}
-		console.error('fail resize redo');
 	};
 	this.undo = function(map) {
 		var obj = map.objects[id];
-		if(obj.dx !== undefined) {
-			obj.dx = dx;
-			obj.dy = dy;
-			obj.dz = dz;
-			return
+		if(obj.size !== undefined) {
+			obj.size = old;
 		}
 		if(obj.vertices !== undefined) {
-			obj.vertices = vertices;
-			obj.radius = radius;
-			obj.height = height;
-			return
+			obj.vertices = old_vertices;
 		}
-		console.error('fail resize undo');
 	};
 }
 
