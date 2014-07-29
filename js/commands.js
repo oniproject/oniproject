@@ -106,15 +106,45 @@ function SetColor(id, color) {
 }
 
 function Resize(id, size) {
-	var old;
+	var dx, dy, dz;
+	var radius, vertices, height;
 	this.redo = function(map) {
 		var obj = map.objects[id];
-		old = obj.size;
-		obj.size = size;
+		if(obj.dx !== undefined) {
+			dx = obj.dx;
+			dy = obj.dy;
+			dz = obj.dz;
+			obj.dx = size[0];
+			obj.dy = size[1];
+			obj.dz = size[2];
+			return
+		}
+		if(obj.vertices !== undefined) {
+			vertices = obj.vertices;
+			radius = obj.radius;
+			height = obj.height;
+			obj.radius = size[0];
+			obj.vertices = size[1];
+			obj.height = size[2];
+			return
+		}
+		console.error('fail resize redo');
 	};
 	this.undo = function(map) {
 		var obj = map.objects[id];
-		obj.size = old;
+		if(obj.dx !== undefined) {
+			obj.dx = dx;
+			obj.dy = dy;
+			obj.dz = dz;
+			return
+		}
+		if(obj.vertices !== undefined) {
+			obj.vertices = vertices;
+			obj.radius = radius;
+			obj.height = height;
+			return
+		}
+		console.error('fail resize undo');
 	};
 }
 
