@@ -26,10 +26,7 @@ iso.canvas.path_line = function (points) {
 		this.lineTo(points[i].x, points[i].y);
 	}
 
-	// XXX hack for pixi v1.6.0
-	if (points.length % 2) {
-		this.lineTo(points[0].x, points[0].y);
-	}
+	this.lineTo(points[0].x, points[0].y);
 }
 
 iso.canvas.path = function (points, color) {
