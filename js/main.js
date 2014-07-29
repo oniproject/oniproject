@@ -2,6 +2,10 @@
 
 console.log("fuck");
 
+var AutoTilemap = require('./autotilemap');
+var Tileset = require('./tileset');
+var Tilemap = require('./tilemap');
+
 function run(player, host) {
 	var w = window.innerWidth,
 		h = window.innerHeight,
@@ -9,8 +13,46 @@ function run(player, host) {
 		renderer = PIXI.autoDetectRenderer(w, h);
 	document.body.appendChild(renderer.view);
 
+	var WH = {width:32, height:32};
+	var World_A1 = new Tileset('/public/game/World_A1.png', 16, 12, WH);
+	var World_A2 = new Tileset('/public/game/World_A2.png', 16, 12, WH);
+	var World_B = new Tileset('/public/game/World_B.png', 16, 16, WH);
+
+	var map = [
+		[1,2,3,4],
+		[3,1,4,1],
+		[3,0,9,10],
+		[3,1,4,1],
+	];
+	var tilemap = new Tilemap(map, World_B);
+
+	var nn = 31;
+
+	var amap = [
+		[0,0,0,0,0,0,0],
+		[0,nn,0,nn,nn,nn,0],
+		[0,nn,0,nn,0,0,0],
+		[0,nn,0,nn,0,0,0],
+		[0,nn,nn,nn,nn,nn,0],
+		[0,0,0,nn,0,nn,0],
+		[0,0,0,nn,0,nn,0],
+		[0,nn,nn,nn,0,nn,0],
+		[0,0,0,0,0,0,0],
+		[0,nn,nn,nn,0,0,0],
+		[0,nn,0,nn,0,0,0],
+		[0,nn,nn,nn,0,0,0],
+		[0,0,nn,nn,nn,0,0],
+		[0,0,0,nn,nn,0,0],
+		[0,0,0,nn,nn,0,0],
+		[0,0,0,0,0,0,0],
+	];
+
+	var amap = new AutoTilemap(amap, World_A2);
+
 	var Game = require('./game');
 	window.game = new Game(renderer, stage, player, 'ws://' +host+ '/ws', require('./test-map'));
+	stage.addChild(tilemap.container);
+	stage.addChild(amap.container);
 
 	window.onresize = resize;
 	resize();
