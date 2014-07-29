@@ -63,6 +63,17 @@ function Redactor(map) {
 			if (item instanceof Isomer.Path) {
 				ctx.path_line(item.points.map(iso._translatePoint.bind(iso)));
 			}
+
+			if(obj.pos) {
+				var pos = this.map.iso._translatePoint(Isomer.Point.apply(null, obj.pos));
+				var n = 4;
+				ctx.moveTo(pos.x-n, pos.y-n);
+				ctx.lineStyle(n*2, 0x0000CC, 1);
+				ctx.lineTo(pos.x-n, pos.y+n);
+				ctx.lineTo(pos.x+n, pos.y+n);
+				ctx.lineTo(pos.x+n, pos.y-n);
+				ctx.lineTo(pos.x-n, pos.y-n);
+			}
 		}
 
 		var s3 = this.map.iso._translatePoint(Isomer.Point(0,0, -gridSize));
