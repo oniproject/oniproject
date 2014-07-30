@@ -91,23 +91,23 @@ redactor.run(new commands.AddPrism([-1, 1, 0], [1,2,1]));
 
 redactor.run(new commands.AddPyramid([2, 3, 3], [1,1,1]));
 redactor.run(new commands.SetColor(redactor.map.objects.length-1, [180,180,0,0]));
-redactor.run(new commands.Modificator(redactor.map.objects.length-1, {type: 'scale', point:[2,4,3], x:0.5}));
+redactor.run(new commands.Resize(redactor.map.objects.length-1, [0.5, 0.5, 0.5]));
 
 redactor.run(new commands.AddPyramid([4, 3, 3], [1,1,1]));
 redactor.run(new commands.SetColor(redactor.map.objects.length-1, [180,0,180,0]));
-redactor.run(new commands.Modificator(redactor.map.objects.length-1, {type: 'scale', point:[5,4,3], x:0.5}));
+redactor.run(new commands.Resize(redactor.map.objects.length-1, [0.5, 0.5, 0.5]));
 
 redactor.run(new commands.AddPyramid([4, 1, 3], [1,1,1]));
 redactor.run(new commands.SetColor(redactor.map.objects.length-1, [0,180,0,0]));
-redactor.run(new commands.Modificator(redactor.map.objects.length-1, {type: 'scale', point:[5,1,3], x:0.5}));
+redactor.run(new commands.Resize(redactor.map.objects.length-1, [0.5, 0.5, 0.5]));
 
 redactor.run(new commands.AddPyramid([2, 1, 3], [1,1,1]));
 redactor.run(new commands.SetColor(redactor.map.objects.length-1, [40,180,40,0]));
-redactor.run(new commands.Modificator(redactor.map.objects.length-1, {type: 'scale', point:[2,1,3], x:0.5}));
+redactor.run(new commands.Resize(redactor.map.objects.length-1, [0.5, 0.5, 0.5]));
 
 redactor.run(new commands.Delete(2));
 redactor.run(new commands.Resize(1, [1,3,1]));
-redactor.run(new commands.Modificator(1, {type: 'rotateZ', point:[1/2,3/2,1/2], yaw:Math.PI/8}));
+redactor.run(new commands.Rotate(1, 15));
 
 redactor.run(new commands.AddCylinder([0, 2, 0], [1,1,2], 30));
 

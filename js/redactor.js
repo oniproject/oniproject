@@ -116,19 +116,18 @@ function Redactor(map) {
 			$('#pos').hide();
 			$('#size').hide();
 			$('#color').hide();
-			$('#modificators').hide();
+			$('#rotateZ').hide();
 		} else {
 			$('#obj').text(''+id+' '+obj.type);
 			var c = obj.color;
 			var cc = new Isomer.Color(c[0], c[1], c[2], c[3])
 			$('#color #hex-color').val(cc.toHex());
 			$('#color #alpha').val(c[3]);
-			$('#modificators-list').html('');
-			for(var i=0, l=obj.modificators.length; i<l; i++) {
-				var mod = obj.modificators[i];
-				$('#modificators-list').append('<p>'+JSON.stringify(mod)+'</p>');
-				// add 
-			}
+
+			$('#rotateZ').show();
+			$('#pos').show();
+			$('#size').show();
+			$('#color').show();
 
 			$('#pos #x').val(obj.pos[0]);
 			$('#pos #y').val(obj.pos[1]);
@@ -140,26 +139,15 @@ function Redactor(map) {
 			switch(obj.type) {
 			case 'pyramid':
 			case 'prism':
-				$('#pos').show();
-				$('#size').show();
-				$('#color').show();
-				$('#modificators').show();
 				$('#size #v').hide();
 				break;
 			case 'cylinder':
-				$('#pos').show();
-				$('#size').show();
-				$('#color').show();
-				$('#modificators').show();
-
 				$('#size #v').show();
 				$('#size #v').val(obj.vertices);
 				break;
 			case 'path':
 			case 'shape':
 				$('#size #v').hide();
-				$('#color').show();
-				$('#modificators').show();
 			}
 		}
 	};

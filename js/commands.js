@@ -159,16 +159,6 @@ function Move(id, pos) {
 	};
 }
 
-function Modificator(id, mod) {
-	this.redo = function(map) {
-		map.objects[id].modificators.push(mod);
-	};
-	this.undo = function(map) {
-		map.objects[id].modificators.pop();
-	};
-}
-
-
 module.exports = {
 	Delete: Delete,
 	AddPrism: AddPrism,
@@ -181,5 +171,4 @@ module.exports = {
 	Resize: Resize,
 	Rotate: Rotate,
 	Move: Move,
-	Modificator: Modificator,
 };
