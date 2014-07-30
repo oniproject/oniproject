@@ -62,15 +62,15 @@ function Map(iso) {
 		default:
 			console.warn('fail obj.type', obj);
 		}
-		if(obj.pos) {
+		if(obj.pos !== undefined) {
 			var pos = obj.pos;
 			var point = Isomer.Point.apply(null, pos);
 			add = add.translate(pos[0], pos[1], pos[2]);
-			if(obj.size) {
+			if(obj.size !== undefined) {
 				add = add.scale(point, obj.size[0], obj.size[1], obj.size[2]);
 			}
-			if(obj.yaw) {
-				add = add.rotateZ(point, yaw);
+			if(obj.yaw !== undefined) {
+				add = add.rotateZ(point, obj.yaw * (Math.PI / 180));
 			}
 		}
 

@@ -18,6 +18,7 @@ function AddPrism(pos, size, color) {
 			type: 'prism',
 			pos:  pos     || [0,0,0],
 			size: size    || [1,1,1],
+			yaw: 0,
 			color:color   || [0,0,0,0],
 			modificators: [],
 		});
@@ -33,6 +34,7 @@ function AddPyramid(pos, size, color) {
 			type: 'pyramid',
 			pos:  pos     || [0,0,0],
 			size: size    || [1,1,1],
+			yaw: 0,
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -48,6 +50,7 @@ function AddCylinder(pos, size, vertices, color) {
 			type: 'cylinder',
 			pos:  pos     || [0,0,0],
 			size: size    || [1,1,1],
+			yaw: 0,
 			vertices: vertices || 30,
 			color: color  || [0,0,0,0],
 			modificators: [],
@@ -65,6 +68,7 @@ function AddPath(path, pos, size, color) {
 			path: path,
 			pos:  pos     || [0,0,0],
 			size: size    || [1,1,1],
+			yaw: 0,
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -82,6 +86,7 @@ function AddShape(path, height, pos, size, color) {
 			height: height,
 			pos:  pos     || [0,0,0],
 			size: size    || [1,1,1],
+			yaw: 0,
 			color: color  || [0,0,0,0],
 			modificators: [],
 		});
@@ -129,6 +134,19 @@ function Resize(id, size, vertices) {
 	};
 }
 
+function Rotate(id, yaw) {
+	var old;
+	this.redo = function(map) {
+		var obj = map.objects[id];
+		old = obj.yaw;
+		obj.yaw = yaw;
+	};
+	this.undo = function(map) {
+		var obj = map.objects[id];
+		obj.yaw = old;
+	};
+}
+
 function Move(id, pos) {
 	var old;
 	this.redo = function(map) {
@@ -161,6 +179,7 @@ module.exports = {
 
 	SetColor: SetColor,
 	Resize: Resize,
+	Rotate: Rotate,
 	Move: Move,
 	Modificator: Modificator,
 };

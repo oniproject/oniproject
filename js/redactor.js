@@ -136,6 +136,7 @@ function Redactor(map) {
 			$('#size #x').val(obj.size[0]);
 			$('#size #y').val(obj.size[1]);
 			$('#size #z').val(obj.size[2]);
+			$('#rotateZ #yaw').val(obj.yaw);
 			switch(obj.type) {
 			case 'pyramid':
 			case 'prism':
@@ -313,7 +314,14 @@ Redactor.prototype._initUI = function() {
 			z = $('#size #z').val(),
 			v = $('#size #v').val();
 		if(that.map.objects[that.active]) {
-			that.run(new commands.Resize(that.active, [+x, +y, +z], v));
+			that.run(new commands.Resize(that.active, [+x, +y, +z], +v));
+		}
+	});
+
+	$('#Rotate').click(function() {
+		var yaw = $('#rotateZ #yaw').val();
+		if(that.map.objects[that.active]) {
+			that.run(new commands.Rotate(that.active, +yaw));
 		}
 	});
 
