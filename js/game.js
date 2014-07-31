@@ -72,7 +72,6 @@ function Game(renderer, stage, player, url, map) {
 				var d = Math.sqrt(x*x + y*y);
 				if(d < 50) {
 					net.SetTargetMsg({id: id});
-					console.log("xxx", id, d, pos, event.global);
 				}
 			}
 		}
