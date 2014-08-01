@@ -1,11 +1,14 @@
 package oni
 
-import "time"
+import (
+	"github.com/skelterjohn/geom"
+	"time"
+)
 
 type GameObject interface {
 	Update(tick uint, t time.Duration) *State
 	GetState(typ uint8, tick uint) *State
-	Position() Point
+	Position() geom.Coord
 	Send(Message)
 	Id() Id
 }

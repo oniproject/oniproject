@@ -1,6 +1,7 @@
 package oni
 
 import (
+	"github.com/skelterjohn/geom"
 	"time"
 )
 
@@ -16,14 +17,14 @@ type State struct {
 	Id        string
 	Tick      uint
 	Lag       time.Duration
-	Position  Point
-	Veloctity Point
+	Position  geom.Coord
+	Veloctity geom.Coord
 }
 type AvatarData struct {
 	Id        Id
 	MapId     Id
-	Position  Point
-	Veloctity Point
+	Position  geom.Coord
+	Veloctity geom.Coord
 }
 
 type AvatarMapper interface {
@@ -37,14 +38,14 @@ type Avatar struct {
 	AvatarConnection
 	Target  Id
 	game    AvatarMapper
-	lastvel Point
+	lastvel geom.Coord
 }
 
 func (a *Avatar) Id() Id {
 	return a.data.Id
 }
 
-func (a *Avatar) Position() Point {
+func (a *Avatar) Position() geom.Coord {
 	return a.data.Position
 }
 
@@ -57,23 +58,21 @@ func (a *Avatar) GetState(typ uint8, tick uint) *State {
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
-	if a.data.Veloctity.X() != 0 || a.data.Veloctity.Y() != 0 {
-		pos := Point{a.data.Position.X(), a.data.Position.Y()}
-		for i := range pos {
-			delta := a.data.Veloctity[i] * t.Seconds()
-			pos[i] += delta
-			a.lastvel[i] = a.data.Veloctity[i]
-		}
+	if a.data.Veloctity.X != 0 || a.data.Veloctity.Y != 0 {
+		delta := a.data.Veloctity.Times(t.Seconds())
+		pos := a.data.Position.Plus(delta)
+		a.lastvel = a.data.Veloctity.Times(1) // just copy
+
 		// XXX {nil} for testing
-		if a.game == nil || a.game.Walkable(int(pos[0]), int(pos[1])) {
+		if a.game == nil || a.game.Walkable(int(pos.X), int(pos.Y)) {
 			a.data.Position = pos
 		}
 		state = a.GetState(STATE_MOVE, tick)
 		return
 	}
 
-	if a.lastvel[0] != 0 || a.lastvel[1] != 0 {
-		a.lastvel = [2]float64{0, 0}
+	if a.lastvel.X != 0 || a.lastvel.Y != 0 {
+		a.lastvel = geom.Coord{0, 0}
 		state = a.GetState(STATE_IDLE, tick)
 	}
 

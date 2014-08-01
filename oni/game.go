@@ -3,6 +3,7 @@ package oni
 import (
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
+	"github.com/skelterjohn/geom"
 	"log"
 	"net/http"
 )
@@ -67,5 +68,5 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gm.Map.RunAvatar(ws, AvatarData{Id: Id(id), Position: Point{1, 1}})
+	gm.Map.RunAvatar(ws, AvatarData{Id: Id(id), Position: geom.Coord{1, 1}})
 }

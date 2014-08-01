@@ -189,10 +189,10 @@ Game.prototype.state_msg = function(state) {
 				if(state.Type == 3) {
 					avatar.rot = 3;
 				}
-				avatar.position.x = state.Position[0];
-				avatar.position.y = state.Position[1];
-				avatar.velocity.x = state.Veloctity[0];
-				avatar.velocity.y = state.Veloctity[1];
+				avatar.position.x = state.Position.X;
+				avatar.position.y = state.Position.Y;
+				avatar.velocity.x = state.Veloctity.X;
+				avatar.velocity.y = state.Veloctity.Y;
 				break;
 		}
 		return true;

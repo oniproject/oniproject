@@ -2,6 +2,7 @@ package oni
 
 import (
 	"github.com/gorilla/websocket"
+	"github.com/skelterjohn/geom"
 	"log"
 	"oniproject/oni/jps"
 	"time"
@@ -61,7 +62,7 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 		sendMessage: make(chan interface{}, 256),
 		ping_pong:   time.Now(),
 	}
-	c := &Avatar{data, conn, 0, m, Point{}}
+	c := &Avatar{data, conn, 0, m, geom.Coord{}}
 
 	m.register <- c
 	go c.writePump()
@@ -106,7 +107,7 @@ func (gm *Map) Run() {
 				if state := obj.Update(gm.tick, TickRate); state != nil {
 					for _, c := range gm.objects {
 						if avatar, ok := c.(*Avatar); ok {
-							r := state.Position.SqrtDistance(avatar.Position())
+							r := state.Position.DistanceFrom(avatar.Position())
 							switch {
 							case r < ReplicRange:
 								send(avatar, state)
