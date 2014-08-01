@@ -1,15 +1,12 @@
 package oni
 
 import (
-	"github.com/skelterjohn/geom"
 	"testing"
 	"time"
 )
 
 func TestAvatarUpdateIDLE(t *testing.T) {
-	avatar := &Avatar{data: AvatarData{0, 0,
-		geom.Coord{0, 0},
-		geom.Coord{0, 0}}}
+	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 0)}
 	state := avatar.Update(1, 0)
 
 	if state.Type != STATE_IDLE {
@@ -18,9 +15,7 @@ func TestAvatarUpdateIDLE(t *testing.T) {
 }
 
 func TestAvatarUpdateSimple(t *testing.T) {
-	avatar := &Avatar{data: AvatarData{0, 0,
-		geom.Coord{0, 0},
-		geom.Coord{1, 2}}}
+	avatar := &Avatar{PositionComponent: NewPositionComponent(1, 2)}
 	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
@@ -33,9 +28,7 @@ func TestAvatarUpdateSimple(t *testing.T) {
 }
 
 func TestAvatarUpdateOnlyX(t *testing.T) {
-	avatar := &Avatar{data: AvatarData{0, 0,
-		geom.Coord{0, 0},
-		geom.Coord{2, 0}}}
+	avatar := &Avatar{PositionComponent: NewPositionComponent(2, 0)}
 	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
@@ -48,9 +41,7 @@ func TestAvatarUpdateOnlyX(t *testing.T) {
 }
 
 func TestAvatarUpdateOnlyY(t *testing.T) {
-	avatar := &Avatar{data: AvatarData{0, 0,
-		geom.Coord{0, 0},
-		geom.Coord{0, 2}}}
+	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 2)}
 	state := avatar.Update(1, 1*time.Second)
 	t.Log(state)
 
@@ -63,9 +54,8 @@ func TestAvatarUpdateOnlyY(t *testing.T) {
 }
 
 func TestAvatarUpdateZero(t *testing.T) {
-	avatar := &Avatar{data: AvatarData{0, 0,
-		geom.Coord{0, 1},
-		geom.Coord{0, 0}}}
+	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 2)}
+	avatar.PositionComponent.position.Y = 1
 	state := avatar.Update(1, 1*time.Second)
 
 	if state == nil {

@@ -89,8 +89,7 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
-	a.data.Veloctity.X = m.X
-	a.data.Veloctity.Y = m.Y
+	a.SetVelocity(m.X, m.Y)
 }
 
 type SetTargetMsg struct {
