@@ -94,12 +94,12 @@ func (m *SetVelocityMsg) Run(obj interface{}) {
 }
 
 type SetTargetMsg struct {
-	Target uint64 `mapstructure:"id"`
+	Target Id `mapstructure:"id"`
 }
 
 func (m *SetTargetMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
-	a.Target = Id(m.Target)
+	a.Target = m.Target
 	log.Println("setTarget", a.Target)
 }
 
@@ -139,6 +139,9 @@ type DestroyMsg struct {
 }
 
 func (m *DestroyMsg) Run(obj interface{}) {
-	a := obj.(*Avatar)
-	a.sendMessage <- WrapMessage(m)
+	if a, ok := obj.(*Avatar); ok {
+		a.sendMessage <- WrapMessage(m)
+	} else {
+		log.Println("fail send: not a Avatar", obj)
+	}
 }
