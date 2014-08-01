@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/skelterjohn/geom"
 	"log"
+	"math/rand"
 	"oniproject/oni/jps"
 	"time"
 )
@@ -69,6 +70,14 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 	c.readPump()
 }
 
+func (m *Map) SpawnMonster() {
+	m.register <- &Monster{
+		game:     m,
+		position: geom.Coord{2, 2},
+		id:       NewId(int64(rand.Intn(10000))),
+	}
+}
+
 func (gm *Map) Run() {
 	send := func(c *Avatar, m interface{}) {
 		select {
@@ -94,6 +103,10 @@ func (gm *Map) Run() {
 	}
 
 	t := time.NewTicker(TickRate)
+
+	rand.Seed(time.Now().UnixNano())
+
+	go gm.SpawnMonster()
 
 	for {
 		select {
