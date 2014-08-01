@@ -107,6 +107,9 @@ func (gm *Map) Run() {
 	rand.Seed(time.Now().UnixNano())
 
 	go gm.SpawnMonster()
+	go gm.SpawnMonster()
+	go gm.SpawnMonster()
+	go gm.SpawnMonster()
 
 	for {
 		select {

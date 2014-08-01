@@ -2,6 +2,7 @@ package oni
 
 import (
 	"github.com/skelterjohn/geom"
+	"math/rand"
 	"time"
 )
 
@@ -36,6 +37,8 @@ func (a *Monster) GetState(typ uint8, tick uint) *State {
 }
 
 func (a *Monster) Update(tick uint, t time.Duration) (state *State) {
+	a.veloctity.X = (rand.Float64() - 0.5) * 5
+	a.veloctity.Y = (rand.Float64() - 0.5) * 5
 	if a.veloctity.X != 0 || a.veloctity.Y != 0 {
 		delta := a.veloctity.Times(t.Seconds())
 		pos := a.position.Plus(delta)
