@@ -45,6 +45,8 @@ func main() {
 		// TODO run database
 		//log.Println("run DATABASE:", *addr, "rpc:", *rpc)
 	default:
+		oni.NewDatabase("sqlite3", "test_db.bin")
+
 		module := oni.NewMaster()
 		// configure
 		if err := yaml.Unmarshal(conf, &module); err != nil {
