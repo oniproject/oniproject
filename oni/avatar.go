@@ -14,7 +14,7 @@ const (
 
 type State struct {
 	Type      uint8
-	Id        string
+	Id        Id
 	Tick      uint
 	Lag       time.Duration
 	Position  geom.Coord
@@ -54,7 +54,7 @@ func (a *Avatar) Send(m Message) {
 }
 
 func (a *Avatar) GetState(typ uint8, tick uint) *State {
-	return &State{typ, a.data.Id.String(), tick, a.Lag, a.data.Position, a.data.Veloctity}
+	return &State{typ, a.data.Id, tick, a.Lag, a.data.Position, a.data.Veloctity}
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {

@@ -89,20 +89,20 @@ func (m *Master) login(w http.ResponseWriter, r *http.Request) {
 
 		var x struct {
 			//Id   uint64
-			Id   string
+			Id   Id
 			Host string
 		}
 		x.Host = "localhost:2000"
 
-		if id, err := strconv.ParseUint(login, 16, 64); err != nil {
+		if id, err := strconv.ParseInt(login, 16, 64); err != nil {
 			http.Error(w, http.StatusText(504), 504)
 			log.Println(err)
 			return
 		} else {
 			id_ := NewAvatarId(id)
 			log.Printf("%b", id_)
-			auth.Values["id"] = uint64(id_)
-			x.Id = id_.String()
+			auth.Values["id"] = int64(id_)
+			x.Id = id_
 		}
 		sessions.Save(r, w)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")

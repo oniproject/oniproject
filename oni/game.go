@@ -45,8 +45,8 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println("Unauthorized (fail session)", err)
 		return
 	}
-	var id uint64
-	if n, ok := auth.Values["id"].(uint64); !ok {
+	var id int64
+	if n, ok := auth.Values["id"].(int64); !ok {
 		http.Error(w, http.StatusText(401), 401)
 		log.Println("Unauthorized fail id", n, auth.Values["id"])
 		return

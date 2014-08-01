@@ -9,7 +9,7 @@ func TestId_IsAvatar(t *testing.T) {
 		t.Fail()
 	}
 
-	id = Id(0xff)
+	id = NewId(0xff)
 	if id.IsAvatar() {
 		t.Fail()
 	}

@@ -134,7 +134,7 @@ func (m *CloseMsg) Run(obj interface{}) {
 }
 
 type DestroyMsg struct {
-	Id string
+	Id Id
 	T  uint // tick
 }
 

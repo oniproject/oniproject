@@ -136,7 +136,7 @@ func (gm *Map) Run() {
 			if c, ok := obj.(*Avatar); ok {
 				close(c.sendMessage)
 			}
-			broadcastMsg(&DestroyMsg{obj.Id().String(), gm.tick})
+			broadcastMsg(&DestroyMsg{obj.Id(), gm.tick})
 			log.Println("unregister", obj)
 
 		// message system

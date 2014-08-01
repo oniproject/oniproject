@@ -1,31 +1,25 @@
 package oni
 
-import "strconv"
+type Id int64
 
-type Id uint64
-
-func NewAvatarId(v uint64) (id Id) {
+func NewId(v int64) (id Id) {
+	id = Id(v)
+	id.SetIsAvatar(false)
+	return
+}
+func NewAvatarId(v int64) (id Id) {
 	id = Id(v)
 	id.SetIsAvatar(true)
 	return
 }
 
-// FIXME string is to long
-func (id Id) String() string {
-	return strconv.FormatUint(uint64(id), 10)
-}
-
 func (id Id) IsAvatar() bool {
-	return (id>>63)&1 == 1
+	return id > 0
 }
 func (id *Id) SetIsAvatar(value bool) {
-	id.setIs(value, 63)
-}
-
-func (id *Id) setIs(value bool, offset uint) {
-	if value {
-		*id |= 1 << offset
-	} else {
-		*id ^= 1 << offset
+	if value && *id < 0 {
+		*id = -*id
+	} else if !value && *id > 0 {
+		*id = -*id
 	}
 }
