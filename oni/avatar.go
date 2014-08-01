@@ -21,10 +21,9 @@ type State struct {
 	Veloctity geom.Coord
 }
 type AvatarData struct {
-	Id        Id
-	MapId     Id
-	Position  geom.Coord
-	Veloctity geom.Coord
+	Id       Id
+	MapId    Id
+	Position geom.Coord
 }
 
 type AvatarMapper interface {
@@ -34,49 +33,29 @@ type AvatarMapper interface {
 }
 
 type Avatar struct {
+	PositionComponent
 	data AvatarData
 	AvatarConnection
-	Target  Id
-	game    AvatarMapper
-	lastvel geom.Coord
+	Target Id
+	game   AvatarMapper
 }
 
-func (a *Avatar) Id() Id {
+func (a Avatar) Id() Id {
 	return a.data.Id
-}
-
-func (a *Avatar) Position() geom.Coord {
-	return a.data.Position
 }
 
 func (a *Avatar) Send(m Message) {
 	m.Run(a)
 }
 
-func (a *Avatar) GetState(typ uint8, tick uint) *State {
-	return &State{typ, a.data.Id, tick, a.Lag, a.data.Position, a.data.Veloctity}
+func (a Avatar) GetState(typ uint8, tick uint) *State {
+	return &State{typ, a.data.Id, tick, a.Lag, a.Position(), a.Velocity()}
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
-	if a.data.Veloctity.X != 0 || a.data.Veloctity.Y != 0 {
-		delta := a.data.Veloctity.Times(t.Seconds())
-		pos := a.data.Position.Plus(delta)
-		a.lastvel = a.data.Veloctity.Times(1) // just copy
-
-		// XXX {nil} for testing
-		if a.game == nil || a.game.Walkable(int(pos.X), int(pos.Y)) {
-			a.data.Position = pos
-		}
-		state = a.GetState(STATE_MOVE, tick)
-		return
+	if a.PositionComponent.Update(a.game, t) {
+		return a.GetState(STATE_MOVE, tick)
+	} else {
+		return a.GetState(STATE_IDLE, tick)
 	}
-
-	if a.lastvel.X != 0 || a.lastvel.Y != 0 {
-		a.lastvel = geom.Coord{0, 0}
-		state = a.GetState(STATE_IDLE, tick)
-	}
-
-	// XXX for normal replication
-	state = a.GetState(STATE_IDLE, tick)
-	return
 }

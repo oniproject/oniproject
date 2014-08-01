@@ -7,17 +7,18 @@ import (
 )
 
 type Monster struct {
+	PositionComponent
 	//data AvatarData
 	//AvatarConnection
-	Target  Id
-	game    AvatarMapper
-	lastvel geom.Coord
+	Target Id
+	game   AvatarMapper
+	//lastvel geom.Coord
 
-	id        Id
-	MapId     Id
-	position  geom.Coord
-	veloctity geom.Coord
-	Lag       time.Duration
+	id    Id
+	MapId Id
+	//position  geom.Coord
+	//veloctity geom.Coord
+	Lag time.Duration
 }
 
 func (a *Monster) Id() Id {
@@ -36,28 +37,12 @@ func (a *Monster) GetState(typ uint8, tick uint) *State {
 	return &State{typ, a.id, tick, a.Lag, a.position, a.veloctity}
 }
 
-func (a *Monster) Update(tick uint, t time.Duration) (state *State) {
-	a.veloctity.X = (rand.Float64() - 0.5) * 5
-	a.veloctity.Y = (rand.Float64() - 0.5) * 5
-	if a.veloctity.X != 0 || a.veloctity.Y != 0 {
-		delta := a.veloctity.Times(t.Seconds())
-		pos := a.position.Plus(delta)
-		a.lastvel = a.veloctity.Times(1) // just copy
-
-		// XXX {nil} for testing
-		if a.game == nil || a.game.Walkable(int(pos.X), int(pos.Y)) {
-			a.position = pos
-		}
-		state = a.GetState(STATE_MOVE, tick)
-		return
+func (m *Monster) Update(tick uint, t time.Duration) *State {
+	m.veloctity.X = (rand.Float64() - 0.5) * 5
+	m.veloctity.Y = (rand.Float64() - 0.5) * 5
+	if m.PositionComponent.Update(m.game, t) {
+		return m.GetState(STATE_MOVE, tick)
+	} else {
+		return m.GetState(STATE_IDLE, tick)
 	}
-
-	if a.lastvel.X != 0 || a.lastvel.Y != 0 {
-		a.lastvel = geom.Coord{0, 0}
-		state = a.GetState(STATE_IDLE, tick)
-	}
-
-	// XXX for normal replication
-	state = a.GetState(STATE_IDLE, tick)
-	return
 }

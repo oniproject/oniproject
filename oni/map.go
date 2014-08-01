@@ -2,7 +2,6 @@ package oni
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/skelterjohn/geom"
 	"log"
 	"math/rand"
 	"oniproject/oni/jps"
@@ -63,7 +62,8 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 		sendMessage: make(chan interface{}, 256),
 		ping_pong:   time.Now(),
 	}
-	c := &Avatar{data, conn, 0, m, geom.Coord{}}
+	p := NewPositionComponent(data.Position.X, data.Position.Y)
+	c := &Avatar{p, data, conn, 0, m}
 
 	m.register <- c
 	go c.writePump()
@@ -72,9 +72,9 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 
 func (m *Map) SpawnMonster() {
 	m.register <- &Monster{
-		game:     m,
-		position: geom.Coord{2, 2},
-		id:       NewId(int64(rand.Intn(10000))),
+		game:              m,
+		PositionComponent: NewPositionComponent(2, 2),
+		id:                NewId(int64(rand.Intn(10000))),
 	}
 }
 
