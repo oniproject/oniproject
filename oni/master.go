@@ -10,7 +10,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	//"strconv"
 )
 
 type Account struct {
@@ -24,12 +23,14 @@ type Master struct {
 	Addr, Rpc             string
 	homeTempl, loginTempl *template.Template
 	authdb                *gorp.DbMap
+	balancer              *Balancer
 }
 
-func NewMaster() *Master {
+func NewMaster(balancer *Balancer) *Master {
 	m := &Master{
 		homeTempl:  template.Must(template.ParseFiles("templates/index.html")),
 		loginTempl: template.Must(template.ParseFiles("templates/login.html")),
+		balancer:   balancer,
 	}
 
 	db, err := sql.Open("sqlite3", "accounts.bin")
@@ -44,10 +45,10 @@ func NewMaster() *Master {
 	}
 
 	/*
-		t1 := Account{Login: "t1", AvatarId: 666}
-		t2 := Account{Login: "t2", AvatarId: 13}
+		t1 := Account{Login: "t1", AvatarId: 1}
+		t2 := Account{Login: "t2", AvatarId: 2}
 		m.authdb.Insert(&t1, &t2)
-	*/
+		// */
 
 	return m
 }
@@ -136,6 +137,9 @@ func (m *Master) login(w http.ResponseWriter, r *http.Request) {
 			Id   int64
 			Host string
 		}{account.AvatarId, "localhost:2000"}
+
+		a, err := m.balancer.AttachAvatar(Id(account.AvatarId))
+		log.Println("AttachAvatar", a, err)
 
 		auth.Values["id"] = account.AvatarId
 

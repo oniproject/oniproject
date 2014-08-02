@@ -27,7 +27,7 @@ func main() {
 
 	switch {
 	case *master:
-		module := oni.NewMaster()
+		module := oni.NewMaster(nil)
 		// configure
 		if err := yaml.Unmarshal(conf, &module); err != nil {
 			log.Panicln("[master] Fail unmarshal config file", err)
@@ -45,14 +45,14 @@ func main() {
 		// TODO run database
 		//log.Println("run DATABASE:", *addr, "rpc:", *rpc)
 	default:
-		oni.NewDatabase("sqlite3", "test_db.bin")
+		db := oni.NewDatabase("sqlite3", "test_db.bin")
+		balancer := oni.NewBalancer("", db)
 
-		module := oni.NewMaster()
+		module := oni.NewMaster(balancer)
 		// configure
 		if err := yaml.Unmarshal(conf, &module); err != nil {
 			log.Panicln("[master] Fail unmarshal config file", err)
 		}
-		balancer := oni.NewBalancer("")
 		go module.Run()
 		balancer.Game.Run()
 	}

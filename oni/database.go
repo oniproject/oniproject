@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/coopernurse/gorp"
 	_ "github.com/mattn/go-sqlite3"
+	//"github.com/skelterjohn/geom"
 	"log"
 	//"time"
 )
@@ -32,16 +33,35 @@ func NewDatabase(driver, source string) (db *Database) {
 		log.Fatalln(err, "Create tables failed")
 	}
 
+	/*
+		*t1 := AvatarData{X: 2, Y: 1, Id: 1}
+		t2 := AvatarData{X: 2, Y: 1, Id: 2}
+		if err := db.dbmap.Insert(&t1, &t2); err != nil {
+			log.Fatalln(err, "Insert fail", err)
+		}
+		// */
+
 	return
 }
 
 func (db *Database) AvatarDataById(id Id) (a *AvatarData, err error) {
 	// TODO choice database by Id
-	obj, err := db.dbmap.Get(AvatarData{}, id)
+	obj, err := db.dbmap.Get(AvatarData{}, int64(id))
 	if err != nil {
 		log.Println("SelectOne failed", err)
 		return
 	}
+	var data []AvatarData
+	_, err = db.dbmap.Select(&data, "select * from avatars order by id")
+	if err != nil {
+		log.Println("Select failed", err)
+		return
+	}
+	log.Println("All rows:")
+	for x, p := range data {
+		log.Printf("    %d: %v\n", x, p)
+	}
+	log.Println("AvatarDataById", obj, id)
 	a = obj.(*AvatarData)
 	log.Println("AvatarDataById", a, err)
 	// TODO sync AvatarData with mechanic database
