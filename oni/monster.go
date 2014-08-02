@@ -8,17 +8,10 @@ import (
 
 type Monster struct {
 	PositionComponent
-	//data AvatarData
-	//AvatarConnection
 	Target Id
 	game   AvatarMapper
-	//lastvel geom.Coord
-
-	id    Id
-	MapId Id
-	//position  geom.Coord
-	//veloctity geom.Coord
-	Lag time.Duration
+	id     Id
+	Lag    time.Duration
 }
 
 func (a *Monster) Id() Id {
