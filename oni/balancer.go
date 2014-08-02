@@ -41,9 +41,12 @@ func (b *Balancer) AttachAvatar(id Id) (a *AvatarData, err error) {
 
 	m, ok := b.Maps[Id(a.MapId)]
 	if !ok {
-		// load map
-		err = errors.New("fail load map")
-		return
+		b.Game.LoadMap(Id(a.MapId))
+		m = BalancerMap{
+			Max:     2,
+			Avatars: make(map[Id]bool),
+		}
+		b.Maps[Id(a.MapId)] = m
 	}
 
 	if len(m.Avatars) == m.Max {

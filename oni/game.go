@@ -70,3 +70,10 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	gm.Map.RunAvatar(ws, AvatarData{Id: id, X: 1, Y: 1})
 }
+
+func (gm *Game) LoadMap(id Id) {
+	log.Println("LoadMap", id)
+}
+func (gm *Game) UnloadMap(id Id) {
+	log.Println("UnloadMap", id)
+}
