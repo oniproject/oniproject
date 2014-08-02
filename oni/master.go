@@ -1,25 +1,55 @@
 package oni
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/coopernurse/gorp"
 	"github.com/gorilla/sessions"
+	_ "github.com/mattn/go-sqlite3"
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
+	//"strconv"
 )
+
+type Account struct {
+	Id       int64  `db:"id"`
+	Login    string `db:"login"`
+	Password string `db:"password"`
+	AvatarId int64  `db:"avatar_id"`
+}
 
 type Master struct {
 	Addr, Rpc             string
 	homeTempl, loginTempl *template.Template
+	authdb                *gorp.DbMap
 }
 
 func NewMaster() *Master {
-	return &Master{
+	m := &Master{
 		homeTempl:  template.Must(template.ParseFiles("templates/index.html")),
 		loginTempl: template.Must(template.ParseFiles("templates/login.html")),
 	}
+
+	db, err := sql.Open("sqlite3", "accounts.bin")
+	if err != nil {
+		log.Fatalln("sql.Open failed", err)
+	}
+	m.authdb = &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+
+	m.authdb.AddTableWithName(Account{}, "accounts").SetKeys(true, "Id")
+	if err := m.authdb.CreateTablesIfNotExists(); err != nil {
+		log.Fatalln(err, "Create tables failed")
+	}
+
+	/*
+		t1 := Account{Login: "t1", AvatarId: 666}
+		t2 := Account{Login: "t2", AvatarId: 13}
+		m.authdb.Insert(&t1, &t2)
+	*/
+
+	return m
 }
 
 func (m *Master) Run() {
@@ -76,9 +106,24 @@ func (m *Master) login(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "POST" {
 		r.ParseForm()
 		login := r.PostFormValue("login")
-		//pass := r.PostFormValue("password")
+		pass := r.PostFormValue("password")
 
-		// TODO auth
+		var account Account
+		if err := m.authdb.SelectOne(
+			&account,
+			"select * from accounts where login=:login",
+			map[string]interface{}{"login": login}); err != nil {
+			// TODO Auth err: notfound
+			log.Println("auth notfound", err)
+			return
+		}
+
+		// FIXME sault and hash pass
+		if pass != account.Password {
+			// TODO Auth err: fail pass
+			log.Println("fail pass")
+			return
+		}
 
 		auth, err := store.Get(r, "auth")
 		if err != nil {
@@ -87,23 +132,13 @@ func (m *Master) login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var x struct {
-			//Id   uint64
-			Id   Id
+		x := struct {
+			Id   int64
 			Host string
-		}
-		x.Host = "localhost:2000"
+		}{account.AvatarId, "localhost:2000"}
 
-		if id, err := strconv.ParseInt(login, 16, 64); err != nil {
-			http.Error(w, http.StatusText(504), 504)
-			log.Println(err)
-			return
-		} else {
-			id_ := NewAvatarId(id)
-			log.Printf("%b", id_)
-			auth.Values["id"] = int64(id_)
-			x.Id = id_
-		}
+		auth.Values["id"] = account.AvatarId
+
 		sessions.Save(r, w)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		//http.Redirect(w, r, "/game", 301)
