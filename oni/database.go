@@ -35,16 +35,15 @@ func NewDatabase(driver, source string) (db *Database) {
 	return
 }
 
-func (db *Database) AvatarDataById(id Id) (a AvatarData, err error) {
-	a = AvatarData{}
+func (db *Database) AvatarDataById(id Id) (a *AvatarData, err error) {
 	// TODO choice database by Id
-	err = db.dbmap.SelectOne(
-		&a, "select * from avatars where id=:id",
-		map[string]interface{}{"id": id})
-	log.Println("AvatarDataById", a, err)
+	obj, err := db.dbmap.Get(AvatarData{}, id)
 	if err != nil {
 		log.Println("SelectOne failed", err)
+		return
 	}
+	a = obj.(*AvatarData)
+	log.Println("AvatarDataById", a, err)
 	// TODO sync AvatarData with mechanic database
 	return
 }
