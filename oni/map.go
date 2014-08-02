@@ -62,7 +62,7 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
 		sendMessage: make(chan interface{}, 256),
 		ping_pong:   time.Now(),
 	}
-	p := NewPositionComponent(data.Position.X, data.Position.Y)
+	p := NewPositionComponent(data.X, data.Y)
 	c := &Avatar{p, data, conn, 0, m}
 
 	m.register <- c

@@ -11,6 +11,7 @@ type Balancer struct {
 	c    *client.Client
 	Maps map[Id]BalancerMap
 	Game *Game
+	db   *Database
 }
 
 type BalancerMap struct {
@@ -18,10 +19,11 @@ type BalancerMap struct {
 	Avatars map[Id]bool
 }
 
-func NewBalancer(circuit string) (b *Balancer) {
+func NewBalancer(circuit string, db *Database) (b *Balancer) {
 	b = &Balancer{
 		Maps: make(map[Id]BalancerMap),
 		Game: NewGame(),
+		db:   db,
 	}
 	b.Game.Addr = ":2000"
 	if circuit != "" {
@@ -30,35 +32,47 @@ func NewBalancer(circuit string) (b *Balancer) {
 	return
 }
 
-func (b *Balancer) AttachAvatar(a AvatarData) error {
-	m, ok := b.Maps[a.MapId]
+func (b *Balancer) AttachAvatar(id Id) (a *AvatarData, err error) {
+	a, err = b.db.AvatarDataById(id)
+	if err != nil {
+		a = nil
+		return
+	}
+
+	m, ok := b.Maps[Id(a.MapId)]
 	if !ok {
-		// load map
-		return errors.New("fail load map")
+		b.Game.LoadMap(Id(a.MapId))
+		m = BalancerMap{
+			Max:     2,
+			Avatars: make(map[Id]bool),
+		}
+		b.Maps[Id(a.MapId)] = m
 	}
 
 	if len(m.Avatars) == m.Max {
-		return errors.New("fail attach: Map is full")
+		err = errors.New("fail attach: Map is full")
+		return
 	}
 
-	if _, ok := m.Avatars[a.Id]; ok {
+	if _, ok := m.Avatars[Id(a.Id)]; ok {
 		// avatar is avilable
 		// unload it!
 		// send disconnect rpc call to Game
-		return errors.New("fail attach: avatar is avilable")
+		err = errors.New("fail attach: avatar is avilable")
+		return
 	}
 
-	m.Avatars[a.Id] = true
+	m.Avatars[Id(a.Id)] = true
 
 	// attach
 
-	return nil
+	return
 }
 
 func (b *Balancer) DetachAvatar(a AvatarData) error {
-	if m, ok := b.Maps[a.MapId]; ok {
-		if _, ok := m.Avatars[a.Id]; ok {
-			delete(m.Avatars, a.Id)
+	if m, ok := b.Maps[Id(a.MapId)]; ok {
+		if _, ok := m.Avatars[Id(a.Id)]; ok {
+			delete(m.Avatars, Id(a.Id))
 			// TODO send it to Game
 		}
 	}

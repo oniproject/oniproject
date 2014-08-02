@@ -21,9 +21,9 @@ type State struct {
 	Veloctity geom.Coord
 }
 type AvatarData struct {
-	Id       Id
-	MapId    Id
-	Position geom.Coord
+	Id    int64
+	MapId int64
+	X, Y  float64
 }
 
 type AvatarMapper interface {
@@ -41,7 +41,7 @@ type Avatar struct {
 }
 
 func (a Avatar) Id() Id {
-	return a.data.Id
+	return Id(a.data.Id)
 }
 
 func (a *Avatar) Send(m Message) {
@@ -49,7 +49,7 @@ func (a *Avatar) Send(m Message) {
 }
 
 func (a Avatar) GetState(typ uint8, tick uint) *State {
-	return &State{typ, a.data.Id, tick, a.Lag, a.Position(), a.Velocity()}
+	return &State{typ, Id(a.data.Id), tick, a.Lag, a.Position(), a.Velocity()}
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {
