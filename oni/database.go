@@ -33,15 +33,15 @@ func NewDatabase(driver, source string) (db *Database) {
 		log.Fatalln(err, "Create tables failed")
 	}
 
-	/*
-		*t1 := AvatarData{X: 2, Y: 1, Id: 1}
-		t2 := AvatarData{X: 2, Y: 1, Id: 2}
-		if err := db.dbmap.Insert(&t1, &t2); err != nil {
-			log.Fatalln(err, "Insert fail", err)
-		}
-		// */
-
 	return
+}
+
+func (db *Database) Migrate() {
+	t1 := AvatarData{X: 2, Y: 1, Id: 1}
+	t2 := AvatarData{X: 2, Y: 1, Id: 2}
+	if err := db.dbmap.Insert(&t1, &t2); err != nil {
+		log.Fatalln(err, "Insert fail", err)
+	}
 }
 
 func (db *Database) AvatarDataById(id Id) (a *AvatarData, err error) {

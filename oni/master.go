@@ -44,13 +44,13 @@ func NewMaster(balancer *Balancer) *Master {
 		log.Fatalln(err, "Create tables failed")
 	}
 
-	/*
-		t1 := Account{Login: "t1", AvatarId: 1}
-		t2 := Account{Login: "t2", AvatarId: 2}
-		m.authdb.Insert(&t1, &t2)
-		// */
-
 	return m
+}
+
+func (m *Master) Migrate() {
+	t1 := Account{Login: "t1", AvatarId: 1}
+	t2 := Account{Login: "t2", AvatarId: 2}
+	m.authdb.Insert(&t1, &t2)
 }
 
 func (m *Master) Run() {
