@@ -23,11 +23,11 @@ var healing = &Skill{
 	onTarget:  EffectList{&RecoverHP{Count: 50}},
 	onCaster:  EffectList{},
 }
+var caster = &FakeSkillTarget{
+	race: 3,
+}
 
 func TestHealing(t *testing.T) {
-	caster := &FakeSkillTarget{
-		race: 3,
-	}
 	target := &FakeSkillTarget{
 		HP:   30,
 		race: 3,
@@ -43,9 +43,6 @@ func TestHealing(t *testing.T) {
 }
 
 func TestHealingCooldown(t *testing.T) {
-	caster := &FakeSkillTarget{
-		race: 3,
-	}
 	target := &FakeSkillTarget{
 		HP:   30,
 		race: 3,
