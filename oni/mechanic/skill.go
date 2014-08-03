@@ -3,6 +3,7 @@ package mechanic
 import (
 	"errors"
 	"github.com/coopernurse/gorp"
+	"log"
 	"time"
 )
 
@@ -20,6 +21,13 @@ const (
 	TARGET_ANYWHERE     = TARGET_ANOTHER_RACE | TARGET_SAME_RACE | TARGET_MONSTER
 )
 
+type SkillTarget interface {
+	// race == 0 is a Monster
+	Race() int
+	//Position() geom.Coord
+	EffectReceiver
+}
+
 type Skill struct {
 	// Basic settings
 	Name        string
@@ -35,7 +43,7 @@ type Skill struct {
 
 	CastDealy time.Duration `cooldown time`
 
-	Animation AnimationId
+	Animation int
 
 	EffectsOnTarget string // json
 	onTarget        EffectList
@@ -56,11 +64,11 @@ func (s *Skill) PostGet(sql gorp.SqlExecutor) error {
 	return nil
 }
 
-type SkillTarget interface {
-	// race == 0 is a Monster
-	Race() int
-	//Position() geom.Coord
-	EffectReceiver
+func (s *Skill) OnLearn(r FeatureReceiver) error {
+	for _, f := range s.features {
+		f.Run(r)
+	}
+	return nil
 }
 
 func (s *Skill) Cast(caster, target SkillTarget, lastCast time.Time) error {
@@ -83,6 +91,8 @@ func (s *Skill) Cast(caster, target SkillTarget, lastCast time.Time) error {
 	if time.Now().Sub(lastCast) < s.CastDealy {
 		return errors.New("fail cooldown")
 	}
+
+	log.Println("Cast Skill", s)
 
 	// TODO Required
 	// TODO Range

@@ -1,6 +1,12 @@
 package mechanic
 
-type EffectReceiver interface{}
+type EffectReceiver interface {
+	RecoverHP(int)
+	RecoverMP(int)
+	RecoverTP(int)
+	//AddState(int)
+	//RemoveState(int)
+}
 type EffectList []Effect
 type Effect interface {
 	ApplyTo(EffectReceiver)
@@ -8,20 +14,28 @@ type Effect interface {
 
 // Recover
 
-// Restores HP.
-// Specify either a percentage of max HP or a set value, or both.
-// In the case of items, the multipler [Medicine Lore] sp-parameter is applied.
 type RecoverHP struct {
-	Procents int // %
-	Count    int // +
+	Count int // +
 }
 
-// Restores MP.
-// Specify either a percentage of max MP or a set value, or both.
-// In the case of items, the multipler [Medicine Lore] sp-parameter is applied.
+func (e *RecoverHP) ApplyTo(r EffectReceiver) {
+	r.RecoverHP(e.Count)
+}
+
 type RecoverMP struct {
-	Procents int // %
-	Count    int // +
+	Count int // +
+}
+
+func (e *RecoverMP) ApplyTo(r EffectReceiver) {
+	r.RecoverMP(e.Count)
+}
+
+type RecoverTP struct {
+	Count int // +
+}
+
+func (e *RecoverTP) ApplyTo(r EffectReceiver) {
+	r.RecoverTP(e.Count)
 }
 
 // Increases the TP by the amount specified.
