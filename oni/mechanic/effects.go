@@ -3,7 +3,7 @@ package mechanic
 type EffectReceiver interface{}
 type EffectList []Effect
 type Effect interface {
-	Run(EffectReceiver)
+	ApplyTo(EffectReceiver)
 }
 
 // Recover
