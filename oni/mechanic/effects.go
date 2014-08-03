@@ -18,25 +18,19 @@ type RecoverHP struct {
 	Count int // +
 }
 
-func (e *RecoverHP) ApplyTo(r EffectReceiver) {
-	r.RecoverHP(e.Count)
-}
+func (e *RecoverHP) ApplyTo(r EffectReceiver) { r.RecoverHP(e.Count) }
 
 type RecoverMP struct {
 	Count int // +
 }
 
-func (e *RecoverMP) ApplyTo(r EffectReceiver) {
-	r.RecoverMP(e.Count)
-}
+func (e *RecoverMP) ApplyTo(r EffectReceiver) { r.RecoverMP(e.Count) }
 
 type RecoverTP struct {
 	Count int // +
 }
 
-func (e *RecoverTP) ApplyTo(r EffectReceiver) {
-	r.RecoverTP(e.Count)
-}
+func (e *RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
 
 // Increases the TP by the amount specified.
 type GainTP struct {

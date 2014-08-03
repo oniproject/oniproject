@@ -49,8 +49,6 @@ type Skill struct {
 	onTarget        EffectList
 	EffectsOnCaster string // json
 	onCaster        EffectList
-	Features        string // json
-	features        FeatureList
 
 	// comment
 	Note string
@@ -60,14 +58,6 @@ type Skill struct {
 func (s *Skill) PostGet(sql gorp.SqlExecutor) error {
 	// TODO EffectsOnTarget -> onTarget
 	// TODO EffectsOnCaster -> onCaster
-	// TODO Features -> features
-	return nil
-}
-
-func (s *Skill) OnLearn(r FeatureReceiver) error {
-	for _, f := range s.features {
-		f.Run(r)
-	}
 	return nil
 }
 

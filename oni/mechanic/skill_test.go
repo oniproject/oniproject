@@ -22,7 +22,6 @@ var healing = &Skill{
 	CastDealy: 10 * time.Second,
 	onTarget:  EffectList{&RecoverHP{Count: 50}},
 	onCaster:  EffectList{},
-	features:  FeatureList{},
 }
 
 func TestHealing(t *testing.T) {
