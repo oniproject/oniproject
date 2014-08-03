@@ -1,5 +1,10 @@
 package mechanic
 
+import (
+	"github.com/coopernurse/gorp"
+	"time"
+)
+
 type StateId int
 
 type State struct {
@@ -8,30 +13,30 @@ type State struct {
 	Icon        string
 	Description string
 
-	Restriction int
-	Priority    int
+	AutoRemovalTiming time.Duration
 
-	// Removal Conditionns
-	RemoveAtBattleEnd   bool
-	RemoveByRestriction bool
-
-	AutoRemovalTiming int
-	DurationInTurns1  int
-	DurationInTurns2  int
-
-	RemoveByDamage       bool
-	RemoveByDamageValue  int
-	RemoveByWalking      bool
-	RemoveByWalkingValue int
-
-	MessageWhenActorEntersState string
-	MessageWhenEnemyEntersState string
-
-	MessageWhenStateRemains string
-	MessageWhenStateRemoves string
-
-	Features FeatureList
+	Features string
+	features FeatureList
 
 	// comment
 	Note string
+}
+
+// db hook
+func (s *State) PostGet(sql gorp.SqlExecutor) error {
+	// TODO Features -> features
+	return nil
+}
+
+func (s *State) ApplyFeatures(r FeatureReceiver) {
+	for _, f := range s.features {
+		f.Run(r)
+	}
+}
+
+func (s *State) AutoRemoval(add_time time.Time) bool {
+	if time.Now().Sub(add_time) < s.AutoRemovalTiming {
+		return true
+	}
+	return true
 }

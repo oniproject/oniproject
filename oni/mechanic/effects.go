@@ -4,8 +4,8 @@ type EffectReceiver interface {
 	RecoverHP(int)
 	RecoverMP(int)
 	RecoverTP(int)
-	//AddState(int)
-	//RemoveState(int)
+	AddState(int)
+	RemoveState(int)
 }
 type EffectList []Effect
 type Effect interface {
@@ -42,15 +42,17 @@ type GainTP struct {
 // Adds the specified state.
 // Specifying a value over 100% enables success at a rate higher then the target's original effectiveness.
 type AddState struct {
-	State  StateId
-	Chance int // %
+	State int
 }
+
+func (e *AddState) ApplyTo(r EffectReceiver) { r.AddState(e.State) }
 
 // Removes the specified state.
 type RemoveState struct {
-	State  StateId
-	Chance int // %
+	State int
 }
+
+func (e *RemoveState) ApplyTo(r EffectReceiver) { r.RemoveState(e.State) }
 
 // Param
 

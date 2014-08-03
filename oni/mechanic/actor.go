@@ -25,49 +25,78 @@ type Actor struct {
 	// index - SlotId
 	//Equips []Equip
 	//Cooldowns []*Cooldown
-	Skills map[int]*Cooldown
+	skills map[int]time.Time
 
 	/*Class ClassId
 	//Race RaceId
+	*/
 
 	EXP int // Experience Points
-	HP  int // Hit Points
-	MP  int // Magic Points
-	TP  int // Tehnical Points
+	Parameters
+	//HP  int // Hit Points
+	//MP  int // Magic Points
+	//TP  int // Tehnical Points
 	DPS int // Damage Per Second
-
-	Parameters   map[ParameterId]int
-	ExParameters map[ExParameterId]int
-	SpParameters map[SpParameterId]int
+	/*
+		Parameters   map[ParameterId]int
+		ExParameters map[ExParameterId]int
+		SpParameters map[SpParameterId]int
 	*/
+	//db
+
+	states map[int]time.Time
 }
 
-func (a *Actor) RunSkill(skill int) error {
-	enabled, ok := a.Skills[skill]
+func (a *Actor) Race() int { return a.RaceId }
+
+func (a *Actor) AddState(id int) {
+	a.states[id] = time.Now()
+	a.recalc()
+}
+func (a *Actor) RemoveState(id int) {
+	delete(a.states, id)
+	a.recalc()
+}
+
+// recalc all params
+func (a *Actor) recalc() {
+	// TODO set params to zero
+	for id := range a.states {
+		state := db.States[id]
+		state.ApplyFeatures(a)
+	}
+}
+
+func (a *Actor) Cast(id int, target SkillTarget) error {
+	lastCast, ok := a.skills[id]
 	if !ok {
 		return errors.New("skill not found")
 	}
-	if enabled != nil {
-		return errors.New("skill is cool")
+
+	if target == nil {
+		target = a
 	}
-	/* TODO get skill data
-	s := ... get skill
-	// send skill
-	s.Call
-	t := s.CooldownTime
-	*/
-	t := 10 * time.Second
-	if t != 0 {
-		//a.Cooldowns = append(a.Cooldowns, NewCooldown(a, skill, t))
-		a.Skills[skill] = NewCooldown(t)
+
+	skill := db.Skills[id]
+	err := skill.Cast(a, target, lastCast)
+	if err != nil {
+		a.skills[id] = time.Now()
 	}
-	return nil
+
+	return err
 }
-func (a *Actor) UpdateCooldowns(t time.Duration) {
-	for skill, c := range a.Skills {
-		if c != nil && c.Update(t) {
-			// remove cooldown
-			a.Skills[skill] = nil
+
+func (a *Actor) UpdateStates() {
+	dirty := false
+	for id, add_time := range a.states {
+		state := db.States[id]
+		if state.AutoRemoval(add_time) {
+			a.RemoveState(id)
+			dirty = true
+			delete(a.states, id)
 		}
+	}
+	if dirty {
+		a.recalc()
 	}
 }
