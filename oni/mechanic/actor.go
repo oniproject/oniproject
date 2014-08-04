@@ -16,6 +16,7 @@ type Ability struct {
 type EquipItem interface {
 	SlotType() int
 	TryEquip(*Actor) error
+	ApplyFeatures(r FeatureReceiver)
 }
 
 type Actor struct {
@@ -81,6 +82,10 @@ func (a *Actor) SetEquipSlot(t int, v bool) {
 	// TODO remove equip if v==false
 }
 
+func (a *Actor) UnEquipItem(item EquipItem) {
+	a.Equip[item.SlotType()] = nil
+	a.recalc()
+}
 func (a *Actor) EquipItem(item EquipItem) {
 	if err := item.TryEquip(a); err != nil {
 		log.Println("fail equip", err)
@@ -88,6 +93,7 @@ func (a *Actor) EquipItem(item EquipItem) {
 	}
 	a.Equip[item.SlotType()] = item
 	// TODO check slot
+	a.recalc()
 }
 
 func (a *Actor) Race() int { return a.RaceId }
@@ -104,6 +110,9 @@ func (a *Actor) RemoveState(id int) {
 // recalc all params
 func (a *Actor) recalc() {
 	// TODO set params to zero
+	for _, equip := range a.Equip {
+		equip.ApplyFeatures(a)
+	}
 	for id := range a.states {
 		state := db.States[id]
 		state.ApplyFeatures(a)

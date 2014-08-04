@@ -13,7 +13,8 @@ type Armor struct {
 	EquipTypeId int
 	SlotTypeId  int
 
-	Features FeatureList
+	Features string
+	features FeatureList `db:"-"`
 
 	// comment
 	Note string
@@ -26,4 +27,10 @@ func (a *Armor) TryEquip(actor *Actor) error {
 		return errors.New("fail armor type")
 	}
 	return nil
+}
+
+func (a *Armor) ApplyFeatures(r FeatureReceiver) {
+	for _, f := range a.features {
+		f.Run(r)
+	}
 }

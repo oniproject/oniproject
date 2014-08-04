@@ -14,7 +14,8 @@ type Weapon struct {
 	SlotTypeId  int
 	Animation   int
 
-	Features FeatureList
+	Features string
+	features FeatureList `db:"-"`
 
 	// comment
 	Note string
@@ -27,4 +28,10 @@ func (w *Weapon) TryEquip(actor *Actor) error {
 		return errors.New("fail weapon type")
 	}
 	return nil
+}
+
+func (w *Weapon) ApplyFeatures(r FeatureReceiver) {
+	for _, f := range w.features {
+		f.Run(r)
+	}
 }
