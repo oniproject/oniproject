@@ -8,7 +8,7 @@ import (
 	//"time"
 )
 
-var db = &DB{}
+var db = NewDB("", "")
 
 type DB struct {
 	db     *sql.DB
@@ -18,6 +18,11 @@ type DB struct {
 }
 
 func NewDB(driver, source string) (db *DB) {
+	db = &DB{
+		States: []*State{},
+		Skills: []*Skill{},
+	}
+
 	driver = "sqlite3"
 	source = "test_db.bin"
 
@@ -27,7 +32,21 @@ func NewDB(driver, source string) (db *DB) {
 		log.Fatalln("sql.Open failed", err)
 	}
 
-	db.dbmap = &gorp.DbMap{Db: db.db, Dialect: gorp.SqliteDialect{}}
+	dbmap := &gorp.DbMap{Db: db.db, Dialect: gorp.SqliteDialect{}}
+	db.dbmap = dbmap
+
+	dbmap.AddTableWithName(Skill{}, "skills")
+	dbmap.AddTableWithName(State{}, "states")
+	if err := dbmap.CreateTablesIfNotExists(); err != nil {
+		log.Fatalln("Create tables failed:", err)
+	}
+
+	if _, err := dbmap.Select(&db.Skills, "select * from skills"); err != nil {
+		log.Fatalln("Select skills failed:", err)
+	}
+	if _, err := dbmap.Select(&db.States, "select * from states"); err != nil {
+		log.Fatalln("Select states failed:", err)
+	}
 
 	return
 }
