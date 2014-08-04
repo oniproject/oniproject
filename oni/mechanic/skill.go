@@ -1,6 +1,7 @@
 package mechanic
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/coopernurse/gorp"
 	"log"
@@ -44,20 +45,28 @@ type Skill struct {
 
 	Animation int
 
-	EffectsOnTarget string // json
-	onTarget        EffectList
-	EffectsOnCaster string // json
-	onCaster        EffectList
+	EffectsOnTarget string     // json
+	onTarget        EffectList `db:"-"`
+	EffectsOnCaster string     // json
+	onCaster        EffectList `db:"-"`
 
 	// comment
 	Note string
 }
 
 // db hook
-func (s *Skill) PostGet(sql gorp.SqlExecutor) error {
-	// TODO EffectsOnTarget -> onTarget
-	// TODO EffectsOnCaster -> onCaster
-	return nil
+func (s *Skill) PostGet(sql gorp.SqlExecutor) (err error) {
+	// EffectsOnTarget -> onTarget
+	err = json.Unmarshal([]byte(s.EffectsOnTarget), &(s.onTarget))
+	if err != nil {
+		return
+	}
+	// EffectsOnCaster -> onCaster
+	err = json.Unmarshal([]byte(s.EffectsOnCaster), &(s.onCaster))
+	if err != nil {
+		return
+	}
+	return
 }
 
 func (s *Skill) Cast(caster, target SkillTarget, lastCast time.Time) error {
