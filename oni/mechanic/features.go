@@ -1,10 +1,23 @@
 package mechanic
 
-type FeatureReceiver interface{}
+type FeatureReceiver interface {
+	AddATK(int)
+	AddDEF(int)
+}
 type FeatureList []Feature
 type Feature interface {
 	Run(FeatureReceiver)
 }
+
+// change parameters
+
+type AddATK struct{ Value int }
+
+func (f *AddATK) Run(r FeatureReceiver) { r.AddATK(f.Value) }
+
+type AddDEF struct{ Value int }
+
+func (f *AddDEF) Run(r FeatureReceiver) { r.AddDEF(f.Value) }
 
 // Rate
 

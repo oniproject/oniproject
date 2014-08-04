@@ -1,11 +1,13 @@
 package mechanic
 
 type Parameters struct {
-	//v p    ex
-	//  Max   ReGeneration rate
-	HP, MHP, HRG int
-	MP, MMP, MRG int
-	TP, MTP, TRG int
+	//v max ReGeneration rate
+	HP, MHP, HRG int // Hit Points
+	MP, MMP, MRG int // Magic Points
+	TP, MTP, TRG int // Tehnical Points
+
+	ATK int // ATtacK power
+	DEF int // DEFense power
 }
 
 // run it every second
@@ -15,6 +17,7 @@ func (p *Parameters) Regeneration() {
 	p.RecoverTP(p.TRG)
 }
 
+// for effects
 func (p *Parameters) RecoverHP(v int) {
 	p.HP += v
 	if p.HP > p.MHP {
@@ -24,7 +27,6 @@ func (p *Parameters) RecoverHP(v int) {
 		p.HP = 0
 	}
 }
-
 func (p *Parameters) RecoverMP(v int) {
 	p.MP += v
 	if p.MP > p.MMP {
@@ -34,7 +36,6 @@ func (p *Parameters) RecoverMP(v int) {
 		p.MP = 0
 	}
 }
-
 func (p *Parameters) RecoverTP(v int) {
 	p.TP += v
 	if p.TP > p.MTP {
@@ -44,3 +45,7 @@ func (p *Parameters) RecoverTP(v int) {
 		p.TP = 0
 	}
 }
+
+// for features
+func (p *Parameters) AddATK(v int) { p.ATK += v }
+func (p *Parameters) AddDEF(v int) { p.DEF += v }

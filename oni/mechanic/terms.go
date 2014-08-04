@@ -55,6 +55,6 @@ type ExParameterId int
 	PDR Physical Damage Rate
 	MDR Magical Damage Rate
 	FDR Floor Damage Rate
-	EXP EXperience Rate
+	EXR EXperience Rate
 */
 type SpParameterId int

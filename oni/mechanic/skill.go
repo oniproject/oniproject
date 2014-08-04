@@ -35,7 +35,6 @@ type Skill struct {
 	Description string
 
 	SkillType int
-	Class     int
 
 	Target int
 	//Range  int

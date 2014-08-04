@@ -2,8 +2,14 @@ package mechanic
 
 import (
 	"errors"
+	"github.com/coopernurse/gorp"
 	"time"
 )
+
+type Ability struct {
+	Level int
+	EXP   int
+}
 
 type Actor struct {
 	Nickname string
@@ -25,6 +31,7 @@ type Actor struct {
 	// index - SlotId
 	//Equips []Equip
 	//Cooldowns []*Cooldown
+	Skills string // json
 	skills map[int]time.Time
 
 	/*Class ClassId
@@ -36,7 +43,7 @@ type Actor struct {
 	//HP  int // Hit Points
 	//MP  int // Magic Points
 	//TP  int // Tehnical Points
-	DPS int // Damage Per Second
+	//DPS int // Damage Per Second
 	/*
 		Parameters   map[ParameterId]int
 		ExParameters map[ExParameterId]int
@@ -44,7 +51,17 @@ type Actor struct {
 	*/
 	//db
 
+	States string // json
 	states map[int]time.Time
+
+	Abilities map[string]Ability
+}
+
+// db hook
+func (a *Actor) PostGet(sql gorp.SqlExecutor) error {
+	// TODO Skills -> skills
+	// TODO States -> states
+	return nil
 }
 
 func (a *Actor) Race() int { return a.RaceId }

@@ -14,21 +14,15 @@ type Effect interface {
 
 // Recover
 
-type RecoverHP struct {
-	Count int // +
-}
+type RecoverHP struct{ Count int }
 
 func (e *RecoverHP) ApplyTo(r EffectReceiver) { r.RecoverHP(e.Count) }
 
-type RecoverMP struct {
-	Count int // +
-}
+type RecoverMP struct{ Count int }
 
 func (e *RecoverMP) ApplyTo(r EffectReceiver) { r.RecoverMP(e.Count) }
 
-type RecoverTP struct {
-	Count int // +
-}
+type RecoverTP struct{ Count int }
 
 func (e *RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
 

@@ -14,9 +14,9 @@ type Weapon struct {
 
 	Price int
 
-	WeaponType       WeaponTypeId
-	Animation        AnimationId
-	ParameterChanges map[ParameterId]int
+	WeaponType int
+	Animation  int
+	//ParameterChanges map[ParameterId]int
 
 	Features FeatureList
 
