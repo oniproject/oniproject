@@ -15,37 +15,27 @@ type Effect interface {
 // Recover
 
 type RecoverHP struct{ Count int }
-
-func (e *RecoverHP) ApplyTo(r EffectReceiver) { r.RecoverHP(e.Count) }
-
 type RecoverMP struct{ Count int }
-
-func (e *RecoverMP) ApplyTo(r EffectReceiver) { r.RecoverMP(e.Count) }
-
 type RecoverTP struct{ Count int }
 
+func (e *RecoverHP) ApplyTo(r EffectReceiver) { r.RecoverHP(e.Count) }
+func (e *RecoverMP) ApplyTo(r EffectReceiver) { r.RecoverMP(e.Count) }
 func (e *RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
 
 // Increases the TP by the amount specified.
-type GainTP struct {
+/*type GainTP struct {
 	Value int // %
-}
+}*/
 
 // State
 
 // Adds the specified state.
-// Specifying a value over 100% enables success at a rate higher then the target's original effectiveness.
-type AddState struct {
-	State int
-}
-
-func (e *AddState) ApplyTo(r EffectReceiver) { r.AddState(e.State) }
-
 // Removes the specified state.
-type RemoveState struct {
-	State int
-}
+// Specifying a value over 100% enables success at a rate higher then the target's original effectiveness.
+type AddState struct{ State int }
+type RemoveState struct{ State int }
 
+func (e *AddState) ApplyTo(r EffectReceiver)    { r.AddState(e.State) }
 func (e *RemoveState) ApplyTo(r EffectReceiver) { r.RemoveState(e.State) }
 
 // Param
@@ -54,7 +44,7 @@ func (e *RemoveState) ApplyTo(r EffectReceiver) { r.RemoveState(e.State) }
 // For each level, there is a 25% fluctuation in the original value,
 // and an increase of up to two levels is possible.
 // To raise a parameter two or more levels at one time, you con apply this effect multiple times.
-type AddBuff struct {
+/*type AddBuff struct {
 	Parameter ParameterId
 	Turns     int
 }
@@ -103,4 +93,4 @@ type LearnSkill struct {
 // Triggers the specified common event. Only one call specification for common events is valid.
 type CommonEvent struct {
 	Event int
-}
+}*/

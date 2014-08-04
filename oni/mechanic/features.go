@@ -3,6 +3,11 @@ package mechanic
 type FeatureReceiver interface {
 	AddATK(int)
 	AddDEF(int)
+	AddSkill(int)
+	SealSkill(int)
+
+	SetEquipSlot(int, bool)
+	SetEquipType(int, bool)
 }
 type FeatureList []Feature
 type Feature interface {
@@ -12,18 +17,16 @@ type Feature interface {
 // change parameters
 
 type AddATK struct{ Value int }
-
-func (f *AddATK) Run(r FeatureReceiver) { r.AddATK(f.Value) }
-
 type AddDEF struct{ Value int }
 
+func (f *AddATK) Run(r FeatureReceiver) { r.AddATK(f.Value) }
 func (f *AddDEF) Run(r FeatureReceiver) { r.AddDEF(f.Value) }
 
 // Rate
 
 // Changes the damage multipler according to the specified elements.
 // The higher the value, the greater the weakness against the element.
-type ElementRate struct {
+/*type ElementRate struct {
 	Element ElementId
 	Value   int // * %
 }
@@ -87,40 +90,46 @@ type AtkSpeed struct {
 // Increases the nimber of times a normal attack hits a target. Entering "+1" means two consecutive attacks.
 type AtkTimes struct {
 	Times int
-}
+}*/
 
 // Skill
 
 // Allow the specified skill type to be selected as a command.
-type AddSkillType struct {
+/*type AddSkillType struct {
 	SkillType SkillTypeId
 }
 
 // Temporarily disables the use of the specified type of skill.
 type SealSkillType struct {
 	SkillType SkillType
-}
+}*/
 
 // Set the specified skills as being learned.
-type AddSkill struct {
-	Skill SkillId
-}
+type AddSkill struct{ SkillId int }
+type SealSkill struct{ SkillId int }
 
-// Temporarily disables the use of the specified skill.
-type SealSkill struct {
-	Skill SkillId
-}
+func (f *AddSkill) Run(r FeatureReceiver)  { r.AddSkill(f.SkillId) }
+func (f *SealSkill) Run(r FeatureReceiver) { r.SealSkill(f.SkillId) }
 
 // Equip
 
-// Enables the equipping of the specified type of weapon.
-type EquipWeapon struct {
-	Weapon WeaponId
-}
+// Enables the equipping of the specified type of slot.
+type AddEquipSlot struct{ SlotId int }
+type SealEquipSlot struct{ SlotId int }
+
+func (f *AddEquipSlot) Run(r FeatureReceiver)  { r.SetEquipSlot(f.SlotId, true) }
+func (f *SealEquipSlot) Run(r FeatureReceiver) { r.SetEquipSlot(f.SlotId, false) }
+
+// Enables the equipping of the specified type of equip.
+type AddEquipType struct{ EquipTypeId int }
+type SealEquipType struct{ EquipTypeId int }
+
+func (f *AddEquipType) Run(r FeatureReceiver)  { r.SetEquipType(f.EquipTypeId, true) }
+func (f *SealEquipType) Run(r FeatureReceiver) { r.SetEquipType(f.EquipTypeId, false) }
 
 // Enables the equipping of the specified type of armor.
-type EquipArmor struct {
-	Armor ArmorId
+/*type EquipArmor struct {
+	ArmorId int
 }
 
 // Prevents the changing of equipment for the specified equipment slot.
@@ -141,7 +150,7 @@ type SealEquip struct {
 // This enables the equipping of two weapons in excange for not being able to equip a shield.
 type SlotType struct {
 	Slot SlotTypeId
-}
+}*/
 
 // Other
 
