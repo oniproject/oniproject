@@ -1,10 +1,6 @@
 package mechanic
 
-type ArmorId int
-type ArmorList []Armor
-
-type ArmorType string
-type ArmorTypeId int
+import "errors"
 
 type Armor struct {
 	// Basic settings
@@ -14,12 +10,20 @@ type Armor struct {
 
 	Price int
 
-	ArmorType        ArmorTypeId
-	EquipType        EquipTypeId
-	ParameterChanges map[ParameterId]int
+	EquipTypeId int
+	SlotTypeId  int
 
 	Features FeatureList
 
 	// comment
 	Note string
+}
+
+func (a *Armor) SlotType() int { return a.SlotTypeId }
+func (a *Armor) TryEquip(actor *Actor) error {
+	// TODO check level and others
+	if !actor.TestEquipType(a.EquipTypeId) {
+		return errors.New("fail armor type")
+	}
+	return nil
 }
