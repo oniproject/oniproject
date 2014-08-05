@@ -19,7 +19,7 @@ function Map(iso) {
 				add = add.scale(point, mod.x, mod.y, mod.z);
 				break;
 			case 'translate':
-				add = add.translate(point, mod.x, mod.y, mod.z);
+				add = add.translate(mod.x, mod.y, mod.z);
 				break;
 			default:
 				console.warn('fail mod.type', mod);
@@ -33,15 +33,21 @@ function Map(iso) {
 		switch(obj.type) {
 		case 'prism':
 			var pos = obj.pos;
-			add = Isomer.Shape.Prism(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
+			//add = Isomer.Shape.Prism(Isomer.Point.ORIGIN, obj.dx, obj.dy, obj.dz);
+			add = Isomer.Shape.Prism(Isomer.Point.ORIGIN, 1,1,1);
+			//add = add.translate(pos[0], pos[1], pos[2]);
+			//add = add.scale(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
 			break;
 		case 'pyramid':
 			var pos = obj.pos;
-			add = Isomer.Shape.Pyramid(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
+			add = Isomer.Shape.Pyramid(Isomer.Point.ORIGIN, 1,1,1);
+			//add = add.translate(pos[0], pos[1], pos[2]);
+			//add = add.scale(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
 			break;
 		case 'cylinder':
 			var pos = obj.pos;
-			add = Isomer.Shape.Cylinder(Isomer.Point.apply(null, pos), obj.radius, obj.vertices, obj.height);
+			add = Isomer.Shape.Cylinder(Isomer.Point.ORIGIN, 1, obj.vertices, 1);
+			//add = add.translate(pos[0], pos[1], pos[2]);
 			break;
 		case 'path':
 			add = new Isomer.Path(obj.path.map(function(el) {
@@ -55,6 +61,17 @@ function Map(iso) {
 			break;
 		default:
 			console.warn('fail obj.type', obj);
+		}
+		if(obj.pos !== undefined) {
+			var pos = obj.pos;
+			var point = Isomer.Point.apply(null, pos);
+			add = add.translate(pos[0], pos[1], pos[2]);
+			if(obj.size !== undefined) {
+				add = add.scale(point, obj.size[0], obj.size[1], obj.size[2]);
+			}
+			if(obj.yaw !== undefined) {
+				add = add.rotateZ(point, obj.yaw * (Math.PI / 180));
+			}
 		}
 
 		return (add && mod(add, obj)) || null;
