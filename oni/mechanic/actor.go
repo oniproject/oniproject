@@ -114,8 +114,7 @@ func (a *Actor) recalc() {
 		equip.ApplyFeatures(a)
 	}
 	for id := range a.states {
-		state := db.States[id]
-		state.ApplyFeatures(a)
+		db.States[id].ApplyFeatures(a)
 	}
 }
 
