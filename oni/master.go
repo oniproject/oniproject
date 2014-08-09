@@ -2,23 +2,16 @@ package oni
 
 import (
 	"database/sql"
-	"encoding/json"
 	"github.com/coopernurse/gorp"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
+	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
 )
-
-type Account struct {
-	Id       int64  `db:"id"`
-	Login    string `db:"login"`
-	Password string `db:"password"`
-	AvatarId int64  `db:"avatar_id"`
-}
 
 type Master struct {
 	Addr, Rpc string
@@ -46,8 +39,8 @@ func NewMaster(balancer *Balancer) *Master {
 }
 
 func (m *Master) Migrate() {
-	t1 := Account{Login: "t1", AvatarId: 1}
-	t2 := Account{Login: "t2", AvatarId: 2}
+	t1 := Account{Username: "t1", AvatarId: 1}
+	t2 := Account{Username: "t2", AvatarId: 2}
 	m.authdb.Insert(&t1, &t2)
 }
 
@@ -59,66 +52,70 @@ func (master *Master) Run() {
 	m := martini.Classic()
 
 	store := sessions.NewCookieStore([]byte("secret123"))
-	m.Use(sessions.Sessions("my_session", store))
+	m.Use(sessions.Sessions("ssid", store))
 	m.Use(render.Renderer(render.Options{
 		Layout: "layout",
 	}))
 
-	m.Get("/", func(session sessions.Session) string {
-		v := session.Get("username")
-		if v == nil {
-			return "fail username"
-		}
-		return v.(string)
+	f := func() sessionauth.User { return &Account{dbmap: master.authdb} }
+	m.Use(sessionauth.SessionUser(f))
+	sessionauth.RedirectUrl = "/login"
+	sessionauth.RedirectParam = "new-next"
+
+	m.Get("/", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
+		r.JSON(200, user)
 	})
 
-	m.Get("/game", func(r render.Render) { r.HTML(200, "index", nil) })
+	m.Get("/game", sessionauth.LoginRequired, func(r render.Render) {
+		r.HTML(200, "index", map[string]interface{}{"title": "Game"})
+	})
 
-	m.Post("/logout", func(session sessions.Session) {
+	m.Get("/logout", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
+		sessionauth.Logout(session, user)
+		//session.Delete("id")
 		session.Clear()
-		return
+		r.Redirect("/")
 	})
 
-	m.Get("/login", func(r render.Render) { r.HTML(200, "login", nil) })
+	m.Get("/login", func(r render.Render) {
+		r.HTML(200, "login", map[string]interface{}{"title": "Login"})
+	})
 
-	type login struct {
-		Login    string `form:"login" binding:"required"`
-		Password string `form:"password"`
-	}
+	m.Post("/login", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) {
+		log.Println(account)
 
-	m.Post("/login", binding.Bind(login{}), func(l login, sessions sessions.Session) string {
-		log.Println(l)
-
-		var account Account
-		if err := master.authdb.SelectOne(
+		err := master.authdb.SelectOne(
 			&account,
-			"select * from accounts where login=:login",
-			map[string]interface{}{"login": l.Login}); err != nil {
-			// TODO Auth err: notfound
-			log.Println("auth notfound", err)
-			return "ERR"
+			"select * from accounts where login=:login and password=:password",
+			map[string]interface{}{"login": account.Username, "password": account.Password})
+
+		if err != nil {
+			//r.Redirect(sessionauth.RedirectUrl)
+			x := struct {
+				Error string
+			}{err.Error()}
+			r.JSON(401, x)
+			// TODO check if pass only err
+		} else {
+			err := sessionauth.AuthenticateSession(session, &account)
+			if err != nil {
+				r.JSON(500, err)
+			}
+
+			//params := req.URL.Query()
+			//redirect := params.Get(sessionauth.RedirectParam)
+			//r.Redirect(redirect)
+			session.Set("id", account.AvatarId)
+			session.Set("username", account.Username)
+
+			a, err := master.balancer.AttachAvatar(Id(account.AvatarId))
+			log.Println("AttachAvatar", a, err)
+			x := struct {
+				Id   int64
+				Host string
+			}{account.AvatarId, "localhost:2000"}
+			r.JSON(200, x)
 		}
-
-		// FIXME sault and hash pass
-		if l.Password != account.Password {
-			// TODO Auth err: fail pass
-			log.Println("fail pass")
-			return "fail pass"
-		}
-
-		x := struct {
-			Id   int64
-			Host string
-		}{account.AvatarId, "localhost:2000"}
-
-		a, err := master.balancer.AttachAvatar(Id(account.AvatarId))
-		log.Println("AttachAvatar", a, err)
-
-		sessions.Set("id", account.AvatarId)
-		sessions.Set("username", account.Login)
-
-		s, _ := json.Marshal(x)
-		return string(s)
 	})
 
 	// run http server

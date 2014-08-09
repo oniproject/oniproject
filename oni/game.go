@@ -28,7 +28,7 @@ func (gm *Game) Run() {
 	m := martini.Classic()
 
 	store := sessions.NewCookieStore([]byte("secret123"))
-	m.Use(sessions.Sessions("my_session", store))
+	m.Use(sessions.Sessions("ssid", store))
 
 	m.Get("/ws", func(sessions sessions.Session, w http.ResponseWriter, r *http.Request) (int, string) {
 		_id := sessions.Get("id")
