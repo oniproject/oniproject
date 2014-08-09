@@ -3,7 +3,6 @@ package oni
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"github.com/coopernurse/gorp"
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/binding"
@@ -61,7 +60,9 @@ func (master *Master) Run() {
 
 	store := sessions.NewCookieStore([]byte("secret123"))
 	m.Use(sessions.Sessions("my_session", store))
-	m.Use(render.Renderer())
+	m.Use(render.Renderer(render.Options{
+		Layout: "layout",
+	}))
 
 	m.Get("/", func(session sessions.Session) string {
 		v := session.Get("username")
@@ -73,14 +74,12 @@ func (master *Master) Run() {
 
 	m.Get("/game", func(r render.Render) { r.HTML(200, "index", nil) })
 
-	m.Post("/logout", func(session sessions.Session) string {
-		session.Delete("username")
-		return "OK"
+	m.Post("/logout", func(session sessions.Session) {
+		session.Clear()
+		return
 	})
 
-	m.Get("/login", func(r render.Render) {
-		r.HTML(200, "login", nil)
-	})
+	m.Get("/login", func(r render.Render) { r.HTML(200, "login", nil) })
 
 	type login struct {
 		Login    string `form:"login" binding:"required"`
@@ -119,8 +118,7 @@ func (master *Master) Run() {
 		sessions.Set("username", account.Login)
 
 		s, _ := json.Marshal(x)
-		return fmt.Sprint(string(s))
-
+		return string(s)
 	})
 
 	// run http server
