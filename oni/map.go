@@ -5,6 +5,8 @@ import (
 	"log"
 	"math/rand"
 	"oniproject/oni/jps"
+	"oniproject/oni/mechanic"
+	"sync"
 	"time"
 )
 
@@ -21,6 +23,8 @@ type sender struct {
 }
 
 type Map struct {
+	mtx sync.Mutex
+
 	tick                 uint
 	objects              map[Id]GameObject
 	register, unregister chan GameObject
@@ -56,7 +60,14 @@ func (gm *Map) Send(id Id, m Message) {
 	log.Println("Send: ", id, m)
 }
 
-func (m *Map) RunAvatar(ws *websocket.Conn, data AvatarData) {
+func (gm *Map) GetObjById(id Id) (obj GameObject) {
+	gm.mtx.Lock()
+	obj = gm.objects[id]
+	gm.mtx.Unlock()
+	return
+}
+
+func (m *Map) RunAvatar(ws *websocket.Conn, data mechanic.Actor) {
 	conn := AvatarConnection{
 		ws:          ws,
 		sendMessage: make(chan interface{}, 256),
@@ -83,8 +94,6 @@ func (gm *Map) Run() {
 		select {
 		case c.sendMessage <- m:
 		default:
-			//delete(gm.objects, c.Id())
-			//close(c.sendMessage)
 			go func() { gm.unregister <- c }()
 		}
 	}
@@ -112,6 +121,7 @@ func (gm *Map) Run() {
 	go gm.SpawnMonster()
 
 	for {
+		gm.mtx.Lock()
 		select {
 		// replication
 		case <-t.C:
@@ -163,5 +173,6 @@ func (gm *Map) Run() {
 				log.Printf("fail sendTo: broken ID %v %T", s, s.m)
 			}
 		}
+		gm.mtx.Unlock()
 	}
 }

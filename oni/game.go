@@ -3,9 +3,9 @@ package oni
 import (
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
-	//"github.com/skelterjohn/geom"
 	"log"
 	"net/http"
+	"oniproject/oni/mechanic"
 )
 
 var store = sessions.NewFilesystemStore(
@@ -68,7 +68,9 @@ func (gm *Game) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gm.Map.RunAvatar(ws, AvatarData{Id: id, X: 1, Y: 1})
+	// TODO get actor from db
+
+	gm.Map.RunAvatar(ws, mechanic.Actor{Id: id, X: 1, Y: 1})
 }
 
 func (gm *Game) LoadMap(id Id) {

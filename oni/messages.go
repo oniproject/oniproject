@@ -119,6 +119,9 @@ func (m *FireMsg) Run(obj interface{}) {
 
 	if m.Type == 0 {
 		a.game.Send(Id(a.Target), &CloseMsg{})
+	} else {
+		obj := a.game.GetObjById(a.Target).(*Avatar)
+		log.Println(a.data.Cast(int(m.Type), &obj.data))
 	}
 
 	log.Println("fire OK", m)

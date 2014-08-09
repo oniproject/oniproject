@@ -20,6 +20,10 @@ type EquipItem interface {
 }
 
 type Actor struct {
+	Id    int64
+	MapId int64
+	X, Y  float64
+
 	Nickname string
 	ClassId  int
 	RaceId   int

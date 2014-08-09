@@ -2,6 +2,7 @@ package oni
 
 import (
 	"github.com/skelterjohn/geom"
+	"oniproject/oni/mechanic"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type State struct {
 	Position  geom.Coord
 	Veloctity geom.Coord
 }
+
 type AvatarData struct {
 	Id    int64
 	MapId int64
@@ -30,11 +32,12 @@ type AvatarMapper interface {
 	Walkable(int, int) bool
 	Unregister(*Avatar)
 	Send(Id, Message)
+	GetObjById(Id) GameObject
 }
 
 type Avatar struct {
 	PositionComponent
-	data AvatarData
+	data mechanic.Actor
 	AvatarConnection
 	Target Id
 	game   AvatarMapper
