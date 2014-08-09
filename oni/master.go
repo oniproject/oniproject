@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/coopernurse/gorp"
-	"github.com/gorilla/sessions"
+	"github.com/go-martini/martini"
+	"github.com/martini-contrib/binding"
+	"github.com/martini-contrib/render"
+	"github.com/martini-contrib/sessions"
 	_ "github.com/mattn/go-sqlite3"
-	"html/template"
 	"log"
 	"net/http"
 )
@@ -20,17 +22,14 @@ type Account struct {
 }
 
 type Master struct {
-	Addr, Rpc             string
-	homeTempl, loginTempl *template.Template
-	authdb                *gorp.DbMap
-	balancer              *Balancer
+	Addr, Rpc string
+	authdb    *gorp.DbMap
+	balancer  *Balancer
 }
 
 func NewMaster(balancer *Balancer) *Master {
 	m := &Master{
-		homeTempl:  template.Must(template.ParseFiles("templates/index.html")),
-		loginTempl: template.Must(template.ParseFiles("templates/login.html")),
-		balancer:   balancer,
+		balancer: balancer,
 	}
 
 	db, err := sql.Open("sqlite3", "accounts.bin")
@@ -53,84 +52,59 @@ func (m *Master) Migrate() {
 	m.authdb.Insert(&t1, &t2)
 }
 
-func (m *Master) Run() {
-	log.Println("run MASTER:", m.Addr, "rpc:", m.Rpc)
+func (master *Master) Run() {
+	log.Println("run MASTER:", master.Addr, "rpc:", master.Rpc)
 
 	// TODO: init RPC
 
-	// run http server
-	http.Handle("/", m)
-	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
-	err := http.ListenAndServe(m.Addr, nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
-}
+	m := martini.Classic()
 
-func (m *Master) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/":
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		auth, _ := store.Get(r, "auth")
-		fmt.Fprintln(w, "index", auth.Values)
-	case "/game":
-		if r.Method != "GET" {
-			http.Error(w, http.StatusText(405), 405)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		m.homeTempl.Execute(w, m)
-	case "/logout":
-		if r.Method != "GET" {
-			http.Error(w, "Method nod allowed", 405)
-			return
-		}
-		auth, err := store.Get(r, "auth")
-		if err != nil {
-			http.Error(w, http.StatusText(504), 504)
-			log.Println(err)
-			return
-		}
-		delete(auth.Values, "id")
-		sessions.Save(r, w)
-	case "/login":
-		m.login(w, r)
-	default:
-		http.Error(w, "Not found", 404)
-	}
-}
+	store := sessions.NewCookieStore([]byte("secret123"))
+	m.Use(sessions.Sessions("my_session", store))
+	m.Use(render.Renderer())
 
-func (m *Master) login(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		m.loginTempl.Execute(w, m)
-	} else if r.Method == "POST" {
-		r.ParseForm()
-		login := r.PostFormValue("login")
-		pass := r.PostFormValue("password")
+	m.Get("/", func(session sessions.Session) string {
+		v := session.Get("username")
+		if v == nil {
+			return "fail username"
+		}
+		return v.(string)
+	})
+
+	m.Get("/game", func(r render.Render) { r.HTML(200, "index", nil) })
+
+	m.Post("/logout", func(session sessions.Session) string {
+		session.Delete("username")
+		return "OK"
+	})
+
+	m.Get("/login", func(r render.Render) {
+		r.HTML(200, "login", nil)
+	})
+
+	type login struct {
+		Login    string `form:"login" binding:"required"`
+		Password string `form:"password"`
+	}
+
+	m.Post("/login", binding.Bind(login{}), func(l login, sessions sessions.Session) string {
+		log.Println(l)
 
 		var account Account
-		if err := m.authdb.SelectOne(
+		if err := master.authdb.SelectOne(
 			&account,
 			"select * from accounts where login=:login",
-			map[string]interface{}{"login": login}); err != nil {
+			map[string]interface{}{"login": l.Login}); err != nil {
 			// TODO Auth err: notfound
 			log.Println("auth notfound", err)
-			return
+			return "ERR"
 		}
 
 		// FIXME sault and hash pass
-		if pass != account.Password {
+		if l.Password != account.Password {
 			// TODO Auth err: fail pass
 			log.Println("fail pass")
-			return
-		}
-
-		auth, err := store.Get(r, "auth")
-		if err != nil {
-			http.Error(w, http.StatusText(504), 504)
-			log.Println(err)
-			return
+			return "fail pass"
 		}
 
 		x := struct {
@@ -138,19 +112,21 @@ func (m *Master) login(w http.ResponseWriter, r *http.Request) {
 			Host string
 		}{account.AvatarId, "localhost:2000"}
 
-		a, err := m.balancer.AttachAvatar(Id(account.AvatarId))
+		a, err := master.balancer.AttachAvatar(Id(account.AvatarId))
 		log.Println("AttachAvatar", a, err)
 
-		auth.Values["id"] = account.AvatarId
-
-		sessions.Save(r, w)
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		//http.Redirect(w, r, "/game", 301)
+		sessions.Set("id", account.AvatarId)
+		sessions.Set("username", account.Login)
 
 		s, _ := json.Marshal(x)
-		//fmt.Fprint(w, "POST", login, pass)
-		fmt.Fprint(w, string(s))
-	} else {
-		http.Error(w, http.StatusText(405), 405)
+		return fmt.Sprint(string(s))
+
+	})
+
+	// run http server
+	http.Handle("/", m)
+	err := http.ListenAndServe(master.Addr, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
 	}
 }
