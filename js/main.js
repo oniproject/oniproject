@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 
 console.log("fuck");
 
@@ -77,24 +77,14 @@ function run(player, host) {
 	}
 }
 
-var form = document.getElementById('form');
-var login = document.getElementById('login');
-var password = document.getElementById('password');
-
-form.onsubmit = function(event) {
-	event.preventDefault();
-	var r = new XMLHttpRequest();
-	r.open("POST", "/login", true);
-	r.onreadystatechange = function () {
-		if (r.readyState != 4 || r.status != 200) return;
-		var json = JSON.parse(r.responseText);
-		form.parentNode.removeChild(form);
+var r = new XMLHttpRequest();
+r.open("POST", "/game", true);
+r.onreadystatechange = function () {
+	if (r.readyState != 4 || r.status != 200) return;
+	var json = JSON.parse(r.responseText);
+	if(json.Id !== undefined) {
 		console.log("Success:", json);
 		run(json.Id, json.Host);
-	};
-	var params = "login="+encodeURIComponent(login.value)+"&password="+encodeURIComponent(password.value);
-	r.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	console.log(params);
-	r.send(params);
-}
-
+	}
+};
+r.send();

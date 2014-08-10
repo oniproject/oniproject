@@ -60,14 +60,26 @@ func (master *Master) Run() {
 	f := func() sessionauth.User { return &Account{dbmap: master.authdb} }
 	m.Use(sessionauth.SessionUser(f))
 	sessionauth.RedirectUrl = "/login"
-	sessionauth.RedirectParam = "new-next"
+	sessionauth.RedirectParam = "next"
 
 	m.Get("/", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
-		r.JSON(200, user)
+		//r.JSON(200, user)
+		r.HTML(200, "index", map[string]interface{}{"title": "Main"})
 	})
 
 	m.Get("/game", sessionauth.LoginRequired, func(r render.Render) {
-		r.HTML(200, "index", map[string]interface{}{"title": "Game"})
+		r.HTML(200, "game", map[string]interface{}{"title": "Game"}, render.HTMLOptions{""})
+	})
+
+	m.Post("/game", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
+		account := user.(*Account)
+		a, err := master.balancer.AttachAvatar(Id(account.AvatarId))
+		log.Println("AttachAvatar", a, err)
+		x := struct {
+			Id   int64
+			Host string
+		}{account.AvatarId, "localhost:2000"}
+		r.JSON(200, x)
 	})
 
 	m.Get("/logout", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
@@ -102,19 +114,13 @@ func (master *Master) Run() {
 				r.JSON(500, err)
 			}
 
-			//params := req.URL.Query()
-			//redirect := params.Get(sessionauth.RedirectParam)
-			//r.Redirect(redirect)
 			session.Set("id", account.AvatarId)
 			session.Set("username", account.Username)
 
-			a, err := master.balancer.AttachAvatar(Id(account.AvatarId))
-			log.Println("AttachAvatar", a, err)
-			x := struct {
-				Id   int64
-				Host string
-			}{account.AvatarId, "localhost:2000"}
-			r.JSON(200, x)
+			params := req.URL.Query()
+			redirect := params.Get(sessionauth.RedirectParam)
+			r.Redirect(redirect)
+			log.Println(redirect, params)
 		}
 	})
 
