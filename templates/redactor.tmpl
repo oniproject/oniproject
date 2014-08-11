@@ -2,7 +2,7 @@
 <html class="uk-height-1-1 uk-margin-remove" lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Isomer Redactor</title>
+<title>{{.title}}</title>
 <link rel="stylesheet" href="/css/uikit.min.css">
 <link rel="stylesheet" href="/css/addons/uikit.addons.min.css">
 <style>
@@ -270,7 +270,7 @@ html, body {
 </div>
 
 <script id="modal-point-tpl" type="tpl">
-<div id="{{id}}" class="uk-form-row">
+<div id="{{`{{`}}id{{`}}`}}" class="uk-form-row">
 	<div class="uk-form-controls uk-form-controls-text">
 		<p class="uk-form-controls-condensed">
 			<label for="x">X</label> <input id="x" value="0" class="uk-form-width-small uk-form-small" type="number">
