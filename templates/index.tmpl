@@ -1,42 +1,37 @@
 <div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
 
 <nav class="uk-navbar uk-margin-large-bottom">
-	<a class="uk-navbar-brand uk-hidden-small" href="layouts_frontpage.html">Brand</a>
+	<a class="uk-navbar-brand uk-hidden-small" href="/">Oni Project</a>
 	<ul class="uk-navbar-nav uk-hidden-small">
 		<li class="uk-active">
-			<a href="layouts_frontpage.html">Frontpage</a>
+			<a href="/">Frontpage</a>
 		</li>
 		<li>
-			<a href="layouts_portfolio.html">Portfolio</a>
-		</li>
-		<li>
-			<a href="layouts_blog.html">Blog</a>
-		</li>
-		<li>
-			<a href="layouts_documentation.html">Documentation</a>
-		</li>
-		<li>
-			<a href="layouts_contact.html">Contact</a>
-		</li>
-		<li>
-			<a href="layouts_login.html">Login</a>
+			<a href="/game">Game</a>
 		</li>
 	</ul>
+	<div class="uk-navbar-content uk-navbar-flip uk-hidden-small">
+{{if .user}}
+		<div class="uk-navbar-content">(<b>{{.user.Username}}</b>)</div>
+		<a class="uk-button" href="/logout">Logout</a>
+{{else}}
+		<div class="uk-button-group">
+			<a class="uk-button uk-button-primary" href="/login">Login</a>
+			<a class="uk-button uk-button-success" href="/signup">Sign-up</a>
+		</div>
+{{end}}
+	</div>
 	<a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
-	<div class="uk-navbar-brand uk-navbar-center uk-visible-small">Brand</div>
+	<div class="uk-navbar-brand uk-navbar-center uk-visible-small">Oni Project</div>
 </nav>
 
 <div class="uk-grid" data-uk-grid-margin>
 <div class="uk-width-medium-1-1">
 
-	<div class="uk-vertical-align uk-text-center" style="background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNi4wLjQsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkViZW5lXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iMTEzMHB4IiBoZWlnaHQ9IjQ1MHB4IiB2aWV3Qm94PSIwIDAgMTEzMCA0NTAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDExMzAgNDUwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxyZWN0IGZpbGw9IiNGNUY1RjUiIHdpZHRoPSIxMTMwIiBoZWlnaHQ9IjQ1MCIvPg0KPC9zdmc+DQo=') 50% 0 no-repeat; height: 450px;">
+	<div class="uk-vertical-align uk-text-center" style="height: 450px;">
 	<div class="uk-vertical-align-middle uk-width-1-2">
-		<h1 class="uk-heading-large">Sample Heading</h1>
-		<p class="uk-text-large">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo.</p>
-		<p>
-			<a class="uk-button uk-button-primary uk-button-large" href="#">Button</a>
-			<a class="uk-button uk-button-large" href="#">Button</a>
-		</p>
+		<h1 class="uk-heading-large">Oni Project</h1>
+		<img width="333" height="327" src="/oni.jpg" alt="">
 	</div>
 	</div>
 
@@ -227,23 +222,23 @@
 	<div class="uk-offcanvas-bar">
 	<ul class="uk-nav uk-nav-offcanvas">
 		<li class="uk-active">
-			<a href="layouts_frontpage.html">Frontpage</a>
+			<a href="/">Frontpage</a>
 		</li>
 		<li>
-			<a href="layouts_portfolio.html">Portfolio</a>
+			<a href="/game">Game</a>
+		</li>
+{{if .user}}
+		<li>
+			<a href="/logout">Logout</a>
+		</li>
+{{else}}
+		<li>
+			<a href="/login">Login</a>
 		</li>
 		<li>
-			<a href="layouts_blog.html">Blog</a>
+			<a href="/signup">Sign-up</a>
 		</li>
-		<li>
-			<a href="layouts_documentation.html">Documentation</a>
-		</li>
-		<li>
-			<a href="layouts_contact.html">Contact</a>
-		</li>
-		<li>
-			<a href="layouts_login.html">Login</a>
-		</li>
+{{end}}
 	</ul>
 	</div>
 </div>

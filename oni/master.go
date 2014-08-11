@@ -62,9 +62,12 @@ func (master *Master) Run() {
 	sessionauth.RedirectUrl = "/login"
 	sessionauth.RedirectParam = "next"
 
-	m.Get("/", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
-		//r.JSON(200, user)
-		r.HTML(200, "index", map[string]interface{}{"title": "Main"})
+	m.Get("/", func(user sessionauth.User, r render.Render) {
+		args := map[string]interface{}{"title": "Main"}
+		if user.IsAuthenticated() {
+			args["user"] = user.(*Account)
+		}
+		r.HTML(200, "index", args)
 	})
 
 	m.Get("/game", sessionauth.LoginRequired, func(r render.Render) {
@@ -118,10 +121,18 @@ func (master *Master) Run() {
 			session.Set("username", account.Username)
 
 			params := req.URL.Query()
+			log.Println(params, req.URL)
 			redirect := params.Get(sessionauth.RedirectParam)
 			r.Redirect(redirect)
-			log.Println(redirect, params)
 		}
+	})
+
+	m.Get("/signup", func(r render.Render) {
+		r.HTML(200, "signup", map[string]interface{}{"title": "Sign-up"})
+	})
+
+	m.Post("/signup", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) (int, string) {
+		return 501, http.StatusText(501)
 	})
 
 	// run http server
