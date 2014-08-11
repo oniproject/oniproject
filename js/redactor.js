@@ -287,6 +287,7 @@ Redactor.prototype._initUI = function() {
 			that.run(new commands.SetColor(that.active, [r, g, b, +alpha]));
 		}
 	});
+
 	$('#Move').click(function() {
 		var x = $('#pos #x').val(),
 			y = $('#pos #y').val(),
@@ -313,63 +314,90 @@ Redactor.prototype._initUI = function() {
 		}
 	});
 
-	$('#AddPrism').click(function() {
-		var x = $('#AddPrismModal #x').val(),
-			y = $('#AddPrismModal #y').val(),
-			z = $('#AddPrismModal #z').val(),
-			dx = $('#AddPrismModal #dx').val(),
-			dy = $('#AddPrismModal #dy').val(),
-			dz = $('#AddPrismModal #dz').val();
-		that.run(new commands.AddPrism([+x, +y, +z], [+dx, +dy, +dz]));
+	new Vue({
+		el: '#AddPrismModal',
+		data: {
+			x:0, y:0, z:0,
+			dx:1, dy:1, dz:1,
+		},
+		methods: {
+			add: function(e) {
+				that.run(new commands.AddPrism(
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					[+this.$data.dx, +this.$data.dy, +this.$data.dz]
+				));
+			},
+		},
 	});
 
-	$('#AddPyramid').click(function() {
-		var x = $('#AddPyramidModal #x').val(),
-			y = $('#AddPyramidModal #y').val(),
-			z = $('#AddPyramidModal #z').val(),
-			dx = $('#AddPyramidModal #dx').val(),
-			dy = $('#AddPyramidModal #dy').val(),
-			dz = $('#AddPyramidModal #dz').val();
-		that.run(new commands.AddPyramid([+x, +y, +z], [+dx, +dy, +dz]));
+	new Vue({
+		el: '#AddPyramidModal',
+		data: {
+			x:0, y:0, z:0,
+			dx:1, dy:1, dz:1,
+		},
+		methods: {
+			add: function(e) {
+				that.run(new commands.AddPyramid(
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					[+this.$data.dx, +this.$data.dy, +this.$data.dz]
+				));
+			},
+		},
 	});
 
-	$('#AddCylinder').click(function() {
-		var x = $('#AddCylinderModal #x').val(),
-			y = $('#AddCylinderModal #y').val(),
-			z = $('#AddCylinderModal #z').val(),
-			dx = $('#AddPyramidModal #dx').val(),
-			dy = $('#AddPyramidModal #dy').val(),
-			dz = $('#AddPyramidModal #dz').val();
-
-			vertices = $('#AddCylinderModal #vertices').val(),
-		that.run(new commands.AddCylinder([+x, +y, +z], [+dx, +dy, +dz], +vertices));
+	new Vue({
+		el: '#AddCylinderModal',
+		data: {
+			x:0, y:0, z:0,
+			dx:1, dy:1, dz:1,
+			vertices: 30,
+		},
+		methods: {
+			add: function(e) {
+				that.run(new commands.AddCylinder(
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					[+this.$data.dx, +this.$data.dy, +this.$data.dz],
+					+this.$data.vertices
+				));
+			},
+		},
 	});
 
-	$('#AddShape').click(function() {
-		var height = $('#AddShapeModal #x').val();
-		var path=[];
-		$('#AddShapeModal #shape-list .uk-form-row').each(function() {
-			var $this = $(this);
-			var x = $this.find('input[name|=x]').val(),
-				y = $this.find('input[name|=y]').val(),
-				z = $this.find('input[name|=z]').val();
-			console.log(+x, +y, +z);
-			path.push([+x, +y, +z]);
-		});
-		that.run(new commands.AddShape(path, height));
+
+	new Vue({
+		el: '#AddShapeModal',
+		data: {
+			height: 1,
+			points: [{x:0, y:0, z:0}],
+		},
+		methods: {
+			add: function(e) {
+				var path=[];
+				for(var i=0,l=this.$data.points.length;i<l;i++) {
+					var p=this.$data.points[i];
+					path.push([+p.x, +p.y, +p.z]);
+				}
+				that.run(new commands.AddShape(path, +this.$data.height));
+			},
+		},
 	});
 
-	$('#AddPath').click(function() {
-		var path=[];
-		$('#AddPathModal #path-list .uk-form-row').each(function() {
-			var $this = $(this);
-			var x = $this.find('input[name|=x]').val(),
-				y = $this.find('input[name|=y]').val(),
-				z = $this.find('input[name|=z]').val();
-			console.log(+x, +y, +z);
-			path.push([+x, +y, +z]);
-		});
-		that.run(new commands.AddPath(path));
+	new Vue({
+		el: '#AddPathModal',
+		data: {
+			points: [{x:0, y:0, z:0}],
+		},
+		methods: {
+			add: function(e) {
+				var path=[];
+				for(var i=0,l=this.$data.points.length;i<l;i++) {
+					var p=this.$data.points[i];
+					path.push([+p.x, +p.y, +p.z]);
+				}
+				that.run(new commands.AddPath(path));
+			},
+		},
 	});
 }
 

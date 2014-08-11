@@ -143,7 +143,6 @@ html, body {
 	</div>
 </div>
 
-
 <div id="AddPrismModal" class="uk-modal">
 	<div class="uk-modal-dialog">
 		<a class="uk-modal-close uk-close uk-close-alt"></a>
@@ -152,11 +151,12 @@ html, body {
 				<legend>Add Prism</legend>
 
 				<div class="uk-form-row">
+					<span class="uk-form-label" for="">Position</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="x">X</label> <input id="x" value="0" class="uk-form-width-small uk-form-small" type="number">
-							<label for="y">Y</label> <input id="y" value="0" class="uk-form-width-small uk-form-small" type="number">
-							<label for="z">Z</label> <input id="z" value="0" class="uk-form-width-small uk-form-small" type="number">
+							<label>X</label> <input v-model="x" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="y" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="z" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
@@ -165,15 +165,15 @@ html, body {
 					<span class="uk-form-label" for="">Size</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="dx">X</label> <input id="dx" value="1" class="uk-form-width-small uk-form-small" type="number">
-							<label for="dy">Y</label> <input id="dy" value="1" class="uk-form-width-small uk-form-small" type="number">
-							<label for="dz">Z</label> <input id="dz" value="1" class="uk-form-width-small uk-form-small" type="number">
+							<label>X</label> <input v-model="dx" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="dy" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="dz" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
 
 				<div class="uk-form-row">
-					<a id="AddPrism" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
+					<a v-on="click: add" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
 				</div>
 
 			</fieldset>
@@ -193,9 +193,9 @@ html, body {
 					<span class="uk-form-label" for="">Position</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="x">X</label> <input id="x" value="0" class="uk-form-width-small uk-form-small" type="number">
-							<label for="y">Y</label> <input id="y" value="0" class="uk-form-width-small uk-form-small" type="number">
-							<label for="z">Z</label> <input id="z" value="0" class="uk-form-width-small uk-form-small" type="number">
+							<label>X</label> <input v-model="x" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="y" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="z" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
@@ -204,15 +204,15 @@ html, body {
 					<span class="uk-form-label" for="">Size</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="dx">X</label> <input id="dx" value="1" class="uk-form-width-small uk-form-small" type="number">
-							<label for="dy">Y</label> <input id="dy" value="1" class="uk-form-width-small uk-form-small" type="number">
-							<label for="dz">Z</label> <input id="dz" value="1" class="uk-form-width-small uk-form-small" type="number">
+							<label>X</label> <input v-model="dx" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="dy" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="dz" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
 
 				<div class="uk-form-row">
-					<a id="AddPyramid" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
+					<a v-on="click: add" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
 				</div>
 
 			</fieldset>
@@ -232,9 +232,9 @@ html, body {
 					<span class="uk-form-label" for="">Position</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="x">X</label> <input id="x" value="0" class="uk-form-width-small uk-form-small" type="number">
-							<label for="y">Y</label> <input id="y" value="0" class="uk-form-width-small uk-form-small" type="number">
-							<label for="z">Z</label> <input id="z" value="0" class="uk-form-width-small uk-form-small" type="number">
+							<label>X</label> <input v-model="x" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="y" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="z" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
@@ -244,42 +244,30 @@ html, body {
 					<span class="uk-form-label" for="">Size</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="dx">X</label> <input id="dx" value="1" class="uk-form-width-small uk-form-small" type="number">
-							<label for="dy">Y</label> <input id="dy" value="1" class="uk-form-width-small uk-form-small" type="number">
-							<label for="dz">Z</label> <input id="dz" value="1" class="uk-form-width-small uk-form-small" type="number">
+							<label>X</label> <input v-model="dx" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="dy" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="dz" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
 
 				<div class="uk-form-row">
-					<span class="uk-form-label" for="">Size</span>
+					<span class="uk-form-label" for="">Vertices</span>
 					<div class="uk-form-controls uk-form-controls-text">
 						<p class="uk-form-controls-condensed">
-							<label for="vertices">Vertices</label> <input id="vertices" value="30" class="uk-form-width-small uk-form-small" type="number">
+							<input v-model="vertices" class="uk-form-width-small uk-form-small" type="number">
 						</p>
 					</div>
 				</div>
 
 				<div class="uk-form-row">
-					<a id="AddCylinder" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
+					<a v-on="click: add" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
 				</div>
 
 			</fieldset>
 		</form>
 	</div>
 </div>
-
-<script id="modal-point-tpl" type="tpl">
-<div id="{{`{{`}}id{{`}}`}}" class="uk-form-row">
-	<div class="uk-form-controls uk-form-controls-text">
-		<p class="uk-form-controls-condensed">
-			<label for="x">X</label> <input id="x" value="0" class="uk-form-width-small uk-form-small" type="number">
-			<label for="y">Y</label> <input id="y" value="0" class="uk-form-width-small uk-form-small" type="number">
-			<label for="z">Z</label> <input id="z" value="0" class="uk-form-width-small uk-form-small" type="number">
-		</p>
-	</div>
-</div>
-</script>
 
 <div id="AddShapeModal" class="uk-modal">
 	<div class="uk-modal-dialog">
@@ -289,17 +277,25 @@ html, body {
 				<legend>Add Shape</legend>
 
 				<div class="uk-form-row">
-					<label for="height">Height</label> <input id="height" value="1" class="uk-form-width-small uk-form-small" type="number">
+					<label>Height</label> <input v-model="height" class="uk-form-width-small uk-form-small" type="number">
 				</div>
 
 				<div class="uk-form-row">
-					<a onclick="$('#shape-list').append($('#modal-point-tpl').text());" class="uk-button uk-button-danger uk-width-1-1">Add Point</a>
+					<a v-on="click: points.push({x:0,y:0,z:0})" class="uk-button uk-button-danger uk-width-1-1">Add Point</a>
 				</div>
 
-				<div id="shape-list"></div>
+				<div v-repeat="points" class="uk-form-row">
+					<div class="uk-form-controls uk-form-controls-text">
+						<p class="uk-form-controls-condensed">
+							<label>X</label> <input v-model="x" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="y" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="z" class="uk-form-width-small uk-form-small" type="number">
+						</p>
+					</div>
+				</div>
 
 				<div class="uk-form-row">
-					<a id="AddShape" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
+					<a v-on="click: add" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
 				</div>
 
 			</fieldset>
@@ -315,13 +311,21 @@ html, body {
 				<legend>Add Path</legend>
 
 				<div class="uk-form-row">
-					<a onclick="$('#path-list').append($('#modal-point-tpl').text());" class="uk-button uk-button-danger uk-width-1-1">Add Point</a>
+					<a v-on="click: points.push({x:0,y:0,z:0})" class="uk-button uk-button-danger uk-width-1-1">Add Point</a>
 				</div>
 
-				<div id="path-list"></div>
+				<div v-repeat="points" class="uk-form-row">
+					<div class="uk-form-controls uk-form-controls-text">
+						<p class="uk-form-controls-condensed">
+							<label>X</label> <input v-model="x" class="uk-form-width-small uk-form-small" type="number">
+							<label>Y</label> <input v-model="y" class="uk-form-width-small uk-form-small" type="number">
+							<label>Z</label> <input v-model="z" class="uk-form-width-small uk-form-small" type="number">
+						</p>
+					</div>
+				</div>
 
 				<div class="uk-form-row">
-					<a id="AddPath" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
+					<a v-on="click: add" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
 				</div>
 
 			</fieldset>
@@ -332,6 +336,7 @@ html, body {
 <script src="/js/jquery-2.1.1.min.js"></script>
 <script src="/js/uikit.min.js"></script>
 <script src="/js/addons/notify.min.js"></script>
+<script src="/js/vue.js"></script>
 <script src="/pixi.js"></script>
 <script src="/redactor.js"></script>
 </body>
