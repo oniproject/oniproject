@@ -115,20 +115,22 @@ func (master *Master) Run() {
 			}{err.Error()}
 			r.JSON(401, x)
 			// TODO check if pass only err
-		} else {
-			err := sessionauth.AuthenticateSession(session, &account)
-			if err != nil {
-				r.JSON(500, err)
-			}
-
-			session.Set("id", account.AvatarId)
-			session.Set("username", account.Username)
-
-			params := req.URL.Query()
-			log.Println(params, req.URL)
-			redirect := params.Get(sessionauth.RedirectParam)
-			r.Redirect(redirect)
+			return
 		}
+
+		err = sessionauth.AuthenticateSession(session, &account)
+		if err != nil {
+			r.JSON(500, err)
+			return
+		}
+
+		session.Set("id", account.AvatarId)
+		session.Set("username", account.Username)
+
+		params := req.URL.Query()
+		log.Println(params, req.URL)
+		redirect := params.Get(sessionauth.RedirectParam)
+		r.Redirect(redirect)
 	})
 
 	m.Get("/signup", func(r render.Render) {
@@ -136,7 +138,41 @@ func (master *Master) Run() {
 	})
 
 	m.Post("/signup", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) (int, string) {
-		return 501, http.StatusText(501)
+		var acc Account
+		err := master.authdb.SelectOne(
+			&acc,
+			"select * from accounts where login=:login",
+			map[string]interface{}{"login": account.Username})
+
+		if err == nil {
+			return 418, http.StatusText(418)
+		}
+		if err != sql.ErrNoRows {
+			log.Println(err)
+			return 500, err.Error()
+		}
+
+		// TODO check pass1 and pass2
+
+		err = master.authdb.Insert(&account)
+		if err != nil {
+			return 500, err.Error()
+		}
+
+		err = sessionauth.AuthenticateSession(session, &account)
+		if err != nil {
+			return 500, err.Error()
+		}
+
+		session.Set("id", account.AvatarId)
+		session.Set("username", account.Username)
+
+		params := req.URL.Query()
+		log.Println(params, req.URL)
+		redirect := params.Get(sessionauth.RedirectParam)
+		r.Redirect(redirect)
+
+		return 200, http.StatusText(200)
 	})
 
 	// run http server
