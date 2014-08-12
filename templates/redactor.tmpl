@@ -29,11 +29,11 @@ html, body {
 				<legend>Position</legend>
 
 				<div class="uk-form-row">
-					<input data-uk-tooltip="{pos:'right'}" title="X" id="x" value="0" class="uk-width-1-1 uk-form-small" type="number">
-					<input data-uk-tooltip="{pos:'right'}" title="Y" id="y" value="0" class="uk-width-1-1 uk-form-small" type="number">
-					<input data-uk-tooltip="{pos:'right'}" title="Z" id="z" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="X" v-model="x" id="x" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Y" v-model="y" id="y" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Z" v-model="z" id="z" class="uk-width-1-1 uk-form-small" type="number">
 
-					<a id="Move" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-arrows"></i></a>
+					<a id="Move" v-on="click: move" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-arrows"></i></a>
 				</div>
 			</fieldset>
 		</form>
@@ -43,13 +43,13 @@ html, body {
 				<legend>Size</legend>
 
 				<div class="uk-form-row">
-					<input data-uk-tooltip="{pos:'right'}" title="X" id="x" value="0" class="uk-width-1-1 uk-form-small" type="number">
-					<input data-uk-tooltip="{pos:'right'}" title="Y" id="y" value="0" class="uk-width-1-1 uk-form-small" type="number">
-					<input data-uk-tooltip="{pos:'right'}" title="Z" id="z" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="X" v-model="x" id="x" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Y" v-model="y" id="y" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Z" v-model="z" id="z" class="uk-width-1-1 uk-form-small" type="number">
 
-					<input data-uk-tooltip="{pos:'right'}" title="Vertices" id="v" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Vertices" v-model="v" id="v" class="uk-width-1-1 uk-form-small" type="number">
 
-					<a id="Resize" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-expand"></i></a>
+					<a id="Resize" v-on="click: resize" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-expand"></i></a>
 				</div>
 			</fieldset>
 		</form>
@@ -59,9 +59,9 @@ html, body {
 				<legend>Rotate</legend>
 
 				<div class="uk-form-row">
-					<input data-uk-tooltip="{pos:'right'}" title="Yaw" id="yaw" value="0" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Yaw" v-model="yaw" id="yaw" value="0" class="uk-width-1-1 uk-form-small" type="number">
 
-					<a id="Rotate" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-undo"></i></a>
+					<a id="Rotate" v-on="click: rotate" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-undo"></i></a>
 				</div>
 			</fieldset>
 		</form>
@@ -71,10 +71,10 @@ html, body {
 				<legend>Color</legend>
 
 				<div class="uk-form-row">
-					<input data-uk-tooltip="{pos:'right'}" title="Color" id="hex-color" value="#000000" class="uk-width-1-1 uk-form-small" type="color">
-					<input data-uk-tooltip="{pos:'right'}" title="Alpha" id="alpha" value="1" class="uk-width-1-1 uk-form-small" type="number">
+					<input data-uk-tooltip="{pos:'right'}" title="Color" v-model="color" id="hex-color" value="#000000" class="uk-width-1-1 uk-form-small" type="color">
+					<input data-uk-tooltip="{pos:'right'}" title="Alpha" v-model="alpha" id="alpha" value="1" class="uk-width-1-1 uk-form-small" type="number">
 
-					<a id="SetColor" class="uk-button uk-button-primary uk-width-1-1">SetColor</a>
+					<a id="SetColor" v-on="click: setColor" class="uk-button uk-button-primary uk-width-1-1">SetColor</a>
 				</div>
 			</fieldset>
 		</form>
