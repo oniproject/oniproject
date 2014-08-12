@@ -77,6 +77,47 @@ function run(player, host) {
 	}
 }
 
+var UI = new Vue({
+	el: '#ui',
+	data: {
+		level: 88,
+		exp: 77,
+		hp: 190, mhp: 300,
+		mp: 50, mmp: 300,
+		tp: 50, mtp: 100,
+		spells: [
+			'all-for-one',
+			'all-for-one',
+			'all-for-one',
+			'all-for-one',
+			'all-for-one',
+
+			'screaming',
+			'screaming',
+			'screaming',
+			'screaming',
+			'screaming',
+
+			'spiral-thrust',
+			'spiral-thrust',
+			'spiral-thrust',
+			'spiral-thrust',
+			'spiral-thrust',
+
+			'rune-sword',
+			'rune-sword',
+			'rune-sword',
+			'rune-sword',
+			'rune-sword',
+		],
+	},
+	methods: {
+		cast: function(spell) {
+			console.info('cast', spell.$value);
+		},
+	},
+});
+
 var r = new XMLHttpRequest();
 r.open("POST", "/game", true);
 r.onreadystatechange = function () {
