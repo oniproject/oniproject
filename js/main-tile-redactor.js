@@ -83,6 +83,7 @@ var TileScene = function(w, h, tilesets) {
 	this.addChild(this.second);
 	this.addChild(this.objects);
 	this.addChild(this.third);
+	this.third.alpha = 0.1;
 
 	for (var y=0; y<h; y++) {
 		data.first.push(new Array(w));
@@ -98,8 +99,8 @@ var TileScene = function(w, h, tilesets) {
 			//data.objects[y][x] = 0;
 			data.third[y][x] = {t:0, v:0};
 			this.setAt(x, y, 'first', 0, [1, 3, 5]);
-			this.setAt(x, y, 'second', 4, 1);
-			this.setAt(x, y, 'third', 5, 56);
+			this.setAt(x, y, 'second', 0, 31, true);
+			this.setAt(x, y, 'third', 0, [0, 1, 2], true);
 		}
 	}
 }
@@ -117,6 +118,51 @@ function cleanLastSprites(layer, tile) {
 			layer.removeChild(tile.s);
 		}
 	}
+}
+
+function _line(line, id, x) {
+	if(line === undefined) return [true, true, true];
+
+	var x1 = line[x-1];
+	var x3 = line[x+1];
+	x1 = (x1 === undefined)? true: x1===id;
+	x3 = (x3 === undefined)? true: x3===id;
+	return [x1, line[x] === id, x3];
+}
+
+function _addAuto(layer, tileset, id, x, y, frame) {
+	var w = tileset.size.width;
+	var h = tileset.size.height;
+
+	var neighbors = [];
+	neighbors.push(_line(layer[y-1], id, x));
+	neighbors.push(_line(layer[y+0], id, x));
+	neighbors.push(_line(layer[y+1], id, x));
+
+	var textures = AutoTilemap.prototype.atAutoTile.call(null, tileset, id, neighbors);
+
+	var s0 = new PIXI.Sprite(textures[0]);
+	s0.position.x = x*w+0;
+	s0.position.y = y*h+0;
+	s0.frame = frame;
+	var s1 = new PIXI.Sprite(textures[1]);
+	s1.position.x = x*w+w/2;
+	s1.position.y = y*h+0;
+	s1.frame = frame;
+	var s2 = new PIXI.Sprite(textures[2]);
+	s2.position.x = x*w+0;
+	s2.position.y = y*h+h/2;
+	s2.frame = frame;
+	var s3 = new PIXI.Sprite(textures[3]);
+	s3.position.x = x*w+w/2;
+	s3.position.y = y*h+h/2;
+	s3.frame = frame;
+
+	layer.addChild(s0);
+	layer.addChild(s1);
+	layer.addChild(s2);
+	layer.addChild(s3);
+	return [s0, s1, s2, s3];
 }
 
 TileScene.prototype.setAt = function(x, y, layer, t, v, auto) {
@@ -137,16 +183,21 @@ TileScene.prototype.setAt = function(x, y, layer, t, v, auto) {
 	// TODO autotiles
 
 	if(typeof v === 'number') {
-		var s = new PIXI.Sprite(tileset.at(v));
-		s.position.x = x * tileset.size.width;
-		s.position.y = y * tileset.size.height;
-		this[layer].addChild(s);
-		tile.s = s;
+		if(tile.auto) {
+			tile.s = _addAuto(this[layer], tileset, tile.v, x, y);
+		} else {
+			var s = new PIXI.Sprite(tileset.at(v));
+			s.position.x = x * tileset.size.width;
+			s.position.y = y * tileset.size.height;
+			this[layer].addChild(s);
+			tile.s = s;
+		}
 	} else if(v instanceof Array) {
 		tile.s = [];
 		for (var i=0, l=v.length; i<l; i++) {
 			if(tile.auto) {
-				console.error('auto');
+				var s = _addAuto(this[layer], tileset, tile.v[i], x, y, i);
+				tile.s = tile.s.concat(s);
 			} else {
 				var s = new PIXI.Sprite(tileset.at(v[i]));
 				s.position.x = x * tileset.size.width;
