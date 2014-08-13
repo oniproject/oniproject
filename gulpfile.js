@@ -13,6 +13,14 @@ gulp.task('js-redactor', function() {
     .pipe(gulp.dest('./public'));
 });
 
+gulp.task('js-tredactor', function() {
+  var bundleStream = browserify('./js/main-tile-redactor.js').bundle();
+
+  bundleStream
+    .pipe(source('tile-redactor.js'))
+    .pipe(gulp.dest('./public'));
+});
+
 gulp.task('js', function() {
   var bundleStream = browserify('./js/main.js').bundle();
 
@@ -21,8 +29,8 @@ gulp.task('js', function() {
     .pipe(gulp.dest('./public'));
 });
 
-gulp.task('watch', ['js', 'js-redactor'], function() {
-  gulp.watch('js/**', ['js', 'js-redactor'])
+gulp.task('watch', ['js', 'js-redactor', 'js-tredactor'], function() {
+  gulp.watch('js/**', ['js', 'js-redactor', 'js-tredactor'])
 });
 
 gulp.task('server', function(next) {
