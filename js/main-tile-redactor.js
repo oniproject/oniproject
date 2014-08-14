@@ -24,17 +24,9 @@ var Outside_C =  new Tileset('/game/Outside_C.png', 16, 16, WH);
 var World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH);
 var World_B = new Tileset('/game/World_B.png', 16, 16, WH);
 
-var map = [
-	[1,2,3,4],
-	[3,1,4,1],
-	[3,0,9,10],
-	[3,1,4,1],
-];
-var tilemap = new Tilemap(map, World_B);
-
 var nn = 31;
 
-var amap = [
+var data = [
 	[0,0,0,0,0,0,0],
 	[0,nn,0,nn,nn,nn,0],
 	[0,nn,0,nn,0,0,0],
@@ -53,12 +45,12 @@ var amap = [
 	[0,0,0,0,0,0,0],
 ];
 
-var amap = new AutoTilemap(amap, World_A2);
+//var amap = new AutoTilemap(amap, World_A2);
 
 
 
 
-var TileScene = function(w, h, tilesets) {
+var TileScene = function(w, h, tilesets, data) {
 	PIXI.DisplayObjectContainer.call(this);
 
 	this.w = w;
@@ -67,12 +59,15 @@ var TileScene = function(w, h, tilesets) {
 
 	this.step = 0;
 
-	var data = {
-		first: [],
-		second: [],
-		//objects: [],
-		third: [],
-	};
+	if(!data) {
+		data = {
+			first: [],
+			second: [],
+			//objects: [],
+			third: [],
+		};
+	}
+
 	this.data = data;
 
 	this.first = new PIXI.SpriteBatch();
@@ -152,7 +147,7 @@ function _addAuto(layer, map, tileset, tile, x, y, frame) {
 	neighbors.push(_line(map[y+0], zeroId, x));
 	neighbors.push(_line(map[y+1], zeroId, x));
 
-	var textures = AutoTilemap.prototype.atAutoTile.call(null, tileset, id, neighbors);
+	var textures = tileset.atAutoTile(id, neighbors);
 
 	var s0 = new PIXI.Sprite(textures[0]);
 	s0.position.x = x*w+0;
@@ -245,6 +240,8 @@ TileScene.prototype._setAt = function(x, y, layer, t, v, auto) {
 	}
 }
 
+
+
 TileScene.prototype.updateTransform = function() {
 	PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
 
@@ -294,21 +291,63 @@ var w = $('#canvas').width(),
 	stage = new PIXI.Stage(0xFFFFFF, true),
 	renderer = PIXI.autoDetectRenderer(w, h);
 
+stage.interactive = true;
 $('#canvas').append(renderer.view);
 
-
-
-stage.addChild(tilemap.container);
-stage.addChild(amap.container);
-
-var Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
+window.Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
 
 window.scene = new TileScene(20, 20, Outside);
-scene.setAt(1, 2, 'first', 0, [4, 5, 6], true);
+for(var y=0, ml=data.length; y<ml; y++) {
+	var line = data[y];
+	for(var x=0, ll=line.length;x<ll; x++) {
+		var nnn = data[y][x];
+		if(nnn) {
+			scene.setAt(x, y, 'second', 0, [0,1,2], true);
+			scene.setAt(x, y, 'third', 0, 3, true);
+		} else {
+			scene.setAt(x, y, 'second', 0, [0,1,2], true);
+		}
+	}
+}
+
+stage.click = function(event) {
+	var loc = event.getLocalPosition(scene);
+	var x = loc.x/32|0;
+	var y = loc.y/32|0;
+	scene.setAt(x, y, 'second', 5, 5);
+	console.log(x, y);
+}
 
 stage.addChild(scene);
 
 
+
+var originX=32*10, originY=32*2, moveSpeed=32;
+var keyCodes = {
+	37: function(event) {
+		originX += moveSpeed;
+		resize();
+	},
+	38: function(event) {
+		originY += moveSpeed;
+		resize();
+	},
+	39: function(event) {
+		originX -= moveSpeed;
+		resize();
+	},
+	40: function(event) {
+		originY -= moveSpeed;
+		resize();
+	},
+}
+document.onkeydown = function(event) {
+	var f = keyCodes[event.keyCode];
+	if (f) {
+		event.preventDefault();
+		f(event);
+	}
+}
 
 
 window.onresize = resize;
@@ -317,18 +356,15 @@ function resize() {
 	w = $('#canvas').width();
 	h = $('#canvas').height();
 
+	scene.position.x = originX;
+	scene.position.y = originY;
+
 	renderer.resize(w, h);
-	//iso.canvas._width = w;
-	//iso.canvas._height = h;
-	//iso.originX = w / 2 + originX;
-	//iso.originY = h * 0.9 + originY;
 }
 
 requestAnimFrame(animate);
 
 function animate() {
-	//redactor.render();
-
 	renderer.render(stage);
 	requestAnimFrame(animate);
 }

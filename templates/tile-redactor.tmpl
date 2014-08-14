@@ -18,6 +18,43 @@ html, body {
 <!-- CANVAS -->
 <div id="canvas" style="position: absolute;" class="uk-width-1-1 uk-height-1-1"></div>
 
+<div style="position: absolute;" class="uk-grid uk-grid-small uk-height-1-1 uk-width-2-10 uk-margin-remove">
+<!-- OBJECT -->
+		<br/><br/>
+		<div id="palete" class="uk-panel uk-panel-box uk-width-1-1">
+			<ul class="uk-tab" data-uk-tab data-uk-switcher="{connect: '#tabs'}">
+				<li class="uk-active" data-uk-dropdown="{mode:'hover'}">
+					<a href="">A <i class="uk-icon-caret-down"></i></a>
+
+					<div class="uk-dropdown uk-dropdown-small">
+						<ul class="uk-nav uk-nav-dropdown">
+							<li><a href="">A1</a></li>
+							<li><a href="">A2</a></li>
+							<li><a href="">A3</a></li>
+							<li><a href="">A4</a></li>
+							<li><a href="">A5</a></li>
+						</ul>
+					</div>
+				</li>
+				<li><a href="">B</a></li>
+				<li><a href="">C</a></li>
+				<li class="uk-disabled"><a href="">D</a></li>
+				<li class="uk-disabled"><a href="">E</a></li>
+			</ul>
+			<ul id="tabs" class="uk-switcher">
+				<li>vnfdjskl</li>
+				<li>fvsdvfds</li>
+				<li>ivfdsvfds</li>
+				<li>FFFDsvdfs</li>
+				<li>vfdsnlvdfsl</li>
+			</ul>
+			<div id="xcanvas"></div>
+
+		</div>
+
+<!-- HACK -->
+</div>
+
 
 <script src="/js/jquery-2.1.1.min.js"></script>
 <script src="/js/uikit.min.js"></script>
@@ -25,5 +62,17 @@ html, body {
 <script src="/js/vue.js"></script>
 <script src="/pixi.js"></script>
 <script src="/tile-redactor.js"></script>
+<script>
+new Vue({
+	el: '#palete',
+	data: {
+	},
+	methods: {
+		setActive: function(e){
+			console.log(e);
+		},
+	},
+});
+</script>
 </body>
 </html>
