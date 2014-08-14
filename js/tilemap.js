@@ -43,8 +43,10 @@ var Tilemap = function(w, h, tilesets, data) {
 			data.second[y][x] = {t:0, v:0};
 			//data.objects[y][x] = 0;
 			data.third[y][x] = {t:0, v:0};
-			this._setAt(x, y, 'first', 0, [0, 1, 2], true);
-			this._setAt(x, y, 'second', 0, 3, true);
+			//this._setAt(x, y, 'first', 0, [0, 1, 2], true);
+			//this._setAt(x, y, 'second', 0, 3, true);
+			this._setAt(x, y, 'first', 5, 56);
+			this._setAt(x, y, 'second', 5, 56);
 			this._setAt(x, y, 'third', 5, 56);
 		}
 	}

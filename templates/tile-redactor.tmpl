@@ -11,6 +11,14 @@ html, body {
 	margin: 0;
 	overflow: hidden;
 }
+
+.img {
+	width: 32px;
+	height:32px;
+	display: inline-block;
+	margin:0;
+}
+
 </style>
 </head>
 <body class="uk-height-1-1 uk-margin-remove">
@@ -42,7 +50,23 @@ html, body {
 				<li class="uk-disabled"><a href="">E</a></li>
 			</ul>
 			<ul id="tabs" class="uk-switcher">
-				<li>vnfdjskl</li>
+				<li id="t1">
+					<div class="img" v-repeat="A1" v-on="click: setActive('A1', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+					<div class="img" v-repeat="A2" v-on="click: setActive('A2', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+					<div class="img" v-repeat="A3" v-on="click: setActive('A3', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+					<div class="img" v-repeat="A4" v-on="click: setActive('A4', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+					<div class="img" v-repeat="A5" v-on="click: setActive('A5', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
 				<li>fvsdvfds</li>
 				<li>ivfdsvfds</li>
 				<li>FFFDsvdfs</li>
@@ -63,16 +87,72 @@ html, body {
 <script src="/pixi.js"></script>
 <script src="/tile-redactor.js"></script>
 <script>
-new Vue({
+var xxx = new Vue({
 	el: '#palete',
 	data: {
+		//{ img: "", x: 0, y:0 },
+		A1: [],
+		A2: [],
+		A3: [],
+		A4: [],
+		A5: [],
 	},
 	methods: {
-		setActive: function(e){
-			console.log(e);
+		setActive: function(a, i){
+			console.log(a, i);
+			switch(a) {
+			case 'A1':
+				type.auto = true;
+				type.t = 0;
+				if(i%2) {
+					i-=1;
+					i*=2;
+					type.v = i+3;
+					type.layer = 'second';
+				} else {
+					i*=2;
+					type.v = [i, i+1, i+2];
+					type.layer = 'first';
+				}
+				break;
+			case 'A2':
+				type.auto = true;
+				type.t = 1;
+				type.v = i;
+				type.layer = 'first';
+				break;
+			}
 		},
 	},
 });
+
+var t1 = document.getElementById('t1');
+//t1.appendChild(Outside[0].image.texture.baseTexture.source);
+//t1.appendChild(Outside[1].image.texture.baseTexture.source);
+/*t1.appendChild(Outside[2].image.texture.baseTexture.source);
+t1.appendChild(Outside[3].image.texture.baseTexture.source);
+t1.appendChild(Outside[4].image.texture.baseTexture.source);
+*/
+
+//xxx.$data.A1.push('background-image: url("' +Outside[0].image.texture.baseTexture.source.src +'");');
+setTimeout(function() {
+	for(var y=0; y<10; y+=3) {
+		xxx.$data.A1.push({x:0, y:-y, img: Outside[0].image.texture.baseTexture.source.src});
+		xxx.$data.A1.push({x:-6, y:-y, img: Outside[0].image.texture.baseTexture.source.src});
+		xxx.$data.A1.push({x:-8, y:-y, img: Outside[0].image.texture.baseTexture.source.src});
+		xxx.$data.A1.push({x:2, y:-y, img: Outside[0].image.texture.baseTexture.source.src});
+	}
+	for(var y=0; y<10; y+=3) {
+		xxx.$data.A2.push({x:0, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-2, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-4, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-6, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-8, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-10, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-12, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+		xxx.$data.A2.push({x:-14, y:-y, img: Outside[1].image.texture.baseTexture.source.src});
+	}
+}, 3000);
 </script>
 </body>
 </html>

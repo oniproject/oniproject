@@ -73,12 +73,16 @@ for(var y=0, ml=data.length; y<ml; y++) {
 	}
 }
 
+window.type = {
+	layer: 'second', t: 5, v:5, auto:undefined,
+}
+
 stage.click = function(event) {
 	var loc = event.getLocalPosition(scene);
 	var x = loc.x/32|0;
 	var y = loc.y/32|0;
-	scene.setAt(x, y, 'second', 5, 5);
-	console.log(x, y);
+	scene.setAt(x, y, type.layer, type.t, type.v, type.auto);
+	console.log(x, y, type);
 }
 
 stage.addChild(scene);
