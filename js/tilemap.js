@@ -39,15 +39,15 @@ var Tilemap = function(w, h, tilesets, data) {
 			// t is a tileset
 			// v is a tile number
 			// if v is array it animated tile
-			data.first[y][x] = {t:0, v:0};
-			data.second[y][x] = {t:0, v:0};
+			data.first[y][x] = null;
+			data.second[y][x] = null;
 			//data.objects[y][x] = 0;
-			data.third[y][x] = {t:0, v:0};
+			data.third[y][x] = null;
 			//this._setAt(x, y, 'first', 0, [0, 1, 2], true);
 			//this._setAt(x, y, 'second', 0, 3, true);
-			this._setAt(x, y, 'first', 5, 56);
-			this._setAt(x, y, 'second', 5, 56);
-			this._setAt(x, y, 'third', 5, 56);
+			//this._setAt(x, y, 'first', 5, 56);
+			//this._setAt(x, y, 'second', 5, 56);
+			//this._setAt(x, y, 'third', 5, 56);
 		}
 	}
 }
@@ -56,6 +56,7 @@ Tilemap.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 Tilemap.constructor = Tilemap;
 
 function cleanLastSprites(layer, tile) {
+	if(!tile) return;
 	if(tile.hasOwnProperty('s')) {
 		if(tile.s instanceof Array) {
 			for(var i=0, l=tile.s.length; i<l; i++) {
@@ -74,12 +75,14 @@ function _line(line, id, x) {
 	var lines = [line[x-1], line[x], line[x+1]];
 	for (var i=0, l=lines.length; i<l; i++) {
 		var n = lines[i];
-		if(n !== undefined) {
+		if(n !== undefined && n !== null) {
 			if(n.v instanceof Array) {
 				n = n.v[0] === id;
 			} else {
 				n = n.v === id;
 			}
+		} else if(n === null) {
+			n = false;
 		} else {
 			n = true;
 		}
@@ -135,6 +138,19 @@ Tilemap.prototype.redrawAt = function(x, y, layer) {
 Tilemap.prototype.setAt = function(x, y, layer, t, v, auto) {
 	this._setAt(x, y, layer, t, v, auto);
 
+	switch(layer) {
+		case 'first':
+			cleanLastSprites(this.second, this.data['second'][y][x]);
+			this.data['second'][y][x] = null;
+			cleanLastSprites(this.third, this.data['third'][y][x]);
+			this.data['third'][y][x] = null;
+			break;
+		case 'second':
+			cleanLastSprites(this.third, this.data['third'][y][x]);
+			this.data['third'][y][x] = null;
+			break;
+	}
+
 	this.redrawAt(x-1, y-1, layer);
 	this.redrawAt(x-1, y, layer);
 	this.redrawAt(x-1, y+1, layer);
@@ -152,6 +168,10 @@ Tilemap.prototype._setAt = function(x, y, layer, t, v, auto) {
 	if(y<0 || y>this.h) { throw 'Fail Y'; }
 
 	if(!this.data.hasOwnProperty(layer) || layer === 'objects') { throw 'Fail Layer'; }
+
+	if(!this.data[layer][y][x]) {
+		this.data[layer][y][x] = {t:0, v:0};
+	}
 
 	var tile = this.data[layer][y][x];
 	tile.t = t;
@@ -212,21 +232,21 @@ Tilemap.prototype.updateTransform = function() {
 	for (var y=0; y<h; y++) {
 		for (var x=0; x<w; x++) {
 			var tile = data.first[y][x];
-			if(tile.v instanceof Array && tile.s) {
+			if(tile && tile.v instanceof Array && tile.s) {
 				for (var i=0, l=tile.s.length; i<l; i++) {
 					var s = tile.s[i];
 					s.visible = s.frame === round;
 				}
 			}
 			var tile = data.second[y][x];
-			if(tile.v instanceof Array && tile.s) {
+			if(tile && tile.v instanceof Array && tile.s) {
 				for (var i=0, l=tile.s.length; i<l; i++) {
 					var s = tile.s[i];
 					s.visible = s.frame === round;
 				}
 			}
 			var tile = data.third[y][x];
-			if(tile.v instanceof Array && tile.s) {
+			if(tile && tile.v instanceof Array && tile.s) {
 				for (var i=0, l=tile.s.length; i<l; i++) {
 					var s = tile.s[i];
 					s.visible = s.frame === round;
@@ -234,6 +254,63 @@ Tilemap.prototype.updateTransform = function() {
 			}
 		}
 	}
+}
+
+Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
+	console.log('fill start');
+	var layer = this.data[_layer];
+	var north;
+	var south;
+
+	var Q = [{x:x, y:y}];
+
+	var empty = (layer[y][x]) ? layer[y][x].v : null;
+	var check = function(x, y) {
+		if(y<0 || y >= layer.length) return false;
+		if(x<0 || x >= layer[y].length) return false;
+		if(!layer[y][x] && !empty) return true;
+		if(!layer[y][x]) return false;
+
+		var v = layer[y][x].v;
+		if(typeof v === 'number' && typeof empty === 'number') {
+			return v === empty;
+		} else if(typeof v !== 'number' && typeof empty !== 'number') {
+			if(!empty) return false;
+			for(var i=0, l=v.length;i<l; i++) {
+				if(v[i] !== empty[i]) { return false; }
+			}
+			return true;
+		}
+		return false;
+	}
+
+	while(Q.length) {
+		var N = Q.pop();
+		x = N.x;
+		y = N.y;
+
+		if(check(x, y)) {
+			north = south = y;
+			do {
+				north--;
+			} while (check(x, north) && north >= 0);
+			do {
+				south++;
+			} while (check(x, south) && south < layer.length);
+
+			for (var n = north + 1; n < south; n++) {
+				console.log('fill');
+				this.setAt(x, n, _layer, t, v, auto);
+				if (check(x-1, n)) {
+					Q.push({x:x-1, y:n});
+				}
+				if (check(x+1, n)) {
+					Q.push({x:x+1, y:n});
+				}
+			}
+		}
+	}
+	console.log('fill end');
 }
 
 module.exports = Tilemap;

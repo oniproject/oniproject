@@ -65,10 +65,10 @@ for(var y=0, ml=data.length; y<ml; y++) {
 	for(var x=0, ll=line.length;x<ll; x++) {
 		var nnn = data[y][x];
 		if(nnn) {
-			scene.setAt(x, y, 'second', 0, [0,1,2], true);
-			scene.setAt(x, y, 'third', 0, 3, true);
+			scene.setAt(x, y, 'first', 0, [0,1,2], true);
+			scene.setAt(x, y, 'second', 0, 3, true);
 		} else {
-			scene.setAt(x, y, 'second', 0, [0,1,2], true);
+			scene.setAt(x, y, 'first', 0, [0,1,2], true);
 		}
 	}
 }
@@ -126,15 +126,11 @@ function animate() {
 }
 
 
-
-
-
-
-
 var type = new Vue({
 	el: '#palete',
 	data: {
 		layer:'first',
+		isFill:false,
 		t: 0,
 		v: 0,
 		auto: false,
@@ -268,6 +264,10 @@ stage.click = function(event) {
 	var loc = event.getLocalPosition(scene);
 	var x = loc.x/32|0;
 	var y = loc.y/32|0;
-	scene.setAt(x, y, type.$data.layer, type.$data.t, type.$data.v, type.$data.auto);
+	if(type.$data.isFill) {
+		scene.Fill(x, y, type.$data.layer, type.$data.t, type.$data.v, type.$data.auto);
+	} else {
+		scene.setAt(x, y, type.$data.layer, type.$data.t, type.$data.v, type.$data.auto);
+	}
 	console.log(x, y, type.$data);
 }
