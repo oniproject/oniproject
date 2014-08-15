@@ -58,13 +58,18 @@ Tilemap.constructor = Tilemap;
 function cleanLastSprites(layer, tile) {
 	if(!tile) return;
 	if(tile.hasOwnProperty('s')) {
-		if(tile.s instanceof Array) {
-			for(var i=0, l=tile.s.length; i<l; i++) {
-				layer.removeChild(tile.s[i]);
+		try {
+			if(tile.s instanceof Array) {
+				for(var i=0, l=tile.s.length; i<l; i++) {
+					layer.removeChild(tile.s[i]);
+				}
+			} else {
+				layer.removeChild(tile.s);
 			}
-		} else {
-			layer.removeChild(tile.s);
+		} catch (e) {
+			console.erro(e);
 		}
+		delete tile.s;
 	}
 }
 
