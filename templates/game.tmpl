@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Game</title>
+<style>
+html, body {
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+#bottom {
+	position:absolute;
+	bottom:0;
+	width:100%;
+	background: gray;
+}
+#spells {
+	margin:auto;
+	width:340px;
+	background:black;
+	font-size: 0;
+	padding:3px;
+}
+#spells img {
+	margin:0;
+	width:32px;
+	height:32px;
+	padding: 1px;
+}
+
+#spells img:hover {
+	outline: 1px solid rgba(255, 255, 255, 1);
+}
+#exp {
+	width:100%;
+}
+#exp div {
+	background: silver;
+	height: 7px;
+}
+
+#top-left {
+	position:absolute;
+	padding: 3px;
+}
+.level {
+	float:left;
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
+	background: blue;
+	color: white;
+	padding: 7px;
+	border-radius:20px 6px 20px 20px;
+	border: 2px solid silver;
+}
+.bars {
+	float:right;
+}
+.points {
+	width:200px;
+	border-radius:6px;
+	border: 1px solid black;
+	background: silver;
+	margin: 2px;
+}
+.points div {
+	height: 7px;
+	border-radius:6px;
+}
+.points.hp div {
+	background: red;
+}
+.points.mp div {
+	height: 4px;
+	background: blue;
+}
+.points.tp div {
+	height: 4px;
+	background: yellow;
+}
+
+</style>
+</head>
+<body>
+<div id="ui">
+
+<div id="top-left">
+	<div class="level" v-text="level"></div>
+	<div class="bars">
+		<div class="points hp"><div v-style="width: hp/mhp*100 + '%'"></div></div>
+		<div class="points mp"><div v-style="width: mp/mmp*100 + '%'"></div></div>
+		<div class="points tp"><div v-style="width: tp/mtp*100 + '%'"></div></div>
+	</div>
+</div>
+<div id="bottom">
+	<div id="spells">
+		<img v-repeat="spells" v-on="click: cast(this)" src="/icons/lorc/originals/svg/``$value``.svg" />
+	</div>
+
+	<div id="exp"><div v-style="width: exp + '%'"></div></div>
+</div>
+
+</div>
+<script src="/pixi.js"></script>
+<script src="/keypress-2.0.2.min.js"></script>
+<script src="/cbor.js"></script>
+<script src="/js/vue.js"></script>
+<script>
+Vue.config({
+	delimiters: ['`', '`'],
+});
+</script>
+<script src="/main.js"></script>
+</body>

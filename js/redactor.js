@@ -120,33 +120,27 @@ function Redactor(map) {
 		} else {
 			$('#obj').text(''+id+' '+obj.type);
 			var c = obj.color;
-			var cc = new Isomer.Color(c[0], c[1], c[2], c[3])
-			$('#color #hex-color').val(cc.toHex());
-			$('#color #alpha').val(c[3]);
+			var cc = new Isomer.Color(c[0], c[1], c[2], c[3]);
+			that.Color.$data.color = cc.toHex();
+			that.Color.$data.alpha = c[3];
 
 			$('#rotateZ').show();
 			$('#pos').show();
 			$('#size').show();
 			$('#color').show();
 
-			$('#pos #x').val(obj.pos[0]);
-			$('#pos #y').val(obj.pos[1]);
-			$('#pos #z').val(obj.pos[2]);
-			$('#size #x').val(obj.size[0]);
-			$('#size #y').val(obj.size[1]);
-			$('#size #z').val(obj.size[2]);
-			$('#rotateZ #yaw').val(obj.yaw);
-			switch(obj.type) {
-			case 'pyramid':
-			case 'prism':
-				$('#size #v').hide();
-				break;
-			case 'cylinder':
+			that.Position.$data.x = obj.pos[0];
+			that.Position.$data.y = obj.pos[1];
+			that.Position.$data.z = obj.pos[2];
+			that.Resize.$data.x = obj.size[0];
+			that.Resize.$data.y = obj.size[1];
+			that.Resize.$data.z = obj.size[2];
+			that.Rotate.$data.yaw = obj.yaw;
+
+			if(obj.type === 'cylinder') {
 				$('#size #v').show();
-				$('#size #v').val(obj.vertices);
-				break;
-			case 'path':
-			case 'shape':
+				that.Resize.$data.v = obj.vertices;
+			} else {
 				$('#size #v').hide();
 			}
 		}
@@ -275,101 +269,155 @@ Redactor.prototype._initUI = function() {
 	dropZone.addEventListener('dragleave', handleDragLeave, false);
 	dropZone.addEventListener('drop', handleFileSelect, false);
 
-	$('#SetColor').click(function() {
-		var color = $('#color #hex-color').val(),
-			alpha = $('#color #alpha').val(),
-			c = parseInt(color.slice(1), 16),
-			r = (c >> 16) & 0xff,
-			g = (c >> 8) & 0xff,
-			b = c & 0xff;
 
-		if(that.map.objects[that.active]) {
-			that.run(new commands.SetColor(that.active, [r, g, b, +alpha]));
-		}
-	});
-	$('#Move').click(function() {
-		var x = $('#pos #x').val(),
-			y = $('#pos #y').val(),
-			z = $('#pos #z').val();
-		if(that.map.objects[that.active]) {
-			that.run(new commands.Move(that.active, [+x, +y, +z]));
-		}
+	this.Color = new Vue({
+		el: '#color',
+		data: {
+			color: '#000000',
+			alpha: 0,
+		},
+		methods: {
+			setColor: function(e) {
+				var c = parseInt(this.$data.color.slice(1), 16),
+					r = (c >> 16) & 0xff,
+					g = (c >> 8) & 0xff,
+					b = c & 0xff;
+				that.run(new commands.SetColor(that.active, [r, g, b, +this.$data.alpha]));
+			},
+		},
 	});
 
-	$('#Resize').click(function() {
-		var x = $('#size #x').val(),
-			y = $('#size #y').val(),
-			z = $('#size #z').val(),
-			v = $('#size #v').val();
-		if(that.map.objects[that.active]) {
-			that.run(new commands.Resize(that.active, [+x, +y, +z], +v));
-		}
+	this.Position = new Vue({
+		el: '#pos',
+		data: {
+			x:0, y:0, z:0,
+		},
+		methods: {
+			move: function(e) {
+				that.run(new commands.Move(
+					that.active,
+					[+this.$data.x, +this.$data.y, +this.$data.z]
+				));
+			},
+		},
 	});
 
-	$('#Rotate').click(function() {
-		var yaw = $('#rotateZ #yaw').val();
-		if(that.map.objects[that.active]) {
-			that.run(new commands.Rotate(that.active, +yaw));
-		}
+	this.Resize = new Vue({
+		el: '#size',
+		data: {
+			x:0, y:0, z:0,
+			v:0,
+		},
+		methods: {
+			resize: function(e) {
+				that.run(new commands.Resize(
+					that.active,
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					+this.$data.v
+				));
+			},
+		},
 	});
 
-	$('#AddPrism').click(function() {
-		var x = $('#AddPrismModal #x').val(),
-			y = $('#AddPrismModal #y').val(),
-			z = $('#AddPrismModal #z').val(),
-			dx = $('#AddPrismModal #dx').val(),
-			dy = $('#AddPrismModal #dy').val(),
-			dz = $('#AddPrismModal #dz').val();
-		that.run(new commands.AddPrism([+x, +y, +z], [+dx, +dy, +dz]));
+	this.Rotate = new Vue({
+		el: '#rotateZ',
+		data: {
+			yaw: 0,
+		},
+		methods: {
+			rotate: function(e) {
+				that.run(new commands.Rotate(
+					that.active,
+					+this.$data.yaw
+				));
+			},
+		},
 	});
 
-	$('#AddPyramid').click(function() {
-		var x = $('#AddPyramidModal #x').val(),
-			y = $('#AddPyramidModal #y').val(),
-			z = $('#AddPyramidModal #z').val(),
-			dx = $('#AddPyramidModal #dx').val(),
-			dy = $('#AddPyramidModal #dy').val(),
-			dz = $('#AddPyramidModal #dz').val();
-		that.run(new commands.AddPyramid([+x, +y, +z], [+dx, +dy, +dz]));
+	new Vue({
+		el: '#AddPrismModal',
+		data: {
+			x:0, y:0, z:0,
+			dx:1, dy:1, dz:1,
+		},
+		methods: {
+			add: function(e) {
+				that.run(new commands.AddPrism(
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					[+this.$data.dx, +this.$data.dy, +this.$data.dz]
+				));
+			},
+		},
 	});
 
-	$('#AddCylinder').click(function() {
-		var x = $('#AddCylinderModal #x').val(),
-			y = $('#AddCylinderModal #y').val(),
-			z = $('#AddCylinderModal #z').val(),
-			dx = $('#AddPyramidModal #dx').val(),
-			dy = $('#AddPyramidModal #dy').val(),
-			dz = $('#AddPyramidModal #dz').val();
-
-			vertices = $('#AddCylinderModal #vertices').val(),
-		that.run(new commands.AddCylinder([+x, +y, +z], [+dx, +dy, +dz], +vertices));
+	new Vue({
+		el: '#AddPyramidModal',
+		data: {
+			x:0, y:0, z:0,
+			dx:1, dy:1, dz:1,
+		},
+		methods: {
+			add: function(e) {
+				that.run(new commands.AddPyramid(
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					[+this.$data.dx, +this.$data.dy, +this.$data.dz]
+				));
+			},
+		},
 	});
 
-	$('#AddShape').click(function() {
-		var height = $('#AddShapeModal #x').val();
-		var path=[];
-		$('#AddShapeModal #shape-list .uk-form-row').each(function() {
-			var $this = $(this);
-			var x = $this.find('input[name|=x]').val(),
-				y = $this.find('input[name|=y]').val(),
-				z = $this.find('input[name|=z]').val();
-			console.log(+x, +y, +z);
-			path.push([+x, +y, +z]);
-		});
-		that.run(new commands.AddShape(path, height));
+	new Vue({
+		el: '#AddCylinderModal',
+		data: {
+			x:0, y:0, z:0,
+			dx:1, dy:1, dz:1,
+			vertices: 30,
+		},
+		methods: {
+			add: function(e) {
+				that.run(new commands.AddCylinder(
+					[+this.$data.x, +this.$data.y, +this.$data.z],
+					[+this.$data.dx, +this.$data.dy, +this.$data.dz],
+					+this.$data.vertices
+				));
+			},
+		},
 	});
 
-	$('#AddPath').click(function() {
-		var path=[];
-		$('#AddPathModal #path-list .uk-form-row').each(function() {
-			var $this = $(this);
-			var x = $this.find('input[name|=x]').val(),
-				y = $this.find('input[name|=y]').val(),
-				z = $this.find('input[name|=z]').val();
-			console.log(+x, +y, +z);
-			path.push([+x, +y, +z]);
-		});
-		that.run(new commands.AddPath(path));
+
+	new Vue({
+		el: '#AddShapeModal',
+		data: {
+			height: 1,
+			points: [{x:0, y:0, z:0}],
+		},
+		methods: {
+			add: function(e) {
+				var path=[];
+				for(var i=0,l=this.$data.points.length;i<l;i++) {
+					var p=this.$data.points[i];
+					path.push([+p.x, +p.y, +p.z]);
+				}
+				that.run(new commands.AddShape(path, +this.$data.height));
+			},
+		},
+	});
+
+	new Vue({
+		el: '#AddPathModal',
+		data: {
+			points: [{x:0, y:0, z:0}],
+		},
+		methods: {
+			add: function(e) {
+				var path=[];
+				for(var i=0,l=this.$data.points.length;i<l;i++) {
+					var p=this.$data.points[i];
+					path.push([+p.x, +p.y, +p.z]);
+				}
+				that.run(new commands.AddPath(path));
+			},
+		},
 	});
 }
 
