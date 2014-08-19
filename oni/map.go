@@ -156,7 +156,7 @@ func (gm *Map) Run() {
 			}
 			gm.objects[obj.Id()] = obj
 			broadcast(obj.GetState(STATE_IDLE, gm.tick))
-			log.Println("register", obj)
+			log.Println("register", obj.Id(), obj)
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
 			if c, ok := obj.(*Avatar); ok {

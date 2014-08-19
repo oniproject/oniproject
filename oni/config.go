@@ -11,10 +11,12 @@ import (
 )
 
 type Config struct {
-	Driver string
-	Db     string
-	Addr   string
-	db     *gorm.DB
+	Driver  string
+	Db      string
+	Addr    string
+	Game    string
+	Circuit string
+	db      *gorm.DB
 }
 
 func NewConfig(config string) (c *Config) {

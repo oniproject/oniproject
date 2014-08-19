@@ -3,12 +3,12 @@ package oni
 import "github.com/jinzhu/gorm"
 
 type Account struct {
-	Id       int64    `db:"id" form:"-"`
-	Username string   `db:"login" form:"login"`
-	Password string   `db:"password" form:"password"`
-	AvatarId int64    `db:"avatar_id" form:"-"`
-	auth     bool     `db:"-" form:"-"`
-	dbmap    *gorm.DB `db:"-" form:"-"`
+	Id       int64    `form:"-"`
+	Username string   `form:"login"`
+	Password string   `form:"password"`
+	AvatarId int64    `form:"-"`
+	auth     bool     `sql:"-" form:"-"`
+	dbmap    *gorm.DB `sql:"-" form:"-"`
 }
 
 func (a *Account) IsAuthenticated() bool { return a.auth }

@@ -14,8 +14,8 @@ type Game struct {
 	adb       AvatarDB
 }
 
-func NewGame(adb AvatarDB) *Game {
-	return &Game{Map: NewMap(), adb: adb}
+func NewGame(config *Config, adb AvatarDB) *Game {
+	return &Game{Map: NewMap(), adb: adb, Addr: config.Game}
 }
 
 func (gm *Game) Run() {
@@ -52,6 +52,7 @@ func (gm *Game) Run() {
 			log.Println("get avatar", err)
 			return 500, http.StatusText(418)
 		}
+		log.Println(a)
 
 		gm.Map.RunAvatar(ws, *a)
 

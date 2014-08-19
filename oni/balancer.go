@@ -20,16 +20,14 @@ type BalancerMap struct {
 	Avatars map[Id]bool
 }
 
-func NewBalancer(circuit string, adb AvatarDB) (b *Balancer) {
+func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	b = &Balancer{
 		Maps: make(map[Id]BalancerMap),
-		Game: NewGame(adb),
+		Game: NewGame(config, adb),
 		adb:  adb,
 	}
-	// XXX fix it
-	b.Game.Addr = ":2000"
-	if circuit != "" {
-		b.c = client.Dial(circuit, nil)
+	if config.Circuit != "" {
+		b.c = client.Dial(config.Circuit, nil)
 	}
 	return
 }
