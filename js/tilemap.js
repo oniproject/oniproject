@@ -66,9 +66,8 @@ function cleanLastSprites(layer, tile) {
 			} else {
 				layer.removeChild(tile.s);
 			}
-		}
-		catch (e) {
-			console.erro(e);
+		} catch (e) {
+			console.error(e);
 		}
 		delete tile.s;
 	}
@@ -272,32 +271,31 @@ Tilemap.prototype.updateTransform = function() {
 }
 
 Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
-	console.log('fill start');
 	var layer = this.data[_layer],
 		north,
 		south,
 		Q = [{x: x, y: y}],
 		empty = (layer[y][x]) ? layer[y][x].v : null,
 		check = function(x, y) {
-		if (y < 0 || y >= layer.length) { return false; }
-		if (x < 0 || x >= layer[y].length) { return false; }
-		if (!layer[y][x] && !empty) { return true; }
-		if (!layer[y][x]) { return false; }
+			if (y < 0 || y >= layer.length) { return false; }
+			if (x < 0 || x >= layer[y].length) { return false; }
+			if (!layer[y][x] && !empty) { return true; }
+			if (!layer[y][x]) { return false; }
 
-		var v = layer[y][x].v;
-		if (typeof v === 'number' && typeof empty === 'number') {
-			return v === empty;
-		} else if (typeof v !== 'number' && typeof empty !== 'number') {
-			if (!empty) { return false; }
-			for (var i = 0, l = v.length; i < l; i++) {
-				if (v[i] !== empty[i]) {
-					return false;
+			var v = layer[y][x].v;
+			if (typeof v === 'number' && typeof empty === 'number') {
+				return v === empty;
+			} else if (typeof v !== 'number' && typeof empty !== 'number') {
+				if (!empty) { return false; }
+				for (var i = 0, l = v.length; i < l; i++) {
+					if (v[i] !== empty[i]) {
+						return false;
+					}
 				}
+				return true;
 			}
-			return true;
-		}
-		return false;
-	}
+			return false;
+		};
 
 	while (Q.length) {
 		var N = Q.pop();
@@ -314,7 +312,6 @@ Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
 			} while (check(x, south) && south < layer.length);
 
 			for (var n = north + 1; n < south; n++) {
-				console.log('fill');
 				this.setAt(x, n, _layer, t, v, auto);
 				if (check(x - 1, n)) {
 					Q.push({
@@ -331,7 +328,6 @@ Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
 			}
 		}
 	}
-	console.log('fill end');
 }
 
 module.exports = Tilemap;
