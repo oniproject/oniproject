@@ -16,12 +16,12 @@ type Database struct {
 	db *gorm.DB
 }
 
-func NewDatabase(config *Config) (db *Database) {
-	db = &Database{db: config.DB()}
+func NewDatabase(config *Config) AvatarDB {
+	db := &Database{db: config.DB()}
 
 	db.db.AutoMigrate(&mechanic.Actor{})
 
-	return
+	return db
 }
 
 func (db *Database) AvatarById(id Id) (*mechanic.Actor, error) {
