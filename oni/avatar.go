@@ -1,7 +1,7 @@
 package oni
 
 import (
-	"github.com/skelterjohn/geom"
+	"oniproject/oni/geom"
 	"oniproject/oni/mechanic"
 	"time"
 )

@@ -1,8 +1,8 @@
 package oni
 
 import (
-	"github.com/skelterjohn/geom"
 	"math/rand"
+	"oniproject/oni/geom"
 	"time"
 )
 
