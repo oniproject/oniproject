@@ -1,15 +1,13 @@
 'use strict';
 
-var Isomer = require('isomer');
-
-var Octahedron = require('./octahedron');
-var Knot = require('./knot');
-
-/* Some convenient renames */
-var Point = Isomer.Point;
-var Path = Isomer.Path;
-var Shape = Isomer.Shape;
-var Color = Isomer.Color;
+var Isomer = require('isomer'),
+	Octahedron = require('./octahedron'),
+	Knot = require('./knot'),
+	/* Some convenient renames */
+	Point = Isomer.Point,
+	Path = Isomer.Path,
+	Shape = Isomer.Shape,
+	Color = Isomer.Color;
 
 function Avatar() {
 	this.position = new Point(0, 0, 0);
@@ -28,8 +26,8 @@ function Avatar() {
 Avatar.prototype.draw = function(iso) {
 	var pos = this.position;
 	//iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)), this.color);
-	iso.add(Octahedron(new Point(pos.x-0.5, pos.y-0.5, pos.z))
-		.rotateZ(new Point(pos.x, pos.y, pos.z+0.5), this.angle), this.color);
+	iso.add(Octahedron(new Point(pos.x - 0.5, pos.y - 0.5, pos.z))
+		.rotateZ(new Point(pos.x, pos.y, pos.z + 0.5), this.angle), this.color);
 }
 
 Avatar.prototype.update = function(time) {
@@ -42,21 +40,21 @@ Avatar.prototype.update = function(time) {
 Avatar.prototype.move = function(dir) {
 	this.velocity.x = 0;
 	this.velocity.y = 0;
-	for(var i=0, l=dir.length; i<l; i++) {
+	for (var i = 0, l = dir.length; i < l; i++) {
 		var to = dir[i];
-		switch(to) {
-		case 'N':
-			this.velocity.x += this.speed;
-			break;
-		case 'W':
-			this.velocity.y += this.speed;
-			break;
-		case 'S':
-			this.velocity.x -= this.speed;
-			break;
-		case 'E':
-			this.velocity.y -= this.speed;
-			break;
+		switch (to) {
+			case 'N':
+				this.velocity.x += this.speed;
+				break;
+			case 'W':
+				this.velocity.y += this.speed;
+				break;
+			case 'S':
+				this.velocity.x -= this.speed;
+				break;
+			case 'E':
+				this.velocity.y -= this.speed;
+				break;
 		}
 	}
 }

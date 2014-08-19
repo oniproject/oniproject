@@ -22,16 +22,16 @@ function Net(url) {
 	websocket.onmessage = function(event) {
 		var message = CBOR.decode(event.data);
 		switch (typeof message) {
-		case 'number':
-			that.emit('tick', message);
-			break;
-		case 'object':
-			if(message.hasOwnProperty('T')) {
-				that._ParseMessages(message.T|0, message.V, event);
+			case 'number':
+				that.emit('tick', message);
 				break;
-			}
-		default:
-			that.emit('message', message, event);
+			case 'object':
+				if (message.hasOwnProperty('T')) {
+					that._ParseMessages(message.T | 0, message.V, event);
+					break;
+				}
+			default:
+				that.emit('message', message, event);
 		}
 	};
 }
@@ -49,7 +49,7 @@ Net.prototype.send = function(message) {
  */
 
 Net.prototype._ParseMessages = function(type, value, event) {
-	switch(type) {
+	switch (type) {
 		case 1:
 			this.emit('SetVelocityMsg', value);
 			break;
@@ -68,13 +68,22 @@ Net.prototype._ParseMessages = function(type, value, event) {
 }
 
 Net.prototype.SetVelocityMsg = function(data) {
-	this.send({T:1, V: data});
+	this.send({
+		T: 1,
+		V: data
+	});
 }
 Net.prototype.SetTargetMsg = function(data) {
-	this.send({T:2, V: data});
+	this.send({
+		T: 2,
+		V: data
+	});
 }
 Net.prototype.FireMsg = function(data) {
-	this.send({T:3, V: data});
+	this.send({
+		T: 3,
+		V: data
+	});
 }
 
 module.exports = Net;

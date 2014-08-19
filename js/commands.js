@@ -6,8 +6,8 @@ function Delete(id) {
 		obj = map.objects.splice(id, 1);
 	};
 	this.undo = function(map) {
-		var left = map.objects.slice(0, id);
-		var right = map.objects.slice(id);
+		var left = map.objects.slice(0, id),
+			right = map.objects.slice(id);
 		map.objects = [].concat(left, obj, right)
 	};
 }
@@ -16,10 +16,10 @@ function AddPrism(pos, size, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'prism',
-			pos:  pos     || [0,0,0],
-			size: size    || [1,1,1],
+			pos: pos || [0, 0, 0],
+			size: size || [1, 1, 1],
 			yaw: 0,
-			color:color   || [0,0,0,0],
+			color: color || [0, 0, 0, 0],
 			modificators: [],
 		});
 	};
@@ -32,10 +32,10 @@ function AddPyramid(pos, size, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'pyramid',
-			pos:  pos     || [0,0,0],
-			size: size    || [1,1,1],
+			pos: pos || [0, 0, 0],
+			size: size || [1, 1, 1],
 			yaw: 0,
-			color: color  || [0,0,0,0],
+			color: color || [0, 0, 0, 0],
 			modificators: [],
 		});
 	};
@@ -48,11 +48,11 @@ function AddCylinder(pos, size, vertices, color) {
 	this.redo = function(map) {
 		map.objects.push({
 			type: 'cylinder',
-			pos:  pos     || [0,0,0],
-			size: size    || [1,1,1],
+			pos: pos || [0, 0, 0],
+			size: size || [1, 1, 1],
 			yaw: 0,
 			vertices: vertices || 30,
-			color: color  || [0,0,0,0],
+			color: color || [0, 0, 0, 0],
 			modificators: [],
 		});
 	};
@@ -66,10 +66,10 @@ function AddPath(path, pos, size, color) {
 		map.objects.push({
 			type: 'path',
 			path: path,
-			pos:  pos     || [0,0,0],
-			size: size    || [1,1,1],
+			pos: pos || [0, 0, 0],
+			size: size || [1, 1, 1],
 			yaw: 0,
-			color: color  || [0,0,0,0],
+			color: color || [0, 0, 0, 0],
 			modificators: [],
 		});
 	};
@@ -84,10 +84,10 @@ function AddShape(path, height, pos, size, color) {
 			type: 'shape',
 			path: path,
 			height: height,
-			pos:  pos     || [0,0,0],
-			size: size    || [1,1,1],
+			pos: pos || [0, 0, 0],
+			size: size || [1, 1, 1],
 			yaw: 0,
-			color: color  || [0,0,0,0],
+			color: color || [0, 0, 0, 0],
 			modificators: [],
 		});
 	};
@@ -110,25 +110,24 @@ function SetColor(id, color) {
 }
 
 function Resize(id, size, vertices) {
-	var old;
-	var old_vertices;
+	var old, old_vertices;
 	this.redo = function(map) {
 		var obj = map.objects[id];
-		if(obj.size !== undefined) {
+		if (obj.size !== undefined) {
 			old = obj.size;
 			obj.size = size;
 		}
-		if(obj.vertices !== undefined) {
+		if (obj.vertices !== undefined) {
 			old_vertices = obj.vertices;
 			obj.vertices = vertices;
 		}
 	};
 	this.undo = function(map) {
 		var obj = map.objects[id];
-		if(obj.size !== undefined) {
+		if (obj.size !== undefined) {
 			obj.size = old;
 		}
-		if(obj.vertices !== undefined) {
+		if (obj.vertices !== undefined) {
 			obj.vertices = old_vertices;
 		}
 	};

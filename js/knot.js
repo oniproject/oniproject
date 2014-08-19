@@ -1,11 +1,10 @@
 'use strict';
 
-var Isomer = require('isomer');
-
-/* Some convenient renames */
-var Path = Isomer.Path;
-var Point = Isomer.Point;
-var Shape = Isomer.Shape;
+var Isomer = require('isomer'),
+	/* Some convenient renames */
+	Path = Isomer.Path,
+	Point = Isomer.Point,
+	Shape = Isomer.Shape;
 
 /* Draws an impossible MC Escher style knot */
 function Knot(origin) {
@@ -19,13 +18,15 @@ function Knot(origin) {
 		new Point(0, 0, 2),
 		new Point(0, 0, 1),
 		new Point(1, 0, 1),
-		new Point(1, 0, 2)]));
+		new Point(1, 0, 2)
+	]));
 
 	knot.push(new Path([
 		new Point(0, 0, 2),
 		new Point(0, 1, 2),
 		new Point(0, 1, 1),
-		new Point(0, 0, 1)]));
+		new Point(0, 0, 1)
+	]));
 
 	return knot.scale(Point.ORIGIN, 1 / 5).translate(-0.1, 0.15, 0.4).translate(origin.x, origin.y, origin.z);
 }
