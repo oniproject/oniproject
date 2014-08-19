@@ -83,8 +83,6 @@ function Redactor(map) {
 		ctx.lineTo(e3.x, e3.y);
 	}
 
-	// FIXME add Backbone or other for UI and move all to other files
-
 	$.UIkit.notify({
 		message : 'Hello Kitty!',
 		status  : 'info',

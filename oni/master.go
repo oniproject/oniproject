@@ -1,9 +1,8 @@
 package oni
 
 import (
-	"database/sql"
-	"github.com/coopernurse/gorp"
 	"github.com/go-martini/martini"
+	"github.com/jinzhu/gorm"
 	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
 	"github.com/martini-contrib/sessionauth"
@@ -15,33 +14,22 @@ import (
 
 type Master struct {
 	Addr, Rpc string
-	authdb    *gorp.DbMap
+	config    *Config
 	balancer  *Balancer
+	authdb    *gorm.DB
 }
 
-func NewMaster(balancer *Balancer) *Master {
+func NewMaster(config *Config, balancer *Balancer) *Master {
 	m := &Master{
 		balancer: balancer,
+		config:   config,
+		authdb:   config.DB(),
+		Addr:     config.Addr,
 	}
 
-	db, err := sql.Open("sqlite3", "accounts.bin")
-	if err != nil {
-		log.Fatalln("sql.Open failed", err)
-	}
-	m.authdb = &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
-
-	m.authdb.AddTableWithName(Account{}, "accounts").SetKeys(true, "Id")
-	if err := m.authdb.CreateTablesIfNotExists(); err != nil {
-		log.Fatalln(err, "Create tables failed")
-	}
+	m.authdb.AutoMigrate(Account{})
 
 	return m
-}
-
-func (m *Master) Migrate() {
-	t1 := Account{Username: "t1", AvatarId: 1}
-	t2 := Account{Username: "t2", AvatarId: 2}
-	m.authdb.Insert(&t1, &t2)
 }
 
 func (master *Master) Run() {
@@ -91,7 +79,6 @@ func (master *Master) Run() {
 
 	m.Get("/logout", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
 		sessionauth.Logout(session, user)
-		//session.Delete("id")
 		session.Clear()
 		r.Redirect("/")
 	})
@@ -103,12 +90,10 @@ func (master *Master) Run() {
 	m.Post("/login", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) {
 		log.Println(account)
 
-		err := master.authdb.SelectOne(
-			&account,
-			"select * from accounts where login=:login and password=:password",
-			map[string]interface{}{"login": account.Username, "password": account.Password})
+		err := master.authdb.First(&account, map[string]interface{}{"username": account.Username, "password": account.Password}).Error
 
 		if err != nil {
+			log.Println(err)
 			//r.Redirect(sessionauth.RedirectUrl)
 			x := struct {
 				Error string
@@ -139,22 +124,25 @@ func (master *Master) Run() {
 
 	m.Post("/signup", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) (int, string) {
 		var acc Account
-		err := master.authdb.SelectOne(
-			&acc,
-			"select * from accounts where login=:login",
-			map[string]interface{}{"login": account.Username})
+
+		err := master.authdb.First(&acc, map[string]interface{}{"username": account.Username}).Error
 
 		if err == nil {
 			return 418, http.StatusText(418)
 		}
-		if err != sql.ErrNoRows {
+		if err != gorm.RecordNotFound {
 			log.Println(err)
 			return 500, err.Error()
 		}
 
-		// TODO check pass1 and pass2
+		actor, err := master.balancer.adb.CreateAvatar()
+		if err != nil {
+			return 500, err.Error()
+		}
 
-		err = master.authdb.Insert(&account)
+		account.AvatarId = actor.Id
+
+		err = master.authdb.Create(&account).Error
 		if err != nil {
 			return 500, err.Error()
 		}

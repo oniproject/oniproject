@@ -6,16 +6,16 @@ import (
 	"github.com/martini-contrib/sessions"
 	"log"
 	"net/http"
-	"oniproject/oni/mechanic"
 )
 
 type Game struct {
 	Addr, Rpc string
 	Map       *Map
+	adb       AvatarDB
 }
 
-func NewGame() *Game {
-	return &Game{Map: NewMap()}
+func NewGame(adb AvatarDB) *Game {
+	return &Game{Map: NewMap(), adb: adb}
 }
 
 func (gm *Game) Run() {
@@ -47,9 +47,13 @@ func (gm *Game) Run() {
 			return 418, http.StatusText(418)
 		}
 
-		// TODO get actor from db
+		a, err := gm.adb.AvatarById(Id(id))
+		if err != nil {
+			log.Println("get avatar", err)
+			return 500, http.StatusText(418)
+		}
 
-		gm.Map.RunAvatar(ws, mechanic.Actor{Id: id, X: 1, Y: 1})
+		gm.Map.RunAvatar(ws, *a)
 
 		return 200, "game over"
 	})

@@ -187,8 +187,6 @@ Tilemap.prototype._setAt = function(x, y, layer, t, v, auto) {
 
 	var tileset = this.tilesets[t];
 
-	// TODO autotiles
-
 	if(typeof v === 'number') {
 		if(tile.auto) {
 			tile.s = _addAuto(this[layer], this.data[layer], tileset, tile, x, y);

@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"gopkg.in/yaml.v1"
-	"io/ioutil"
+	//	"fmt"
+	//	"gopkg.in/yaml.v1"
+	//	"io/ioutil"
 	"log"
 	"oniproject/oni"
 )
@@ -20,39 +20,43 @@ func main() {
 	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)
 	flag.Parse()
 
-	conf, err := ioutil.ReadFile(fmt.Sprintf("config/%s.yml", *config))
+	conf := oni.NewConfig(*config)
+
+	/*conf, err := ioutil.ReadFile(fmt.Sprintf("config/%s.yml", *config))
 	if err != nil {
 		log.Panicln("Fail load config file", err)
-	}
+	}*/
 
 	switch {
 	case *master:
-		module := oni.NewMaster(nil)
+		/*module := oni.NewMaster(nil)
 		// configure
 		if err := yaml.Unmarshal(conf, &module); err != nil {
 			log.Panicln("[master] Fail unmarshal config file", err)
 		}
 		module.Run()
+		*/
 	case *game:
-		module := oni.NewGame()
+		/*module := oni.NewGame()
 		// configure
 		if err := yaml.Unmarshal(conf, &module); err != nil {
 			log.Panicln("[game] Fail unmarshal config file", err)
 		}
 		module.Run()
 		//log.Println("run GAME:", *addr, "rpc:", *rpc)
+		*/
 	case *database:
 		// TODO run database
 		//log.Println("run DATABASE:", *addr, "rpc:", *rpc)
 	default:
-		db := oni.NewDatabase("sqlite3", "test_db.bin")
+		db := oni.NewDatabase(conf)
 		balancer := oni.NewBalancer("", db)
 
-		module := oni.NewMaster(balancer)
+		module := oni.NewMaster(conf, balancer)
 		// configure
-		if err := yaml.Unmarshal(conf, &module); err != nil {
+		/*if err := yaml.Unmarshal(conf, &module); err != nil {
 			log.Panicln("[master] Fail unmarshal config file", err)
-		}
+		}*/
 		go module.Run()
 		balancer.Game.Run()
 	}

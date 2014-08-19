@@ -22,12 +22,6 @@ type State struct {
 	Veloctity geom.Coord
 }
 
-type AvatarData struct {
-	Id    int64
-	MapId int64
-	X, Y  float64
-}
-
 type AvatarMapper interface {
 	Walkable(int, int) bool
 	Unregister(*Avatar)

@@ -5,13 +5,14 @@ package oni
 import (
 	"errors"
 	"github.com/gocircuit/circuit/client"
+	"oniproject/oni/mechanic"
 )
 
 type Balancer struct {
 	c    *client.Client
 	Maps map[Id]BalancerMap
 	Game *Game
-	db   *Database
+	adb  AvatarDB
 }
 
 type BalancerMap struct {
@@ -19,12 +20,13 @@ type BalancerMap struct {
 	Avatars map[Id]bool
 }
 
-func NewBalancer(circuit string, db *Database) (b *Balancer) {
+func NewBalancer(circuit string, adb AvatarDB) (b *Balancer) {
 	b = &Balancer{
 		Maps: make(map[Id]BalancerMap),
-		Game: NewGame(),
-		db:   db,
+		Game: NewGame(adb),
+		adb:  adb,
 	}
+	// XXX fix it
 	b.Game.Addr = ":2000"
 	if circuit != "" {
 		b.c = client.Dial(circuit, nil)
@@ -32,8 +34,8 @@ func NewBalancer(circuit string, db *Database) (b *Balancer) {
 	return
 }
 
-func (b *Balancer) AttachAvatar(id Id) (a *AvatarData, err error) {
-	a, err = b.db.AvatarDataById(id)
+func (b *Balancer) AttachAvatar(id Id) (a *mechanic.Actor, err error) {
+	a, err = b.adb.AvatarById(id)
 	if err != nil {
 		a = nil
 		return
@@ -69,7 +71,7 @@ func (b *Balancer) AttachAvatar(id Id) (a *AvatarData, err error) {
 	return
 }
 
-func (b *Balancer) DetachAvatar(a AvatarData) error {
+func (b *Balancer) DetachAvatar(a *mechanic.Actor) error {
 	if m, ok := b.Maps[Id(a.MapId)]; ok {
 		if _, ok := m.Avatars[Id(a.Id)]; ok {
 			delete(m.Avatars, Id(a.Id))

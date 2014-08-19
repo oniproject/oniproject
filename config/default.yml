@@ -1,2 +1,6 @@
 addr: ":8000"
 rpc: ":7000"
+
+driver: sqlite3
+db: development.bin
+

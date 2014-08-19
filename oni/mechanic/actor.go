@@ -40,20 +40,20 @@ type Actor struct {
 		// ... other graphic
 	}
 
-	Equip      map[int]EquipItem
-	EquipTypes map[int]bool
-	EquipSlots map[int]bool
+	Equip      map[int]EquipItem `sql:"-"`
+	EquipTypes map[int]bool      `sql:"-"`
+	EquipSlots map[int]bool      `sql:"-"`
 
 	Skills string            // json
-	skills map[int]time.Time `db:"-"`
+	skills map[int]time.Time `sql:"-"`
 
 	EXP int // Experience Points
 	Parameters
 
 	States string            // json
-	states map[int]time.Time `db:"-"`
+	states map[int]time.Time `sql:"-"`
 
-	Abilities map[string]Ability
+	Abilities map[string]Ability `sql:"-"`
 }
 
 // db hook
