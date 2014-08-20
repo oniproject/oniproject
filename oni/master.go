@@ -62,6 +62,10 @@ func (master *Master) Run() {
 		r.HTML(200, "redactor", map[string]interface{}{"title": "Redactor"}, render.HTMLOptions{""})
 	})
 
+	m.Get("/tile-redactor", func(user sessionauth.User, r render.Render) {
+		r.HTML(200, "tile-redactor", map[string]interface{}{"title": "Redactor"}, render.HTMLOptions{""})
+	})
+
 	m.Get("/game", sessionauth.LoginRequired, func(r render.Render) {
 		r.HTML(200, "game", map[string]interface{}{"title": "Game"}, render.HTMLOptions{""})
 	})
