@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
+<path d="m0,0h512v512h-512z"/>
+<defs>
+<path id="0" d="m309.88055 192.14804a140.36668 140.36668 0 1 1 -280.73336 0 140.36668 140.36668 0 1 1 280.73336 0"/>
+<path id="1" d="m262.51 71.59l-8.924-5.153v-10.305l8.924-5.153 8.924 5.153v10.305z"/>
+</defs>
+<use transform="matrix(1.0929 0 0 1.0929 70.74 46)" xlink:href="#0"/>
+<path d="m454.08241 237.40286a191.75777 191.75777 0 1 1 -383.51553 0 191.75777 191.75777 0 1 1 383.51553 0" transform="translate(-6.325 18.597)" fill="#fff"/>
+<use transform="matrix(1.0929 0 0 1.0929 70.74 46)" xlink:href="#0"/>
+<use transform="translate(-6.85 367.13)" xlink:href="#1"/>
+<use transform="translate(143.06 281.22)" xlink:href="#1"/>
+<use transform="translate(-156.76 281.93)" xlink:href="#1"/>
+<use transform="translate(-157.11 107.98)" xlink:href="#1"/>
+<use transform="translate(143.41 107.98)" xlink:href="#1"/>
+<use transform="translate(-5.558 22.432)" xlink:href="#1"/>
+<use transform="matrix(.95184 0 0 .95184 94.65 73.11)" fill="#fff" xlink:href="#0"/>
+<rect width="17.678" height="237.11" x="330.06" y="136.89" rx="1.261"/>
+<rect width="17.678" height="291.13" x="248.94" y="110.68" rx="1.548"/>
+<rect width="17.678" height="241.11" x="166.11" y="135.98" rx="1.282"/>
+</svg>

@@ -1,0 +1,6 @@
+node_modules
+*.bin
+
+public/main.js
+public/redactor.js
+public/tile-redactor.js
