@@ -62,7 +62,7 @@ Tileset.prototype.atAutoTile = function(id, neighbors) {
 	 * ←2|1→
 	 * ↙↓|↓↘
 	 */
-	var w = this.width >>> 1;
+	var w = this.width >>> 1,
 		x = (id % w) * 2,
 		y = (id - id % w) / w * 3,
 		map = [

@@ -108,10 +108,10 @@ function _addAuto(layer, map, tileset, tile, x, y, frame) {
 	neighbors.push(_line(map[y + 0], zeroId, x));
 	neighbors.push(_line(map[y + 1], zeroId, x));
 
-	var textures = tileset.atAutoTile(id, neighbors);
-		s0 = new PIXI.Sprite(textures[0]);
-		s1 = new PIXI.Sprite(textures[1]);
-		s2 = new PIXI.Sprite(textures[2]);
+	var textures = tileset.atAutoTile(id, neighbors),
+		s0 = new PIXI.Sprite(textures[0]),
+		s1 = new PIXI.Sprite(textures[1]),
+		s2 = new PIXI.Sprite(textures[2]),
 		s3 = new PIXI.Sprite(textures[3]);
 
 	s0.position.x = x * w + 0;
