@@ -1,31 +1,76 @@
-<div class="uk-panel uk-grid">
-	<div class="uk-width-1-5">
+<div class="uk-grid">
+	<div class="uk-width-1-6">
 		Tools
-		<button class="uk-button" type="button" data-uk-button>Pose</button>
-		<button class="uk-button" type="button" data-uk-button>Create</button>
-	</div>
-	<div class="uk-width-1-5">
-		Transform
-		<button class="uk-button" type="button" data-uk-button>Rotate</button>
-		<button class="uk-button" type="button" data-uk-button>Translate</button>
-		<button class="uk-button" type="button" data-uk-button>Scale</button>
-	</div>
-	<div class="uk-width-1-5">
-		Axis
 		<div data-uk-button-radio>
-			<button class="uk-button" type="button">Local</button>
-			<button class="uk-button" type="button">Parent</button>
-			<button class="uk-button" type="button">Global</button>
+			<button class="uk-button uk-width-1-1" type="button">Pose</button>
+			<button class="uk-button uk-width-1-1" type="button">Create</button>
 		</div>
 	</div>
-	<div class="uk-width-1-5">
-		Compensate
-		<button class="uk-button" type="button" data-uk-button>Bones</button>
-		<button class="uk-button" type="button" data-uk-button>Images</button>
+	<div class="uk-width-2-6 uk-form">
+		Transform
+		<div class="uk-form-icon uk-width-1-1">
+			<i class="uk-icon-rotate-right uk-text-success"></i>
+			<input title="Angle" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+		</div>
+		<div class="uk-clearfix">
+			<div class="uk-form-icon uk-float-left" style="width:50%">
+				<i class="uk-icon-arrows uk-text-primary"></i>
+				<input title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+			</div>
+			<input class="uk-float-right" title="Y" data-uk-tooltip type="number" style="width:50%; display:block" value="-434.8">
+		</div>
+		<div class="uk-clearfix">
+			<div class="uk-form-icon uk-float-left" style="width:50%">
+				<i class="uk-icon-crop uk-text-danger"></i>
+				<input title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+			</div>
+			<input class="uk-float-right" title="Y" data-uk-tooltip type="number" style="width:50%; display:block" value="-434.8">
+		</div>
 	</div>
-	<div class="uk-width-1-5">
+	<div class="uk-width-1-6">
+		Axis
+		<div data-uk-button-radio>
+			<button class="uk-button uk-width-1-1" type="button">Local</button>
+			<button class="uk-button uk-width-1-1" type="button">Parent</button>
+			<button class="uk-button uk-width-1-1" type="button">Global</button>
+		</div>
+	</div>
+	<div class="uk-width-1-6">
+		Compensate
+		<button class="uk-button uk-width-1-1" type="button" data-uk-button>Bones</button>
+		<button class="uk-button uk-width-1-1" type="button" data-uk-button>Images</button>
+	</div>
+	<div class="uk-width-1-6">
 		Options
-		vfdnsjkl
-		vfdsnjkl
+		<table class="uk-text-small">
+			<thead>
+				<tr>
+					<th></th>
+					<th><i class="uk-icon-edit"></i></th>
+					<th><i class="uk-icon-eye"></i></th>
+					<th><i class="uk-icon-tag"></i></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Bones</td>
+					<td>v</td>
+					<td>v</td>
+					<td>v</td>
+				</tr>
+				<tr>
+					<td>Images</td>
+					<td>v</td>
+					<td>v</td>
+					<td>v</td>
+				</tr>
+				<tr>
+					<td>Bounds</td>
+					<td>v</td>
+					<td>v</td>
+					<td>v</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
