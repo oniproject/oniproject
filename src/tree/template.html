@@ -1,4 +1,4 @@
-<div class="uk-panel uk-panel-box">
+<div class="uk-panel uk-panel-box uk-scrollable-box" style="resize:vertical;">
 	<small>Tree</small>
 	<div class="uk-button-group" data-uk-button-checkbox>
 		<button title="Show bones in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
@@ -15,7 +15,17 @@
 		<button class="uk-button uk-button-mini" type="button">Collapse</button>
 		<button class="uk-button uk-button-mini" type="button">Expand</button>
 	</div>
-		<ul>
-			<li v-component="skeleton" v-with="model: treeData"></li>
-		</ul>
+	<div class="uk-clearfix">
+		<div class="uk-float-right">
+			<i class="uk-icon-key"></i>
+			<i class="uk-icon-eye"></i>
+			&nbsp;
+		</div>
+	</div>
+	<ul class="uk-margin-remove">
+		<li v-component="skeleton" v-with="model: treeData"></li>
+	</ul>
+	<div class="uk-panel uk-panel-box uk-panel-box-primary">
+		vnfdjskl
+	</div
 </div>

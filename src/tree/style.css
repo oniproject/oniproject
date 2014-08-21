@@ -3,6 +3,10 @@
 	list-style-type: none;
 }
 
+#tree .uk-button-link {
+	color: black;
+}
+
 #tree .item:hover {
 	outline: 1px solid red;
 }
