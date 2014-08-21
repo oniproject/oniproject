@@ -1,21 +1,21 @@
 <div class="uk-panel uk-panel-box">
-<small>Tree</small>
-<div class="uk-button-group" data-uk-button-checkbox>
-	<button title="Show bones in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
-	<button title="Show slots in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
-	<button title="Show attachments in the tree" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
-</div>
-<button title="Expand and scroll tree to editor selection" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button" data-uk-button>
-	<i class="uk-icon-shield"></i>
-</button>
-<button title="Find and replace text in the project" data-uk-tooltip class="uk-button uk-button-mini" type="button">
-	<i class="uk-icon-search"></i>
-</button>
-<div class="uk-button-group">
-	<button class="uk-button uk-button-mini" type="button">Collapse</button>
-	<button class="uk-button uk-button-mini" type="button">Expand</button>
-</div>
-	<ul>
-		<li v-component="skeleton" v-with="model: treeData"></li>
-	</ul>
+	<small>Tree</small>
+	<div class="uk-button-group" data-uk-button-checkbox>
+		<button title="Show bones in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
+		<button title="Show slots in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
+		<button title="Show attachments in the tree" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
+	</div>
+	<button title="Expand and scroll tree to editor selection" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button" data-uk-button>
+		<i class="uk-icon-shield"></i>
+	</button>
+	<button title="Find and replace text in the project" data-uk-tooltip class="uk-button uk-button-mini" type="button">
+		<i class="uk-icon-search"></i>
+	</button>
+	<div class="uk-button-group">
+		<button class="uk-button uk-button-mini" type="button">Collapse</button>
+		<button class="uk-button uk-button-mini" type="button">Expand</button>
+	</div>
+		<ul>
+			<li v-component="skeleton" v-with="model: treeData"></li>
+		</ul>
 </div>

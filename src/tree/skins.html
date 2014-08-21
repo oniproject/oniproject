@@ -1,5 +1,6 @@
 <div class="item folder" v-on="click: open = !open">
-	Skins [{{open ? '-' : '+'}}]
+	<i class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
+	Skins
 </div>
 <ul v-show="open">
 	<li v-repeat="model: model.children" v-component="{{model.type}}">

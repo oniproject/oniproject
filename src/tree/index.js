@@ -63,7 +63,7 @@ module.exports = {
 	id: 'tree',
 	template: require('./template.html'),
 	data: {
-		msg: 'I am component A!',
+		msg: 'I am component tree!',
 		treeData: {
 			name: 'xxx skeleton',
 			children: [
