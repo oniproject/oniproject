@@ -1,0 +1,7 @@
+<div class="item folder" v-on="click: open = !open">
+	Placeholder [{{open ? '-' : '+'}}]
+</div>
+<ul v-show="open">
+	<li v-repeat="model: model.children" v-component="{{model.type}}">
+	</li>
+</ul>

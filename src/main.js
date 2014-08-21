@@ -6,7 +6,8 @@ new Vue({
 	el: '#app',
 	components: {
 		a: require('./component-a'),
-		b: require('./component-b')
+		b: require('./component-b'),
+		tree: require('./tree'),
 	},
 	// require html enabled by the partialify transform
 	template: require('./app.html'),
