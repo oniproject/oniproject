@@ -1,0 +1,9 @@
+<div title="{{model.type}}" data-uk-tooltip class="item file {{model.type}} uk-clearfix">
+	<div class="uk-float-right">
+		<i v-show="model.keyframe !== undefined"  v-on="click: model.keyframe = !model.keyframe"   class="uk-icon-circle uk-text-{{model.keyframe ? 'danger' : 'success'}}"></i>
+		<i v-show="model.visiblity !== undefined" v-on="click: model.visiblity = !model.visiblity" class="uk-icon-{{model.visiblity ? 'circle' : 'circle-thin'}}"></i>
+	</div>
+	<a class="uk-button uk-button-mini">
+		{{model.type}}: {{model.name}}
+	</a>
+</div>

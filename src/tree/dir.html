@@ -1,0 +1,14 @@
+<div title="{{model.type}}" data-uk-tooltip class="item folder {{model.type}} uk-clearfix">
+	<div class="uk-float-right">
+		<i v-show="model.keyframe !== undefined"  v-on="click: model.keyframe = !model.keyframe"   class="uk-icon-circle uk-text-{{model.keyframe ? 'danger' : 'success'}}"></i>
+		<i v-show="model.visiblity !== undefined" v-on="click: model.visiblity = !model.visiblity" class="uk-icon-{{model.visiblity ? 'circle' : 'circle-thin'}}"></i>
+	</div>
+	<a class="uk-button uk-button-mini" v-on="click: open = !open">
+		<i v-if="model.children" class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
+		{{model.type}}: {{model.name}}
+	</a>
+</div>
+<ul v-show="model.children ? open :false">
+	<li v-repeat="model: model.children" v-component="{{model.type}}">
+	</li>
+</ul>

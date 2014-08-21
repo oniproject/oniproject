@@ -3,59 +3,63 @@ require('insert-css')(require('./style.css'))
 var Vue = require('vue')
 
 Vue.component('animation', {
-	template: require('./animation.html'),
+	template: require('./item.html'),
 	data: {}
 })
 Vue.component('animations', {
-	template: require('./animations.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
 Vue.component('bone', {
-	template: require('./bone.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
 Vue.component('bounding_box', {
-	template: require('./bounding_box.html'),
+	template: require('./item.html'),
 	data: {}
 })
 Vue.component('draw_order', {
-	template: require('./draw_order.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
 Vue.component('event', {
-	template: require('./event.html'),
+	template: require('./item.html'),
 	data: {}
 })
 Vue.component('events', {
-	template: require('./events.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
+Vue.component('region', {
+	template: require('./item.html'),
+	data: {}
+})
 Vue.component('image', {
-	template: require('./image.html'),
+	template: require('./item.html'),
 	data: {}
 })
 Vue.component('images', {
-	template: require('./images.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
-Vue.component('placeholder', {
-	template: require('./placeholder.html'),
+Vue.component('skin_placeholder', {
+	template: require('./dir.html'),
 	data: {open: false}
 })
 Vue.component('skeleton', {
-	template: require('./skeleton.html'),
+	template: require('./dir.html'),
 	data: {open: true}
 })
 Vue.component('skin', {
-	template: require('./skin.html'),
+	template: require('./item.html'),
 	data: {}
 })
 Vue.component('skins', {
-	template: require('./skins.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
 Vue.component('slot', {
-	template: require('./slot.html'),
+	template: require('./dir.html'),
 	data: {open: false}
 })
 
@@ -65,36 +69,34 @@ module.exports = {
 	data: {
 		msg: 'I am component tree!',
 		treeData: {
-			name: 'xxx skeleton',
+			type:'skeleton', name: 'xxx skeleton', visiblity: true,
 			children: [
-				{type:'bone', name: 'root', children:[
-					{type:'bone', name: 'hip', children:[
-						{type: 'slot', name: 'vfds', children:[
-							{type: 'placeholder', name: 'vfds', children:[
-								{type: 'image', name: 'vfds'},
+				{type:'bone', name: 'root', visiblity: true, children:[
+					{type:'bone', name: 'hip', visiblity: true, children:[
+						{type: 'slot', name: 'vfds', visiblity: true, children:[
+							{type: 'skin_placeholder', name: 'vfds', visiblity: true, children:[
+								{type: 'region', visiblity: true, name: 'vfds'},
 							]},
 							{type: 'bounding_box', name: 'vfds'},
 						]},
 					]}
 				]},
 				{type:'draw_order', children:[
-					{type: 'slot', name: 'vfds'},
-					{type: 'slot', name: 'vfds'},
-					{type: 'slot', name: 'vfds'},
-					{type: 'slot', name: 'vfds'},
+					{type: 'slot', name: 'vfds', visiblity: true},
+					{type: 'slot', name: 'vfds', visiblity: true},
+					{type: 'slot', name: 'vfds', visiblity: true},
+					{type: 'slot', name: 'vfds', visiblity: true},
 				]},
 				{type:'images', children:[
 					{type: 'image', name: 'vfds'},
 					{type: 'image', name: 'vfds'},
 					{type: 'image', name: 'vfds'},
 					{type: 'image', name: 'vfds'},
-					{type: 'image', name: 'vfds'},
-					{type: 'image', name: 'vfds'},
 				]},
 				{type:'skins', children:[
-					{type: 'skin', name: 'vfds'},
-					{type: 'skin', name: 'vfds'},
-					{type: 'skin', name: 'vfds'},
+					{type: 'skin', name: 'vfds', visiblity: true},
+					{type: 'skin', name: 'vfds', visiblity: true},
+					{type: 'skin', name: 'vfds', visiblity: true},
 				]},
 				{type:'animations', children:[
 					{type: 'animation', name: 'vfds'},

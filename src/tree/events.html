@@ -1,8 +1,0 @@
-<div class="item folder" v-on="click: open = !open">
-	<i class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
-	Events
-</div>
-<ul v-show="open">
-	<li v-repeat="model: model.children" v-component="{{model.type}}">
-	</li>
-</ul>
