@@ -4552,7 +4552,7 @@ module.exports = ViewModel
 },{"./batcher":"/home/lain/a2d/node_modules/vue/src/batcher.js","./compiler":"/home/lain/a2d/node_modules/vue/src/compiler.js","./transition":"/home/lain/a2d/node_modules/vue/src/transition.js","./utils":"/home/lain/a2d/node_modules/vue/src/utils.js"}],"/home/lain/a2d/src/app.css":[function(require,module,exports){
 module.exports = '#app {\n	font-family: \'Helvetica Neue\', Arial, sans-serif;\n}\n';
 },{}],"/home/lain/a2d/src/app.html":[function(require,module,exports){
-module.exports = '<h1>{{title}}</h1>\n<div v-component="a"></div>\n<div v-component="b"></div>\n<div v-component="tree"></div>\n';
+module.exports = '<h1>{{title}}</h1>\n<div v-component="a"></div>\n<div v-component="b"></div>\n<div v-component="tree"></div>\n<div v-component="tools"></div>\n';
 },{}],"/home/lain/a2d/src/component-a/index.js":[function(require,module,exports){
 require('insert-css')(require('./style.css'))
 
@@ -4593,6 +4593,7 @@ new Vue({
 	components: {
 		a: require('./component-a'),
 		b: require('./component-b'),
+		tools: require('./tools'),
 		tree: require('./tree'),
 	},
 	// require html enabled by the partialify transform
@@ -4602,24 +4603,39 @@ new Vue({
 	}
 })
 
-},{"./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tree/animation.html":[function(require,module,exports){
+},{"./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tools":"/home/lain/a2d/src/tools/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tools/index.js":[function(require,module,exports){
+require('insert-css')(require('./style.css'))
+
+module.exports = {
+	id: 'tools',
+	template: require('./template.html'),
+	data: {
+		msg: 'I am component tools!'
+	}
+}
+
+},{"./style.css":"/home/lain/a2d/src/tools/style.css","./template.html":"/home/lain/a2d/src/tools/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js"}],"/home/lain/a2d/src/tools/style.css":[function(require,module,exports){
+module.exports = '';
+},{}],"/home/lain/a2d/src/tools/template.html":[function(require,module,exports){
+module.exports = '<div class="uk-panel uk-grid">\n	<div class="uk-width-1-5">\n		Tools\n		<button class="uk-button" type="button" data-uk-button>Pose</button>\n		<button class="uk-button" type="button" data-uk-button>Create</button>\n	</div>\n	<div class="uk-width-1-5">\n		Transform\n		<button class="uk-button" type="button" data-uk-button>Rotate</button>\n		<button class="uk-button" type="button" data-uk-button>Translate</button>\n		<button class="uk-button" type="button" data-uk-button>Scale</button>\n	</div>\n	<div class="uk-width-1-5">\n		Axis\n		<div data-uk-button-radio>\n			<button class="uk-button" type="button">Local</button>\n			<button class="uk-button" type="button">Parent</button>\n			<button class="uk-button" type="button">Global</button>\n		</div>\n	</div>\n	<div class="uk-width-1-5">\n		Compensate\n		<button class="uk-button" type="button" data-uk-button>Bones</button>\n		<button class="uk-button" type="button" data-uk-button>Images</button>\n	</div>\n	<div class="uk-width-1-5">\n		Options\n		vfdnsjkl\n		vfdsnjkl\n	</div>\n</div>\n';
+},{}],"/home/lain/a2d/src/tree/animation.html":[function(require,module,exports){
 module.exports = '<div class="item file">Animation: {{model.name}}</div>\n';
 },{}],"/home/lain/a2d/src/tree/animations.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Animations [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Animations\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/bone.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Bone: {{model.name}} [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Bone: {{model.name}}\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/bounding_box.html":[function(require,module,exports){
 module.exports = '<div class="item file">Bounding Box: {{model.name}}</div>\n';
 },{}],"/home/lain/a2d/src/tree/draw_order.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Draw Order [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Draw Order\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/event.html":[function(require,module,exports){
 module.exports = '<div class="item file">Event: {{model.name}}</div>\n';
 },{}],"/home/lain/a2d/src/tree/events.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Events [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Events\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/image.html":[function(require,module,exports){
 module.exports = '<div class="item file">Image: {{model.name}}</div>\n';
 },{}],"/home/lain/a2d/src/tree/images.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Images [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Images\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/index.js":[function(require,module,exports){
 require('insert-css')(require('./style.css'))
 
@@ -4686,7 +4702,7 @@ module.exports = {
 	id: 'tree',
 	template: require('./template.html'),
 	data: {
-		msg: 'I am component A!',
+		msg: 'I am component tree!',
 		treeData: {
 			name: 'xxx skeleton',
 			children: [
@@ -4736,17 +4752,17 @@ module.exports = {
 }
 
 },{"./animation.html":"/home/lain/a2d/src/tree/animation.html","./animations.html":"/home/lain/a2d/src/tree/animations.html","./bone.html":"/home/lain/a2d/src/tree/bone.html","./bounding_box.html":"/home/lain/a2d/src/tree/bounding_box.html","./draw_order.html":"/home/lain/a2d/src/tree/draw_order.html","./event.html":"/home/lain/a2d/src/tree/event.html","./events.html":"/home/lain/a2d/src/tree/events.html","./image.html":"/home/lain/a2d/src/tree/image.html","./images.html":"/home/lain/a2d/src/tree/images.html","./placeholder.html":"/home/lain/a2d/src/tree/placeholder.html","./skeleton.html":"/home/lain/a2d/src/tree/skeleton.html","./skin.html":"/home/lain/a2d/src/tree/skin.html","./skins.html":"/home/lain/a2d/src/tree/skins.html","./slot.html":"/home/lain/a2d/src/tree/slot.html","./style.css":"/home/lain/a2d/src/tree/style.css","./template.html":"/home/lain/a2d/src/tree/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tree/placeholder.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Placeholder [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Placeholder\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/skeleton.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Skeleton: {{model.name}} [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Skeleton: {{model.name}}\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n\n';
 },{}],"/home/lain/a2d/src/tree/skin.html":[function(require,module,exports){
 module.exports = '<div class="item file">Skin: {{model.name}}</div>\n';
 },{}],"/home/lain/a2d/src/tree/skins.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Skins [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Skins\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/slot.html":[function(require,module,exports){
-module.exports = '<div class="item folder" v-on="click: open = !open">\n	Slot: {{model.name}} [{{open ? \'-\' : \'+\'}}]\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div class="item folder" v-on="click: open = !open">\n	<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n	Slot: {{model.name}}\n</div>\n<ul v-show="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/style.css":[function(require,module,exports){
 module.exports = '';
 },{}],"/home/lain/a2d/src/tree/template.html":[function(require,module,exports){
-module.exports = '<div class="uk-panel uk-panel-box">\n<small>Tree</small>\n<div class="uk-button-group" data-uk-button-checkbox>\n	<button title="Show bones in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>\n	<button title="Show slots in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>\n	<button title="Show attachments in the tree" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>\n</div>\n<button title="Expand and scroll tree to editor selection" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button" data-uk-button>\n	<i class="uk-icon-shield"></i>\n</button>\n<button title="Find and replace text in the project" data-uk-tooltip class="uk-button uk-button-mini" type="button">\n	<i class="uk-icon-search"></i>\n</button>\n<div class="uk-button-group">\n	<button class="uk-button uk-button-mini" type="button">Collapse</button>\n	<button class="uk-button uk-button-mini" type="button">Expand</button>\n</div>\n	<ul>\n		<li v-component="skeleton" v-with="model: treeData"></li>\n	</ul>\n</div>\n';
+module.exports = '<div class="uk-panel uk-panel-box">\n	<small>Tree</small>\n	<div class="uk-button-group" data-uk-button-checkbox>\n		<button title="Show bones in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>\n		<button title="Show slots in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>\n		<button title="Show attachments in the tree" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>\n	</div>\n	<button title="Expand and scroll tree to editor selection" data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button" data-uk-button>\n		<i class="uk-icon-shield"></i>\n	</button>\n	<button title="Find and replace text in the project" data-uk-tooltip class="uk-button uk-button-mini" type="button">\n		<i class="uk-icon-search"></i>\n	</button>\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-mini" type="button">Collapse</button>\n		<button class="uk-button uk-button-mini" type="button">Expand</button>\n	</div>\n		<ul>\n			<li v-component="skeleton" v-with="model: treeData"></li>\n		</ul>\n</div>\n';
 },{}]},{},["/home/lain/a2d/src/main.js"]);

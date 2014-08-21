@@ -7,6 +7,7 @@ new Vue({
 	components: {
 		a: require('./component-a'),
 		b: require('./component-b'),
+		tools: require('./tools'),
 		tree: require('./tree'),
 	},
 	// require html enabled by the partialify transform
