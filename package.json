@@ -1,0 +1,19 @@
+{
+	"name": "a2d",
+	"version": "0.0.0",
+	"description": "Opensource Spine for PIXI.js",
+	"main": "src/main.js",
+	"dependencies": {
+		"vue": "~0.10.6"
+	},
+	"devDependencies": {
+		"watchify": "~1.0.2",
+		"partialify": "~3.1.1",
+		"insert-css": "~0.2.0"
+	},
+	"author": "lain-dono",
+	"license": "MIT",
+	"scripts": {
+		"dev": "watchify -e src/main.js -t partialify -o dist/bundle.js"
+	}
+}
