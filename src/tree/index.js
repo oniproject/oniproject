@@ -2,70 +2,66 @@ require('insert-css')(require('./style.css'))
 
 var Vue = require('vue')
 
-Vue.component('animation', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('animations', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('bone', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('bounding_box', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('draw_order', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('event', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('events', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('region', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('image', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('images', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('skin_placeholder', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('skeleton', {
-	template: require('./dir.html'),
-	data: {open: true}
-})
-Vue.component('skin', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('skins', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('slot', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
 
 module.exports = {
 	id: 'tree',
 	template: require('./template.html'),
+	components: {
+		animation: {
+			template: require('./item.html'),
+		},
+		animations: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		bone: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		bounding_box: {
+			template: require('./item.html'),
+		},
+		draw_order: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		event: {
+			template: require('./item.html'),
+		},
+		events: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		region: {
+			template: require('./item.html'),
+		},
+		image: {
+			template: require('./item.html'),
+		},
+		images: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		skin_placeholder: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		skeleton: {
+			template: require('./dir.html'),
+			data: {open: true}
+		},
+		skin: {
+			template: require('./item.html'),
+		},
+		skins: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		slot: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+	},
 	data: {
 		msg: 'I am component tree!',
 		treeData: {

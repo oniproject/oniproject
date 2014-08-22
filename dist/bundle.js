@@ -4549,10 +4549,25 @@ function query (el) {
 
 module.exports = ViewModel
 
-},{"./batcher":"/home/lain/a2d/node_modules/vue/src/batcher.js","./compiler":"/home/lain/a2d/node_modules/vue/src/compiler.js","./transition":"/home/lain/a2d/node_modules/vue/src/transition.js","./utils":"/home/lain/a2d/node_modules/vue/src/utils.js"}],"/home/lain/a2d/src/app.css":[function(require,module,exports){
+},{"./batcher":"/home/lain/a2d/node_modules/vue/src/batcher.js","./compiler":"/home/lain/a2d/node_modules/vue/src/compiler.js","./transition":"/home/lain/a2d/node_modules/vue/src/transition.js","./utils":"/home/lain/a2d/node_modules/vue/src/utils.js"}],"/home/lain/a2d/src/animations/index.js":[function(require,module,exports){
+require('insert-css')(require('./style.css'))
+
+module.exports = {
+	id: 'animations',
+	template: require('./template.html'),
+	data: {
+		msg: 'I am component Animations!'
+	}
+}
+
+},{"./style.css":"/home/lain/a2d/src/animations/style.css","./template.html":"/home/lain/a2d/src/animations/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js"}],"/home/lain/a2d/src/animations/style.css":[function(require,module,exports){
+module.exports = '#animations h2 {\n	font-style: italic;\n}\n\n#animations .key {\n	height:1em;\n	width:3px;\n	border:1px solid black;\n	display: inline-block;\n}\n\n#animations .key.all {\n	background: white;\n}\n#animations .key.color {\n	background: pink;\n}\n#animations .key.translate {\n	background: blue;\n}\n#animations .key.attach {\n	background: yellow;\n}\n#animations .key.scale {\n	background: red;\n}\n#animations .key.rotate {\n	background: green;\n}\n#animations .key.event {\n	background: purple;\n}\n';
+},{}],"/home/lain/a2d/src/animations/template.html":[function(require,module,exports){
+module.exports = '<div class="uk-panel uk-form">\n	<fieldset>\n		<button class="uk-button uk-button-primary" type="button">\n			<i class="uk-icon-caret-down"></i>\n			Dopsheet\n		</button>\n\n		<button class="uk-button" type="button">Current</button>\n		<input class="uk-form-width-small" type="number" value="10">\n		<button class="uk-button" type="button">Loop Start</button>\n		<input class="uk-form-width-small" type="number" value="10">\n		<button class="uk-button" type="button">Loop End</button>\n		<input class="uk-form-width-small" type="number" value="10">\n		<button class="uk-button" type="button">\n			<i class="uk-icon-key"></i>\n			Auto Key\n		</button>\n		<button class="uk-button" type="button">Ghosting</button>\n		<button class="uk-button" type="button">\n			<i class="uk-icon-play-circle"></i>\n			Playback\n		</button>\n	</fieldset>\n</div>\n\n<div>\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small" type="button">Collapse</button>\n		<button class="uk-button uk-button-small" type="button">Expand</button>\n	</div>\n\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-lock"></i>\n		</button>\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-refresh"></i>\n		</button>\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-rocket"></i>\n		</button>\n	</div>\n\n\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-copy"></i>\n		</button>\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-cut"></i>\n		</button>\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-times"></i>\n		</button>\n		<button class="uk-button uk-button-small" type="button">\n			<i class="uk-icon-paste"></i>\n	</button>\n	</div>\n\n	<button class="uk-button uk-button-small" type="button">\n		<i class="uk-icon-long-arrow-right"></i>\n		Shift\n	</button>\n	<button class="uk-button uk-button-small" type="button">\n		<i class="uk-icon-pencil"></i>\n		Adjust\n	</button>\n	<button class="uk-button uk-button-small" type="button">\n		<i class="uk-icon-send"></i>\n		Offset\n	</button>\n</div>\n\n<div>\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small" type="button"><i class="uk-icon-fast-backward"></i></button>\n		<button class="uk-button uk-button-small" type="button"><i class="uk-icon-step-backward"></i></button>\n	</div>\n	<div class="uk-button-group">\n		<button class="uk-button uk-text-large" type="button"><i class="uk-icon-caret-left"></i></button>\n		<button class="uk-button uk-text-large" type="button"><i class="uk-icon-caret-right"></i></button>\n	</div>\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small" type="button"><i class="uk-icon-fast-forward"></i></button>\n		<button class="uk-button uk-button-small" type="button"><i class="uk-icon-step-forward"></i></button>\n	</div>\n	<button class="uk-button" type="button"><i class="uk-icon-repeat"></i></button>\n</div>\n\n<div>\n	vnfjdklsvnfjdkls\n	<div class="key all"></div>\n	<div class="key translate"></div>\n	<div class="key scale"></div>\n	<div class="key rotate"></div>\n	<div class="key attach"></div>\n	<div class="key event"></div>\n	<div class="key color"></div>\n</div>\n';
+},{}],"/home/lain/a2d/src/app.css":[function(require,module,exports){
 module.exports = '#app {\n	font-family: \'Helvetica Neue\', Arial, sans-serif;\n}\n';
 },{}],"/home/lain/a2d/src/app.html":[function(require,module,exports){
-module.exports = '<nav class="uk-navbar">\n	<a class="uk-navbar-brand" href="">A2D</a>\n	<ul class="uk-navbar-nav">\n		<li class="uk-active"><a href="">...</a></li>\n		<li><a href="">...</a></li>\n		<li class="uk-parent"><a href="">...</a></li>\n	</ul>\n</nav>\n<div v-component="tree" class="uk-width-1-3 uk-position-absolute" style="right:0"></div>\n<div class="uk-position-absolute uk-width-1-1 uk-panel uk-panel-box" style="bottom:0">\n	<div v-component="tools" class="uk-width-2-3 uk-container-center"></div>\n	<hr>\n	vnfdjsl\n</div>\n<!--\n<h1>{{title}}</h1>\n<div v-component="a"></div>\n<div v-component="b"></div>\n-->\n';
+module.exports = '<nav class="uk-navbar">\n	<a class="uk-navbar-brand" href="">A2D</a>\n	<ul class="uk-navbar-nav">\n		<li class="uk-active"><a href="">...</a></li>\n		<li><a href="">...</a></li>\n		<li class="uk-parent"><a href="">...</a></li>\n	</ul>\n</nav>\n<div v-component="Tree" class="uk-width-1-3 uk-position-absolute" style="right:0"></div>\n<div class="uk-position-absolute uk-width-1-1 uk-panel uk-panel-box" style="bottom:0">\n	<div v-component="Tools" class="uk-width-2-3 uk-container-center"></div>\n	<hr>\n	vnfdjsl\n	<div v-component="Animations"></div>\n</div>\n';
 },{}],"/home/lain/a2d/src/component-a/index.js":[function(require,module,exports){
 require('insert-css')(require('./style.css'))
 
@@ -4593,8 +4608,9 @@ new Vue({
 	components: {
 		a: require('./component-a'),
 		b: require('./component-b'),
-		tools: require('./tools'),
-		tree: require('./tree'),
+		Animations: require('./animations'),
+		Tools: require('./tools'),
+		Tree: require('./tree'),
 	},
 	// require html enabled by the partialify transform
 	template: require('./app.html'),
@@ -4603,7 +4619,7 @@ new Vue({
 	}
 })
 
-},{"./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tools":"/home/lain/a2d/src/tools/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tools/index.js":[function(require,module,exports){
+},{"./animations":"/home/lain/a2d/src/animations/index.js","./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tools":"/home/lain/a2d/src/tools/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tools/index.js":[function(require,module,exports){
 require('insert-css')(require('./style.css'))
 
 module.exports = {
@@ -4625,70 +4641,66 @@ require('insert-css')(require('./style.css'))
 
 var Vue = require('vue')
 
-Vue.component('animation', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('animations', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('bone', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('bounding_box', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('draw_order', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('event', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('events', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('region', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('image', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('images', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('skin_placeholder', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('skeleton', {
-	template: require('./dir.html'),
-	data: {open: true}
-})
-Vue.component('skin', {
-	template: require('./item.html'),
-	data: {}
-})
-Vue.component('skins', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
-Vue.component('slot', {
-	template: require('./dir.html'),
-	data: {open: false}
-})
 
 module.exports = {
 	id: 'tree',
 	template: require('./template.html'),
+	components: {
+		animation: {
+			template: require('./item.html'),
+		},
+		animations: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		bone: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		bounding_box: {
+			template: require('./item.html'),
+		},
+		draw_order: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		event: {
+			template: require('./item.html'),
+		},
+		events: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		region: {
+			template: require('./item.html'),
+		},
+		image: {
+			template: require('./item.html'),
+		},
+		images: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		skin_placeholder: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		skeleton: {
+			template: require('./dir.html'),
+			data: {open: true}
+		},
+		skin: {
+			template: require('./item.html'),
+		},
+		skins: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+		slot: {
+			template: require('./dir.html'),
+			data: {open: false}
+		},
+	},
 	data: {
 		msg: 'I am component tree!',
 		treeData: {

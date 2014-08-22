@@ -1,0 +1,32 @@
+#animations h2 {
+	font-style: italic;
+}
+
+#animations .key {
+	height:1em;
+	width:3px;
+	border:1px solid black;
+	display: inline-block;
+}
+
+#animations .key.all {
+	background: white;
+}
+#animations .key.color {
+	background: pink;
+}
+#animations .key.translate {
+	background: blue;
+}
+#animations .key.attach {
+	background: yellow;
+}
+#animations .key.scale {
+	background: red;
+}
+#animations .key.rotate {
+	background: green;
+}
+#animations .key.event {
+	background: purple;
+}
