@@ -1,29 +1,42 @@
-<div class="uk-panel uk-form">
-	<fieldset>
-		<button class="uk-button uk-button-primary">
-			<i class="uk-icon-caret-down"></i>
-			Dopsheet
-		</button>
+<div class="uk-panel uk-form uk-clearfix">
+	<fieldset class="uk-clearfix">
+		<div class="uk-float-left">
+			<button class="uk-button uk-button-primary"
+				v-on="click: Dopesheet = !Dopesheet, click: Graph = false">
+				<i class="uk-icon-caret-{{Dopesheet? 'down': 'up'}}"></i>
+				Dopesheet
+			</button>
 
-		<button class="uk-button">Current</button>
-		<input class="uk-form-width-small" type="number" value="10">
-		<button class="uk-button">Loop Start</button>
-		<input class="uk-form-width-small" type="number" value="10">
-		<button class="uk-button">Loop End</button>
-		<input class="uk-form-width-small" type="number" value="10">
-		<button class="uk-button">
-			<i class="uk-icon-key"></i>
-			Auto Key
-		</button>
-		<button class="uk-button">Ghosting</button>
-		<button class="uk-button">
-			<i class="uk-icon-play-circle"></i>
-			Playback
-		</button>
+			<button class="uk-button">Current</button>
+			<input class="uk-form-width-small" type="number" v-model="Current">
+			<button class="uk-button">Loop Start</button>
+			<input class="uk-form-width-small" type="number" v-model="LoopStart">
+			<button class="uk-button">Loop End</button>
+			<input class="uk-form-width-small" type="number" v-model="LoopEnd">
+			<button class="uk-button">
+				<i class="uk-icon-key"></i>
+				Auto Key
+			</button>
+			<button class="uk-button">Ghosting</button>
+			<button class="uk-button">
+				<i class="uk-icon-play-circle"></i>
+				Playback
+			</button>
+		</div>
+		<div class="uk-float-right">
+			<button class="uk-button uk-button-primary"
+				v-on="click: Graph = !Graph, click: Dopesheet = true">
+				<i class="uk-icon-caret-{{Graph? 'right': 'left'}}"></i>
+				Graph
+			</button>
+		</div>
 	</fieldset>
 </div>
 
-<div>
+<div class="uk-grid">
+<div v-class="uk-width-1-1: !Graph, uk-width-4-5: Graph">
+
+<div v-show="Dopesheet">
 	<div class="uk-button-group">
 		<button class="uk-button uk-button-small">Collapse</button>
 		<button class="uk-button uk-button-small">Expand</button>
@@ -71,39 +84,79 @@
 	</button>
 </div>
 
-<div>
-	<div class="uk-button-group">
-		<button class="uk-button uk-button-small"><i class="uk-icon-fast-backward"></i></button>
-		<button class="uk-button uk-button-small"><i class="uk-icon-step-backward"></i></button>
-	</div>
-	<div class="uk-button-group">
-		<button v-show="reversed" class="uk-button uk-text-large" v-on="click: stop">
-			<i class="uk-icon-stop"></i>
-		</button>
-		<button v-show="!reversed" class="uk-button uk-text-large" v-on="click: play_reverse">
-			<i class="uk-icon-caret-left"></i>
-		</button>
-		<button v-show="played" class="uk-button uk-text-large" v-on="click: stop">
-			<i class="uk-icon-stop"></i>
-		</button>
-		<button v-show="!played" class="uk-button uk-text-large" v-on="click: play">
-			<i class="uk-icon-caret-right"></i>
-		</button>
-	</div>
-	<div class="uk-button-group">
-		<button class="uk-button uk-button-small"><i class="uk-icon-fast-forward"></i></button>
-		<button class="uk-button uk-button-small"><i class="uk-icon-step-forward"></i></button>
-	</div>
-	<button class="uk-button"><i class="uk-icon-repeat"></i></button>
-</div>
 
 <div>
-	vnfjdklsvnfjdkls
-	<div class="key all"></div>
-	<div class="key translate"></div>
-	<div class="key scale"></div>
-	<div class="key rotate"></div>
-	<div class="key attach"></div>
-	<div class="key event"></div>
-	<div class="key color"></div>
+	<div class="uk-grid">
+		<div class="uk-width-{{Graph?'3':'2'}}-10">
+			<div class="uk-button-group">
+				<button class="uk-button uk-button-small" v-on="click: Current=LoopStart">
+					<i class="uk-icon-fast-backward"></i>
+				</button>
+				<button class="uk-button uk-button-small" v-on="click: Current--">
+					<i class="uk-icon-step-backward"></i>
+				</button>
+			</div>
+			<div class="uk-button-group">
+				<button v-show="reversed" class="uk-button uk-button-danger" v-on="click: stop">
+					<i class="uk-icon-stop"></i>
+				</button>
+				<button v-show="!reversed" class="uk-button uk-button-primary uk-text-large" v-on="click: play_reverse">
+					<i class="uk-icon-caret-left"></i>
+				</button>
+				<button v-show="played" class="uk-button uk-button-danger" v-on="click: stop">
+					<i class="uk-icon-stop"></i>
+				</button>
+				<button v-show="!played" class="uk-button uk-button-primary uk-text-large" v-on="click: play">
+					<i class="uk-icon-caret-right"></i>
+				</button>
+			</div>
+			<div class="uk-button-group">
+				<button class="uk-button uk-button-small" v-on="click: Current++">
+					<i class="uk-icon-step-forward"></i>
+				</button>
+				<button class="uk-button uk-button-small" v-on="click: Current=LoopEnd">
+					<i class="uk-icon-fast-forward"></i>
+				</button>
+			</div>
+			<button class="uk-button"><i class="uk-icon-repeat"></i></button>
+		</div>
+
+		<div class="uk-width-{{Graph?'7':'8'}}-10">
+			<div class="uk-progress uk-width-1-1">
+				<div class="uk-progress-bar"
+					style="-webkit-transition: none!important; transition:none!important;"
+					v-style="width: Time*100.0 + '%'"></div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<div v-show="Dopesheet">
+
+
+	<div class="uk-grid">
+		<div class="uk-width-{{Graph?'3':'2'}}-10">
+			vnfjdklsvnfjdkls
+		</div>
+		<div class="uk-width-{{Graph?'7':'8'}}-10">
+			<div class="key all"></div>
+			<div class="key translate"></div>
+			<div class="key scale"></div>
+			<div class="key rotate"></div>
+			<div class="key attach"></div>
+			<div class="key event"></div>
+			<div class="key color"></div>
+			<div class="key all"></div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+<div v-show="Graph" class="uk-width-1-5">
+	<div class="uk-panel uk-panel-box uk-panel-box-secondary">
+	Graph
+	</div>
+</div>
+
 </div>

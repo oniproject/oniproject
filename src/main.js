@@ -4,6 +4,9 @@ require('less').render(require('./app.css'), function (e, css) {
 });
 
 var Vue = require('vue')
+Vue.filter('int', function (value) {
+	return value |0;
+})
 
 var assetsToLoader = [
 	"data/dragonBones.json",
@@ -18,6 +21,7 @@ renderer.view.style.display = "block";
 renderer.view.style.width = "800px";
 renderer.view.style.height = "500px";
 window.Spine = null;
+window.app = null;
 
 document.body.appendChild(renderer.view);
 function onAssetsLoaded() {
@@ -29,7 +33,7 @@ function onAssetsLoaded() {
 	Spine.scale.x = Spine.scale.y = scale
 	Spine.state.setAnimationByName("flying", true);
 
-	new Vue({
+	app = new Vue({
 		el: '#app',
 		data: {
 			selected: {
@@ -53,10 +57,16 @@ function onAssetsLoaded() {
 					names: false,
 				},
 			},
-			toolT: 'rotation',
+			toolT: 'none',
 			transformEnable: false,
 			played: true,
 			reversed: false,
+			Time: 0.4,
+			LoopStart: 0,
+			LoopEnd: 29,
+
+			Dopesheet: false,
+			Graph: false,
 		},
 		methods: {
 			stop: function() {
@@ -85,6 +95,9 @@ function onAssetsLoaded() {
 			updateTransform: function(type, name) {
 				console.log('updateTransform[%s] %s', type, name);
 				this.$data.transformEnable = type === 'bone';
+				if(!this.$data.transformEnable) {
+					this.$data.toolT = 'none';
+				}
 			},
 		},
 		components: {
@@ -98,6 +111,14 @@ function onAssetsLoaded() {
 		computed: {
 			Spine: function() {
 				return Spine;
+			},
+			Current: {
+				$get: function() {
+					return (this.Time*30) |0;
+				},
+				$set: function(val) {
+					Spine.state.currentTime = val / 30;
+				},
 			},
 			rotation: {
 				$get: function() {
@@ -167,11 +188,21 @@ function onAssetsLoaded() {
 			},
 		},
 	});
+	Vue.nextTick(function() {
+		var c = Spine.state.currentTime;
+		var time = c - (Spine.state.currentTime|0);
+		console.log(time);
+		app.$data.Time = time+0.5;
+	});
 }
 
 requestAnimFrame(animate);
 function animate() {
 	requestAnimFrame(animate);
+	if(app) {
+		var time = Spine.state.currentTime - (Spine.state.currentTime|0);
+		app.$data.Time = time;
+	}
 	renderer.render(stage);
 }
 

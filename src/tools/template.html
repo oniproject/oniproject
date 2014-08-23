@@ -10,11 +10,11 @@
 		Transform
 
 		<div class="rotation uk-clearfix" v-class="active: toolT === 'rotation'">
-			<div class="uk-form-icon uk-float-left" style="width:82%"
-				v-on="click: toolT = 'rotation'">
+			<div class="uk-form-icon uk-float-left" style="width:82%">
 				<i class="uk-icon-rotate-right"></i>
 				<input class="uk-width-1-1" type="number"
-					title="Angle" data-uk-tooltip
+					title="Rotatetion" data-uk-tooltip
+					v-on="click: toolT = 'rotation'"
 					v-model="rotation"
 					v-attr="disabled: !transformEnable">
 			</div>
@@ -24,17 +24,18 @@
 		</div>
 
 		<div class="translate uk-clearfix" v-class="active: toolT === 'translate'">
-			<div class="uk-form-icon uk-float-left" style="width:41%"
-				v-on="click: toolT = 'translate'">
+			<div class="uk-form-icon uk-float-left" style="width:41%">
 				<i class="uk-icon-arrows"></i>
 				<input class="uk-width-1-1" type="number"
 					title="Translate X" data-uk-tooltip
+					v-on="click: toolT = 'translate'"
 					v-model="translateX"
 					v-attr="disabled: !transformEnable">
 			</div>
 			<input class="uk-float-left" type="number"
 				style="width:41%; display:block"
 				title="Translate Y" data-uk-tooltip
+				v-on="click: toolT = 'translate'"
 				v-model="translateY"
 				v-attr="disabled: !transformEnable">
 			<button class="uk-button uk-float-left" style="width:18%">
@@ -43,18 +44,18 @@
 		</div>
 
 		<div class="scale uk-clearfix" v-class="active: toolT === 'scale'">
-			<div class="uk-form-icon uk-float-left" style="width:41%"
-				v-on="click: toolT = 'scale'">
-				<i class="uk-icon-crop"
-					v-on="click: toolT = 'scale'"></i>
+			<div class="uk-form-icon uk-float-left" style="width:41%">
+				<i class="uk-icon-crop"></i>
 				<input class="uk-width-1-1" type="number"
 					title="Scale X" data-uk-tooltip
+					v-on="click: toolT = 'scale'"
 					v-model="scaleX"
 					v-attr="disabled: !transformEnable">
 			</div>
 			<input class="uk-float-left" type="number"
 				style="width:41%; display:block"
 				title="Scale Y" data-uk-tooltip
+				v-on="click: toolT = 'scale'"
 				v-model="scaleY"
 				v-attr="disabled: !transformEnable">
 			<button class="uk-button uk-float-left" style="width:18%">
