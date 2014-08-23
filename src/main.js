@@ -1,5 +1,7 @@
 'use strict';
-require('insert-css')(require('./app.css'))
+require('less').render(require('./style.css'), function (e, css) {
+	require('insert-css')(css)
+});
 
 var Vue = require('vue')
 
@@ -30,6 +32,15 @@ function onAssetsLoaded() {
 	new Vue({
 		el: '#app',
 		methods: {
+			pause: function() {
+				dragon.stage.animationSpeed = 0;
+			},
+			play: function() {
+				dragon.stage.animationSpeed = 1;
+			},
+			play_reverse: function() {
+				dragon.stage.animationSpeed = -1;
+			},
 			select: function(type, name) {
 				console.log('select[%s] %s', type, name);
 				this.$data.selected.type = type;
@@ -45,7 +56,7 @@ function onAssetsLoaded() {
 						break;
 				}
 				if(obj) {
-					this.$data.angle = obj.data.rotation;
+					//this.$data.angle = obj.data.rotation;
 					/*this.$data.scaleX = obj.data.scaleX;
 					this.$data.scaleY = obj.data.scaleY;
 					this.$data.translateX = obj.data.x;
@@ -87,6 +98,11 @@ function onAssetsLoaded() {
 					}
 					return NaN;
 				},
+				$set: function(val) {
+					if(this.selected.type === 'bone') {
+						dragon.skeleton.findBone(this.selected.name).data.x = +val;
+					}
+				},
 			},
 			translateY: {
 				$get: function() {
@@ -94,6 +110,11 @@ function onAssetsLoaded() {
 						return dragon.skeleton.findBone(this.selected.name).data.y;
 					}
 					return NaN;
+				},
+				$set: function(val) {
+					if(this.selected.type === 'bone') {
+						dragon.skeleton.findBone(this.selected.name).data.y = +val;
+					}
 				},
 			},
 			scaleX: {
@@ -105,7 +126,7 @@ function onAssetsLoaded() {
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						dragon.skeleton.findBone(this.selected.name).data.scaleX = val;
+						dragon.skeleton.findBone(this.selected.name).data.scaleX = +val;
 					}
 				},
 			},
@@ -118,7 +139,7 @@ function onAssetsLoaded() {
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						dragon.skeleton.findBone(this.selected.name).data.scaleY = val;
+						dragon.skeleton.findBone(this.selected.name).data.scaleY = +val;
 					}
 				},
 			},

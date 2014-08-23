@@ -1,39 +1,40 @@
-#tree ul {
-	padding-left: 1em;
-	list-style-type: none;
-}
+#tree {
+	ul {
+		padding-left: 1em;
+		list-style-type: none;
+	}
 
-#tree .uk-button-link {
-	color: black;
-}
+	.uk-button-link {
+		color: black;
+	}
 
-#tree .item:hover {
-	outline: 1px solid red;
-}
+	.item:hover {
+		outline: 1px solid red;
+	}
 
+	.item.folder {
+		padding: 0;
+		margin: 0;
+	}
 
-#tree .item.folder {
-	padding: 0;
-	margin: 0;
-}
+	.bone {
+		background: #99ccff;
+	}
 
-#tree .bone {
-	background: #99ccff;
-}
+	.skin,
+	.skins,
+	.skin_placeholder {
+		background: #ffcc99;
+	}
 
-#tree .skin,
-#tree .skins,
-#tree .skin_placeholder {
-	background: #ffcc99;
-}
+	.region,
+	.image,
+	.images {
+		background: #ccff99;
+	}
 
-#tree .region,
-#tree .image,
-#tree .images {
-	background: #ccff99;
-}
-
-#tree .event,
-#tree .events {
-	background: #cc99ff;
+	.event,
+	.events {
+		background: #cc99ff;
+	}
 }

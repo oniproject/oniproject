@@ -1,5 +1,7 @@
 'use strict';
-require('insert-css')(require('./style.css'))
+require('less').render(require('./style.css'), function (e, css) {
+	require('insert-css')(css)
+});
 
 module.exports = {
 	id: 'animations',
