@@ -1,13 +1,28 @@
 <div title="{{model.type}}" data-uk-tooltip class="item folder {{model.type}} uk-clearfix">
 	<div class="uk-float-right">
-		<i v-show="model.keyframe !== undefined"  v-on="click: model.keyframe = !model.keyframe"   class="uk-icon-circle uk-text-{{model.keyframe ? 'danger' : 'success'}}"></i>
-		<i v-show="model.visiblity !== undefined" v-on="click: model.visiblity = !model.visiblity" class="uk-icon-{{model.visiblity ? 'circle' : 'circle-thin'}}"></i>
-		&nbsp;
+		<a class="uk-button uk-button-mini uk-button-link"
+			v-show="model.keyframe !== undefined"
+			v-on="click: model.keyframe = !model.keyframe">
+			<i class="uk-icon-circle uk-text-{{model.keyframe ? 'danger' : 'success'}}"></i>
+		</a>
+		<a class="uk-button uk-button-mini uk-button-link"
+			v-show="model.visiblity !== undefined"
+			v-on="click: model.visiblity = !model.visiblity">
+			<i class="uk-icon-{{model.visiblity ? 'circle' : 'circle-thin'}}"></i>
+		</a>
 	</div>
-	<a class="uk-button uk-button-link uk-button-mini uk-float-left">
-		<i v-on="click: open = !open" v-if="model.children" class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
-		<span v-on="click: select(model.type, model.name)">{{model.type}}: {{model.name}}</span>
-	</a>
+	<span class=" uk-float-left">
+		<a class="uk-button uk-button-mini uk-button-link"
+			v-on="click: open = !open" v-if="model.children">
+			<i class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
+		</a>
+		<a class="uk-button uk-button-mini uk-button-link"
+			v-on="
+				click: select(model.type, model.name),
+				click: updateTransform(model.type, model.name)">
+			{{model.type}}: {{model.name}}
+		</a>
+	</span>
 </div>
 <ul v-if="open">
 	<li v-repeat="model: model.children" v-component="{{model.type}}">

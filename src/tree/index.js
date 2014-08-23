@@ -6,6 +6,13 @@ require('less').render(require('./style.css'), function (e, css) {
 module.exports = {
 	id: 'tree',
 	template: require('./template.html'),
+	methods: {
+		select: function(type, name) {
+			console.log('select[%s] %s', type, name);
+			this.$parent.$data.selected.type = type;
+			this.$parent.$data.selected.name = name;
+		},
+	},
 	components: {
 		animation: {
 			template: require('./item.html'),
@@ -67,7 +74,7 @@ module.exports = {
 			var Spine = this.$parent.$get('Spine');
 			var spineData = Spine.spineData;
 			var drawOrder = Spine.skeleton.drawOrder;
-			var obj = {type:'skeleton', name: '', visiblity: true,children:[]};
+			var obj = {type:'skeleton', name: 'xxx', visiblity: true, children:[]};
 			var root = null;
 			var bone_map = {};
 
@@ -91,6 +98,7 @@ module.exports = {
 				obj.children.push(root);
 			}
 
+			// draw order
 			var draw_order = {type:'draw_order', children:[]};
 			obj.children.push(draw_order);
 
@@ -116,6 +124,21 @@ module.exports = {
 			}
 			draw_order.children = draw_order.children.reverse();
 
+			// images
+			obj.children.push({type:'images', children:[
+				{type: 'image', name: 'vfds'},
+				{type: 'image', name: 'vfds'},
+				{type: 'image', name: 'vfds'},
+				{type: 'image', name: 'vfds'},
+			]});
+
+			// skins
+			obj.children.push({type:'skins', children:[
+				{type: 'skin', name: 'vfds', visiblity: true},
+				{type: 'skin', name: 'vfds', visiblity: false},
+			]});
+
+			// animations
 			var animations = {type:'animations', children:[]};
 			obj.children.push(animations);
 			for(var i=0, l=spineData.animations.length; i<l;i++) {
@@ -123,53 +146,16 @@ module.exports = {
 				animations.children.push({type: 'animation', name: animation.name});
 			}
 			animations.children = animations.children.reverse();
+
+			// events
+			obj.children.push({type:'events', children:[
+				{type: 'event', name: 'vfds'},
+			]});
+
 			return obj;
 		},
 	},
 	data: {
 		msg: 'I am component tree!',
-		treeData: {
-			type:'skeleton', name: 'xxx skeleton', visiblity: true,
-			children: [
-				{type:'bone', name: 'root', visiblity: true, children:[
-					{type:'bone', name: 'hip', visiblity: true, children:[
-						{type: 'slot', name: 'vfds', visiblity: true, children:[
-							{type: 'skin_placeholder', name: 'vfds', visiblity: true, children:[
-								{type: 'region', visiblity: true, name: 'vfds'},
-							]},
-							{type: 'bounding_box', name: 'vfds'},
-						]},
-					]}
-				]},
-				{type:'draw_order', children:[
-					{type: 'slot', name: 'vfds', visiblity: true},
-					{type: 'slot', name: 'vfds', visiblity: true},
-					{type: 'slot', name: 'vfds', visiblity: true},
-					{type: 'slot', name: 'vfds', visiblity: true},
-				]},
-				{type:'images', children:[
-					{type: 'image', name: 'vfds'},
-					{type: 'image', name: 'vfds'},
-					{type: 'image', name: 'vfds'},
-					{type: 'image', name: 'vfds'},
-				]},
-				{type:'skins', children:[
-					{type: 'skin', name: 'vfds', visiblity: true},
-					{type: 'skin', name: 'vfds', visiblity: true},
-					{type: 'skin', name: 'vfds', visiblity: true},
-				]},
-				{type:'animations', children:[
-					{type: 'animation', name: 'vfds'},
-					{type: 'animation', name: 'vfds'},
-					{type: 'animation', name: 'vfds'},
-				]},
-				{type:'events', children:[
-					{type: 'event', name: 'vfds'},
-					{type: 'event', name: 'vfds'},
-					{type: 'event', name: 'vfds'},
-					{type: 'event', name: 'vfds'},
-				]},
-			]
-		}
 	}
 }

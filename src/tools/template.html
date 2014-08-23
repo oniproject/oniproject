@@ -2,41 +2,62 @@
 	<div class="uk-width-1-6">
 		Tools
 		<div data-uk-button-radio>
-			<button class="uk-button uk-width-1-1" type="button">Pose</button>
-			<button class="uk-button uk-width-1-1" type="button">Create</button>
+			<button class="uk-button uk-width-1-1">Pose</button>
+			<button class="uk-button uk-width-1-1">Create</button>
 		</div>
 	</div>
 	<div class="uk-width-2-6 uk-form">
 		Transform
 
-		<div class="uk-clearfix">
-			<div class="uk-form-icon uk-float-left" style="width:82%">
-				<i class="uk-icon-rotate-right uk-text-success"></i>
-				<input v-model="angle" title="Angle" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+		<div class="rotation uk-clearfix" v-class="active: toolT === 'rotation'">
+			<div class="uk-form-icon uk-float-left" style="width:82%"
+				v-on="click: toolT = 'rotation'">
+				<i class="uk-icon-rotate-right"></i>
+				<input class="uk-width-1-1" type="number"
+					title="Angle" data-uk-tooltip
+					v-model="rotation"
+					v-attr="disabled: !transformEnable">
 			</div>
-			<button class="uk-button uk-float-left" type="button" style="width:18%">
+			<button class="uk-button uk-float-left" style="width:18%">
 				<i class="uk-icon-key"></i>
 			</button>
 		</div>
 
-		<div class="uk-clearfix">
-			<div class="uk-form-icon uk-float-left" style="width:41%">
-				<i class="uk-icon-arrows uk-text-primary"></i>
-				<input v-model="translateX" title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+		<div class="translate uk-clearfix" v-class="active: toolT === 'translate'">
+			<div class="uk-form-icon uk-float-left" style="width:41%"
+				v-on="click: toolT = 'translate'">
+				<i class="uk-icon-arrows"></i>
+				<input class="uk-width-1-1" type="number"
+					title="Translate X" data-uk-tooltip
+					v-model="translateX"
+					v-attr="disabled: !transformEnable">
 			</div>
-			<input v-model="translateY" class="uk-float-left" title="Y" data-uk-tooltip type="number" style="width:41%; display:block" value="-434.8">
-			<button class="uk-button uk-float-left" type="button" style="width:18%">
+			<input class="uk-float-left" type="number"
+				style="width:41%; display:block"
+				title="Translate Y" data-uk-tooltip
+				v-model="translateY"
+				v-attr="disabled: !transformEnable">
+			<button class="uk-button uk-float-left" style="width:18%">
 				<i class="uk-icon-key"></i>
 			</button>
 		</div>
 
-		<div class="uk-clearfix">
-			<div class="uk-form-icon uk-float-left" style="width:41%">
-				<i class="uk-icon-crop uk-text-danger"></i>
-				<input v-model="scaleX" title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+		<div class="scale uk-clearfix" v-class="active: toolT === 'scale'">
+			<div class="uk-form-icon uk-float-left" style="width:41%"
+				v-on="click: toolT = 'scale'">
+				<i class="uk-icon-crop"
+					v-on="click: toolT = 'scale'"></i>
+				<input class="uk-width-1-1" type="number"
+					title="Scale X" data-uk-tooltip
+					v-model="scaleX"
+					v-attr="disabled: !transformEnable">
 			</div>
-			<input v-model="scaleY" class="uk-float-left" title="Y" data-uk-tooltip type="number" style="width:41%; display:block" value="-434.8">
-			<button class="uk-button uk-float-left" type="button" style="width:18%">
+			<input class="uk-float-left" type="number"
+				style="width:41%; display:block"
+				title="Scale Y" data-uk-tooltip
+				v-model="scaleY"
+				v-attr="disabled: !transformEnable">
+			<button class="uk-button uk-float-left" style="width:18%">
 				<i class="uk-icon-key"></i>
 			</button>
 		</div>
@@ -44,15 +65,21 @@
 	<div class="uk-width-1-6">
 		Axis
 		<div data-uk-button-radio>
-			<button class="uk-button uk-width-1-1" type="button">Local</button>
-			<button class="uk-button uk-width-1-1" type="button">Parent</button>
-			<button class="uk-button uk-width-1-1" type="button">Global</button>
+			<button class="uk-button uk-width-1-1">Local</button>
+			<button class="uk-button uk-width-1-1">Parent</button>
+			<button class="uk-button uk-width-1-1">Global</button>
 		</div>
 	</div>
 	<div class="uk-width-1-6">
 		Compensate
-		<button class="uk-button uk-width-1-1" type="button" data-uk-button>Bones</button>
-		<button class="uk-button uk-width-1-1" type="button" data-uk-button>Images</button>
+		<button class="uk-button uk-width-1-1" data-uk-button>
+			<i class="uk-icon-lock"></i>
+			Bones
+		</button>
+		<button class="uk-button uk-width-1-1" data-uk-button>
+			<i class="uk-icon-lock"></i>
+			Images
+		</button>
 	</div>
 	<div class="uk-width-1-6">
 		Options
@@ -68,21 +95,30 @@
 			<tbody>
 				<tr>
 					<td>Bones</td>
-					<td><i class="uk-icon-circle"></i></td>
-					<td><i class="uk-icon-circle"></i></td>
-					<td><i class="uk-icon-circle-thin"></i></td>
+					<td v-on="click: options.bones.selecting = !options.bones.selecting">
+						<i class="uk-icon-circle{{options.bones.selecting?'':'-thin'}}"></i></td>
+					<td v-on="click: options.bones.show = !options.bones.show">
+						<i class="uk-icon-circle{{options.bones.show?'':'-thin'}}"></i></td>
+					<td v-on="click: options.bones.names = !options.bones.names">
+						<i class="uk-icon-circle{{options.bones.names?'':'-thin'}}"></i></td>
 				</tr>
 				<tr>
 					<td>Images</td>
-					<td><i class="uk-icon-circle"></i></td>
-					<td><i class="uk-icon-circle"></i></td>
-					<td><i class="uk-icon-circle-thin"></i></td>
+					<td v-on="click: options.images.selecting = !options.images.selecting">
+						<i class="uk-icon-circle{{options.images.selecting?'':'-thin'}}"></i></td>
+					<td v-on="click: options.images.show = !options.images.show">
+						<i class="uk-icon-circle{{options.images.show?'':'-thin'}}"></i></td>
+					<td v-on="click: options.images.names = !options.images.names">
+						<i class="uk-icon-circle{{options.images.names?'':'-thin'}}"></i></td>
 				</tr>
 				<tr>
 					<td>Bounds</td>
-					<td><i class="uk-icon-circle"></i></td>
-					<td><i class="uk-icon-circle"></i></td>
-					<td><i class="uk-icon-circle-thin"></i></td>
+					<td v-on="click: options.bounds.selecting = !options.bounds.selecting">
+						<i class="uk-icon-circle{{options.bounds.selecting?'':'-thin'}}"></i></td>
+					<td v-on="click: options.bounds.show = !options.bounds.show">
+						<i class="uk-icon-circle{{options.bounds.show?'':'-thin'}}"></i></td>
+					<td v-on="click: options.bounds.names = !options.bounds.names">
+						<i class="uk-icon-circle{{options.bounds.names?'':'-thin'}}"></i></td>
 				</tr>
 			</tbody>
 		</table>

@@ -1,5 +1,5 @@
 'use strict';
-require('less').render(require('./style.css'), function (e, css) {
+require('less').render(require('./app.css'), function (e, css) {
 	require('insert-css')(css)
 });
 
@@ -17,52 +17,74 @@ var renderer = new PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight
 renderer.view.style.display = "block";
 renderer.view.style.width = "800px";
 renderer.view.style.height = "500px";
-window.dragon = null;
+window.Spine = null;
 
 document.body.appendChild(renderer.view);
 function onAssetsLoaded() {
-	dragon = new PIXI.Spine("data/dragonBonesData.json");
+	Spine = new PIXI.Spine("data/dragonBonesData.json");
+	stage.addChild(Spine);
 	var scale = 1;//window.innerHeight / 700;
-	dragon.position.x = window.innerWidth/2;
-	dragon.position.y = window.innerHeight/2 + (450 * scale);
-	dragon.scale.x = dragon.scale.y = scale
-	dragon.state.setAnimationByName("flying", true);
-	stage.addChild(dragon);
+	Spine.position.x = window.innerWidth/2;
+	Spine.position.y = window.innerHeight/2 + (450 * scale);
+	Spine.scale.x = Spine.scale.y = scale
+	Spine.state.setAnimationByName("flying", true);
 
 	new Vue({
 		el: '#app',
+		data: {
+			selected: {
+				type: '',
+				name: '',
+			},
+			options: {
+				bones: {
+					selecting: true,
+					show: true,
+					names: false,
+				},
+				images: {
+					selecting: true,
+					show: true,
+					names: false,
+				},
+				bounds: {
+					selecting: true,
+					show: false,
+					names: false,
+				},
+			},
+			toolT: 'rotation',
+			transformEnable: false,
+			played: true,
+			reversed: false,
+		},
 		methods: {
-			pause: function() {
-				dragon.stage.animationSpeed = 0;
+			stop: function() {
+				console.info('stop');
+				this.$data.played = false;
+				this.$data.reversed = false;
+				Spine.state.animationSpeed = 0;
+				Spine.state.currentTime -= Spine.state.currentTime|0;
 			},
 			play: function() {
-				dragon.stage.animationSpeed = 1;
+				console.info('play');
+				this.$data.played = true;
+				this.$data.reversed = false;
+				Spine.state.animationSpeed = 1;
+				Spine.state.currentLoop = true;
+				Spine.state.currentTime -= Spine.state.currentTime|0;
 			},
 			play_reverse: function() {
-				dragon.stage.animationSpeed = -1;
+				console.info('play_reverse');
+				this.$data.played = false;
+				this.$data.reversed = true;
+				Spine.state.currentLoop = true;
+				Spine.state.currentTime = Spine.state.currentTime - Spine.state.currentTime|0 + 100000;
+				Spine.state.animationSpeed = -1;
 			},
-			select: function(type, name) {
-				console.log('select[%s] %s', type, name);
-				this.$data.selected.type = type;
-				this.$data.selected.name = name;
-
-				var obj=null;
-				switch(type) {
-					case 'bone':
-						obj = dragon.skeleton.findBone(name);
-						break;
-					case 'slot':
-						obj = dragon.skeleton.findSlot(name);
-						break;
-				}
-				if(obj) {
-					//this.$data.angle = obj.data.rotation;
-					/*this.$data.scaleX = obj.data.scaleX;
-					this.$data.scaleY = obj.data.scaleY;
-					this.$data.translateX = obj.data.x;
-					this.$data.translateY = obj.data.y;
-					*/
-				}
+			updateTransform: function(type, name) {
+				console.log('updateTransform[%s] %s', type, name);
+				this.$data.transformEnable = type === 'bone';
 			},
 		},
 		components: {
@@ -75,81 +97,75 @@ function onAssetsLoaded() {
 		template: require('./app.html'),
 		computed: {
 			Spine: function() {
-				return dragon;
+				return Spine;
 			},
-			angle: {
+			rotation: {
 				$get: function() {
 					if(this.selected.type === 'bone') {
-						return dragon.skeleton.findBone(this.selected.name).data.rotation;
+						return Spine.skeleton.findBone(this.selected.name).data.rotation;
 					}
 					return NaN;
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
 						console.warn('angle $set', this.selected, val)
-						dragon.skeleton.findBone(this.selected.name).data.rotation = +val;
+						Spine.skeleton.findBone(this.selected.name).data.rotation = +val;
 					}
 				},
 			},
 			translateX: {
 				$get: function() {
 					if(this.selected.type === 'bone') {
-						return dragon.skeleton.findBone(this.selected.name).data.x;
+						return Spine.skeleton.findBone(this.selected.name).data.x;
 					}
 					return NaN;
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						dragon.skeleton.findBone(this.selected.name).data.x = +val;
+						Spine.skeleton.findBone(this.selected.name).data.x = +val;
 					}
 				},
 			},
 			translateY: {
 				$get: function() {
 					if(this.selected.type === 'bone') {
-						return dragon.skeleton.findBone(this.selected.name).data.y;
+						return Spine.skeleton.findBone(this.selected.name).data.y;
 					}
 					return NaN;
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						dragon.skeleton.findBone(this.selected.name).data.y = +val;
+						Spine.skeleton.findBone(this.selected.name).data.y = +val;
 					}
 				},
 			},
 			scaleX: {
 				$get: function() {
 					if(this.selected.type === 'bone') {
-						return dragon.skeleton.findBone(this.selected.name).data.scaleX;
+						return Spine.skeleton.findBone(this.selected.name).data.scaleX;
 					}
 					return NaN;
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						dragon.skeleton.findBone(this.selected.name).data.scaleX = +val;
+						Spine.skeleton.findBone(this.selected.name).data.scaleX = +val;
 					}
 				},
 			},
 			scaleY: {
 				$get: function() {
 					if(this.selected.type === 'bone') {
-						return dragon.skeleton.findBone(this.selected.name).data.scaleY;
+						return Spine.skeleton.findBone(this.selected.name).data.scaleY;
 					}
 					return NaN;
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						dragon.skeleton.findBone(this.selected.name).data.scaleY = +val;
+						Spine.skeleton.findBone(this.selected.name).data.scaleY = +val;
 					}
 				},
 			},
 		},
-		data: {
-			selected: {
-				type: '',
-				name: '',
-			},
-		}
 	});
 }
 
