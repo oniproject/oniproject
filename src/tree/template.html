@@ -1,4 +1,4 @@
-<div class="uk-panel uk-panel-box uk-scrollable-box" style="resize:vertical;">
+<div class="uk-panel uk-panel-box uk-scrollable-box" style="resize:vertical; height:400px">
 	<small>Tree</small>
 	<div class="uk-button-group" data-uk-button-checkbox>
 		<button title="Show bones in the tree"       data-uk-tooltip class="uk-button uk-button-mini uk-button-primary" type="button">x</button>
@@ -22,6 +22,9 @@
 			&nbsp;
 		</div>
 	</div>
+	<ul class="uk-margin-remove">
+		<li v-component="skeleton" v-with="model: Skeleton"></li>
+	</ul>
 	<ul class="uk-margin-remove">
 		<li v-component="skeleton" v-with="model: treeData"></li>
 	</ul>

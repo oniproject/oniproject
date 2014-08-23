@@ -12,7 +12,7 @@
 		<div class="uk-clearfix">
 			<div class="uk-form-icon uk-float-left" style="width:82%">
 				<i class="uk-icon-rotate-right uk-text-success"></i>
-				<input title="Angle" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+				<input v-model="angle" title="Angle" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
 			</div>
 			<button class="uk-button uk-float-left" type="button" style="width:18%">
 				<i class="uk-icon-key"></i>
@@ -22,9 +22,9 @@
 		<div class="uk-clearfix">
 			<div class="uk-form-icon uk-float-left" style="width:41%">
 				<i class="uk-icon-arrows uk-text-primary"></i>
-				<input title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+				<input v-model="translateX" title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
 			</div>
-			<input class="uk-float-left" title="Y" data-uk-tooltip type="number" style="width:41%; display:block" value="-434.8">
+			<input v-model="translateY" class="uk-float-left" title="Y" data-uk-tooltip type="number" style="width:41%; display:block" value="-434.8">
 			<button class="uk-button uk-float-left" type="button" style="width:18%">
 				<i class="uk-icon-key"></i>
 			</button>
@@ -33,9 +33,9 @@
 		<div class="uk-clearfix">
 			<div class="uk-form-icon uk-float-left" style="width:41%">
 				<i class="uk-icon-crop uk-text-danger"></i>
-				<input title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
+				<input v-model="scaleX" title="X" data-uk-tooltip type="number" class="uk-width-1-1" value="10.7">
 			</div>
-			<input class="uk-float-left" title="Y" data-uk-tooltip type="number" style="width:41%; display:block" value="-434.8">
+			<input v-model="scaleY" class="uk-float-left" title="Y" data-uk-tooltip type="number" style="width:41%; display:block" value="-434.8">
 			<button class="uk-button uk-float-left" type="button" style="width:18%">
 				<i class="uk-icon-key"></i>
 			</button>
