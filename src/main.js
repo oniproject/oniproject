@@ -120,7 +120,6 @@ function onAssetsLoaded() {
 			resize: function() {
 				console.log('resize');
 				Vue.nextTick(resizeAnimations);
-				//setTimeout(resizeAnimations, 200);
 			},
 			stop: function() {
 				console.info('stop');
@@ -134,21 +133,23 @@ function onAssetsLoaded() {
 				console.info('play');
 				this.$data.played = true;
 				this.$data.reversed = false;
-				Spine.state.animationSpeed = this.$data.speed;
-				Spine.state.currentLoop = true;
-				Spine.state.currentTime -= Spine.state.currentTime|0;
-				this.$data.transformEnable = false;
+
 				Spine.state.setAnimationByName('flying', true);
+				Spine.state.animationSpeed = this.$data.speed;
+				Spine.state.currentTime -= Spine.state.currentTime|0;
+
+				this.$data.transformEnable = false;
 			},
 			play_reverse: function() {
 				console.info('play_reverse');
 				this.$data.played = false;
 				this.$data.reversed = true;
-				Spine.state.currentLoop = true;
-				Spine.state.currentTime = Spine.state.currentTime - Spine.state.currentTime|0 + 100000;
-				Spine.state.animationSpeed = -this.$data.speed;
-				this.$data.transformEnable = false;
+
 				Spine.state.setAnimationByName('flying', true);
+				Spine.state.animationSpeed = -this.$data.speed;
+				Spine.state.currentTime = Spine.state.currentTime - (Spine.state.currentTime|0) + 10000;
+
+				this.$data.transformEnable = false;
 			},
 			updateTransform: function(type, name) {
 				console.log('updateTransform[%s] %s', type, name);
@@ -275,10 +276,10 @@ function onAssetsLoaded() {
 			renderer.resize(getW(canvas), getH(canvas));
 		});
 		console.log('newHeight', app.$data.animHeight, app.$data.otherHeight);
-		//renderer.view.height = otherHeight;
 	}
 	window.addEventListener('resize', resizeAnimations);
 	resizeAnimations();
+
 	requestAnimFrame(animate);
 	function animate() {
 		requestAnimFrame(animate);
@@ -289,6 +290,4 @@ function onAssetsLoaded() {
 		renderer.render(stage);
 	}
 }
-
-
 
