@@ -11,7 +11,7 @@ html, body {
 .panel, .panelX {
 	background: #666666;
 	color: white;
-	padding: 8px;
+	padding: 4px;
 }
 
 .panel .panel {

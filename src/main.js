@@ -3,7 +3,9 @@ require('less').render(require('./app.css'), function (e, css) {
 	require('insert-css')(css)
 });
 
-var Vue = require('vue')
+window.Vue = require('vue');
+Vue.directive('phimg', require('vue-placeholders/src/vue-placeholders-image'))
+Vue.directive('phtxt', require('vue-placeholders/src/vue-placeholders-text'))
 Vue.filter('int', function (value) {
 	return value |0;
 })
@@ -22,22 +24,58 @@ window.app = null;
 var backGrid = new PIXI.Graphics();
 stage.addChild(backGrid);
 var n = 50;
+var nn = 32;
 for(var x = -n; x<n; x++) {
 	for(var y = -n; y<n; y++) {
 		backGrid.beginFill(0x000000, ((x+y)%2)?0.4:0.8);
-		backGrid.drawRect(x*32, y*32, 32,32);
+		backGrid.drawRect(x*nn, y*nn, nn,nn);
 		backGrid.endFill();
 	}
 }
 
 function onAssetsLoaded() {
+	var boneDrawer = new PIXI.Graphics();
 	Spine = new PIXI.Spine("data/dragonBonesData.json");
 	stage.addChild(Spine);
+	stage.addChild(boneDrawer);
 	var scale = 0.5;//window.innerHeight / 700;
-	Spine.position.x = window.innerWidth/4;
-	Spine.position.y = window.innerHeight/4 + (450 * scale);
-	Spine.scale.x = Spine.scale.y = scale
-	Spine.state.setAnimationByName("flying", true);
+	boneDrawer.position.x = Spine.position.x = window.innerWidth/4;
+	boneDrawer.position.y = Spine.position.y = window.innerHeight/4 + (450 * scale);
+	boneDrawer.scale.x = boneDrawer.scale.y = Spine.scale.x = Spine.scale.y = scale
+
+	Spine.state.setAnimationByName('flying', true);
+	//setTimeout(function(){Spine.state.clearAnimation()}, 2000);
+	//Spine.state.setAnimation('FAIL', true);
+	
+	window.UpdateSetup = function() {
+		Spine.state.clearAnimation();
+		Spine.skeleton.setToSetupPose();
+	}
+
+	boneDrawer.updateTransform = function() {
+		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
+		boneDrawer.clear();
+		for(var i=0, l= Spine.skeleton.bones.length;i<l;i++) {
+			var bone = Spine.skeleton.bones[i];
+			boneDrawer.beginFill(0x9999ff, 0.8);
+			boneDrawer.drawCircle(bone.worldX, bone.worldY, 5);
+			boneDrawer.endFill();
+			boneDrawer.lineStyle(2, 0x9999ff, 1);
+
+			if(bone.data.length) {
+				var rot = bone.worldRotation * Math.PI/180;
+				var x = Math.cos(rot) * bone.data.length;
+				var y = Math.sin(rot) * bone.data.length;
+				boneDrawer.moveTo(bone.worldX +x, bone.worldY -y);
+				boneDrawer.lineTo(bone.worldX, bone.worldY);
+			} else {
+				boneDrawer.moveTo(bone.worldX -nn, bone.worldY);
+				boneDrawer.lineTo(bone.worldX +nn, bone.worldY);
+				boneDrawer.moveTo(bone.worldX, bone.worldY -nn);
+				boneDrawer.lineTo(bone.worldX, bone.worldY +nn);
+			}
+		}
+	}
 
 	app = new Vue({
 		el: '#app',
@@ -90,6 +128,7 @@ function onAssetsLoaded() {
 				this.$data.reversed = false;
 				Spine.state.animationSpeed = 0;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
+				this.$data.transformEnable = true;
 			},
 			play: function() {
 				console.info('play');
@@ -98,6 +137,8 @@ function onAssetsLoaded() {
 				Spine.state.animationSpeed = this.$data.speed;
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
+				this.$data.transformEnable = false;
+				Spine.state.setAnimationByName('flying', true);
 			},
 			play_reverse: function() {
 				console.info('play_reverse');
@@ -106,10 +147,14 @@ function onAssetsLoaded() {
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime = Spine.state.currentTime - Spine.state.currentTime|0 + 100000;
 				Spine.state.animationSpeed = -this.$data.speed;
+				this.$data.transformEnable = false;
+				Spine.state.setAnimationByName('flying', true);
 			},
 			updateTransform: function(type, name) {
 				console.log('updateTransform[%s] %s', type, name);
-				this.$data.transformEnable = type === 'bone';
+				if(!this.$data.played && !this.$data.reversed) {
+					this.$data.transformEnable = type === 'bone';
+				}
 				if(!this.$data.transformEnable) {
 					this.$data.toolT = 'none';
 				}
@@ -147,8 +192,9 @@ function onAssetsLoaded() {
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						console.warn('angle $set', this.selected, val)
 						Spine.skeleton.findBone(this.selected.name).data.rotation = +val;
+						UpdateSetup();
+						console.warn('angle $set', this.selected.name, val);
 					}
 				},
 			},
@@ -208,7 +254,7 @@ function onAssetsLoaded() {
 	});
 
 	var canvas = document.getElementById('canvas');
-	var renderer = new PIXI.autoDetectRenderer(100, 100, canvas, true);
+	var renderer = new PIXI.autoDetectRenderer(100, 100, canvas, true, true);
 
 	var getH = function(el) {
 		var style = window.getComputedStyle(el, null);

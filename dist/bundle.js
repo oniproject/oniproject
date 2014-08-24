@@ -15069,7 +15069,369 @@ function amdefine(module, requireFn) {
 module.exports = amdefine;
 
 }).call(this,require('_process'),"/node_modules/less/node_modules/source-map/node_modules/amdefine/amdefine.js")
-},{"_process":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","path":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/path-browserify/index.js"}],"/home/lain/a2d/node_modules/vue/src/batcher.js":[function(require,module,exports){
+},{"_process":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","path":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/path-browserify/index.js"}],"/home/lain/a2d/node_modules/vue-placeholders/src/vue-placeholders-image.js":[function(require,module,exports){
+/*jshint asi: true*/
+/**
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/**
+* Based entirely on the work of Josh David Miller (https://github.com/joshdmiller/angular-placeholders)
+* Ported from AngularJS to Vue.js (http://vuejs.org/)
+**/
+
+module.exports = {
+
+  bind: function() {
+    this.config  = {
+      text_size: 10,
+      fill_color: '#EEEEEE',
+      text_color: '#AAAAAA'
+    }
+  },
+  
+  update: function (value) {
+    var val     = this.value ? this.value : this.key,
+        el      = this.el,
+        matches = val.match( /^(\d+)x(\d+)$/ ),
+        dataUrl,
+        size
+
+    if(!matches) return
+    
+    size = { w: matches[1], h: matches[2] }
+    el.setAttribute("title", val)
+    el.setAttribute("alt", val)
+
+    dataUrl = this.drawImage(val, size)
+
+    if (el.tagName === "IMG") {
+      el.setAttribute('src', dataUrl)
+    } else {
+      el.style.backgroundImage = 'url("' + dataUrl + '")'
+    }
+  },
+
+  getTextSize: function(size) {
+    var dimension_arr = [size.h, size.w].sort(),
+        maxFactor     = Math.round(dimension_arr[1] / 16)
+ 
+    return Math.max(this.config.text_size, maxFactor)
+  },
+
+  drawImage: function(val, size) {
+    var canvas    = document.createElement( 'canvas' ),
+        context   = canvas.getContext( '2d' ),
+        text_size = this.getTextSize(size),
+        config    = this.config,
+        text      = val
+
+    canvas.width = size.w
+    canvas.height = size.h
+    context.fillStyle = config.fill_color
+    context.fillRect( 0, 0, size.w, size.h )
+    context.fillStyle = config.text_color
+    context.textAlign = 'center'
+    context.textBaseline = 'middle'
+    context.font = 'bold '+ text_size + 'pt sans-serif'
+
+    if (context.measureText(text).width / size.w > 1) {
+      text_size = config.text_size / (context.measureText(text).width / size.w)
+      context.font = 'bold ' + text_size + 'pt sans-serif'
+    }
+
+    context.fillText( text, size.w / 2, size.h / 2 )
+    return canvas.toDataURL("image/png")
+  }
+}
+
+},{}],"/home/lain/a2d/node_modules/vue-placeholders/src/vue-placeholders-text.js":[function(require,module,exports){
+/**
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/**
+* Based entirely on the work of Josh David Miller (https://github.com/joshdmiller/angular-placeholders)
+* which is itself based, in part, on https://github.com/fkadeveloper/loremjs
+* Ported from AngularJS to Vue.js (http://vuejs.org/)
+**/
+
+module.exports = {
+
+  update: function(value) {
+ 
+    var val      = this.value ? this.value : this.key,
+        el       = this.el,
+        numSentences,
+        numParagraphs,
+        p_match,
+        s_match
+
+    p_match = val.match( /(\d+)p/ )
+    s_match = val.match( /(\d+)s/ )
+
+    if ( p_match !== null) {
+      numParagraphs = parseInt( p_match[1], 10 )
+    } else {
+      numParagraphs = false;
+    }
+
+    if ( s_match !== null ) {
+      numSentences = parseInt( s_match[1], 10 )
+    } else {
+      numSentences = false;
+    }
+
+    this.populate(numParagraphs, numSentences, el)
+  },
+
+  populate: function(numParagraphs, numSentences, el) {
+    var contents
+
+    if ( numParagraphs || !numSentences ) {
+      contents = this.createParagraphs( numParagraphs, numSentences )
+    } else {
+      contents = this.createSentences( numSentences )
+    }
+    
+    el.innerHTML =  contents 
+  },
+
+  randomInt: function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+  },
+
+  createSentence: function (sentenceLength) {
+    var wordIndex,
+        sentence
+         
+    sentenceLength = sentenceLength || this.randomInt( 5, 20 )
+    wordIndex = this.randomInt(0, this.words.length - sentenceLength - 1)
+    sentence = this.words.slice(wordIndex, wordIndex + sentenceLength)
+      .join(' ')
+      .replace(/\,$/g, '') + '.'
+ 
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1)
+  },
+
+  createSentences: function(numSentences) {
+    var sentences = []
+
+    numSentences = numSentences || this.randomInt( 3, 7 )
+   
+    for (var i = 0; i < numSentences; i++ ) {
+      sentences.push(this.createSentence())
+    }
+
+    return sentences.join(' ')
+  },
+
+  createParagraph: function(numSentences) {
+    var sentences = this.createSentences( numSentences )
+    return "<p>" + sentences + "</p>"
+  },
+
+  createParagraphs: function (numParagraphs, numSentences) {
+    var paragraphs = [],
+        randomInt  = this.randomInt
+
+    numParagraphs = numParagraphs || randomInt( 3, 7 )
+    for (var i = 0; i < numParagraphs; i++ ) {
+      paragraphs.push( this.createParagraph( numSentences ) )
+    }
+    
+    return paragraphs.join('\n')
+  },
+ 
+  words: ["lorem", "ipsum", "dolor", "sit", "amet,", "consectetur", "adipiscing",
+    "elit", "ut", "aliquam,", "purus", "sit", "amet", "luctus", "venenatis,",
+    "lectus", "magna", "fringilla", "urna,", "porttitor", "rhoncus", "dolor",
+    "purus", "non", "enim", "praesent", "elementum", "facilisis", "leo,", "vel",
+    "fringilla", "est", "ullamcorper", "eget", "nulla", "facilisi", "etiam",
+    "dignissim", "diam", "quis", "enim", "lobortis", "scelerisque", "fermentum",
+    "dui", "faucibus", "in", "ornare", "quam", "viverra", "orci", "sagittis", "eu",
+    "volutpat", "odio", "facilisis", "mauris", "sit", "amet", "massa", "vitae",
+    "tortor", "condimentum", "lacinia", "quis", "vel", "eros", "donec", "ac",
+    "odio", "tempor", "orci", "dapibus", "ultrices", "in", "iaculis", "nunc",
+    "sed", "augue", "lacus,", "viverra", "vitae", "congue", "eu,", "consequat",
+    "ac", "felis", "donec", "et", "odio", "pellentesque", "diam", "volutpat",
+    "commodo", "sed", "egestas", "egestas", "fringilla", "phasellus", "faucibus",
+    "scelerisque", "eleifend", "donec", "pretium", "vulputate", "sapien", "nec",
+    "sagittis", "aliquam", "malesuada", "bibendum", "arcu", "vitae", "elementum",
+    "curabitur", "vitae", "nunc", "sed", "velit", "dignissim", "sodales", "ut",
+    "eu", "sem", "integer", "vitae", "justo", "eget", "magna", "fermentum",
+    "iaculis", "eu", "non", "diam", "phasellus", "vestibulum", "lorem", "sed",
+    "risus", "ultricies", "tristique", "nulla", "aliquet", "enim", "tortor,", "at",
+    "auctor", "urna", "nunc", "id", "cursus", "metus", "aliquam", "eleifend", "mi",
+    "in", "nulla", "posuere", "sollicitudin", "aliquam", "ultrices", "sagittis",
+    "orci,", "a", "scelerisque", "purus", "semper", "eget", "duis", "at", "tellus",
+    "at", "urna", "condimentum", "mattis", "pellentesque", "id", "nibh", "tortor,",
+    "id", "aliquet", "lectus", "proin", "nibh", "nisl,", "condimentum", "id",
+    "venenatis", "a,", "condimentum", "vitae", "sapien", "pellentesque",
+    "habitant", "morbi", "tristique", "senectus", "et", "netus", "et", "malesuada",
+    "fames", "ac", "turpis", "egestas", "sed", "tempus,", "urna", "et", "pharetra",
+    "pharetra,", "massa", "massa", "ultricies", "mi,", "quis", "hendrerit",
+    "dolor", "magna", "eget", "est", "lorem", "ipsum", "dolor", "sit", "amet,",
+    "consectetur", "adipiscing", "elit", "pellentesque", "habitant", "morbi",
+    "tristique", "senectus", "et", "netus", "et", "malesuada", "fames", "ac",
+    "turpis", "egestas", "integer", "eget", "aliquet", "nibh", "praesent",
+    "tristique", "magna", "sit", "amet", "purus", "gravida", "quis", "blandit",
+    "turpis", "cursus", "in", "hac", "habitasse", "platea", "dictumst", "quisque",
+    "sagittis,", "purus", "sit", "amet", "volutpat", "consequat,", "mauris",
+    "nunc", "congue", "nisi,", "vitae", "suscipit", "tellus", "mauris", "a",
+    "diam", "maecenas", "sed", "enim", "ut", "sem", "viverra", "aliquet", "eget",
+    "sit", "amet", "tellus", "cras", "adipiscing", "enim", "eu", "turpis",
+    "egestas", "pretium", "aenean", "pharetra,", "magna", "ac", "placerat",
+    "vestibulum,", "lectus", "mauris", "ultrices", "eros,", "in", "cursus",
+    "turpis", "massa", "tincidunt", "dui", "ut", "ornare", "lectus", "sit", "amet",
+    "est", "placerat", "in", "egestas", "erat", "imperdiet", "sed", "euismod",
+    "nisi", "porta", "lorem", "mollis", "aliquam", "ut", "porttitor", "leo", "a",
+    "diam", "sollicitudin", "tempor", "id", "eu", "nisl", "nunc", "mi", "ipsum,",
+    "faucibus", "vitae", "aliquet", "nec,", "ullamcorper", "sit", "amet", "risus",
+    "nullam", "eget", "felis", "eget", "nunc", "lobortis", "mattis", "aliquam",
+    "faucibus", "purus", "in", "massa", "tempor", "nec", "feugiat", "nisl",
+    "pretium", "fusce", "id", "velit", "ut", "tortor", "pretium", "viverra",
+    "suspendisse", "potenti", "nullam", "ac", "tortor", "vitae", "purus",
+    "faucibus", "ornare", "suspendisse", "sed", "nisi", "lacus,", "sed", "viverra",
+    "tellus", "in", "hac", "habitasse", "platea", "dictumst", "vestibulum",
+    "rhoncus", "est", "pellentesque", "elit", "ullamcorper", "dignissim", "cras",
+    "tincidunt", "lobortis", "feugiat", "vivamus", "at", "augue", "eget", "arcu",
+    "dictum", "varius", "duis", "at", "consectetur", "lorem", "donec", "massa",
+    "sapien,", "faucibus", "et", "molestie", "ac,", "feugiat", "sed", "lectus",
+    "vestibulum", "mattis", "ullamcorper", "velit", "sed", "ullamcorper", "morbi",
+    "tincidunt", "ornare", "massa,", "eget", "egestas", "purus", "viverra",
+    "accumsan", "in", "nisl", "nisi,", "scelerisque", "eu", "ultrices", "vitae,",
+    "auctor", "eu", "augue", "ut", "lectus", "arcu,", "bibendum", "at", "varius",
+    "vel,", "pharetra", "vel", "turpis", "nunc", "eget", "lorem", "dolor,", "sed",
+    "viverra", "ipsum", "nunc", "aliquet", "bibendum", "enim,", "facilisis",
+    "gravida", "neque", "convallis", "a", "cras", "semper", "auctor", "neque,",
+    "vitae", "tempus", "quam", "pellentesque", "nec", "nam", "aliquam", "sem",
+    "et", "tortor", "consequat", "id", "porta", "nibh", "venenatis", "cras", "sed",
+    "felis", "eget", "velit", "aliquet", "sagittis", "id", "consectetur", "purus",
+    "ut", "faucibus", "pulvinar", "elementum", "integer", "enim", "neque,",
+    "volutpat", "ac", "tincidunt", "vitae,", "semper", "quis", "lectus", "nulla",
+    "at", "volutpat", "diam", "ut", "venenatis", "tellus", "in", "metus",
+    "vulputate", "eu", "scelerisque", "felis", "imperdiet", "proin", "fermentum",
+    "leo", "vel", "orci", "porta", "non", "pulvinar", "neque", "laoreet",
+    "suspendisse", "interdum", "consectetur", "libero,", "id", "faucibus", "nisl",
+    "tincidunt", "eget", "nullam", "non", "nisi", "est,", "sit", "amet",
+    "facilisis", "magna", "etiam", "tempor,", "orci", "eu", "lobortis",
+    "elementum,", "nibh", "tellus", "molestie", "nunc,", "non", "blandit", "massa",
+    "enim", "nec", "dui", "nunc", "mattis", "enim", "ut", "tellus", "elementum",
+    "sagittis", "vitae", "et", "leo", "duis", "ut", "diam", "quam", "nulla",
+    "porttitor", "massa", "id", "neque", "aliquam", "vestibulum", "morbi",
+    "blandit", "cursus", "risus,", "at", "ultrices", "mi", "tempus", "imperdiet",
+    "nulla", "malesuada", "pellentesque", "elit", "eget", "gravida", "cum",
+    "sociis", "natoque", "penatibus", "et", "magnis", "dis", "parturient",
+    "montes,", "nascetur", "ridiculus", "mus", "mauris", "vitae", "ultricies",
+    "leo", "integer", "malesuada", "nunc", "vel", "risus", "commodo", "viverra",
+    "maecenas", "accumsan,", "lacus", "vel", "facilisis", "volutpat,", "est",
+    "velit", "egestas", "dui,", "id", "ornare", "arcu", "odio", "ut", "sem",
+    "nulla", "pharetra", "diam", "sit", "amet", "nisl", "suscipit", "adipiscing",
+    "bibendum", "est", "ultricies", "integer", "quis", "auctor", "elit", "sed",
+    "vulputate", "mi", "sit", "amet", "mauris", "commodo", "quis", "imperdiet",
+    "massa", "tincidunt", "nunc", "pulvinar", "sapien", "et", "ligula",
+    "ullamcorper", "malesuada", "proin", "libero", "nunc,", "consequat",
+    "interdum", "varius", "sit", "amet,", "mattis", "vulputate", "enim", "nulla",
+    "aliquet", "porttitor", "lacus,", "luctus", "accumsan", "tortor", "posuere",
+    "ac", "ut", "consequat", "semper", "viverra", "nam", "libero", "justo,",
+    "laoreet", "sit", "amet", "cursus", "sit", "amet,", "dictum", "sit", "amet",
+    "justo", "donec", "enim", "diam,", "vulputate", "ut", "pharetra", "sit",
+    "amet,", "aliquam", "id", "diam", "maecenas", "ultricies", "mi", "eget",
+    "mauris", "pharetra", "et", "ultrices", "neque", "ornare", "aenean", "euismod",
+    "elementum", "nisi,", "quis", "eleifend", "quam", "adipiscing", "vitae",
+    "proin", "sagittis,", "nisl", "rhoncus", "mattis", "rhoncus,", "urna", "neque",
+    "viverra", "justo,", "nec", "ultrices", "dui", "sapien", "eget", "mi", "proin",
+    "sed", "libero", "enim,", "sed", "faucibus", "turpis", "in", "eu", "mi",
+    "bibendum", "neque", "egestas", "congue", "quisque", "egestas", "diam", "in",
+    "arcu", "cursus", "euismod", "quis", "viverra", "nibh", "cras", "pulvinar",
+    "mattis", "nunc,", "sed", "blandit", "libero", "volutpat", "sed", "cras",
+    "ornare", "arcu", "dui", "vivamus", "arcu", "felis,", "bibendum", "ut",
+    "tristique", "et,", "egestas", "quis", "ipsum", "suspendisse", "ultrices",
+    "fusce", "ut", "placerat", "orci", "nulla", "pellentesque",
+    "dignissim", "enim,", "sit", "amet", "venenatis", "urna", "cursus", "eget",
+    "nunc", "scelerisque", "viverra", "mauris,", "in", "aliquam", "sem",
+    "fringilla", "ut", "morbi", "tincidunt", "augue", "interdum", "velit",
+    "euismod", "in", "pellentesque", "massa", "placerat", "duis", "ultricies",
+    "lacus", "sed", "turpis", "tincidunt", "id", "aliquet", "risus", "feugiat",
+    "in", "ante", "metus,", "dictum", "at", "tempor", "commodo,", "ullamcorper",
+    "a", "lacus", "vestibulum", "sed", "arcu", "non", "odio", "euismod", "lacinia",
+    "at", "quis", "risus", "sed", "vulputate", "odio", "ut", "enim", "blandit",
+    "volutpat", "maecenas", "volutpat", "blandit", "aliquam", "etiam", "erat",
+    "velit,", "scelerisque", "in", "dictum", "non,", "consectetur", "a", "erat",
+    "nam", "at", "lectus", "urna", "duis", "convallis", "convallis", "tellus,",
+    "id", "interdum", "velit", "laoreet", "id", "donec", "ultrices", "tincidunt",
+    "arcu,", "non", "sodales", "neque", "sodales", "ut", "etiam", "sit", "amet",
+    "nisl", "purus,", "in", "mollis", "nunc", "sed", "id", "semper", "risus", "in",
+    "hendrerit", "gravida", "rutrum", "quisque", "non", "tellus", "orci,", "ac",
+    "auctor", "augue", "mauris", "augue", "neque,", "gravida", "in", "fermentum",
+    "et,", "sollicitudin", "ac", "orci", "phasellus", "egestas", "tellus",
+    "rutrum", "tellus", "pellentesque", "eu", "tincidunt", "tortor", "aliquam",
+    "nulla", "facilisi", "cras", "fermentum,", "odio", "eu", "feugiat", "pretium,",
+    "nibh", "ipsum", "consequat", "nisl,", "vel", "pretium", "lectus", "quam",
+    "id", "leo", "in", "vitae", "turpis", "massa", "sed", "elementum", "tempus",
+    "egestas", "sed", "sed", "risus", "pretium", "quam", "vulputate", "dignissim",
+    "suspendisse", "in", "est", "ante", "in", "nibh", "mauris,", "cursus",
+    "mattis", "molestie", "a,", "iaculis", "at", "erat", "pellentesque",
+    "adipiscing", "commodo", "elit,", "at", "imperdiet", "dui", "accumsan", "sit",
+    "amet", "nulla", "facilisi", "morbi", "tempus", "iaculis", "urna,", "id",
+    "volutpat", "lacus", "laoreet", "non", "curabitur", "gravida", "arcu", "ac",
+    "tortor", "dignissim", "convallis", "aenean", "et", "tortor", "at", "risus",
+    "viverra", "adipiscing", "at", "in", "tellus", "integer", "feugiat",
+    "scelerisque", "varius", "morbi", "enim", "nunc,", "faucibus", "a",
+    "pellentesque", "sit", "amet,", "porttitor", "eget", "dolor", "morbi", "non",
+    "arcu", "risus,", "quis", "varius", "quam", "quisque", "id", "diam", "vel",
+    "quam", "elementum", "pulvinar", "etiam", "non", "quam", "lacus",
+    "suspendisse", "faucibus", "interdum", "posuere", "lorem", "ipsum", "dolor",
+    "sit", "amet,", "consectetur", "adipiscing", "elit", "duis", "tristique",
+    "sollicitudin", "nibh", "sit", "amet", "commodo", "nulla", "facilisi",
+    "nullam", "vehicula", "ipsum", "a", "arcu", "cursus", "vitae", "congue",
+    "mauris", "rhoncus", "aenean", "vel", "elit", "scelerisque", "mauris",
+    "pellentesque", "pulvinar", "pellentesque", "habitant", "morbi", "tristique",
+    "senectus", "et", "netus", "et", "malesuada", "fames", "ac", "turpis",
+    "egestas", "maecenas", "pharetra", "convallis", "posuere", "morbi", "leo",
+    "urna,", "molestie", "at", "elementum", "eu,", "facilisis", "sed", "odio",
+    "morbi", "quis", "commodo", "odio", "aenean", "sed", "adipiscing", "diam",
+    "donec", "adipiscing", "tristique", "risus", "nec", "feugiat", "in",
+    "fermentum", "posuere", "urna", "nec", "tincidunt", "praesent", "semper",
+    "feugiat", "nibh", "sed", "pulvinar", "proin", "gravida", "hendrerit",
+    "lectus", "a", "molestie", "gravida", "dictum"
+  ]
+}
+
+},{}],"/home/lain/a2d/node_modules/vue/src/batcher.js":[function(require,module,exports){
 var utils = require('./utils')
 
 function Batcher () {
@@ -21937,7 +22299,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 };
 
 },{}],"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/constants-browserify/constants.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={
   "O_RDONLY": 0,
   "O_WRONLY": 1,
   "O_RDWR": 2,
@@ -28592,7 +28954,7 @@ function hasOwnProperty(obj, prop) {
 },{"./support/isBuffer":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js","_process":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","inherits":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/home/lain/a2d/src/animations/ds_head.html":[function(require,module,exports){
 module.exports = '<div class="uk-button-group">\n	<button class="uk-button uk-button-small">Collapse</button>\n	<button class="uk-button uk-button-small">Expand</button>\n</div>\n\n<div class="uk-button-group">\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-lock"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-refresh"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-rocket"></i>\n	</button>\n</div>\n\n\n<div class="uk-button-group">\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-copy"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-cut"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-times"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-paste"></i>\n</button>\n</div>\n\n<button class="uk-button uk-button-small">\n	<i class="uk-icon-long-arrow-right"></i>\n	Shift\n</button>\n<button class="uk-button uk-button-small">\n	<i class="uk-icon-pencil"></i>\n	Adjust\n</button>\n<button class="uk-button uk-button-small">\n	<i class="uk-icon-send"></i>\n	Offset\n</button>\n\n';
 },{}],"/home/lain/a2d/src/animations/graph.html":[function(require,module,exports){
-module.exports = '<div class="panel">\n	Curve type:\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small uk-button-success">1</button>\n		<button class="uk-button uk-button-small uk-button-success">2</button>\n		<button class="uk-button uk-button-small uk-button-success">3</button>\n	</div>\n	<button class="uk-button uk-button-small uk-button-success">Match</button>\n	<div class="panel uk-height-1-1">\n		vnfdjskl\n	</div>\n</div>\n';
+module.exports = '<div class="panel">\n	Curve type:\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small uk-button-success">1</button>\n		<button class="uk-button uk-button-small uk-button-success">2</button>\n		<button class="uk-button uk-button-small uk-button-success">3</button>\n	</div>\n	<button class="uk-button uk-button-small uk-button-success">Match</button>\n	<div class="panel uk-height-1-1">\n		<img v-phimg="200x150">\n	</div>\n</div>\n';
 },{}],"/home/lain/a2d/src/animations/head.html":[function(require,module,exports){
 module.exports = '<div class="uk-float-left">\n	<button class="uk-button uk-button-primary"\n		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize">\n		<i class="uk-icon-caret-{{Dopesheet? \'down\': \'up\'}}"></i>\n		Dopesheet</button>\n\n	<span class=panel">\n		<button class="uk-button"\n			title="Automaticaly scroll timeline during playback" data-uk-tooltip>\n			Current</button>\n		<input class="uk-form-width-small" type="number" v-model="Current">\n		<button class="uk-button"\n			title="Set loop start to current frame\n Click again to clear" data-uk-tooltip>\n			Loop Start</button>\n		<input class="uk-form-width-small" type="number" v-model="LoopStart">\n		<button class="uk-button"\n			title="Set loop end to current frame\n Click again to clear" data-uk-tooltip>\n			Loop End</button>\n		<input class="uk-form-width-small" type="number" v-model="LoopEnd">\n	</span>\n\n	<span class=panel">\n		<button class="uk-button"\n			title="Keys will be created automaticaly whenever a bone is changed" data-uk-tooltip>\n			<i class="uk-icon-key"></i>\n			Auto Key</button>\n		<button class="uk-button"\n			title="Toggles the ghosting options dialog" data-uk-tooltip>\n			Ghosting</button>\n		<button class="uk-button"\n			title="Toggles the playback options dialog" data-uk-tooltip>\n			<i class="uk-icon-play-circle"></i>\n			Playback</button>\n	</span>\n</div>\n<div class="uk-float-right">\n	<button class="uk-button uk-button-primary"\n		v-on="click: Graph = !Graph, click: Dopesheet = true, click: resize">\n		<i class="uk-icon-caret-{{Graph? \'right\': \'left\'}}"></i>\n		Graph</button>\n</div>\n';
 },{}],"/home/lain/a2d/src/animations/index.js":[function(require,module,exports){
@@ -28604,22 +28966,157 @@ require('less').render(require('./style.css'), function (e, css) {
 module.exports = {
 	id: 'animations',
 	template: require('./template.html'),
+	data: {
+		msg: 'I am component Animations!'
+	},
 	components: {
 		head: {template: require('./head.html')},
 		ds_head: {template: require('./ds_head.html')},
 		graph: {template: require('./graph.html')},
+		player: {template: require('./player.html')},
 	},
-	data: {
-		msg: 'I am component Animations!'
-	}
+	computed: {
+		AnimationList: function() {
+			var Spine = this.$parent.$get('Spine');
+
+			// TODO choise anim by name
+			var animList = Spine.skeleton.data.animations[0];
+			var animations = [];
+			for(var i=0, l=animList.timelines.length; i<l; i++) {
+				var timeline = animList.timelines[i];
+				if(timeline instanceof PIXI.Spine.spine.RotateTimeline) {
+					console.log('RotateTimeline count', timeline.getFrameCount(),
+						'bone', timeline.boneIndex);
+
+					var t = {type:'rotate',
+						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
+					animations.push(t);
+
+					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+						t.frames.push({
+							curve: timeline.curves[j],
+							time: timeline.frames[j*2],
+							angle: timeline.frames[j*2+1],
+						});
+					}
+
+					/*
+						this.curves = new spine.Curves(frameCount);
+						this.frames = []; // time, angle, ...
+						this.frames.length = frameCount * 2;
+						boneIndex: 0,
+						*/
+				}
+				if(timeline instanceof PIXI.Spine.spine.TranslateTimeline) {
+					console.log('TranslateTimeline', timeline.getFrameCount(),
+						'bone', timeline.boneIndex);
+
+					var t = {type:'translate',
+						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
+					animations.push(t);
+
+					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+						t.frames.push({
+							curve: timeline.curves[j],
+							time: timeline.frames[j*3],
+							x: timeline.frames[j*3+1],
+							y: timeline.frames[j*3+2],
+						});
+					}
+					/*
+						this.curves = new spine.Curves(frameCount);
+						this.frames = []; // time, x, y, ...
+						this.frames.length = frameCount * 3;
+						boneIndex: 0,
+						*/
+				}
+				if(timeline instanceof PIXI.Spine.spine.ScaleTimeline) {
+					console.log('ScaleTimeline', timeline.getFrameCount(),
+						'bone', timeline.boneIndex);
+
+					var t = {type:'scale',
+						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
+					animations.push(t);
+
+					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+						t.frames.push({
+							curve: timeline.curves[j],
+							time: timeline.frames[j*3],
+							x: timeline.frames[j*3+1],
+							y: timeline.frames[j*3+2],
+						});
+					}
+					/*
+						this.curves = new spine.Curves(frameCount);
+						this.frames = []; // time, x, y, ...
+						this.frames.length = frameCount * 3;
+						boneIndex: 0,
+						*/
+				}
+				if(timeline instanceof PIXI.Spine.spine.ColorTimeline) {
+					console.log('ColorTimeline', timeline.getFrameCount(),
+						'slot', timeline.slotIndex);
+
+					var t = {type:'color',
+						slot: Spine.skeleton.slots[timeline.slotIndex].data.name, frames:[]};
+					animations.push(t);
+
+					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+						t.frames.push({
+							curve: timeline.curves[j],
+							time: timeline.frames[j*5],
+							r: timeline.frames[j*5+1],
+							g: timeline.frames[j*5+2],
+							b: timeline.frames[j*5+3],
+							a: timeline.frames[j*5+4],
+						});
+					}
+					/*
+						this.curves = new spine.Curves(frameCount);
+						this.frames = []; // time, r, g, b, a, ...
+						this.frames.length = frameCount * 5;
+						slotIndex: 0,
+						*/
+				}
+				if(timeline instanceof PIXI.Spine.spine.AttachmentTimeline) {
+					console.log('AttachmentTimeline', timeline.getFrameCount(),
+						'slot', timeline.slotIndex);
+					animations.push({type:'attachment', slot: timeline.slotIndex, frames:[]});
+
+					var t = {type:'attachment',
+						slot: Spine.skeleton.slots[timeline.slotIndex].data.name, frames:[]};
+					animations.push(t);
+
+					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+						t.frames.push({
+							curve: timeline.curves[j],
+							time: timeline.frames[j],
+							name: timeline.attachmentNames[j],
+						});
+					}
+					/*
+						this.curves = new spine.Curves(frameCount);
+						this.frames = []; // time, ...
+						this.frames.length = frameCount;
+						this.attachmentNames = []; // time, ...
+						this.attachmentNames.length = frameCount;
+						slotIndex: 0,
+						*/
+				}
+			}
+			return animations;
+		},
+	},
 }
 
-},{"./ds_head.html":"/home/lain/a2d/src/animations/ds_head.html","./graph.html":"/home/lain/a2d/src/animations/graph.html","./head.html":"/home/lain/a2d/src/animations/head.html","./style.css":"/home/lain/a2d/src/animations/style.css","./template.html":"/home/lain/a2d/src/animations/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js"}],"/home/lain/a2d/src/animations/style.css":[function(require,module,exports){
-module.exports = '#animations h2 {\n	font-style: italic;\n}\n\n#animations .key {\n	height:1em;\n	width:3px;\n	border:1px solid black;\n	display: inline-block;\n}\n\n#animations .key.all {\n	background: white;\n}\n#animations .key.color {\n	background: pink;\n}\n#animations .key.translate {\n	background: blue;\n}\n#animations .key.attach {\n	background: yellow;\n}\n#animations .key.scale {\n	background: red;\n}\n#animations .key.rotate {\n	background: green;\n}\n#animations .key.event {\n	background: purple;\n}\n';
+},{"./ds_head.html":"/home/lain/a2d/src/animations/ds_head.html","./graph.html":"/home/lain/a2d/src/animations/graph.html","./head.html":"/home/lain/a2d/src/animations/head.html","./player.html":"/home/lain/a2d/src/animations/player.html","./style.css":"/home/lain/a2d/src/animations/style.css","./template.html":"/home/lain/a2d/src/animations/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js"}],"/home/lain/a2d/src/animations/player.html":[function(require,module,exports){
+module.exports = '<div class="uk-button-group">\n	<button class="uk-button uk-button-small"\n		v-on="click: Current=LoopStart">\n		<i class="uk-icon-fast-backward"></i>\n	</button>\n	<button class="uk-button uk-button-small"\n		v-on="click: Current--">\n		<i class="uk-icon-step-backward"></i>\n	</button>\n</div>\n\n<div class="uk-button-group">\n	<button class="uk-button uk-button-danger uk-text-small"\n		v-show="reversed"\n		v-on="click: stop">\n		<i class="uk-icon-stop"></i>\n	</button>\n	<button class="uk-button uk-button-primary uk-text-large"\n		v-show="!reversed"\n		v-on="click: play_reverse">\n		<i class="uk-icon-caret-left"></i>\n	</button>\n	<button class="uk-button uk-button-danger uk-text-small"\n		v-show="played"\n		v-on="click: stop">\n		<i class="uk-icon-stop"></i>\n	</button>\n	<button class="uk-button uk-button-primary uk-text-large"\n		v-show="!played"\n		v-on="click: play">\n		<i class="uk-icon-caret-right"></i>\n	</button>\n</div>\n\n<div class="uk-button-group">\n	<button class="uk-button uk-button-small"\n		v-on="click: Current++">\n		<i class="uk-icon-step-forward"></i>\n	</button>\n	<button class="uk-button uk-button-small"\n		v-on="click: Current=LoopEnd">\n		<i class="uk-icon-fast-forward"></i>\n	</button>\n</div>\n\n<button class="uk-button uk-button-small"><i class="uk-icon-repeat"></i></button>\n';
+},{}],"/home/lain/a2d/src/animations/style.css":[function(require,module,exports){
+module.exports = '#animations {\n	.bone {\n		font-weight: bold;\n	}\n\n	.custom_scroll_bar{\n		width:100%;\n		height:150px;\n		overflow:hidden;\n		position:relative;\n	}\n\n	.custom_scroll_bar_handle{\n		top:0;\n		right:0;\n		position:absolute;\n		width:10px;\n		height:15px;\n		background:#c00;\n		cursor:pointer;\n	}\n\n	.custom_scroll_bar_handle:hover{\n		background:red;\n	}\n\n	.custom_scroll_bar .native{\n		height:200px;\n		overflow-y:scroll;\n		overflow-x:hidden;\n		width:200%;\n	}\n\n	.custom_scroll_bar .content{\n		overflow:hidden;\n		width:50%;\n	}\n\n\n	.key {\n		height:1em;\n		width:3px;\n		border:1px solid black;\n		display: inline-block;\n		position: absolute;\n	}\n\n	.key.all {\n		background: white;\n	}\n\n	.color i {\n		color: pink;\n	}\n	.key.color {\n		background: pink;\n	}\n\n	.translate i {\n		color: blue;\n	}\n	.key.translate {\n		background: blue;\n	}\n	.attachment i {\n		color: yellow;\n	}\n	.key.attachment {\n		background: yellow;\n	}\n	.scale i {\n		color: red;\n	}\n	.key.scale {\n		background: red;\n	}\n	.rotate i {\n		color: green;\n	}\n	.key.rotate {\n		background: green;\n	}\n	.event i {\n		color: purple;\n	}\n	.key.event {\n		background: purple;\n	}\n}\n';
 },{}],"/home/lain/a2d/src/animations/template.html":[function(require,module,exports){
-module.exports = '<div v-component="head" class="uk-form uk-clearfix panel"></div>\n\n<div class="uk-grid uk-grid-small">\n<div v-class="uk-width-1-1: !Graph, uk-width-4-5: Graph">\n\n<div v-show="Dopesheet" v-component="ds_head"></div>\n\n<div class="uk-grid uk-grid-small">\n	<div class="uk-width-{{Graph?\'4\':\'5\'}}-5">\n	<div class="uk-grid uk-grid-small">\n		<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small"\n					v-on="click: Current=LoopStart">\n					<i class="uk-icon-fast-backward"></i>\n				</button>\n				<button class="uk-button uk-button-small"\n					v-on="click: Current--">\n					<i class="uk-icon-step-backward"></i>\n				</button>\n			</div>\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-danger uk-text-small"\n					v-show="reversed"\n					v-on="click: stop">\n					<i class="uk-icon-stop"></i>\n				</button>\n				<button class="uk-button uk-button-primary uk-text-large"\n					v-show="!reversed"\n					v-on="click: play_reverse">\n					<i class="uk-icon-caret-left"></i>\n				</button>\n				<button class="uk-button uk-button-danger uk-text-small"\n					v-show="played"\n					v-on="click: stop">\n					<i class="uk-icon-stop"></i>\n				</button>\n				<button class="uk-button uk-button-primary uk-text-large"\n					v-show="!played"\n					v-on="click: play">\n					<i class="uk-icon-caret-right"></i>\n				</button>\n			</div>\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small"\n					v-on="click: Current++">\n					<i class="uk-icon-step-forward"></i>\n				</button>\n				<button class="uk-button uk-button-small"\n					v-on="click: Current=LoopEnd">\n					<i class="uk-icon-fast-forward"></i>\n				</button>\n			</div>\n			<button class="uk-button uk-button-small"><i class="uk-icon-repeat"></i></button>\n		</div>\n\n		<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n			<div class="uk-progress uk-width-1-1">\n				<div class="uk-progress-bar"\n					style="height: 2.5em; -webkit-transition: none!important; transition:none!important;"\n					v-style="width: Time*100.0 + \'%\'"></div>\n			</div>\n		</div>\n	</div>\n\n</div>\n\n\n<div v-show="Dopesheet">\n	<div class="uk-grid">\n		<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n			vnfjdklsvnfjdkls\n		</div>\n		<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n			<div class="key all"></div>\n			<div class="key translate"></div>\n			<div class="key scale"></div>\n			<div class="key rotate"></div>\n			<div class="key attach"></div>\n			<div class="key event"></div>\n			<div class="key color"></div>\n			<div class="key all"></div>\n		</div>\n	</div>\n</div>\n\n</div>\n\n<div v-show="Graph" v-component="graph" class="uk-width-1-5"></div>\n\n</div>\n';
+module.exports = '<div v-component="head" class="uk-form uk-clearfix"></div>\n\n<div class="uk-grid uk-grid-small">\n	<div class="uk-width-{{Graph?\'4\':\'5\'}}-5">\n\n		<div v-show="Dopesheet" v-component="ds_head"></div>\n\n		<div class="uk-grid uk-grid-small">\n			<div class="uk-width-{{Graph?\'5\':\'5\'}}-5">\n\n				<div class="uk-grid uk-grid-small">\n					<div v-component="player" class="uk-width-{{Graph?\'3\':\'2\'}}-10"></div>\n\n					<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n						<div class="uk-position-relative">\n							<div class="uk-progress uk-width-1-1 uk-position-absolute" style="left:-2%">\n								<div class="uk-progress-bar"\n									style="height: 2.5em;\n										-webkit-transition: none!important; transition:none!important;"\n									v-style="width: Time*100.0 + \'%\'"></div>\n							</div>\n						</div>\n					</div>\n				</div>\n\n				<div v-show="Dopesheet" class="custom_scroll_bar">\n					<div class="native"><div class="content">\n						<div v-repeat="AnimationList" class="uk-grid uk-grid-small {{type}}">\n							<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n								<i v-if="type===\'rotate\'" class="uk-icon-rotate-right"></i>\n								<i v-if="type===\'translate\'" class="uk-icon-arrows"></i>\n								<i v-if="type===\'scale\'" class="uk-icon-crop"></i>\n								<i v-if="type===\'attachment\'" class="uk-icon-paperclip"></i>\n								<i v-if="type===\'color\'" class="uk-icon-image"></i>\n								<span v-if="bone" class="bone">{{bone}}</span>\n								<span v-if="slot" class="slot">{{slot}}</span>\n							</div>\n							<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n								<div class="uk-position-relative">\n									<div v-repeat="frame: frames"\n										class="key {{type}}"\n										v-style="left: (frame.time*100)-2 +\'%\'"></div>\n								</div>\n							</div>\n						</div>\n					</div></div>\n				</div>\n\n			</div>\n		</div>\n	</div>\n\n	<div v-show="Graph" v-component="graph" class="uk-width-1-5"></div>\n</div>\n';
 },{}],"/home/lain/a2d/src/app.css":[function(require,module,exports){
-module.exports = 'html, body {\n	padding:0;\n	margin:0;\n	overflow: hidden;\n}\n#app {\n	font-family: \'Helvetica Neue\', Arial, sans-serif;\n	background: #cc0000;\n}\n\n.panel, .panelX {\n	background: #666666;\n	color: white;\n	padding: 8px;\n}\n\n.panel .panel {\n	background: #333333;\n	color: white;\n	padding: 8px;\n}\n\n.panelX {\n	padding: 0px;\n}\n';
+module.exports = 'html, body {\n	padding:0;\n	margin:0;\n	overflow: hidden;\n}\n#app {\n	font-family: \'Helvetica Neue\', Arial, sans-serif;\n	background: #cc0000;\n}\n\n.panel, .panelX {\n	background: #666666;\n	color: white;\n	padding: 4px;\n}\n\n.panel .panel {\n	background: #333333;\n	color: white;\n	padding: 8px;\n}\n\n.panelX {\n	padding: 0px;\n}\n';
 },{}],"/home/lain/a2d/src/app.html":[function(require,module,exports){
 module.exports = '<div class="uk-height-1-1">\n	<div class="panel uk-width-2-3 uk-position-absolute"\n		v-component="Tools"\n		v-style="bottom: animHeight +\'px\'"></div>\n	<div class="uk-grid uk-grid-small"\n		v-style="height: otherHeight +\'px\'">\n		<canvas id="canvas" class="uk-width-2-3 uk-height-1-1"></canvas>\n		<div v-component="Tree" class="panelX uk-width-1-3 uk-height-1-1"></div>\n	<div v-component="Animations" class="panel uk-width-1-1"></div>\n	</div>\n</div>\n';
 },{}],"/home/lain/a2d/src/component-a/index.js":[function(require,module,exports){
@@ -28658,7 +29155,9 @@ require('less').render(require('./app.css'), function (e, css) {
 	require('insert-css')(css)
 });
 
-var Vue = require('vue')
+window.Vue = require('vue');
+Vue.directive('phimg', require('vue-placeholders/src/vue-placeholders-image'))
+Vue.directive('phtxt', require('vue-placeholders/src/vue-placeholders-text'))
 Vue.filter('int', function (value) {
 	return value |0;
 })
@@ -28677,22 +29176,58 @@ window.app = null;
 var backGrid = new PIXI.Graphics();
 stage.addChild(backGrid);
 var n = 50;
+var nn = 32;
 for(var x = -n; x<n; x++) {
 	for(var y = -n; y<n; y++) {
 		backGrid.beginFill(0x000000, ((x+y)%2)?0.4:0.8);
-		backGrid.drawRect(x*32, y*32, 32,32);
+		backGrid.drawRect(x*nn, y*nn, nn,nn);
 		backGrid.endFill();
 	}
 }
 
 function onAssetsLoaded() {
+	var boneDrawer = new PIXI.Graphics();
 	Spine = new PIXI.Spine("data/dragonBonesData.json");
 	stage.addChild(Spine);
+	stage.addChild(boneDrawer);
 	var scale = 0.5;//window.innerHeight / 700;
-	Spine.position.x = window.innerWidth/4;
-	Spine.position.y = window.innerHeight/4 + (450 * scale);
-	Spine.scale.x = Spine.scale.y = scale
-	Spine.state.setAnimationByName("flying", true);
+	boneDrawer.position.x = Spine.position.x = window.innerWidth/4;
+	boneDrawer.position.y = Spine.position.y = window.innerHeight/4 + (450 * scale);
+	boneDrawer.scale.x = boneDrawer.scale.y = Spine.scale.x = Spine.scale.y = scale
+
+	Spine.state.setAnimationByName('flying', true);
+	//setTimeout(function(){Spine.state.clearAnimation()}, 2000);
+	//Spine.state.setAnimation('FAIL', true);
+	
+	window.UpdateSetup = function() {
+		Spine.state.clearAnimation();
+		Spine.skeleton.setToSetupPose();
+	}
+
+	boneDrawer.updateTransform = function() {
+		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
+		boneDrawer.clear();
+		for(var i=0, l= Spine.skeleton.bones.length;i<l;i++) {
+			var bone = Spine.skeleton.bones[i];
+			boneDrawer.beginFill(0x9999ff, 0.8);
+			boneDrawer.drawCircle(bone.worldX, bone.worldY, 5);
+			boneDrawer.endFill();
+			boneDrawer.lineStyle(2, 0x9999ff, 1);
+
+			if(bone.data.length) {
+				var rot = bone.worldRotation * Math.PI/180;
+				var x = Math.cos(rot) * bone.data.length;
+				var y = Math.sin(rot) * bone.data.length;
+				boneDrawer.moveTo(bone.worldX +x, bone.worldY -y);
+				boneDrawer.lineTo(bone.worldX, bone.worldY);
+			} else {
+				boneDrawer.moveTo(bone.worldX -nn, bone.worldY);
+				boneDrawer.lineTo(bone.worldX +nn, bone.worldY);
+				boneDrawer.moveTo(bone.worldX, bone.worldY -nn);
+				boneDrawer.lineTo(bone.worldX, bone.worldY +nn);
+			}
+		}
+	}
 
 	app = new Vue({
 		el: '#app',
@@ -28745,6 +29280,7 @@ function onAssetsLoaded() {
 				this.$data.reversed = false;
 				Spine.state.animationSpeed = 0;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
+				this.$data.transformEnable = true;
 			},
 			play: function() {
 				console.info('play');
@@ -28753,6 +29289,8 @@ function onAssetsLoaded() {
 				Spine.state.animationSpeed = this.$data.speed;
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
+				this.$data.transformEnable = false;
+				Spine.state.setAnimationByName('flying', true);
 			},
 			play_reverse: function() {
 				console.info('play_reverse');
@@ -28761,10 +29299,14 @@ function onAssetsLoaded() {
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime = Spine.state.currentTime - Spine.state.currentTime|0 + 100000;
 				Spine.state.animationSpeed = -this.$data.speed;
+				this.$data.transformEnable = false;
+				Spine.state.setAnimationByName('flying', true);
 			},
 			updateTransform: function(type, name) {
 				console.log('updateTransform[%s] %s', type, name);
-				this.$data.transformEnable = type === 'bone';
+				if(!this.$data.played && !this.$data.reversed) {
+					this.$data.transformEnable = type === 'bone';
+				}
 				if(!this.$data.transformEnable) {
 					this.$data.toolT = 'none';
 				}
@@ -28802,8 +29344,9 @@ function onAssetsLoaded() {
 				},
 				$set: function(val) {
 					if(this.selected.type === 'bone') {
-						console.warn('angle $set', this.selected, val)
 						Spine.skeleton.findBone(this.selected.name).data.rotation = +val;
+						UpdateSetup();
+						console.warn('angle $set', this.selected.name, val);
 					}
 				},
 			},
@@ -28863,7 +29406,7 @@ function onAssetsLoaded() {
 	});
 
 	var canvas = document.getElementById('canvas');
-	var renderer = new PIXI.autoDetectRenderer(100, 100, canvas, true);
+	var renderer = new PIXI.autoDetectRenderer(100, 100, canvas, true, true);
 
 	var getH = function(el) {
 		var style = window.getComputedStyle(el, null);
@@ -28902,7 +29445,7 @@ function onAssetsLoaded() {
 
 
 
-},{"./animations":"/home/lain/a2d/src/animations/index.js","./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tools":"/home/lain/a2d/src/tools/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tools/index.js":[function(require,module,exports){
+},{"./animations":"/home/lain/a2d/src/animations/index.js","./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tools":"/home/lain/a2d/src/tools/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js","vue-placeholders/src/vue-placeholders-image":"/home/lain/a2d/node_modules/vue-placeholders/src/vue-placeholders-image.js","vue-placeholders/src/vue-placeholders-text":"/home/lain/a2d/node_modules/vue-placeholders/src/vue-placeholders-text.js"}],"/home/lain/a2d/src/tools/index.js":[function(require,module,exports){
 'use strict';
 require('less').render(require('./style.css'), function (e, css) {
 	require('insert-css')(css)

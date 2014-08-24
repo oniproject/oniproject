@@ -1,91 +1,54 @@
-<div v-component="head" class="uk-form uk-clearfix panel"></div>
-
-<div class="uk-grid uk-grid-small">
-<div v-class="uk-width-1-1: !Graph, uk-width-4-5: Graph">
-
-<div v-show="Dopesheet" v-component="ds_head"></div>
+<div v-component="head" class="uk-form uk-clearfix"></div>
 
 <div class="uk-grid uk-grid-small">
 	<div class="uk-width-{{Graph?'4':'5'}}-5">
-	<div class="uk-grid uk-grid-small">
-		<div class="uk-width-{{Graph?'3':'2'}}-10">
-			<div class="uk-button-group">
-				<button class="uk-button uk-button-small"
-					v-on="click: Current=LoopStart">
-					<i class="uk-icon-fast-backward"></i>
-				</button>
-				<button class="uk-button uk-button-small"
-					v-on="click: Current--">
-					<i class="uk-icon-step-backward"></i>
-				</button>
-			</div>
-			<div class="uk-button-group">
-				<button class="uk-button uk-button-danger uk-text-small"
-					v-show="reversed"
-					v-on="click: stop">
-					<i class="uk-icon-stop"></i>
-				</button>
-				<button class="uk-button uk-button-primary uk-text-large"
-					v-show="!reversed"
-					v-on="click: play_reverse">
-					<i class="uk-icon-caret-left"></i>
-				</button>
-				<button class="uk-button uk-button-danger uk-text-small"
-					v-show="played"
-					v-on="click: stop">
-					<i class="uk-icon-stop"></i>
-				</button>
-				<button class="uk-button uk-button-primary uk-text-large"
-					v-show="!played"
-					v-on="click: play">
-					<i class="uk-icon-caret-right"></i>
-				</button>
-			</div>
-			<div class="uk-button-group">
-				<button class="uk-button uk-button-small"
-					v-on="click: Current++">
-					<i class="uk-icon-step-forward"></i>
-				</button>
-				<button class="uk-button uk-button-small"
-					v-on="click: Current=LoopEnd">
-					<i class="uk-icon-fast-forward"></i>
-				</button>
-			</div>
-			<button class="uk-button uk-button-small"><i class="uk-icon-repeat"></i></button>
-		</div>
 
-		<div class="uk-width-{{Graph?'7':'8'}}-10">
-			<div class="uk-progress uk-width-1-1">
-				<div class="uk-progress-bar"
-					style="height: 2.5em; -webkit-transition: none!important; transition:none!important;"
-					v-style="width: Time*100.0 + '%'"></div>
+		<div v-show="Dopesheet" v-component="ds_head"></div>
+
+		<div class="uk-grid uk-grid-small">
+			<div class="uk-width-{{Graph?'5':'5'}}-5">
+
+				<div class="uk-grid uk-grid-small">
+					<div v-component="player" class="uk-width-{{Graph?'3':'2'}}-10"></div>
+
+					<div class="uk-width-{{Graph?'7':'8'}}-10">
+						<div class="uk-position-relative">
+							<div class="uk-progress uk-width-1-1 uk-position-absolute" style="left:-2%">
+								<div class="uk-progress-bar"
+									style="height: 2.5em;
+										-webkit-transition: none!important; transition:none!important;"
+									v-style="width: Time*100.0 + '%'"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div v-show="Dopesheet" class="custom_scroll_bar">
+					<div class="native"><div class="content">
+						<div v-repeat="AnimationList" class="uk-grid uk-grid-small {{type}}">
+							<div class="uk-width-{{Graph?'3':'2'}}-10">
+								<i v-if="type==='rotate'" class="uk-icon-rotate-right"></i>
+								<i v-if="type==='translate'" class="uk-icon-arrows"></i>
+								<i v-if="type==='scale'" class="uk-icon-crop"></i>
+								<i v-if="type==='attachment'" class="uk-icon-paperclip"></i>
+								<i v-if="type==='color'" class="uk-icon-image"></i>
+								<span v-if="bone" class="bone">{{bone}}</span>
+								<span v-if="slot" class="slot">{{slot}}</span>
+							</div>
+							<div class="uk-width-{{Graph?'7':'8'}}-10">
+								<div class="uk-position-relative">
+									<div v-repeat="frame: frames"
+										class="key {{type}}"
+										v-style="left: (frame.time*100)-2 +'%'"></div>
+								</div>
+							</div>
+						</div>
+					</div></div>
+				</div>
+
 			</div>
 		</div>
 	</div>
 
-</div>
-
-
-<div v-show="Dopesheet">
-	<div class="uk-grid">
-		<div class="uk-width-{{Graph?'3':'2'}}-10">
-			vnfjdklsvnfjdkls
-		</div>
-		<div class="uk-width-{{Graph?'7':'8'}}-10">
-			<div class="key all"></div>
-			<div class="key translate"></div>
-			<div class="key scale"></div>
-			<div class="key rotate"></div>
-			<div class="key attach"></div>
-			<div class="key event"></div>
-			<div class="key color"></div>
-			<div class="key all"></div>
-		</div>
-	</div>
-</div>
-
-</div>
-
-<div v-show="Graph" v-component="graph" class="uk-width-1-5"></div>
-
+	<div v-show="Graph" v-component="graph" class="uk-width-1-5"></div>
 </div>

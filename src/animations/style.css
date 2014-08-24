@@ -1,32 +1,89 @@
-#animations h2 {
-	font-style: italic;
-}
+#animations {
+	.bone {
+		font-weight: bold;
+	}
 
-#animations .key {
-	height:1em;
-	width:3px;
-	border:1px solid black;
-	display: inline-block;
-}
+	.custom_scroll_bar{
+		width:100%;
+		height:150px;
+		overflow:hidden;
+		position:relative;
+	}
 
-#animations .key.all {
-	background: white;
-}
-#animations .key.color {
-	background: pink;
-}
-#animations .key.translate {
-	background: blue;
-}
-#animations .key.attach {
-	background: yellow;
-}
-#animations .key.scale {
-	background: red;
-}
-#animations .key.rotate {
-	background: green;
-}
-#animations .key.event {
-	background: purple;
+	.custom_scroll_bar_handle{
+		top:0;
+		right:0;
+		position:absolute;
+		width:10px;
+		height:15px;
+		background:#c00;
+		cursor:pointer;
+	}
+
+	.custom_scroll_bar_handle:hover{
+		background:red;
+	}
+
+	.custom_scroll_bar .native{
+		height:200px;
+		overflow-y:scroll;
+		overflow-x:hidden;
+		width:200%;
+	}
+
+	.custom_scroll_bar .content{
+		overflow:hidden;
+		width:50%;
+	}
+
+
+	.key {
+		height:1em;
+		width:3px;
+		border:1px solid black;
+		display: inline-block;
+		position: absolute;
+	}
+
+	.key.all {
+		background: white;
+	}
+
+	.color i {
+		color: pink;
+	}
+	.key.color {
+		background: pink;
+	}
+
+	.translate i {
+		color: blue;
+	}
+	.key.translate {
+		background: blue;
+	}
+	.attachment i {
+		color: yellow;
+	}
+	.key.attachment {
+		background: yellow;
+	}
+	.scale i {
+		color: red;
+	}
+	.key.scale {
+		background: red;
+	}
+	.rotate i {
+		color: green;
+	}
+	.key.rotate {
+		background: green;
+	}
+	.event i {
+		color: purple;
+	}
+	.key.event {
+		background: purple;
+	}
 }

@@ -4,7 +4,8 @@
 	"description": "Opensource Spine for PIXI.js",
 	"main": "src/main.js",
 	"dependencies": {
-		"vue": "~0.10.6"
+		"vue": "~0.10.6",
+		"vue-placeholders": "git://github.com/lithiumjake/vue-placeholders.git"
 	},
 	"devDependencies": {
 		"watchify": "~1.0.2",
