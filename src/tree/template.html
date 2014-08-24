@@ -1,52 +1,55 @@
-<div class="uk-scrollable-box" style="resize:vertical; height:400px">
-	<div class="uk-clearfix">
-		<div class="uk-float-left">Tree</div>
-		<div class="uk-float-right">
-			<div class="uk-button-group" data-uk-button-checkbox>
-				<button class="uk-button uk-button-small uk-button-primary"
-					title="Show bones in the tree" data-uk-tooltip>x</button>
-				<button class="uk-button uk-button-small uk-button-primary"
-					title="Show slots in the tree" data-uk-tooltip >x</button>
-				<button class="uk-button uk-button-small uk-button-primary"
-					title="Show attachments in the tree" data-uk-tooltip >x</button>
-			</div>
+<div class="panel uk-height-1-1 uk-position-relative">
+<br><br>
+<div class="uk-clearfix">
+	<div class="uk-float-left">Tree</div>
+	<div class="uk-float-right">
+		<div class="uk-button-group" data-uk-button-checkbox>
 			<button class="uk-button uk-button-small uk-button-primary"
-				title="Expand and scroll tree to editor selection" data-uk-tooltip data-uk-button>
-				<i class="uk-icon-shield"></i>
-			</button>
+				title="Show bones in the tree" data-uk-tooltip>x</button>
+			<button class="uk-button uk-button-small uk-button-primary"
+				title="Show slots in the tree" data-uk-tooltip >x</button>
+			<button class="uk-button uk-button-small uk-button-primary"
+				title="Show attachments in the tree" data-uk-tooltip >x</button>
+		</div>
+		<button class="uk-button uk-button-small uk-button-primary"
+			title="Expand and scroll tree to editor selection" data-uk-tooltip data-uk-button>
+			<i class="uk-icon-shield"></i>
+		</button>
+		<button class="uk-button uk-button-small"
+			title="Find and replace text in the project" data-uk-tooltip>
+			<i class="uk-icon-search"></i>
+		</button>
+		<div class="uk-button-group">
 			<button class="uk-button uk-button-small"
-				title="Find and replace text in the project" data-uk-tooltip>
-				<i class="uk-icon-search"></i>
-			</button>
-			<div class="uk-button-group">
-				<button class="uk-button uk-button-small"
-					title="Collapse all if nothing is selected,
-						else collapse everything under the selected node"
-					data-uk-tooltip>Collapse</button>
-				<button class="uk-button uk-button-small"
-					title="Expand all if nothing is selected,
-						else expand everything under the selected node"
-					data-uk-tooltip>Expand</button>
-			</div>
+				title="Collapse all if nothing is selected,
+					else collapse everything under the selected node"
+				data-uk-tooltip>Collapse</button>
+			<button class="uk-button uk-button-small"
+				title="Expand all if nothing is selected,
+					else expand everything under the selected node"
+				data-uk-tooltip>Expand</button>
 		</div>
 	</div>
-	<div class="uk-panel uk-panel-box uk-margin-remove">
-		<div class="uk-clearfix">
-			<small>Hierarchy</small>
-			<div class="uk-float-right">
-				<a class="uk-button uk-button-mini uk-button-link">
-					<i class="uk-icon-key"></i>
-				</a>
-				<a class="uk-button uk-button-mini uk-button-link">
-					<i class="uk-icon-eye"></i>
-				</a>
-			</div>
+</div>
+<div class="panel hierarchy">
+	<div class="uk-clearfix">
+		<small>Hierarchy</small>
+		<div class="uk-float-right">
+			<a class="uk-button uk-button-mini uk-button-link">
+				<i class="uk-icon-key"></i>
+			</a>
+			<a class="uk-button uk-button-mini uk-button-link">
+				<i class="uk-icon-eye"></i>
+			</a>
 		</div>
-		<ul class="uk-margin-remove" style="padding: 0">
-			<li v-component="skeleton" v-with="model: Skeleton"></li>
-		</ul>
 	</div>
-	<div class="uk-panel uk-panel-box uk-panel-box-primary">
-		vnfdjskl
-	</div
+	<ul class="uk-margin-remove" style="padding: 0">
+		<li v-component="skeleton" v-with="model: Skeleton"></li>
+	</ul>
+</div>
+<div class="uk- uk-width-1-1 uk-position-absolute" style="bottom: 0">
+	vnfdjskl<br />
+	vnfdjskl<br />
+	vnjfdkls
+</div>
 </div>

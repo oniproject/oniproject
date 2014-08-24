@@ -16,20 +16,26 @@ loader.onComplete = onAssetsLoaded
 loader.load();
 
 var stage = new PIXI.Stage(0xFFFFFF, true);
-var renderer = new PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
-renderer.view.style.display = "block";
-renderer.view.style.width = "800px";
-renderer.view.style.height = "500px";
 window.Spine = null;
 window.app = null;
 
-document.body.appendChild(renderer.view);
+var backGrid = new PIXI.Graphics();
+stage.addChild(backGrid);
+var n = 50;
+for(var x = -n; x<n; x++) {
+	for(var y = -n; y<n; y++) {
+		backGrid.beginFill(0x000000, ((x+y)%2)?0.4:0.8);
+		backGrid.drawRect(x*32, y*32, 32,32);
+		backGrid.endFill();
+	}
+}
+
 function onAssetsLoaded() {
 	Spine = new PIXI.Spine("data/dragonBonesData.json");
 	stage.addChild(Spine);
-	var scale = 1;//window.innerHeight / 700;
-	Spine.position.x = window.innerWidth/2;
-	Spine.position.y = window.innerHeight/2 + (450 * scale);
+	var scale = 0.5;//window.innerHeight / 700;
+	Spine.position.x = window.innerWidth/4;
+	Spine.position.y = window.innerHeight/4 + (450 * scale);
 	Spine.scale.x = Spine.scale.y = scale
 	Spine.state.setAnimationByName("flying", true);
 
@@ -63,12 +69,21 @@ function onAssetsLoaded() {
 			reversed: false,
 			Time: 0.4,
 			LoopStart: 0,
-			LoopEnd: 29,
+			LoopEnd: 30,
+			speed: 1,
+
+			animHeight: 0,
+			otherHeight: 0,
 
 			Dopesheet: false,
 			Graph: false,
 		},
 		methods: {
+			resize: function() {
+				console.log('resize');
+				Vue.nextTick(resizeAnimations);
+				//setTimeout(resizeAnimations, 200);
+			},
 			stop: function() {
 				console.info('stop');
 				this.$data.played = false;
@@ -80,7 +95,7 @@ function onAssetsLoaded() {
 				console.info('play');
 				this.$data.played = true;
 				this.$data.reversed = false;
-				Spine.state.animationSpeed = 1;
+				Spine.state.animationSpeed = this.$data.speed;
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
 			},
@@ -90,7 +105,7 @@ function onAssetsLoaded() {
 				this.$data.reversed = true;
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime = Spine.state.currentTime - Spine.state.currentTime|0 + 100000;
-				Spine.state.animationSpeed = -1;
+				Spine.state.animationSpeed = -this.$data.speed;
 			},
 			updateTransform: function(type, name) {
 				console.log('updateTransform[%s] %s', type, name);
@@ -114,10 +129,13 @@ function onAssetsLoaded() {
 			},
 			Current: {
 				$get: function() {
-					return (this.Time*30) |0;
+					return (this.Time*31) |0;
 				},
 				$set: function(val) {
-					Spine.state.currentTime = val / 30;
+					if(val<0) {
+						val=0;
+					}
+					Spine.state.currentTime = val / 31;
 				},
 			},
 			rotation: {
@@ -188,21 +206,43 @@ function onAssetsLoaded() {
 			},
 		},
 	});
-	Vue.nextTick(function() {
-		var c = Spine.state.currentTime;
-		var time = c - (Spine.state.currentTime|0);
-		console.log(time);
-		app.$data.Time = time+0.5;
-	});
+
+	var canvas = document.getElementById('canvas');
+	var renderer = new PIXI.autoDetectRenderer(100, 100, canvas, true);
+
+	var getH = function(el) {
+		var style = window.getComputedStyle(el, null);
+		return parseFloat(style.getPropertyValue('height'));
+	}
+	var getW = function(el) {
+		var style = window.getComputedStyle(el, null);
+		return parseFloat(style.getPropertyValue('width'));
+	}
+
+	var resizeAnimations = function(event) {
+		console.log('oldHeight', app.$data.animHeight);
+		var animHeight = getH(document.getElementById('animations'));
+		var otherHeight = window.innerHeight - animHeight;
+		app.$data.otherHeight = otherHeight;
+		app.$data.animHeight = animHeight;
+		Vue.nextTick(function(){
+			renderer.resize(getW(canvas), getH(canvas));
+		});
+		console.log('newHeight', app.$data.animHeight, app.$data.otherHeight);
+		//renderer.view.height = otherHeight;
+	}
+	window.addEventListener('resize', resizeAnimations);
+	resizeAnimations();
+	requestAnimFrame(animate);
+	function animate() {
+		requestAnimFrame(animate);
+		if(app) {
+			var time = Spine.state.currentTime - (Spine.state.currentTime|0);
+			app.$data.Time = time;
+		}
+		renderer.render(stage);
+	}
 }
 
-requestAnimFrame(animate);
-function animate() {
-	requestAnimFrame(animate);
-	if(app) {
-		var time = Spine.state.currentTime - (Spine.state.currentTime|0);
-		app.$data.Time = time;
-	}
-	renderer.render(stage);
-}
+
 

@@ -21937,7 +21937,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 };
 
 },{}],"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/constants-browserify/constants.json":[function(require,module,exports){
-module.exports=module.exports={
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={
   "O_RDONLY": 0,
   "O_WRONLY": 1,
   "O_RDWR": 2,
@@ -28589,7 +28589,13 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js","_process":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","inherits":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/home/lain/a2d/src/animations/index.js":[function(require,module,exports){
+},{"./support/isBuffer":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js","_process":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","inherits":"/home/lain/a2d/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/home/lain/a2d/src/animations/ds_head.html":[function(require,module,exports){
+module.exports = '<div class="uk-button-group">\n	<button class="uk-button uk-button-small">Collapse</button>\n	<button class="uk-button uk-button-small">Expand</button>\n</div>\n\n<div class="uk-button-group">\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-lock"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-refresh"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-rocket"></i>\n	</button>\n</div>\n\n\n<div class="uk-button-group">\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-copy"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-cut"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-times"></i>\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-paste"></i>\n</button>\n</div>\n\n<button class="uk-button uk-button-small">\n	<i class="uk-icon-long-arrow-right"></i>\n	Shift\n</button>\n<button class="uk-button uk-button-small">\n	<i class="uk-icon-pencil"></i>\n	Adjust\n</button>\n<button class="uk-button uk-button-small">\n	<i class="uk-icon-send"></i>\n	Offset\n</button>\n\n';
+},{}],"/home/lain/a2d/src/animations/graph.html":[function(require,module,exports){
+module.exports = '<div class="panel">\n	Curve type:\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small uk-button-success">1</button>\n		<button class="uk-button uk-button-small uk-button-success">2</button>\n		<button class="uk-button uk-button-small uk-button-success">3</button>\n	</div>\n	<button class="uk-button uk-button-small uk-button-success">Match</button>\n	<div class="panel uk-height-1-1">\n		vnfdjskl\n	</div>\n</div>\n';
+},{}],"/home/lain/a2d/src/animations/head.html":[function(require,module,exports){
+module.exports = '<div class="uk-float-left">\n	<button class="uk-button uk-button-primary"\n		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize">\n		<i class="uk-icon-caret-{{Dopesheet? \'down\': \'up\'}}"></i>\n		Dopesheet</button>\n\n	<span class=panel">\n		<button class="uk-button"\n			title="Automaticaly scroll timeline during playback" data-uk-tooltip>\n			Current</button>\n		<input class="uk-form-width-small" type="number" v-model="Current">\n		<button class="uk-button"\n			title="Set loop start to current frame\n Click again to clear" data-uk-tooltip>\n			Loop Start</button>\n		<input class="uk-form-width-small" type="number" v-model="LoopStart">\n		<button class="uk-button"\n			title="Set loop end to current frame\n Click again to clear" data-uk-tooltip>\n			Loop End</button>\n		<input class="uk-form-width-small" type="number" v-model="LoopEnd">\n	</span>\n\n	<span class=panel">\n		<button class="uk-button"\n			title="Keys will be created automaticaly whenever a bone is changed" data-uk-tooltip>\n			<i class="uk-icon-key"></i>\n			Auto Key</button>\n		<button class="uk-button"\n			title="Toggles the ghosting options dialog" data-uk-tooltip>\n			Ghosting</button>\n		<button class="uk-button"\n			title="Toggles the playback options dialog" data-uk-tooltip>\n			<i class="uk-icon-play-circle"></i>\n			Playback</button>\n	</span>\n</div>\n<div class="uk-float-right">\n	<button class="uk-button uk-button-primary"\n		v-on="click: Graph = !Graph, click: Dopesheet = true, click: resize">\n		<i class="uk-icon-caret-{{Graph? \'right\': \'left\'}}"></i>\n		Graph</button>\n</div>\n';
+},{}],"/home/lain/a2d/src/animations/index.js":[function(require,module,exports){
 'use strict';
 require('less').render(require('./style.css'), function (e, css) {
 	require('insert-css')(css)
@@ -28598,19 +28604,24 @@ require('less').render(require('./style.css'), function (e, css) {
 module.exports = {
 	id: 'animations',
 	template: require('./template.html'),
+	components: {
+		head: {template: require('./head.html')},
+		ds_head: {template: require('./ds_head.html')},
+		graph: {template: require('./graph.html')},
+	},
 	data: {
 		msg: 'I am component Animations!'
 	}
 }
 
-},{"./style.css":"/home/lain/a2d/src/animations/style.css","./template.html":"/home/lain/a2d/src/animations/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js"}],"/home/lain/a2d/src/animations/style.css":[function(require,module,exports){
+},{"./ds_head.html":"/home/lain/a2d/src/animations/ds_head.html","./graph.html":"/home/lain/a2d/src/animations/graph.html","./head.html":"/home/lain/a2d/src/animations/head.html","./style.css":"/home/lain/a2d/src/animations/style.css","./template.html":"/home/lain/a2d/src/animations/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js"}],"/home/lain/a2d/src/animations/style.css":[function(require,module,exports){
 module.exports = '#animations h2 {\n	font-style: italic;\n}\n\n#animations .key {\n	height:1em;\n	width:3px;\n	border:1px solid black;\n	display: inline-block;\n}\n\n#animations .key.all {\n	background: white;\n}\n#animations .key.color {\n	background: pink;\n}\n#animations .key.translate {\n	background: blue;\n}\n#animations .key.attach {\n	background: yellow;\n}\n#animations .key.scale {\n	background: red;\n}\n#animations .key.rotate {\n	background: green;\n}\n#animations .key.event {\n	background: purple;\n}\n';
 },{}],"/home/lain/a2d/src/animations/template.html":[function(require,module,exports){
-module.exports = '<div class="uk-panel uk-form uk-clearfix">\n	<fieldset class="uk-clearfix">\n		<div class="uk-float-left">\n			<button class="uk-button uk-button-primary"\n				v-on="click: Dopesheet = !Dopesheet, click: Graph = false">\n				<i class="uk-icon-caret-{{Dopesheet? \'down\': \'up\'}}"></i>\n				Dopesheet\n			</button>\n\n			<button class="uk-button">Current</button>\n			<input class="uk-form-width-small" type="number" v-model="Current">\n			<button class="uk-button">Loop Start</button>\n			<input class="uk-form-width-small" type="number" v-model="LoopStart">\n			<button class="uk-button">Loop End</button>\n			<input class="uk-form-width-small" type="number" v-model="LoopEnd">\n			<button class="uk-button">\n				<i class="uk-icon-key"></i>\n				Auto Key\n			</button>\n			<button class="uk-button">Ghosting</button>\n			<button class="uk-button">\n				<i class="uk-icon-play-circle"></i>\n				Playback\n			</button>\n		</div>\n		<div class="uk-float-right">\n			<button class="uk-button uk-button-primary"\n				v-on="click: Graph = !Graph, click: Dopesheet = true">\n				<i class="uk-icon-caret-{{Graph? \'right\': \'left\'}}"></i>\n				Graph\n			</button>\n		</div>\n	</fieldset>\n</div>\n\n<div class="uk-grid">\n<div v-class="uk-width-1-1: !Graph, uk-width-4-5: Graph">\n\n<div v-show="Dopesheet">\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small">Collapse</button>\n		<button class="uk-button uk-button-small">Expand</button>\n	</div>\n\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-lock"></i>\n		</button>\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-refresh"></i>\n		</button>\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-rocket"></i>\n		</button>\n	</div>\n\n\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-copy"></i>\n		</button>\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-cut"></i>\n		</button>\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-times"></i>\n		</button>\n		<button class="uk-button uk-button-small">\n			<i class="uk-icon-paste"></i>\n	</button>\n	</div>\n\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-long-arrow-right"></i>\n		Shift\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-pencil"></i>\n		Adjust\n	</button>\n	<button class="uk-button uk-button-small">\n		<i class="uk-icon-send"></i>\n		Offset\n	</button>\n</div>\n\n\n<div>\n	<div class="uk-grid">\n		<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small" v-on="click: Current=LoopStart">\n					<i class="uk-icon-fast-backward"></i>\n				</button>\n				<button class="uk-button uk-button-small" v-on="click: Current--">\n					<i class="uk-icon-step-backward"></i>\n				</button>\n			</div>\n			<div class="uk-button-group">\n				<button v-show="reversed" class="uk-button uk-button-danger" v-on="click: stop">\n					<i class="uk-icon-stop"></i>\n				</button>\n				<button v-show="!reversed" class="uk-button uk-button-primary uk-text-large" v-on="click: play_reverse">\n					<i class="uk-icon-caret-left"></i>\n				</button>\n				<button v-show="played" class="uk-button uk-button-danger" v-on="click: stop">\n					<i class="uk-icon-stop"></i>\n				</button>\n				<button v-show="!played" class="uk-button uk-button-primary uk-text-large" v-on="click: play">\n					<i class="uk-icon-caret-right"></i>\n				</button>\n			</div>\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small" v-on="click: Current++">\n					<i class="uk-icon-step-forward"></i>\n				</button>\n				<button class="uk-button uk-button-small" v-on="click: Current=LoopEnd">\n					<i class="uk-icon-fast-forward"></i>\n				</button>\n			</div>\n			<button class="uk-button"><i class="uk-icon-repeat"></i></button>\n		</div>\n\n		<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n			<div class="uk-progress uk-width-1-1">\n				<div class="uk-progress-bar"\n					style="-webkit-transition: none!important; transition:none!important;"\n					v-style="width: Time*100.0 + \'%\'"></div>\n			</div>\n		</div>\n	</div>\n\n</div>\n<div v-show="Dopesheet">\n\n\n	<div class="uk-grid">\n		<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n			vnfjdklsvnfjdkls\n		</div>\n		<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n			<div class="key all"></div>\n			<div class="key translate"></div>\n			<div class="key scale"></div>\n			<div class="key rotate"></div>\n			<div class="key attach"></div>\n			<div class="key event"></div>\n			<div class="key color"></div>\n			<div class="key all"></div>\n		</div>\n	</div>\n</div>\n\n</div>\n\n<div v-show="Graph" class="uk-width-1-5">\n	<div class="uk-panel uk-panel-box uk-panel-box-secondary">\n	Graph\n	</div>\n</div>\n\n</div>\n';
+module.exports = '<div v-component="head" class="uk-form uk-clearfix panel"></div>\n\n<div class="uk-grid uk-grid-small">\n<div v-class="uk-width-1-1: !Graph, uk-width-4-5: Graph">\n\n<div v-show="Dopesheet" v-component="ds_head"></div>\n\n<div class="uk-grid uk-grid-small">\n	<div class="uk-width-{{Graph?\'4\':\'5\'}}-5">\n	<div class="uk-grid uk-grid-small">\n		<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small"\n					v-on="click: Current=LoopStart">\n					<i class="uk-icon-fast-backward"></i>\n				</button>\n				<button class="uk-button uk-button-small"\n					v-on="click: Current--">\n					<i class="uk-icon-step-backward"></i>\n				</button>\n			</div>\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-danger uk-text-small"\n					v-show="reversed"\n					v-on="click: stop">\n					<i class="uk-icon-stop"></i>\n				</button>\n				<button class="uk-button uk-button-primary uk-text-large"\n					v-show="!reversed"\n					v-on="click: play_reverse">\n					<i class="uk-icon-caret-left"></i>\n				</button>\n				<button class="uk-button uk-button-danger uk-text-small"\n					v-show="played"\n					v-on="click: stop">\n					<i class="uk-icon-stop"></i>\n				</button>\n				<button class="uk-button uk-button-primary uk-text-large"\n					v-show="!played"\n					v-on="click: play">\n					<i class="uk-icon-caret-right"></i>\n				</button>\n			</div>\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small"\n					v-on="click: Current++">\n					<i class="uk-icon-step-forward"></i>\n				</button>\n				<button class="uk-button uk-button-small"\n					v-on="click: Current=LoopEnd">\n					<i class="uk-icon-fast-forward"></i>\n				</button>\n			</div>\n			<button class="uk-button uk-button-small"><i class="uk-icon-repeat"></i></button>\n		</div>\n\n		<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n			<div class="uk-progress uk-width-1-1">\n				<div class="uk-progress-bar"\n					style="height: 2.5em; -webkit-transition: none!important; transition:none!important;"\n					v-style="width: Time*100.0 + \'%\'"></div>\n			</div>\n		</div>\n	</div>\n\n</div>\n\n\n<div v-show="Dopesheet">\n	<div class="uk-grid">\n		<div class="uk-width-{{Graph?\'3\':\'2\'}}-10">\n			vnfjdklsvnfjdkls\n		</div>\n		<div class="uk-width-{{Graph?\'7\':\'8\'}}-10">\n			<div class="key all"></div>\n			<div class="key translate"></div>\n			<div class="key scale"></div>\n			<div class="key rotate"></div>\n			<div class="key attach"></div>\n			<div class="key event"></div>\n			<div class="key color"></div>\n			<div class="key all"></div>\n		</div>\n	</div>\n</div>\n\n</div>\n\n<div v-show="Graph" v-component="graph" class="uk-width-1-5"></div>\n\n</div>\n';
 },{}],"/home/lain/a2d/src/app.css":[function(require,module,exports){
-module.exports = '#app {\n	font-family: \'Helvetica Neue\', Arial, sans-serif;\n}\n';
+module.exports = 'html, body {\n	padding:0;\n	margin:0;\n	overflow: hidden;\n}\n#app {\n	font-family: \'Helvetica Neue\', Arial, sans-serif;\n	background: #cc0000;\n}\n\n.panel, .panelX {\n	background: #666666;\n	color: white;\n	padding: 8px;\n}\n\n.panel .panel {\n	background: #333333;\n	color: white;\n	padding: 8px;\n}\n\n.panelX {\n	padding: 0px;\n}\n';
 },{}],"/home/lain/a2d/src/app.html":[function(require,module,exports){
-module.exports = '<nav class="uk-navbar">\n	<a class="uk-navbar-brand" href="">A2D</a>\n	<ul class="uk-navbar-nav">\n		<li class="uk-active"><a href="">...</a></li>\n		<li><a href="">...</a></li>\n		<li class="uk-parent"><a href="">...</a></li>\n	</ul>\n</nav>\n<div v-component="Tree" class="uk-width-1-3 uk-position-absolute" style="right:0"></div>\n<div class="uk-position-absolute uk-width-1-1 uk-panel uk-panel-box" style="bottom:0">\n	<div>\n		{{Spine.position.x}}\n		{{Spine.position.y}}\n	</div>\n	<div v-component="Tools" class="uk-width-2-3 uk-container-center"></div>\n	<hr>\n	<div v-component="Animations"></div>\n</div>\n';
+module.exports = '<div class="uk-height-1-1">\n	<div class="panel uk-width-2-3 uk-position-absolute"\n		v-component="Tools"\n		v-style="bottom: animHeight +\'px\'"></div>\n	<div class="uk-grid uk-grid-small"\n		v-style="height: otherHeight +\'px\'">\n		<canvas id="canvas" class="uk-width-2-3 uk-height-1-1"></canvas>\n		<div v-component="Tree" class="panelX uk-width-1-3 uk-height-1-1"></div>\n	<div v-component="Animations" class="panel uk-width-1-1"></div>\n	</div>\n</div>\n';
 },{}],"/home/lain/a2d/src/component-a/index.js":[function(require,module,exports){
 require('insert-css')(require('./style.css'))
 
@@ -28660,20 +28671,26 @@ loader.onComplete = onAssetsLoaded
 loader.load();
 
 var stage = new PIXI.Stage(0xFFFFFF, true);
-var renderer = new PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight);
-renderer.view.style.display = "block";
-renderer.view.style.width = "800px";
-renderer.view.style.height = "500px";
 window.Spine = null;
 window.app = null;
 
-document.body.appendChild(renderer.view);
+var backGrid = new PIXI.Graphics();
+stage.addChild(backGrid);
+var n = 50;
+for(var x = -n; x<n; x++) {
+	for(var y = -n; y<n; y++) {
+		backGrid.beginFill(0x000000, ((x+y)%2)?0.4:0.8);
+		backGrid.drawRect(x*32, y*32, 32,32);
+		backGrid.endFill();
+	}
+}
+
 function onAssetsLoaded() {
 	Spine = new PIXI.Spine("data/dragonBonesData.json");
 	stage.addChild(Spine);
-	var scale = 1;//window.innerHeight / 700;
-	Spine.position.x = window.innerWidth/2;
-	Spine.position.y = window.innerHeight/2 + (450 * scale);
+	var scale = 0.5;//window.innerHeight / 700;
+	Spine.position.x = window.innerWidth/4;
+	Spine.position.y = window.innerHeight/4 + (450 * scale);
 	Spine.scale.x = Spine.scale.y = scale
 	Spine.state.setAnimationByName("flying", true);
 
@@ -28707,12 +28724,21 @@ function onAssetsLoaded() {
 			reversed: false,
 			Time: 0.4,
 			LoopStart: 0,
-			LoopEnd: 29,
+			LoopEnd: 30,
+			speed: 1,
+
+			animHeight: 0,
+			otherHeight: 0,
 
 			Dopesheet: false,
 			Graph: false,
 		},
 		methods: {
+			resize: function() {
+				console.log('resize');
+				Vue.nextTick(resizeAnimations);
+				//setTimeout(resizeAnimations, 200);
+			},
 			stop: function() {
 				console.info('stop');
 				this.$data.played = false;
@@ -28724,7 +28750,7 @@ function onAssetsLoaded() {
 				console.info('play');
 				this.$data.played = true;
 				this.$data.reversed = false;
-				Spine.state.animationSpeed = 1;
+				Spine.state.animationSpeed = this.$data.speed;
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
 			},
@@ -28734,7 +28760,7 @@ function onAssetsLoaded() {
 				this.$data.reversed = true;
 				Spine.state.currentLoop = true;
 				Spine.state.currentTime = Spine.state.currentTime - Spine.state.currentTime|0 + 100000;
-				Spine.state.animationSpeed = -1;
+				Spine.state.animationSpeed = -this.$data.speed;
 			},
 			updateTransform: function(type, name) {
 				console.log('updateTransform[%s] %s', type, name);
@@ -28758,10 +28784,13 @@ function onAssetsLoaded() {
 			},
 			Current: {
 				$get: function() {
-					return (this.Time*30) |0;
+					return (this.Time*31) |0;
 				},
 				$set: function(val) {
-					Spine.state.currentTime = val / 30;
+					if(val<0) {
+						val=0;
+					}
+					Spine.state.currentTime = val / 31;
 				},
 			},
 			rotation: {
@@ -28832,23 +28861,45 @@ function onAssetsLoaded() {
 			},
 		},
 	});
-	Vue.nextTick(function() {
-		var c = Spine.state.currentTime;
-		var time = c - (Spine.state.currentTime|0);
-		console.log(time);
-		app.$data.Time = time+0.5;
-	});
+
+	var canvas = document.getElementById('canvas');
+	var renderer = new PIXI.autoDetectRenderer(100, 100, canvas, true);
+
+	var getH = function(el) {
+		var style = window.getComputedStyle(el, null);
+		return parseFloat(style.getPropertyValue('height'));
+	}
+	var getW = function(el) {
+		var style = window.getComputedStyle(el, null);
+		return parseFloat(style.getPropertyValue('width'));
+	}
+
+	var resizeAnimations = function(event) {
+		console.log('oldHeight', app.$data.animHeight);
+		var animHeight = getH(document.getElementById('animations'));
+		var otherHeight = window.innerHeight - animHeight;
+		app.$data.otherHeight = otherHeight;
+		app.$data.animHeight = animHeight;
+		Vue.nextTick(function(){
+			renderer.resize(getW(canvas), getH(canvas));
+		});
+		console.log('newHeight', app.$data.animHeight, app.$data.otherHeight);
+		//renderer.view.height = otherHeight;
+	}
+	window.addEventListener('resize', resizeAnimations);
+	resizeAnimations();
+	requestAnimFrame(animate);
+	function animate() {
+		requestAnimFrame(animate);
+		if(app) {
+			var time = Spine.state.currentTime - (Spine.state.currentTime|0);
+			app.$data.Time = time;
+		}
+		renderer.render(stage);
+	}
 }
 
-requestAnimFrame(animate);
-function animate() {
-	requestAnimFrame(animate);
-	if(app) {
-		var time = Spine.state.currentTime - (Spine.state.currentTime|0);
-		app.$data.Time = time;
-	}
-	renderer.render(stage);
-}
+
 
 
 },{"./animations":"/home/lain/a2d/src/animations/index.js","./app.css":"/home/lain/a2d/src/app.css","./app.html":"/home/lain/a2d/src/app.html","./component-a":"/home/lain/a2d/src/component-a/index.js","./component-b":"/home/lain/a2d/src/component-b/index.js","./tools":"/home/lain/a2d/src/tools/index.js","./tree":"/home/lain/a2d/src/tree/index.js","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js","vue":"/home/lain/a2d/node_modules/vue/src/main.js"}],"/home/lain/a2d/src/tools/index.js":[function(require,module,exports){
@@ -28868,9 +28919,9 @@ module.exports = {
 },{"./style.css":"/home/lain/a2d/src/tools/style.css","./template.html":"/home/lain/a2d/src/tools/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js"}],"/home/lain/a2d/src/tools/style.css":[function(require,module,exports){
 module.exports = '#tools {\n	.rotation.active {\n		input {\n			border-color: green;\n		}\n		.uk-form-icon i {\n			color: green;\n		}\n	}\n	.translate.active {\n		input {\n			border-color: blue;\n		}\n		.uk-form-icon i {\n			color: blue;\n		}\n	}\n	.scale.active {\n		input {\n			border-color: red;\n		}\n		.uk-form-icon i {\n			color: red;\n		}\n	}\n}\n';
 },{}],"/home/lain/a2d/src/tools/template.html":[function(require,module,exports){
-module.exports = '<div class="uk-grid">\n	<div class="uk-width-1-6">\n		Tools\n		<div data-uk-button-radio>\n			<button class="uk-button uk-width-1-1">Pose</button>\n			<button class="uk-button uk-width-1-1">Create</button>\n		</div>\n	</div>\n	<div class="uk-width-2-6 uk-form">\n		Transform\n\n		<div class="rotation uk-clearfix" v-class="active: toolT === \'rotation\'">\n			<div class="uk-form-icon uk-float-left" style="width:82%">\n				<i class="uk-icon-rotate-right"></i>\n				<input class="uk-width-1-1" type="number"\n					title="Rotatetion" data-uk-tooltip\n					v-on="click: toolT = \'rotation\'"\n					v-model="rotation"\n					v-attr="disabled: !transformEnable">\n			</div>\n			<button class="uk-button uk-float-left" style="width:18%">\n				<i class="uk-icon-key"></i>\n			</button>\n		</div>\n\n		<div class="translate uk-clearfix" v-class="active: toolT === \'translate\'">\n			<div class="uk-form-icon uk-float-left" style="width:41%">\n				<i class="uk-icon-arrows"></i>\n				<input class="uk-width-1-1" type="number"\n					title="Translate X" data-uk-tooltip\n					v-on="click: toolT = \'translate\'"\n					v-model="translateX"\n					v-attr="disabled: !transformEnable">\n			</div>\n			<input class="uk-float-left" type="number"\n				style="width:41%; display:block"\n				title="Translate Y" data-uk-tooltip\n				v-on="click: toolT = \'translate\'"\n				v-model="translateY"\n				v-attr="disabled: !transformEnable">\n			<button class="uk-button uk-float-left" style="width:18%">\n				<i class="uk-icon-key"></i>\n			</button>\n		</div>\n\n		<div class="scale uk-clearfix" v-class="active: toolT === \'scale\'">\n			<div class="uk-form-icon uk-float-left" style="width:41%">\n				<i class="uk-icon-crop"></i>\n				<input class="uk-width-1-1" type="number"\n					title="Scale X" data-uk-tooltip\n					v-on="click: toolT = \'scale\'"\n					v-model="scaleX"\n					v-attr="disabled: !transformEnable">\n			</div>\n			<input class="uk-float-left" type="number"\n				style="width:41%; display:block"\n				title="Scale Y" data-uk-tooltip\n				v-on="click: toolT = \'scale\'"\n				v-model="scaleY"\n				v-attr="disabled: !transformEnable">\n			<button class="uk-button uk-float-left" style="width:18%">\n				<i class="uk-icon-key"></i>\n			</button>\n		</div>\n	</div>\n	<div class="uk-width-1-6">\n		Axis\n		<div data-uk-button-radio>\n			<button class="uk-button uk-width-1-1">Local</button>\n			<button class="uk-button uk-width-1-1">Parent</button>\n			<button class="uk-button uk-width-1-1">Global</button>\n		</div>\n	</div>\n	<div class="uk-width-1-6">\n		Compensate\n		<button class="uk-button uk-width-1-1" data-uk-button>\n			<i class="uk-icon-lock"></i>\n			Bones\n		</button>\n		<button class="uk-button uk-width-1-1" data-uk-button>\n			<i class="uk-icon-lock"></i>\n			Images\n		</button>\n	</div>\n	<div class="uk-width-1-6">\n		Options\n		<table class="uk-text-small">\n			<thead>\n				<tr>\n					<th></th>\n					<th><i class="uk-icon-edit"></i></th>\n					<th><i class="uk-icon-eye"></i></th>\n					<th><i class="uk-icon-tag"></i></th>\n				</tr>\n			</thead>\n			<tbody>\n				<tr>\n					<td>Bones</td>\n					<td v-on="click: options.bones.selecting = !options.bones.selecting">\n						<i class="uk-icon-circle{{options.bones.selecting?\'\':\'-thin\'}}"></i></td>\n					<td v-on="click: options.bones.show = !options.bones.show">\n						<i class="uk-icon-circle{{options.bones.show?\'\':\'-thin\'}}"></i></td>\n					<td v-on="click: options.bones.names = !options.bones.names">\n						<i class="uk-icon-circle{{options.bones.names?\'\':\'-thin\'}}"></i></td>\n				</tr>\n				<tr>\n					<td>Images</td>\n					<td v-on="click: options.images.selecting = !options.images.selecting">\n						<i class="uk-icon-circle{{options.images.selecting?\'\':\'-thin\'}}"></i></td>\n					<td v-on="click: options.images.show = !options.images.show">\n						<i class="uk-icon-circle{{options.images.show?\'\':\'-thin\'}}"></i></td>\n					<td v-on="click: options.images.names = !options.images.names">\n						<i class="uk-icon-circle{{options.images.names?\'\':\'-thin\'}}"></i></td>\n				</tr>\n				<tr>\n					<td>Bounds</td>\n					<td v-on="click: options.bounds.selecting = !options.bounds.selecting">\n						<i class="uk-icon-circle{{options.bounds.selecting?\'\':\'-thin\'}}"></i></td>\n					<td v-on="click: options.bounds.show = !options.bounds.show">\n						<i class="uk-icon-circle{{options.bounds.show?\'\':\'-thin\'}}"></i></td>\n					<td v-on="click: options.bounds.names = !options.bounds.names">\n						<i class="uk-icon-circle{{options.bounds.names?\'\':\'-thin\'}}"></i></td>\n				</tr>\n			</tbody>\n		</table>\n	</div>\n</div>\n';
+module.exports = '<div class="uk-grid uk-grid-small" data-uk-grid-match="{target: \'.panel\'}">\n	<div class="uk-width-1-6">\n		<div class="panel">\n			Tools\n			<div data-uk-button-radio>\n				<button class="uk-button uk-width-1-1">Pose</button>\n				<button class="uk-button uk-width-1-1">Create</button>\n			</div>\n		</div>\n	</div>\n	<div class="uk-width-2-6 uk-form">\n		<div class="panel">\n			Transform\n\n			<div class="rotation uk-clearfix" v-class="active: toolT === \'rotation\'">\n				<div class="uk-form-icon uk-float-left" style="width:82%">\n					<i class="uk-icon-rotate-right"></i>\n					<input class="uk-width-1-1" type="number"\n						title="Rotatetion" data-uk-tooltip\n						v-on="click: toolT = \'rotation\'"\n						v-model="rotation"\n						v-attr="disabled: !transformEnable">\n				</div>\n				<button class="uk-button uk-float-left" style="width:18%">\n					<i class="uk-icon-key"></i>\n				</button>\n			</div>\n\n			<div class="translate uk-clearfix" v-class="active: toolT === \'translate\'">\n				<div class="uk-form-icon uk-float-left" style="width:41%">\n					<i class="uk-icon-arrows"></i>\n					<input class="uk-width-1-1" type="number"\n						title="Translate X" data-uk-tooltip\n						v-on="click: toolT = \'translate\'"\n						v-model="translateX"\n						v-attr="disabled: !transformEnable">\n				</div>\n				<input class="uk-float-left" type="number"\n					style="width:41%; display:block"\n					title="Translate Y" data-uk-tooltip\n					v-on="click: toolT = \'translate\'"\n					v-model="translateY"\n					v-attr="disabled: !transformEnable">\n				<button class="uk-button uk-float-left" style="width:18%">\n					<i class="uk-icon-key"></i>\n				</button>\n			</div>\n\n			<div class="scale uk-clearfix" v-class="active: toolT === \'scale\'">\n				<div class="uk-form-icon uk-float-left" style="width:41%">\n					<i class="uk-icon-crop"></i>\n					<input class="uk-width-1-1" type="number"\n						title="Scale X" data-uk-tooltip\n						v-on="click: toolT = \'scale\'"\n						v-model="scaleX"\n						v-attr="disabled: !transformEnable">\n				</div>\n				<input class="uk-float-left" type="number"\n					style="width:41%; display:block"\n					title="Scale Y" data-uk-tooltip\n					v-on="click: toolT = \'scale\'"\n					v-model="scaleY"\n					v-attr="disabled: !transformEnable">\n				<button class="uk-button uk-float-left" style="width:18%">\n					<i class="uk-icon-key"></i>\n				</button>\n			</div>\n		</div>\n	</div>\n	<div class="uk-width-1-6">\n		<div class="panel">\n			Axis\n			<div data-uk-button-radio>\n				<button class="uk-button uk-width-1-1">Local</button>\n				<button class="uk-button uk-width-1-1">Parent</button>\n				<button class="uk-button uk-width-1-1">Global</button>\n			</div>\n		</div>\n	</div>\n	<div class="uk-width-1-6">\n		<div class="panel">\n			Compensate\n			<button class="uk-button uk-width-1-1" data-uk-button>\n				<i class="uk-icon-lock"></i>\n				Bones\n			</button>\n			<button class="uk-button uk-width-1-1" data-uk-button>\n				<i class="uk-icon-lock"></i>\n				Images\n			</button>\n		</div>\n	</div>\n	<div class="uk-width-1-6">\n		<div class="panel">\n			Options\n			<table class="uk-text-small uk-width-1-1">\n				<tbody>\n					<tr>\n						<td></td>\n						<td>\n							<i class="uk-icon-edit"></i></td>\n						<td>\n							<i class="uk-icon-eye"></i></td>\n						<td>\n							<i class="uk-icon-tag"></i></td>\n					</tr>\n					<tr>\n						<td>Bones</td>\n						<td v-on="click: options.bones.selecting = !options.bones.selecting">\n							<i class="uk-icon-circle{{options.bones.selecting?\'\':\'-thin\'}}"></i></td>\n						<td v-on="click: options.bones.show = !options.bones.show">\n							<i class="uk-icon-circle{{options.bones.show?\'\':\'-thin\'}}"></i></td>\n						<td v-on="click: options.bones.names = !options.bones.names">\n							<i class="uk-icon-circle{{options.bones.names?\'\':\'-thin\'}}"></i></td>\n					</tr>\n					<tr>\n						<td>Images</td>\n						<td v-on="click: options.images.selecting = !options.images.selecting">\n							<i class="uk-icon-circle{{options.images.selecting?\'\':\'-thin\'}}"></i></td>\n						<td v-on="click: options.images.show = !options.images.show">\n							<i class="uk-icon-circle{{options.images.show?\'\':\'-thin\'}}"></i></td>\n						<td v-on="click: options.images.names = !options.images.names">\n							<i class="uk-icon-circle{{options.images.names?\'\':\'-thin\'}}"></i></td>\n					</tr>\n					<tr>\n						<td>Bounds</td>\n						<td v-on="click: options.bounds.selecting = !options.bounds.selecting">\n							<i class="uk-icon-circle{{options.bounds.selecting?\'\':\'-thin\'}}"></i></td>\n						<td v-on="click: options.bounds.show = !options.bounds.show">\n							<i class="uk-icon-circle{{options.bounds.show?\'\':\'-thin\'}}"></i></td>\n						<td v-on="click: options.bounds.names = !options.bounds.names">\n							<i class="uk-icon-circle{{options.bounds.names?\'\':\'-thin\'}}"></i></td>\n					</tr>\n				</tbody>\n			</table>\n		</div>\n	</div>\n</div>\n';
 },{}],"/home/lain/a2d/src/tree/dir.html":[function(require,module,exports){
-module.exports = '<div title="{{model.type}}" data-uk-tooltip class="item folder {{model.type}} uk-clearfix">\n	<div class="uk-float-right">\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-show="model.keyframe !== undefined"\n			v-on="click: model.keyframe = !model.keyframe">\n			<i class="uk-icon-circle uk-text-{{model.keyframe ? \'danger\' : \'success\'}}"></i>\n		</a>\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-show="model.visiblity !== undefined"\n			v-on="click: model.visiblity = !model.visiblity">\n			<i class="uk-icon-{{model.visiblity ? \'circle\' : \'circle-thin\'}}"></i>\n		</a>\n	</div>\n	<span class=" uk-float-left">\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-on="click: open = !open" v-if="model.children">\n			<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n		</a>\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-on="\n				click: select(model.type, model.name),\n				click: updateTransform(model.type, model.name)">\n			{{model.type}}: {{model.name}}\n		</a>\n	</span>\n</div>\n<ul v-if="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}">\n	</li>\n</ul>\n';
+module.exports = '<div title="{{model.type}}" data-uk-tooltip class="item folder {{model.type}} uk-clearfix">\n	<div class="uk-float-right">\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-show="model.keyframe !== undefined"\n			v-on="click: model.keyframe = !model.keyframe">\n			<i class="uk-icon-circle uk-text-{{model.keyframe ? \'danger\' : \'success\'}}"></i>\n		</a>\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-show="model.visiblity !== undefined"\n			v-on="click: model.visiblity = !model.visiblity">\n			<i class="uk-icon-{{model.visiblity ? \'circle\' : \'circle-thin\'}}"></i>\n		</a>\n	</div>\n	<span class=" uk-float-left">\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-on="click: open = !open" v-if="model.children">\n			<i class="uk-icon-caret-{{open ? \'down\' : \'right\'}}"></i>\n		</a>\n		<a class="uk-button uk-button-mini uk-button-link"\n			v-on="\n				click: select(model.type, model.name),\n				click: updateTransform(model.type, model.name)">\n			{{model.type}}: {{model.name}}\n		</a>\n	</span>\n</div>\n<ul v-if="open">\n	<li v-repeat="model: model.children" v-component="{{model.type}}"></li>\n</ul>\n';
 },{}],"/home/lain/a2d/src/tree/index.js":[function(require,module,exports){
 'use strict';
 require('less').render(require('./style.css'), function (e, css) {
@@ -29035,9 +29086,9 @@ module.exports = {
 }
 
 },{"./dir.html":"/home/lain/a2d/src/tree/dir.html","./item.html":"/home/lain/a2d/src/tree/item.html","./style.css":"/home/lain/a2d/src/tree/style.css","./template.html":"/home/lain/a2d/src/tree/template.html","insert-css":"/home/lain/a2d/node_modules/insert-css/index.js","less":"/home/lain/a2d/node_modules/less/lib/less/index.js"}],"/home/lain/a2d/src/tree/item.html":[function(require,module,exports){
-module.exports = '<div title="{{model.type}}" data-uk-tooltip class="item file {{model.type}} uk-clearfix">\n	<div class="uk-float-right">\n		<i v-show="model.keyframe !== undefined"  v-on="click: model.keyframe = !model.keyframe"   class="uk-icon-circle uk-text-{{model.keyframe ? \'danger\' : \'success\'}}"></i>\n		<i v-show="model.visiblity !== undefined" v-on="click: model.visiblity = !model.visiblity" class="uk-icon-{{model.visiblity ? \'circle\' : \'circle-thin\'}}"></i>\n		&nbsp;\n	</div>\n	<a class="uk-button uk-button-link uk-button-mini uk-float-left">\n		{{model.name}}\n	</a>\n</div>\n';
+module.exports = '<div title="{{model.type}}" data-uk-tooltip class="item file {{model.type}} uk-clearfix">\n	<div class="uk-float-right">\n		<i v-show="model.keyframe !== undefined"  v-on="click: model.keyframe = !model.keyframe"   class="uk-icon-circle uk-text-{{model.keyframe ? \'danger\' : \'success\'}}"></i>\n		<i v-show="model.visiblity !== undefined" v-on="click: model.visiblity = !model.visiblity" class="uk-icon-{{model.visiblity ? \'circle\' : \'circle-thin\'}}"></i>\n		&nbsp;\n	</div>\n	<a class="uk-button uk-button-mini uk-float-left">\n		{{model.name}}\n	</a>\n</div>\n';
 },{}],"/home/lain/a2d/src/tree/style.css":[function(require,module,exports){
-module.exports = '#tree {\n	ul {\n		padding-left: 1em;\n		list-style-type: none;\n	}\n\n	.uk-button-link {\n		color: black;\n	}\n\n	.item:hover {\n		outline: 1px solid red;\n	}\n\n	.item.folder {\n		padding: 0;\n		margin: 0;\n	}\n\n	.bone {\n		background: #99ccff;\n	}\n\n	.skin,\n	.skins,\n	.skin_placeholder {\n		background: #ffcc99;\n	}\n\n	.region,\n	.image,\n	.images {\n		background: #ccff99;\n	}\n\n	.event,\n	.events {\n		background: #cc99ff;\n	}\n}\n';
+module.exports = '#tree {\n	.hierarchy{\n		overflow-y: scroll;\n		height: 80%;\n		margin-bottom: 40px;\n	}\n	ul {\n		padding-left: 1em;\n		list-style-type: none;\n	}\n\n	.uk-button-link {\n		color: black;\n	}\n	.item {\n		color: white!important;\n	}\n\n	.item:hover {\n		outline: 1px solid red;\n	}\n\n	.item.folder {\n		padding: 0;\n		margin: 0;\n	}\n\n	.bone {\n		background: #99ccff;\n	}\n\n	.skin,\n	.skins,\n	.skin_placeholder {\n		background: #ffcc99;\n	}\n\n	.region,\n	.image,\n	.images {\n		background: #ccff99;\n	}\n\n	.event,\n	.events {\n		background: #cc99ff;\n	}\n}\n';
 },{}],"/home/lain/a2d/src/tree/template.html":[function(require,module,exports){
-module.exports = '<div class="uk-scrollable-box" style="resize:vertical; height:400px">\n	<div class="uk-clearfix">\n		<div class="uk-float-left">Tree</div>\n		<div class="uk-float-right">\n			<div class="uk-button-group" data-uk-button-checkbox>\n				<button class="uk-button uk-button-small uk-button-primary"\n					title="Show bones in the tree" data-uk-tooltip>x</button>\n				<button class="uk-button uk-button-small uk-button-primary"\n					title="Show slots in the tree" data-uk-tooltip >x</button>\n				<button class="uk-button uk-button-small uk-button-primary"\n					title="Show attachments in the tree" data-uk-tooltip >x</button>\n			</div>\n			<button class="uk-button uk-button-small uk-button-primary"\n				title="Expand and scroll tree to editor selection" data-uk-tooltip data-uk-button>\n				<i class="uk-icon-shield"></i>\n			</button>\n			<button class="uk-button uk-button-small"\n				title="Find and replace text in the project" data-uk-tooltip>\n				<i class="uk-icon-search"></i>\n			</button>\n			<div class="uk-button-group">\n				<button class="uk-button uk-button-small"\n					title="Collapse all if nothing is selected,\n						else collapse everything under the selected node"\n					data-uk-tooltip>Collapse</button>\n				<button class="uk-button uk-button-small"\n					title="Expand all if nothing is selected,\n						else expand everything under the selected node"\n					data-uk-tooltip>Expand</button>\n			</div>\n		</div>\n	</div>\n	<div class="uk-panel uk-panel-box uk-margin-remove">\n		<div class="uk-clearfix">\n			<small>Hierarchy</small>\n			<div class="uk-float-right">\n				<a class="uk-button uk-button-mini uk-button-link">\n					<i class="uk-icon-key"></i>\n				</a>\n				<a class="uk-button uk-button-mini uk-button-link">\n					<i class="uk-icon-eye"></i>\n				</a>\n			</div>\n		</div>\n		<ul class="uk-margin-remove" style="padding: 0">\n			<li v-component="skeleton" v-with="model: Skeleton"></li>\n		</ul>\n	</div>\n	<div class="uk-panel uk-panel-box uk-panel-box-primary">\n		vnfdjskl\n	</div\n</div>\n';
+module.exports = '<div class="panel uk-height-1-1 uk-position-relative">\n<br><br>\n<div class="uk-clearfix">\n	<div class="uk-float-left">Tree</div>\n	<div class="uk-float-right">\n		<div class="uk-button-group" data-uk-button-checkbox>\n			<button class="uk-button uk-button-small uk-button-primary"\n				title="Show bones in the tree" data-uk-tooltip>x</button>\n			<button class="uk-button uk-button-small uk-button-primary"\n				title="Show slots in the tree" data-uk-tooltip >x</button>\n			<button class="uk-button uk-button-small uk-button-primary"\n				title="Show attachments in the tree" data-uk-tooltip >x</button>\n		</div>\n		<button class="uk-button uk-button-small uk-button-primary"\n			title="Expand and scroll tree to editor selection" data-uk-tooltip data-uk-button>\n			<i class="uk-icon-shield"></i>\n		</button>\n		<button class="uk-button uk-button-small"\n			title="Find and replace text in the project" data-uk-tooltip>\n			<i class="uk-icon-search"></i>\n		</button>\n		<div class="uk-button-group">\n			<button class="uk-button uk-button-small"\n				title="Collapse all if nothing is selected,\n					else collapse everything under the selected node"\n				data-uk-tooltip>Collapse</button>\n			<button class="uk-button uk-button-small"\n				title="Expand all if nothing is selected,\n					else expand everything under the selected node"\n				data-uk-tooltip>Expand</button>\n		</div>\n	</div>\n</div>\n<div class="panel hierarchy">\n	<div class="uk-clearfix">\n		<small>Hierarchy</small>\n		<div class="uk-float-right">\n			<a class="uk-button uk-button-mini uk-button-link">\n				<i class="uk-icon-key"></i>\n			</a>\n			<a class="uk-button uk-button-mini uk-button-link">\n				<i class="uk-icon-eye"></i>\n			</a>\n		</div>\n	</div>\n	<ul class="uk-margin-remove" style="padding: 0">\n		<li v-component="skeleton" v-with="model: Skeleton"></li>\n	</ul>\n</div>\n<div class="uk- uk-width-1-1 uk-position-absolute" style="bottom: 0">\n	vnfdjskl<br />\n	vnfdjskl<br />\n	vnjfdkls\n</div>\n</div>\n';
 },{}]},{},["/home/lain/a2d/src/main.js"]);

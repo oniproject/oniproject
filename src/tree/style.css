@@ -1,4 +1,9 @@
 #tree {
+	.hierarchy{
+		overflow-y: scroll;
+		height: 80%;
+		margin-bottom: 40px;
+	}
 	ul {
 		padding-left: 1em;
 		list-style-type: none;
@@ -6,6 +11,9 @@
 
 	.uk-button-link {
 		color: black;
+	}
+	.item {
+		color: white!important;
 	}
 
 	.item:hover {

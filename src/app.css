@@ -1,3 +1,25 @@
+html, body {
+	padding:0;
+	margin:0;
+	overflow: hidden;
+}
 #app {
 	font-family: 'Helvetica Neue', Arial, sans-serif;
+	background: #cc0000;
+}
+
+.panel, .panelX {
+	background: #666666;
+	color: white;
+	padding: 8px;
+}
+
+.panel .panel {
+	background: #333333;
+	color: white;
+	padding: 8px;
+}
+
+.panelX {
+	padding: 0px;
 }
