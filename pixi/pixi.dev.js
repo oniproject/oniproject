@@ -13152,6 +13152,8 @@ PIXI.Spine = function (url) {
     }
 };
 
+PIXI.Spine.spine = spine;
+
 PIXI.Spine.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 PIXI.Spine.prototype.constructor = PIXI.Spine;
 
