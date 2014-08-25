@@ -1,10 +1,10 @@
-<div class="uk-grid uk-grid-small" data-uk-grid-match="{target: '.panel'}">
+<div class="uk-grid uk-grid-small uk-text-center" data-uk-grid-match="{target: '.panel'}">
 	<div class="uk-width-1-6">
 		<div class="panel">
 			Tools
 			<div data-uk-button-radio>
-				<button class="uk-button uk-width-1-1">Pose</button>
-				<button class="uk-button uk-width-1-1">Create</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Pose</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Create</button>
 			</div>
 		</div>
 	</div>
@@ -15,13 +15,13 @@
 			<div class="rotation uk-clearfix" v-class="active: toolT === 'rotation'">
 				<div class="uk-form-icon uk-float-left" style="width:82%">
 					<i class="uk-icon-rotate-right"></i>
-					<input class="uk-width-1-1" type="number"
+					<input class="uk-width-1-1 uk-form-small" type="number"
 						title="Rotatetion" data-uk-tooltip
 						v-on="click: toolT = 'rotation'"
 						v-model="rotation"
 						v-attr="disabled: !transformEnable">
 				</div>
-				<button class="uk-button uk-float-left" style="width:18%">
+				<button class="uk-button uk-button-small uk-float-left" style="width:18%">
 					<i class="uk-icon-key"></i>
 				</button>
 			</div>
@@ -29,19 +29,19 @@
 			<div class="translate uk-clearfix" v-class="active: toolT === 'translate'">
 				<div class="uk-form-icon uk-float-left" style="width:41%">
 					<i class="uk-icon-arrows"></i>
-					<input class="uk-width-1-1" type="number"
+					<input class="uk-width-1-1 uk-form-small" type="number"
 						title="Translate X" data-uk-tooltip
 						v-on="click: toolT = 'translate'"
 						v-model="translateX"
 						v-attr="disabled: !transformEnable">
 				</div>
-				<input class="uk-float-left" type="number"
+				<input class="uk-float-left uk-form-small" type="number"
 					style="width:41%; display:block"
 					title="Translate Y" data-uk-tooltip
 					v-on="click: toolT = 'translate'"
 					v-model="translateY"
 					v-attr="disabled: !transformEnable">
-				<button class="uk-button uk-float-left" style="width:18%">
+				<button class="uk-button uk-button-small uk-float-left" style="width:18%">
 					<i class="uk-icon-key"></i>
 				</button>
 			</div>
@@ -49,19 +49,19 @@
 			<div class="scale uk-clearfix" v-class="active: toolT === 'scale'">
 				<div class="uk-form-icon uk-float-left" style="width:41%">
 					<i class="uk-icon-crop"></i>
-					<input class="uk-width-1-1" type="number"
+					<input class="uk-width-1-1 uk-form-small" type="number"
 						title="Scale X" data-uk-tooltip
 						v-on="click: toolT = 'scale'"
 						v-model="scaleX"
 						v-attr="disabled: !transformEnable">
 				</div>
-				<input class="uk-float-left" type="number"
+				<input class="uk-float-left uk-form-small" type="number"
 					style="width:41%; display:block"
 					title="Scale Y" data-uk-tooltip
 					v-on="click: toolT = 'scale'"
 					v-model="scaleY"
 					v-attr="disabled: !transformEnable">
-				<button class="uk-button uk-float-left" style="width:18%">
+				<button class="uk-button uk-button-small uk-float-left" style="width:18%">
 					<i class="uk-icon-key"></i>
 				</button>
 			</div>
@@ -71,20 +71,20 @@
 		<div class="panel">
 			Axis
 			<div data-uk-button-radio>
-				<button class="uk-button uk-width-1-1">Local</button>
-				<button class="uk-button uk-width-1-1">Parent</button>
-				<button class="uk-button uk-width-1-1">Global</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Local</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Parent</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Global</button>
 			</div>
 		</div>
 	</div>
 	<div class="uk-width-1-6">
 		<div class="panel">
 			Compensate
-			<button class="uk-button uk-width-1-1" data-uk-button>
+			<button class="uk-button uk-button-small uk-width-1-1" data-uk-button>
 				<i class="uk-icon-lock"></i>
 				Bones
 			</button>
-			<button class="uk-button uk-width-1-1" data-uk-button>
+			<button class="uk-button uk-button-small uk-width-1-1" data-uk-button>
 				<i class="uk-icon-lock"></i>
 				Images
 			</button>

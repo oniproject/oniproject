@@ -7,13 +7,15 @@
 		</a>
 		<a class="uk-button uk-button-mini uk-button-link"
 			v-show="model.visiblity !== undefined"
-			v-on="click: model.visiblity = !model.visiblity">
+			v-on="click: model.visiblity = !model.visiblity,
+			click: setVisiblity(model.type, model.name, model.visiblity)">
 			<i class="uk-icon-{{model.visiblity ? 'circle' : 'circle-thin'}}"></i>
 		</a>
 	</div>
 	<span class=" uk-float-left">
 		<a class="uk-button uk-button-mini uk-button-link"
-			v-on="click: open = !open" v-if="model.children">
+			v-on="click: open = !open"
+			v-if="model.children">
 			<i class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
 		</a>
 		<a class="uk-button uk-button-mini uk-button-link"

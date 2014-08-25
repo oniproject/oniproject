@@ -1,20 +1,28 @@
 #tree {
 	.hierarchy{
-		overflow-y: scroll;
 		height: 80%;
 		margin-bottom: 40px;
+		width: 97%;
+		.native {
+			height: 100%;
+		}
 	}
 	ul {
 		padding-left: 1em;
 		list-style-type: none;
+		li {
+			margin-top: 1px;
+		}
 	}
 
 	.uk-button-link {
 		color: black;
 	}
 	.item {
+		border-radius: 3px;
 		color: white!important;
 	}
+
 
 	.item:hover {
 		outline: 1px solid red;

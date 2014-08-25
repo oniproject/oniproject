@@ -9,15 +9,39 @@ module.exports = {
 	data: {
 		msg: 'I am component Animations!'
 	},
+	methods: {
+		setCurve: function(curve) {
+			this.$broadcast('updateCurve', curve);
+		},
+	},
 	components: {
 		head: {template: require('./head.html')},
 		ds_head: {template: require('./ds_head.html')},
-		graph: {template: require('./graph.html')},
+		graph: require('./graph'),
 		player: {template: require('./player.html')},
 	},
 	computed: {
 		AnimationList: function() {
 			var Spine = this.$parent.$get('Spine');
+			var getCurve = function(curves, i) {
+				//var type = curves.type[i];
+				var type;
+
+				var t = curves.curves[i*6];
+				if(t !== undefined) {
+					if(t == -1) type='stepped';
+					else type = 'bezier';
+					if(t == 0) type = 'linear';
+				}
+
+				var c = curves._curves[i];
+				if(!c) c=[0.5, 0.5, 0.5, 0.5];
+				return {
+					type: type,
+					cx1: c[0], cy1: c[1],
+					cx2: c[2], cy2: c[3],
+				};
+			}
 
 			// TODO choise anim by name
 			var animList = Spine.skeleton.data.animations[0];
@@ -25,16 +49,15 @@ module.exports = {
 			for(var i=0, l=animList.timelines.length; i<l; i++) {
 				var timeline = animList.timelines[i];
 				if(timeline instanceof PIXI.Spine.spine.RotateTimeline) {
-					console.log('RotateTimeline count', timeline.getFrameCount(),
-						'bone', timeline.boneIndex);
-
 					var t = {type:'rotate',
 						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
 					animations.push(t);
 
 					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+						var curve = getCurve(timeline.curves, j);
 						t.frames.push({
-							curve: timeline.curves[j],
+							curve: curve,
+							type: curve.type,
 							time: timeline.frames[j*2],
 							angle: timeline.frames[j*2+1],
 						});
@@ -48,9 +71,6 @@ module.exports = {
 						*/
 				}
 				if(timeline instanceof PIXI.Spine.spine.TranslateTimeline) {
-					console.log('TranslateTimeline', timeline.getFrameCount(),
-						'bone', timeline.boneIndex);
-
 					var t = {type:'translate',
 						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
 					animations.push(t);
@@ -71,9 +91,6 @@ module.exports = {
 						*/
 				}
 				if(timeline instanceof PIXI.Spine.spine.ScaleTimeline) {
-					console.log('ScaleTimeline', timeline.getFrameCount(),
-						'bone', timeline.boneIndex);
-
 					var t = {type:'scale',
 						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
 					animations.push(t);
@@ -94,9 +111,6 @@ module.exports = {
 						*/
 				}
 				if(timeline instanceof PIXI.Spine.spine.ColorTimeline) {
-					console.log('ColorTimeline', timeline.getFrameCount(),
-						'slot', timeline.slotIndex);
-
 					var t = {type:'color',
 						slot: Spine.skeleton.slots[timeline.slotIndex].data.name, frames:[]};
 					animations.push(t);
@@ -119,10 +133,6 @@ module.exports = {
 						*/
 				}
 				if(timeline instanceof PIXI.Spine.spine.AttachmentTimeline) {
-					console.log('AttachmentTimeline', timeline.getFrameCount(),
-						'slot', timeline.slotIndex);
-					animations.push({type:'attachment', slot: timeline.slotIndex, frames:[]});
-
 					var t = {type:'attachment',
 						slot: Spine.skeleton.slots[timeline.slotIndex].data.name, frames:[]};
 					animations.push(t);

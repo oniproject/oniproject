@@ -1,4 +1,5 @@
 #tools {
+	width: 600px;
 	.rotation.active {
 		input {
 			border-color: green;

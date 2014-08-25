@@ -5,33 +5,40 @@
 	<div class="uk-float-right">
 		<div class="uk-button-group" data-uk-button-checkbox>
 			<button class="uk-button uk-button-small uk-button-primary"
-				title="Show bones in the tree" data-uk-tooltip>x</button>
+			title="Show bones in the tree" data-uk-tooltip="{pos:'top'}">
+				<i class="uk-icon-exclamation"></i>
+			</button>
 			<button class="uk-button uk-button-small uk-button-primary"
-				title="Show slots in the tree" data-uk-tooltip >x</button>
+				title="Show slots in the tree" data-uk-tooltip="{pos:'top'}">
+				<i class="uk-icon-dot-circle-o"></i>
+			</button>
 			<button class="uk-button uk-button-small uk-button-primary"
-				title="Show attachments in the tree" data-uk-tooltip >x</button>
+				title="Show attachments in the tree" data-uk-tooltip="{pos:'top'}">
+				<i class="uk-icon-paperclip"></i>
+			</button>
 		</div>
 		<button class="uk-button uk-button-small uk-button-primary"
-			title="Expand and scroll tree to editor selection" data-uk-tooltip data-uk-button>
+			title="Scroll tree to editor selection" data-uk-tooltip="{pos:'top'}" data-uk-button>
 			<i class="uk-icon-shield"></i>
 		</button>
 		<button class="uk-button uk-button-small"
-			title="Find and replace text in the project" data-uk-tooltip>
+			title="Find and replace text in the project" data-uk-tooltip="{pos:'top'}">
 			<i class="uk-icon-search"></i>
 		</button>
 		<div class="uk-button-group">
 			<button class="uk-button uk-button-small"
 				title="Collapse all if nothing is selected,
 					else collapse everything under the selected node"
-				data-uk-tooltip>Collapse</button>
+				data-uk-tooltip="{pos:'top'}">Collapse</button>
 			<button class="uk-button uk-button-small"
 				title="Expand all if nothing is selected,
 					else expand everything under the selected node"
-				data-uk-tooltip>Expand</button>
+				data-uk-tooltip="{pos:'top'}">Expand</button>
 		</div>
 	</div>
 </div>
-<div class="panel hierarchy">
+<div class="panel custom_scroll_bar hierarchy">
+	<div class="native"><div class="content">
 	<div class="uk-clearfix">
 		<small>Hierarchy</small>
 		<div class="uk-float-right">
@@ -46,6 +53,7 @@
 	<ul class="uk-margin-remove" style="padding: 0">
 		<li v-component="skeleton" v-with="model: Skeleton"></li>
 	</ul>
+	</div></div>
 </div>
 <div class="uk- uk-width-1-1 uk-position-absolute" style="bottom: 0">
 	vnfdjskl<br />

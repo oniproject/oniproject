@@ -1,7 +1,7 @@
 <div v-component="head" class="uk-form uk-clearfix"></div>
 
-<div class="uk-grid uk-grid-small">
-	<div class="uk-width-{{Graph?'7':'10'}}-10">
+<div class="uk-grid uk-grid-small panel">
+	<div class="uk-width-{{Graph?'7':'10'}}-10 panel">
 
 		<div v-show="Dopesheet" v-component="ds_head"></div>
 
@@ -22,10 +22,12 @@
 						</div>
 					</div>
 				</div>
+				<hr>
 
-				<div v-show="Dopesheet" class="custom_scroll_bar">
+				<div id="anim-list" v-show="Dopesheet" class="custom_scroll_bar">
 					<div class="native"><div class="content">
-						<div v-repeat="anim: AnimationList" class="uk-grid uk-grid-small {{anim.type}}">
+						<div v-repeat="anim: AnimationList"
+							class="uk-grid uk-grid-small uk-margin-remove {{anim.type}}">
 							<div class="uk-width-{{Graph?'3':'2'}}-10">
 								<i v-if="anim.type==='rotate'" class="uk-icon-rotate-right"></i>
 								<i v-if="anim.type==='translate'" class="uk-icon-arrows"></i>
@@ -38,8 +40,10 @@
 							<div class="uk-width-{{Graph?'7':'8'}}-10">
 								<div class="uk-position-relative">
 									<div v-repeat="frame: anim.frames"
-										title="{{anim.bone||anim.slot}} {{anim.type}} {{$index}}" data-uk-tooltip
-										class="key {{anim.type}}"
+										class="key {{anim.type}} {{frame.type}}"
+										title="{{anim.bone||anim.slot}} {{anim.type}} {{$index}}"
+										data-uk-tooltip
+										v-on="click: setCurve(frame.curve)"
 										v-style="left: (frame.time*100)-2 +'%'"></div>
 								</div>
 							</div>
@@ -51,5 +55,5 @@
 		</div>
 	</div>
 
-	<div v-show="Graph" v-component="graph" class="uk-width-3-10"></div>
+	<div v-show="Graph" v-component="graph" class="uk-width-3-10 panel"></div>
 </div>

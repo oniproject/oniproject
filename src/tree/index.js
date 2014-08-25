@@ -7,6 +7,11 @@ module.exports = {
 	id: 'tree',
 	template: require('./template.html'),
 	methods: {
+		updateTree: function() {
+			Vue.nextTick((function(){
+				this.dirty = !this.dirty;
+			}).bind(this))
+		},
 		select: function(type, name) {
 			console.log('select[%s] %s', type, name);
 			this.$parent.$data.selected.type = type;
@@ -71,6 +76,8 @@ module.exports = {
 	},
 	computed: {
 		Skeleton: function() {
+			console.error('Skeleton');
+			this.dirty;
 			var Spine = this.$parent.$get('Spine');
 			var spineData = Spine.spineData;
 			var drawOrder = Spine.skeleton.drawOrder;
@@ -155,7 +162,15 @@ module.exports = {
 			return obj;
 		},
 	},
+	created: function() {
+		console.log('created');
+		this.$on('updateTree', (function() {
+			console.log('updateTree');
+			this.dirty = !this.dirty;
+		}).bind(this));
+	},
 	data: {
 		msg: 'I am component tree!',
+		dirty: true,
 	}
 }

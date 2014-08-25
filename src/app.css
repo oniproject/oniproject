@@ -17,9 +17,51 @@ html, body {
 .panel .panel {
 	background: #333333;
 	color: white;
-	padding: 8px;
+	padding: 4px;
+	border-radius: 4px;
+}
+.panel .panel .panel {
+	background: #666666;
+	color: white;
+	padding: 4px;
+}
+
+.ib {
+	display: inline-block;
 }
 
 .panelX {
 	padding: 0px;
 }
+
+.custom_scroll_bar{
+	width:100%;
+	overflow:hidden;
+	position:relative;
+}
+
+.custom_scroll_bar_handle{
+	top:0;
+	right:0;
+	position:absolute;
+	width:10px;
+	height:15px;
+	background:#c00;
+	cursor:pointer;
+}
+
+.custom_scroll_bar_handle:hover{
+	background:red;
+}
+
+.custom_scroll_bar .native{
+	overflow-y:scroll;
+	overflow-x:hidden;
+	width:200%;
+}
+
+.custom_scroll_bar .content{
+	overflow:hidden;
+	width:50%;
+}
+

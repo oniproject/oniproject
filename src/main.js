@@ -34,14 +34,22 @@ for(var x = -n; x<n; x++) {
 }
 
 function onAssetsLoaded() {
+	var scale = 0.7;//window.innerHeight / 700;
+	var xxxx = new PIXI.DisplayObjectContainer();
+	stage.addChild(xxxx);
+	xxxx.scale.x = xxxx.scale.y = scale;
+	xxxx.position.x = window.innerWidth/4;
+	xxxx.position.y = window.innerHeight/4 + (450 * scale);
+
+	var bbDrawer = new PIXI.Graphics();
 	var boneDrawer = new PIXI.Graphics();
 	Spine = new PIXI.Spine("data/dragonBonesData.json");
-	stage.addChild(Spine);
-	stage.addChild(boneDrawer);
-	var scale = 0.5;//window.innerHeight / 700;
-	boneDrawer.position.x = Spine.position.x = window.innerWidth/4;
-	boneDrawer.position.y = Spine.position.y = window.innerHeight/4 + (450 * scale);
-	boneDrawer.scale.x = boneDrawer.scale.y = Spine.scale.x = Spine.scale.y = scale
+	xxxx.addChild(Spine);
+	xxxx.addChild(bbDrawer);
+	xxxx.addChild(boneDrawer);
+	//boneDrawer.position.x = Spine.position.x = window.innerWidth/4;
+	//boneDrawer.position.y = Spine.position.y = window.innerHeight/4 + (450 * scale);
+	//boneDrawer.scale.x = boneDrawer.scale.y = Spine.scale.x = Spine.scale.y = scale
 
 	Spine.state.setAnimationByName('flying', true);
 	//setTimeout(function(){Spine.state.clearAnimation()}, 2000);
@@ -51,24 +59,44 @@ function onAssetsLoaded() {
 		Spine.state.clearAnimation();
 		Spine.skeleton.setToSetupPose();
 	}
+	bbDrawer.updateTransform = function() {
+		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
+		bbDrawer.clear();
+
+		for(var i=0, l= Spine.skeleton.drawOrder.length; i<l; i++) {
+			var att = Spine.skeleton.drawOrder[i].currentSprite;
+			var bb = att.getBounds();
+			bb.x -= xxxx.position.x;
+			bb.y -= xxxx.position.y;
+			bbDrawer.lineStyle(1, 0x999999, 1);
+			//bbDrawer.beginFill(0x9999ff, 0.1);
+			bbDrawer.drawRect(bb.x/scale, bb.y/scale, bb.width/scale, bb.height/scale);
+			//bbDrawer.endFill();
+		}
+	}
 
 	boneDrawer.updateTransform = function() {
 		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
 		boneDrawer.clear();
+
+
 		for(var i=0, l= Spine.skeleton.bones.length;i<l;i++) {
 			var bone = Spine.skeleton.bones[i];
+
+			boneDrawer.lineStyle(0, 0x999999, 1);
 			boneDrawer.beginFill(0x9999ff, 0.8);
 			boneDrawer.drawCircle(bone.worldX, bone.worldY, 5);
 			boneDrawer.endFill();
-			boneDrawer.lineStyle(2, 0x9999ff, 1);
 
 			if(bone.data.length) {
+				boneDrawer.lineStyle(1, 0x9999ff, 1);
 				var rot = bone.worldRotation * Math.PI/180;
 				var x = Math.cos(rot) * bone.data.length;
 				var y = Math.sin(rot) * bone.data.length;
 				boneDrawer.moveTo(bone.worldX +x, bone.worldY -y);
 				boneDrawer.lineTo(bone.worldX, bone.worldY);
 			} else {
+				boneDrawer.lineStyle(1, 0xff9999, 1);
 				boneDrawer.moveTo(bone.worldX -nn, bone.worldY);
 				boneDrawer.lineTo(bone.worldX +nn, bone.worldY);
 				boneDrawer.moveTo(bone.worldX, bone.worldY -nn);
@@ -117,8 +145,12 @@ function onAssetsLoaded() {
 			Graph: false,
 		},
 		methods: {
+			setVisiblity: function(type, name, val) {
+				console.log('setVisiblity', type, name, val);
+			},
 			resize: function() {
 				console.log('resize');
+				this.$broadcast('updateTree');
 				Vue.nextTick(resizeAnimations);
 			},
 			stop: function() {
@@ -267,7 +299,7 @@ function onAssetsLoaded() {
 	}
 
 	var resizeAnimations = function(event) {
-		console.log('oldHeight', app.$data.animHeight);
+		//console.log('oldHeight', app.$data.animHeight);
 		var animHeight = getH(document.getElementById('animations'));
 		var otherHeight = window.innerHeight - animHeight;
 		app.$data.otherHeight = otherHeight;
@@ -275,7 +307,7 @@ function onAssetsLoaded() {
 		Vue.nextTick(function(){
 			renderer.resize(getW(canvas), getH(canvas));
 		});
-		console.log('newHeight', app.$data.animHeight, app.$data.otherHeight);
+		//console.log('newHeight', app.$data.animHeight, app.$data.otherHeight);
 	}
 	window.addEventListener('resize', resizeAnimations);
 	resizeAnimations();
