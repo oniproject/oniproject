@@ -22,7 +22,7 @@
 		"less": "1.7.4"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
 		"a2d": "watchify -e a2d/main.js -t partialify -o public/a2d.js"
 	},
 	"author": "lain-dono",
