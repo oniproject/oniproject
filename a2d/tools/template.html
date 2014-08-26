@@ -1,0 +1,138 @@
+<div class="uk-grid uk-grid-preserve uk-text-center" data-uk-grid-match="{target: '.panel'}">
+	<div class="uk-width-1-6">
+		<div class="panel second">
+			Tools
+			<div data-uk-button-radio>
+				<button class="uk-button uk-button-small uk-width-1-1">Pose</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Create</button>
+			</div>
+		</div>
+	</div>
+	<div class="uk-width-2-6 uk-form">
+		<div class="panel second">
+			Transform
+
+			<div class="rotation uk-clearfix" v-class="active: toolT === 'rotation'">
+				<div class="uk-form-icon uk-float-left" style="width:82%">
+					<i class="uk-icon-rotate-right"></i>
+					<input class="uk-width-1-1 uk-form-small" type="number"
+						title="Rotation" data-uk-tooltip
+						v-on="click: toolT = 'rotation'"
+						v-model="rotation"
+						v-attr="disabled: !transformEnable">
+				</div>
+				<button class="uk-button uk-button-small uk-float-left" style="width:18%">
+					<i class="uk-icon-key"></i>
+				</button>
+			</div>
+
+			<div class="translate uk-clearfix" v-class="active: toolT === 'translate'">
+				<div class="uk-form-icon uk-float-left" style="width:41%">
+					<i class="uk-icon-arrows"></i>
+					<input class="uk-width-1-1 uk-form-small" type="number"
+						title="Translate X" data-uk-tooltip
+						v-on="click: toolT = 'translate'"
+						v-model="translateX"
+						v-attr="disabled: !transformEnable">
+				</div>
+				<input class="uk-float-left uk-form-small" type="number"
+					style="width:41%; display:block"
+					title="Translate Y" data-uk-tooltip
+					v-on="click: toolT = 'translate'"
+					v-model="translateY"
+					v-attr="disabled: !transformEnable">
+				<button class="uk-button uk-button-small uk-float-left" style="width:18%">
+					<i class="uk-icon-key"></i>
+				</button>
+			</div>
+
+			<div class="scale uk-clearfix" v-class="active: toolT === 'scale'">
+				<div class="uk-form-icon uk-float-left" style="width:41%">
+					<i class="uk-icon-crop"></i>
+					<input class="uk-width-1-1 uk-form-small" type="number"
+						title="Scale X" data-uk-tooltip
+						v-on="click: toolT = 'scale'"
+						v-model="scaleX"
+						v-attr="disabled: !transformEnable">
+				</div>
+				<input class="uk-float-left uk-form-small" type="number"
+					style="width:41%; display:block"
+					title="Scale Y" data-uk-tooltip
+					v-on="click: toolT = 'scale'"
+					v-model="scaleY"
+					v-attr="disabled: !transformEnable">
+				<button class="uk-button uk-button-small uk-float-left" style="width:18%">
+					<i class="uk-icon-key"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="uk-width-1-6">
+		<div class="panel second">
+			Axis
+			<div data-uk-button-radio>
+				<button class="uk-button uk-button-small uk-width-1-1">Local</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Parent</button>
+				<button class="uk-button uk-button-small uk-width-1-1">Global</button>
+			</div>
+		</div>
+	</div>
+	<div class="uk-width-1-6">
+		<div class="panel second">
+			Compensate
+			<button class="uk-button uk-button-small uk-width-1-1" data-uk-button>
+				<i class="uk-icon-lock"></i>
+				Bones
+			</button>
+			<button class="uk-button uk-button-small uk-width-1-1" data-uk-button>
+				<i class="uk-icon-lock"></i>
+				Images
+			</button>
+		</div>
+	</div>
+	<div class="uk-width-1-6">
+		<div class="panel second">
+			Options
+			<table class="uk-text-small uk-width-1-1">
+				<tbody>
+					<tr>
+						<td></td>
+						<td>
+							<i class="uk-icon-edit"></i></td>
+						<td>
+							<i class="uk-icon-eye"></i></td>
+						<td>
+							<i class="uk-icon-tag"></i></td>
+					</tr>
+					<tr>
+						<td>Bones</td>
+						<td v-on="click: options.bones.selecting = !options.bones.selecting">
+							<i class="uk-icon-circle{{options.bones.selecting?'':'-thin'}}"></i></td>
+						<td v-on="click: options.bones.show = !options.bones.show">
+							<i class="uk-icon-circle{{options.bones.show?'':'-thin'}}"></i></td>
+						<td v-on="click: options.bones.names = !options.bones.names">
+							<i class="uk-icon-circle{{options.bones.names?'':'-thin'}}"></i></td>
+					</tr>
+					<tr>
+						<td>Images</td>
+						<td v-on="click: options.images.selecting = !options.images.selecting">
+							<i class="uk-icon-circle{{options.images.selecting?'':'-thin'}}"></i></td>
+						<td v-on="click: options.images.show = !options.images.show">
+							<i class="uk-icon-circle{{options.images.show?'':'-thin'}}"></i></td>
+						<td v-on="click: options.images.names = !options.images.names">
+							<i class="uk-icon-circle{{options.images.names?'':'-thin'}}"></i></td>
+					</tr>
+					<tr>
+						<td>Bounds</td>
+						<td v-on="click: options.bounds.selecting = !options.bounds.selecting">
+							<i class="uk-icon-circle{{options.bounds.selecting?'':'-thin'}}"></i></td>
+						<td v-on="click: options.bounds.show = !options.bounds.show">
+							<i class="uk-icon-circle{{options.bounds.show?'':'-thin'}}"></i></td>
+						<td v-on="click: options.bounds.names = !options.bounds.names">
+							<i class="uk-icon-circle{{options.bounds.names?'':'-thin'}}"></i></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

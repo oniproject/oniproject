@@ -1,0 +1,18 @@
+<div class="panel">
+	Curve type:
+	<div class="uk-button-group">
+		<button class="uk-button uk-button-small uk-button-success"
+			v-on="click: type='linear'"
+			v-class="uk-active: type === 'linear'">L</button>
+		<button class="uk-button uk-button-small uk-button-success"
+			v-on="click: type='bezier'"
+			v-class="uk-active: type === 'bezier'">B</button>
+		<button class="uk-button uk-button-small uk-button-success"
+			v-on="click: type='stepped'"
+			v-class="uk-active: type === 'stepped'">S</button>
+	</div>
+	<button class="uk-button uk-button-small uk-button-success">Match</button>
+	<div class="panel uk-height-1-1">
+		<canvas id="graph-canvas"></canvas>
+	</div>
+</div>

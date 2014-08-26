@@ -1,0 +1,88 @@
+#animations {
+	hr {
+		margin: 2px 0 4px;
+	}
+
+	.bone {
+		font-weight: bold;
+	}
+
+	#anim-list {
+		height: 150px;
+		.native {
+			height: 150px;
+		}
+	}
+
+	#graph-canvas {
+		width: 350px;
+		height: 150px;
+	}
+
+	.key {
+		height:1em;
+		width:3px;
+		margin-left: 2px;
+		border:1px solid black;
+		display: inline-block;
+		position: absolute;
+	}
+
+	.key.linear {
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.75);
+		-moz-box-shadow:    0px 0px 10px 0px rgba(255, 255, 255, 0.75);
+		box-shadow:         0px 0px 10px 0px rgba(255, 255, 255, 0.75);
+	}
+	.key.stepped {
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(255, 50, 50, 0.75);
+		-moz-box-shadow:    0px 0px 10px 0px rgba(255, 50, 50, 0.75);
+		box-shadow:         0px 0px 10px 0px rgba(255, 50, 50, 0.75);
+	}
+	.key.bezier {
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 255, 255, 0.75);
+		-moz-box-shadow:    0px 0px 10px 0px rgba(50, 255, 255, 0.75);
+		box-shadow:         0px 0px 10px 0px rgba(50, 255, 255, 0.75);
+	}
+
+	.key.all {
+		background: white;
+	}
+
+	.color i {
+		color: pink;
+	}
+	.key.color {
+		background: pink;
+	}
+
+	.translate i {
+		color: blue;
+	}
+	.key.translate {
+		background: blue;
+	}
+	.attachment i {
+		color: yellow;
+	}
+	.key.attachment {
+		background: yellow;
+	}
+	.scale i {
+		color: red;
+	}
+	.key.scale {
+		background: red;
+	}
+	.rotate i {
+		color: green;
+	}
+	.key.rotate {
+		background: green;
+	}
+	.event i {
+		color: purple;
+	}
+	.key.event {
+		background: purple;
+	}
+}

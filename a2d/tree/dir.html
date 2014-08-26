@@ -1,0 +1,53 @@
+<li title="{{model.type}}" data-uk-tooltip>
+	<a class="icon-button uk-position-absolute" style="left: -1.5em"
+		v-show="model.visibility !== undefined"
+		v-class="uk-text-muted: !model.visibility"
+		v-on="click: model.visibility = !model.visibility,
+		click: setVisibility(model.type, model.name, model.visibility)">
+		<i class="uk-icon-eye{{model.visibility ? '' : '-slash'}}"></i>
+	</a>
+	<a class="icon-button uk-position-absolute" style="left:0"
+		v-show="model.keyframe !== undefined"
+		v-on="click: model.keyframe = !model.keyframe">
+		<i class="uk-icon-key uk-text-{{model.keyframe ? 'danger' : 'success'}}"></i>
+	</a>
+
+	<div v-class="selected: selected.type == model.type && selected.name == model.name">
+		<a class="icon-button"
+			v-if="model.children"
+			v-on="click: open = !open">
+			<i class="uk-icon-caret-{{open ? 'down' : 'right'}}"></i>
+		</a>
+
+		<a class="icon-button" v-if="!model.children">
+			<i v-if="model.type === 'image'" class="uk-icon-image"></i>
+			<i v-if="model.type === 'region'" class="uk-icon-image"></i>
+		</a>
+
+		<div class="item folder {{model.type}} uk-clearfix"
+			v-on="
+				dblclick: model.rename = !model.rename,
+				click: select(model.type, model.name),
+				click: updateTransform(model.type, model.name)">
+			<i v-if="model.type === 'skins'" class="uk-icon-cubes"></i>
+			<i v-if="model.type === 'animations'" class="uk-icon-space-shuttle"></i>
+			<i v-if="model.type === 'draw_order'" class="uk-icon-sort-amount-desc"></i>
+			<i v-if="model.type === 'bone'" class="uk-icon-exclamation"></i>
+			<i v-if="model.type === 'slot'" class="uk-icon-dot-circle-o"></i>
+			<i v-if="model.type === 'events'" class="uk-icon-comment"></i>
+			<i v-if="model.type === 'images'" class="uk-icon-file-image-o"></i>
+
+			<span v-if="!model.name">
+				{{model.type}}
+			</span>
+			<span v-if="!model.rename">{{model.name}}</span>
+			<input class="rename"
+				v-if="model.rename && model.name"
+				v-on="keyup: model.rename = !model.rename | key enter"
+				v-model="model.name">
+		</div>
+	</div>
+	<ul v-if="open">
+		<li v-repeat="model: model.children" v-component="dir"></li>
+	</ul>
+</li>

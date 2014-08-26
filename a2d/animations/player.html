@@ -1,0 +1,48 @@
+<div>
+	<div class="uk-button-group">
+		<button class="uk-button uk-button-small"
+			v-on="click: Current=LoopStart">
+			<i class="uk-icon-fast-backward"></i>
+		</button>
+		<button class="uk-button uk-button-small"
+			v-on="click: Current--">
+			<i class="uk-icon-step-backward"></i>
+		</button>
+	</div>
+
+	<div class="uk-button-group">
+		<button class="uk-button uk-button-small uk-button-danger uk-text-small"
+			v-show="reversed"
+			v-on="click: stop">
+			<i class="uk-icon-stop"></i>
+		</button>
+		<button class="uk-button uk-button-small uk-button-primary uk-text-large"
+			v-show="!reversed"
+			v-on="click: play_reverse">
+			<i class="uk-icon-caret-left"></i>
+		</button>
+		<button class="uk-button uk-button-small uk-button-danger uk-text-small"
+			v-show="played"
+			v-on="click: stop">
+			<i class="uk-icon-stop"></i>
+		</button>
+		<button class="uk-button uk-button-small uk-button-primary uk-text-large"
+			v-show="!played"
+			v-on="click: play">
+			<i class="uk-icon-caret-right"></i>
+		</button>
+	</div>
+
+	<div class="uk-button-group">
+		<button class="uk-button uk-button-small"
+			v-on="click: Current++">
+			<i class="uk-icon-step-forward"></i>
+		</button>
+		<button class="uk-button uk-button-small"
+			v-on="click: Current=LoopEnd">
+			<i class="uk-icon-fast-forward"></i>
+		</button>
+	</div>
+
+	<button class="uk-button uk-button-small" data-uk-button><i class="uk-icon-repeat"></i></button>
+</div>

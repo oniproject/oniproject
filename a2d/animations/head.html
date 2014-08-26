@@ -1,0 +1,41 @@
+<div class="uk-float-left">
+	<button class="uk-button uk-button-primary"
+		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize">
+		<i class="uk-icon-caret-{{Dopesheet? 'down': 'up'}}"></i>
+		Dopesheet</button>
+
+	<span class="panel second ib">
+		<button class="uk-button uk-button-small"
+			title="Automaticaly scroll timeline during playback" data-uk-tooltip>
+			Current</button>
+		<input class="uk-form-width-mini uk-form-small" type="number" v-model="Current">
+		<button class="uk-button uk-button-small"
+			title="Set loop start to current frame\n Click again to clear" data-uk-tooltip>
+			Loop Start</button>
+		<input class="uk-form-width-mini uk-form-small" type="number" v-model="LoopStart">
+		<button class="uk-button uk-button-small"
+			title="Set loop end to current frame\n Click again to clear" data-uk-tooltip>
+			Loop End</button>
+		<input class="uk-form-width-mini uk-form-small" type="number" v-model="LoopEnd">
+	</span>
+
+	<span class="panel second ib">
+		<button class="uk-button uk-button-small"
+			title="Keys will be created automaticaly whenever a bone is changed" data-uk-tooltip>
+			<i class="uk-icon-key"></i>
+			Auto Key</button>
+		<button class="uk-button uk-button-small"
+			title="Toggles the ghosting options dialog" data-uk-tooltip>
+			Ghosting</button>
+		<button class="uk-button uk-button-small"
+			title="Toggles the playback options dialog" data-uk-tooltip>
+			<i class="uk-icon-play-circle"></i>
+			Playback</button>
+	</span>
+</div>
+<div class="uk-float-right">
+	<button class="uk-button uk-button-primary"
+		v-on="click: Graph = !Graph, click: Dopesheet = true, click: resize">
+		<i class="uk-icon-caret-{{Graph? 'right': 'left'}}"></i>
+		Graph</button>
+</div>

@@ -1,0 +1,60 @@
+<div class="panel uk-height-1-1 uk-position-relative">
+<div class="uk-clearfix">
+	<div class="uk-float-left">Tree</div>
+	<div class="uk-float-right">
+		<div class="uk-button-group">
+			<button class="uk-button uk-button-small uk-button-primary"
+				v-on="click: show.bones = !show.bones"
+				v-class="uk-active: show.bones"
+				title="Show bones in the tree" data-uk-tooltip="{pos:'top'}">
+				<i class="uk-icon-exclamation"></i>
+			</button>
+			<button class="uk-button uk-button-small uk-button-primary"
+				v-on="click: show.slots = !show.slots"
+				v-class="uk-active: show.slots"
+				title="Show slots in the tree" data-uk-tooltip="{pos:'top'}">
+				<i class="uk-icon-dot-circle-o"></i>
+			</button>
+			<button class="uk-button uk-button-small uk-button-primary"
+				v-on="click: show.attachments = !show.attachments"
+				v-class="uk-active: show.attachments"
+				title="Show attachments in the tree" data-uk-tooltip="{pos:'top'}">
+				<i class="uk-icon-paperclip"></i>
+			</button>
+		</div>
+		<button class="uk-button uk-button-small uk-button-primary"
+			title="Scroll tree to editor selection" data-uk-tooltip="{pos:'top'}" data-uk-button>
+			<i class="uk-icon-shield"></i>
+		</button>
+		<button class="uk-button uk-button-small"
+			title="Find and replace text in the project" data-uk-tooltip="{pos:'top'}">
+			<i class="uk-icon-search"></i>
+		</button>
+		<div class="uk-button-group">
+			<button class="uk-button uk-button-small"
+				title="Collapse all if nothing is selected,
+					else collapse everything under the selected node"
+				data-uk-tooltip="{pos:'top'}">Collapse</button>
+			<button class="uk-button uk-button-small"
+				title="Expand all if nothing is selected,
+					else expand everything under the selected node"
+				data-uk-tooltip="{pos:'top'}">Expand</button>
+		</div>
+	</div>
+</div>
+
+<div class="panel second hierarchy">
+	<div class="custom_scroll_bar">
+		<div class="native"><div class="content">
+			<ul class="uk-margin-remove uk-position-relative" style="padding: 0">
+				<li v-component="skeleton" v-with="model: skeleton"></li>
+			</ul>
+		</div></div>
+	</div>
+</div>
+<div class="uk- uk-width-1-1 uk-position-absolute" style="bottom: 0">
+	vnfdjskl<br />
+	vnfdjskl<br />
+	vnjfdkls
+</div>
+</div>

@@ -2,7 +2,10 @@
 	"name": "oniproject",
 	"version": "0.0.0",
 	"description": "",
-	"dependencies": {},
+	"dependencies": {
+		"vue": "~0.10.6",
+		"vue-placeholders": "git://github.com/lithiumjake/vue-placeholders.git"
+	},
 	"devDependencies": {
 		"browserify": "latest",
 		"watchify": "~1.0.2",
@@ -13,10 +16,14 @@
 		"gulp-buffer": "0.0.2",
 		"gulp-livereload": "~1.5.0",
 		"gulp-watch": "~0.6.5",
-		"isomer": "git+https://github.com/jdan/isomer.git"
+		"isomer": "git+https://github.com/jdan/isomer.git",
+		"partialify": "~3.1.1",
+		"insert-css": "~0.2.0",
+		"less": "1.7.4"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
+		"a2d": "watchify -e a2d/main.js -t partialify -o public/a2d.js"
 	},
 	"author": "lain-dono",
 	"license": "MIT"
