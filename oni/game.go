@@ -29,6 +29,7 @@ func (gm *Game) Run() {
 	m := martini.Classic()
 
 	store := sessions.NewCookieStore([]byte("secret123"))
+	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, Domain: "ngrok.com", HttpOnly: true})
 	m.Use(sessions.Sessions("ssid", store))
 
 	m.Get("/ws", func(sessions sessions.Session, w http.ResponseWriter, r *http.Request) (int, string) {
@@ -37,6 +38,7 @@ func (gm *Game) Run() {
 			return 401, "Unauthorized"
 		}
 		id := _id.(int64)
+		log.Println("_ID", _id, "id", id)
 
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
