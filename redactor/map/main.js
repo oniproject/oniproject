@@ -6,7 +6,7 @@ window.Isomer = require('isomer');
 
 window.commands = require('./commands');
 var Redactor = require('./redactor'),
-	Map = require('./map'),
+	Map = require('../../js/map'),
 	w = $('#canvas').width(),
 	h = $('#canvas').height(),
 	stage = new PIXI.Stage(0xFFFFFF, true),

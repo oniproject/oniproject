@@ -9,8 +9,8 @@ var browserify = require('browserify'),
 var dest = './public/';
 var apps = {
 	game:      {dest: 'main.js',      source: './js/main.js'},
-	redactor:  {dest: 'redactor.js',  source: './js/main-redactor.js'},
-	tredactor: {dest: 'tredactor.js', source: './js/main-tile-redactor.js'},
+	redactor:  {dest: 'redactor.js',  source: './redactor/map/main.js'},
+	tredactor: {dest: 'tredactor.js', source: './redactor/tile/main.js'},
 	a2d:       {dest: 'a2d.js',       source: './redactor/a2d/main.js'},
 }
 

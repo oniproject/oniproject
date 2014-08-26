@@ -2,8 +2,8 @@
 
 console.log('start');
 
-var Tileset = require('./tileset'),
-	Tilemap = require('./tilemap'),
+var Tileset = require('../../js/tileset'),
+	Tilemap = require('../../js/tilemap'),
 	WH = {
 		width: 32,
 		height: 32
