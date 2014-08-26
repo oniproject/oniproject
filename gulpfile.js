@@ -1,5 +1,6 @@
 var browserify = require('browserify'),
 	watchify = require('watchify'),
+	partialify = require('partialify'),
 	gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
 	watch = require('gulp-watch'),
@@ -10,43 +11,49 @@ var apps = {
 	game:      {dest: 'main.js',      source: './js/main.js'},
 	redactor:  {dest: 'redactor.js',  source: './js/main-redactor.js'},
 	tredactor: {dest: 'tredactor.js', source: './js/main-tile-redactor.js'},
+	a2d:       {dest: 'a2d.js',       source: './redactor/a2d/main.js'},
 }
 
-var updateFN = function(app) {
+var fn = function(app, isWatching) {
 	return function() {
-		return browserify(app.source).bundle()
-			.pipe(source(app.dest))
-			.pipe(gulp.dest(dest));
-	}
-}
-var watchFN = function(app) {
-	return function() {
-		var bundler = watchify(browserify({
-			cache: {},
-			entries: apps.game.source
-		}));
-		bundler.on('update', rebundle);
-		function rebundle() {
-			return bundler.bundle()
-				.pipe(source(apps.game.dest))
+		var bundler = browserify({
+			// Required watchify args
+			cache: {}, packageCache: {}, fullPaths: true,
+			// Browserify Options
+			entries: [app.source],
+			//extensions: ['.coffee', '.hbs', ],
+			debug: true
+		});
+
+		var bundle = function() {
+			return bundler
+				.transform(partialify)
+				.bundle()
+				//.on('error', handleErrors)
+				.pipe(source(app.dest))
 				.pipe(gulp.dest(dest));
+		};
+
+		if(isWatching) {
+			bundler = watchify(bundler);
+			bundler.on('update', bundle);
 		}
-		return rebundle();
+
+		return bundle();
 	}
 }
 
 var w = [];
 var b = [];
 for(var k in apps) {
-	gulp.task('browserify-' + k, updateFN(apps[k]));
-	gulp.task('watch-' + k, watchFN(apps[k]));
+	gulp.task('browserify-' + k, fn(apps[k], false));
+	gulp.task('watch-' + k, fn(apps[k], true));
 	b.push('browserify-' + k);
 	w.push('watch-' + k);
-	console.log(k);
 }
 
 gulp.task('watch', w);
-gulp.task('js', b);
+gulp.task('build', b);
 
 gulp.task('default', ['watch']);
 
