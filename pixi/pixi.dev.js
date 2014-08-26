@@ -11956,6 +11956,8 @@ spine.linearSearch = function (values, target, step) {
 spine.Curves = function (frameCount) {
     this.curves = []; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
     this.curves.length = (frameCount - 1) * 6;
+    this._curves = [];
+    this._curves.length = frameCount - 1;
 };
 spine.Curves.prototype = {
     setLinear: function (frameIndex) {
@@ -11968,6 +11970,7 @@ spine.Curves.prototype = {
      * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
      * the difference between the keyframe's values. */
     setCurve: function (frameIndex, cx1, cy1, cx2, cy2) {
+        this._curves[frameIndex] = [cx1, cy1, cx2, cy2];
         var subdiv_step = 1 / 10/*BEZIER_SEGMENTS*/;
         var subdiv_step2 = subdiv_step * subdiv_step;
         var subdiv_step3 = subdiv_step2 * subdiv_step;
