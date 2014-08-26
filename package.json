@@ -15,6 +15,6 @@
 	},
 	"author": "lain-dono",
 	"scripts": {
-		"dev": "watchify -e src/main.js -t partialify -o dist/bundle.js"
+		"dev": "watchify -e src/main.js -t partialify -o public/a2d.js"
 	}
 }
