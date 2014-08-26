@@ -1,50 +1,65 @@
-var browserify = require('browserify');
+var browserify = require('browserify'),
+	watchify = require('watchify'),
+	gulp = require('gulp'),
+	livereload = require('gulp-livereload'),
+	watch = require('gulp-watch'),
+	source = require('vinyl-source-stream');
 
-var gulp = require('gulp'),
-    livereload = require('gulp-livereload'),
-    source = require('vinyl-source-stream'),
-    watch = require('gulp-watch');
+var dest = './public/';
+var apps = {
+	game:      {dest: 'main.js',      source: './js/main.js'},
+	redactor:  {dest: 'redactor.js',  source: './js/main-redactor.js'},
+	tredactor: {dest: 'tredactor.js', source: './js/main-tile-redactor.js'},
+}
 
-gulp.task('js-redactor', function() {
-  var bundleStream = browserify('./js/main-redactor.js').bundle();
+var updateFN = function(app) {
+	return function() {
+		return browserify(app.source).bundle()
+			.pipe(source(app.dest))
+			.pipe(gulp.dest(dest));
+	}
+}
+var watchFN = function(app) {
+	return function() {
+		var bundler = watchify(browserify({
+			cache: {},
+			entries: apps.game.source
+		}));
+		bundler.on('update', rebundle);
+		function rebundle() {
+			return bundler.bundle()
+				.pipe(source(apps.game.dest))
+				.pipe(gulp.dest(dest));
+		}
+		return rebundle();
+	}
+}
 
-  bundleStream
-    .pipe(source('redactor.js'))
-    .pipe(gulp.dest('./public'));
-});
+var w = [];
+var b = [];
+for(var k in apps) {
+	gulp.task('browserify-' + k, updateFN(apps[k]));
+	gulp.task('watch-' + k, watchFN(apps[k]));
+	b.push('browserify-' + k);
+	w.push('watch-' + k);
+	console.log(k);
+}
 
-gulp.task('js-tredactor', function() {
-  var bundleStream = browserify('./js/main-tile-redactor.js').bundle();
-
-  bundleStream
-    .pipe(source('tile-redactor.js'))
-    .pipe(gulp.dest('./public'));
-});
-
-gulp.task('js', function() {
-  var bundleStream = browserify('./js/main.js').bundle();
-
-  bundleStream
-    .pipe(source('main.js'))
-    .pipe(gulp.dest('./public'));
-});
-
-gulp.task('watch', ['js', 'js-redactor', 'js-tredactor'], function() {
-  gulp.watch('js/**', ['js', 'js-redactor', 'js-tredactor'])
-});
-
-gulp.task('server', function(next) {
-  var connect = require('connect'),
-      server = connect();
-  server.use(connect.static('./')).listen(process.env.PORT || 9999, next);
-});
-
-gulp.task('reload', ['server'], function() {
-  var server = livereload();
-  gulp.watch('public/**').on('change', function(event) {
-      server.changed(event.path);
-      console.log('File '+event.path+' was '+event.type+', running tasks...');
-  });
-});
+gulp.task('watch', w);
+gulp.task('js', b);
 
 gulp.task('default', ['watch']);
+
+/* reload */
+gulp.task('server', function(next) {
+	var connect = require('connect'),
+		server = connect();
+	server.use(connect.static('./')).listen(process.env.PORT || 9999, next);
+});
+gulp.task('reload', ['server'], function() {
+	var server = livereload();
+	gulp.watch('public/**').on('change', function(event) {
+		server.changed(event.path);
+		console.log('File '+event.path+' was '+event.type+', running tasks...');
+	});
+});
