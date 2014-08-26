@@ -1,10 +1,10 @@
-<div class="uk-float-left panel">
+<div class="uk-float-left">
 	<button class="uk-button uk-button-primary"
 		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize">
 		<i class="uk-icon-caret-{{Dopesheet? 'down': 'up'}}"></i>
 		Dopesheet</button>
 
-	<span class="panel ib">
+	<span class="panel second ib">
 		<button class="uk-button uk-button-small"
 			title="Automaticaly scroll timeline during playback" data-uk-tooltip>
 			Current</button>
@@ -19,7 +19,7 @@
 		<input class="uk-form-width-mini uk-form-small" type="number" v-model="LoopEnd">
 	</span>
 
-	<span class="panel ib">
+	<span class="panel second ib">
 		<button class="uk-button uk-button-small"
 			title="Keys will be created automaticaly whenever a bone is changed" data-uk-tooltip>
 			<i class="uk-icon-key"></i>

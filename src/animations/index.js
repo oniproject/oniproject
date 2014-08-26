@@ -7,7 +7,8 @@ module.exports = {
 	id: 'animations',
 	template: require('./template.html'),
 	data: {
-		msg: 'I am component Animations!'
+		Dopesheet: false,
+		Graph: false,
 	},
 	methods: {
 		setCurve: function(curve) {

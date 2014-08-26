@@ -51,14 +51,22 @@ function onAssetsLoaded() {
 	//boneDrawer.position.y = Spine.position.y = window.innerHeight/4 + (450 * scale);
 	//boneDrawer.scale.x = boneDrawer.scale.y = Spine.scale.x = Spine.scale.y = scale
 
-	Spine.state.setAnimationByName('flying', true);
-	//setTimeout(function(){Spine.state.clearAnimation()}, 2000);
-	//Spine.state.setAnimation('FAIL', true);
-	
 	window.UpdateSetup = function() {
 		Spine.state.clearAnimation();
 		Spine.skeleton.setToSetupPose();
 	}
+
+	Spine.state.setAnimationByName('flying', false);
+	for(var i=0;i<100;i++) {
+		Spine.stage.currentTime = i/100;
+		Spine.updateTransform();
+	}
+	Spine.stage.animationSpeed = 0;
+	UpdateSetup();
+	//Spine.state.setAnimationByName('flying', true);
+	//setTimeout(function(){Spine.state.clearAnimation()}, 2000);
+	//Spine.state.setAnimation('FAIL', true);
+	
 	bbDrawer.updateTransform = function() {
 		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
 		bbDrawer.clear();
@@ -112,27 +120,9 @@ function onAssetsLoaded() {
 				type: '',
 				name: '',
 			},
-			options: {
-				bones: {
-					selecting: true,
-					show: true,
-					names: false,
-				},
-				images: {
-					selecting: true,
-					show: true,
-					names: false,
-				},
-				bounds: {
-					selecting: true,
-					show: false,
-					names: false,
-				},
-			},
-			toolT: 'none',
-			transformEnable: false,
-			played: true,
+			played: false,
 			reversed: false,
+
 			Time: 0.4,
 			LoopStart: 0,
 			LoopEnd: 30,
@@ -140,13 +130,10 @@ function onAssetsLoaded() {
 
 			animHeight: 0,
 			otherHeight: 0,
-
-			Dopesheet: false,
-			Graph: false,
 		},
 		methods: {
-			setVisiblity: function(type, name, val) {
-				console.log('setVisiblity', type, name, val);
+			setVisibility: function(type, name, val) {
+				console.log('setVisibility', type, name, val);
 			},
 			resize: function() {
 				console.log('resize');
@@ -159,7 +146,7 @@ function onAssetsLoaded() {
 				this.$data.reversed = false;
 				Spine.state.animationSpeed = 0;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
-				this.$data.transformEnable = true;
+				this.$.Tools.transformEnable = true;
 			},
 			play: function() {
 				console.info('play');
@@ -170,7 +157,7 @@ function onAssetsLoaded() {
 				Spine.state.animationSpeed = this.$data.speed;
 				Spine.state.currentTime -= Spine.state.currentTime|0;
 
-				this.$data.transformEnable = false;
+				this.$.Tools.transformEnable = false;
 			},
 			play_reverse: function() {
 				console.info('play_reverse');
@@ -181,106 +168,122 @@ function onAssetsLoaded() {
 				Spine.state.animationSpeed = -this.$data.speed;
 				Spine.state.currentTime = Spine.state.currentTime - (Spine.state.currentTime|0) + 10000;
 
-				this.$data.transformEnable = false;
+				this.$.Tools.transformEnable = false;
 			},
 			updateTransform: function(type, name) {
-				console.log('updateTransform[%s] %s', type, name);
 				if(!this.$data.played && !this.$data.reversed) {
-					this.$data.transformEnable = type === 'bone';
+					this.$.Tools.transformEnable = type === 'bone';
 				}
-				if(!this.$data.transformEnable) {
-					this.$data.toolT = 'none';
+				if(!this.$.Tools.transformEnable) {
+					this.$.Tools.toolT = 'none';
 				}
+				console.log('updateTransform[%s] %s', type, name);
 			},
 		},
 		components: {
 			a: require('./component-a'),
 			b: require('./component-b'),
-			Animations: require('./animations'),
+			AnimationsComponent: require('./animations'),
 			Tools: require('./tools'),
 			Tree: require('./tree'),
 		},
 		template: require('./app.html'),
 		computed: {
-			Spine: function() {
-				return Spine;
+			Spine: function() { return Spine; },
+			Bones: function() {
+				var bones = [];
+				for(var i=0, l=Spine.skeleton.bones.length; i<l;i++) {
+					var bone = Spine.skeleton.bones[i];
+					bones.push({
+						name: bone.data.name,
+						parent: bone.parent? bone.parent.data.name: '',
+						length: bone.data.length,
+						data: {
+							rotation: bone.data.rotation,
+							position: {x: bone.data.x, y: bone.data.y},
+							scale: {x: bone.data.scaleX, y: bone.data.scaleY},
+						},
+						local: {
+							rotation: bone.rotation,
+							position: {x: bone.x, y: bone.y},
+							scale: {x: bone.scaleX, y: bone.scaleY},
+						},
+						world: {
+							rotation: bone.worldRotation,
+							position: {x: bone.worldX, y: bone.worldY},
+							scale: {x: bone.worldScaleX, y: bone.worldScaleY},
+						}
+					});
+				}
+				return bones;
 			},
+			Slots: function() {
+				var slots = [];
+				for(var i=0, l=Spine.skeleton.drawOrder.length; i<l;i++) {
+					var slot = Spine.skeleton.drawOrder[i];
+					var s = {
+						name: slot.data.name,
+						bone: slot.bone.data.name,
+						color: {r: slot.r, g: slot.g, b: slot.b, a: slot.a},
+						attachments: [],
+					};
+					slots.push(s);
+					// TODO find in animations ?
+					for(var k in slot.sprites) {
+						if(slot.sprites.hasOwnProperty(k)) {
+							s.attachments.push({
+								name: k,
+								visible: slot.sprites[k].visible
+							});
+						}
+					}
+				}
+				return slots;
+			},
+			Animations: function() {
+				var animations = [];
+				for(var i=0, l=Spine.skeleton.data.animations.length; i<l; i++) {
+					var a = Spine.skeleton.data.animations[i];
+					// TODO parse timelines
+					animations.push({name: a.name});
+				}
+				return animations;
+			},
+			Attachments: function() {
+				var attachments = [];
+				// TODO get current skin
+				var skin = Spine.skeleton.data.defaultSkin;
+				for(var k in skin.attachments) {
+					if(skin.attachments.hasOwnProperty(k)) {
+						var a = skin.attachments[k];
+						attachments.push({
+							name: a.rendererObject.name,
+						});
+					}
+				}
+				return attachments;
+			},
+			Skins: function() {
+				var skins = [];
+				for(var i=0, l=Spine.skeleton.data.skins.length; i<l;i++) {
+					var skin = Spine.skeleton.data.skins[i];
+					//if(skin.name !== 'default') {
+						skins.push({name: skin.name});
+					//}
+				}
+				return skins;
+			},
+
+			// current time
 			Current: {
 				$get: function() {
 					return (this.Time*31) |0;
 				},
 				$set: function(val) {
-					if(val<0) {
+					if (val<0) {
 						val=0;
 					}
 					Spine.state.currentTime = val / 31;
-				},
-			},
-			rotation: {
-				$get: function() {
-					if(this.selected.type === 'bone') {
-						return Spine.skeleton.findBone(this.selected.name).data.rotation;
-					}
-					return NaN;
-				},
-				$set: function(val) {
-					if(this.selected.type === 'bone') {
-						Spine.skeleton.findBone(this.selected.name).data.rotation = +val;
-						UpdateSetup();
-						console.warn('angle $set', this.selected.name, val);
-					}
-				},
-			},
-			translateX: {
-				$get: function() {
-					if(this.selected.type === 'bone') {
-						return Spine.skeleton.findBone(this.selected.name).data.x;
-					}
-					return NaN;
-				},
-				$set: function(val) {
-					if(this.selected.type === 'bone') {
-						Spine.skeleton.findBone(this.selected.name).data.x = +val;
-					}
-				},
-			},
-			translateY: {
-				$get: function() {
-					if(this.selected.type === 'bone') {
-						return Spine.skeleton.findBone(this.selected.name).data.y;
-					}
-					return NaN;
-				},
-				$set: function(val) {
-					if(this.selected.type === 'bone') {
-						Spine.skeleton.findBone(this.selected.name).data.y = +val;
-					}
-				},
-			},
-			scaleX: {
-				$get: function() {
-					if(this.selected.type === 'bone') {
-						return Spine.skeleton.findBone(this.selected.name).data.scaleX;
-					}
-					return NaN;
-				},
-				$set: function(val) {
-					if(this.selected.type === 'bone') {
-						Spine.skeleton.findBone(this.selected.name).data.scaleX = +val;
-					}
-				},
-			},
-			scaleY: {
-				$get: function() {
-					if(this.selected.type === 'bone') {
-						return Spine.skeleton.findBone(this.selected.name).data.scaleY;
-					}
-					return NaN;
-				},
-				$set: function(val) {
-					if(this.selected.type === 'bone') {
-						Spine.skeleton.findBone(this.selected.name).data.scaleY = +val;
-					}
 				},
 			},
 		},

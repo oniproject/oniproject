@@ -3,12 +3,16 @@
 		<i class="uk-icon-circle uk-text-{{model.keyframe ? 'danger' : 'success'}}"
 			v-show="model.keyframe !== undefined"
 			v-on="click: model.keyframe = !model.keyframe"></i>
-		<i class="uk-icon-{{model.visiblity ? 'circle' : 'circle-thin'}}"
-			v-show="model.visiblity !== undefined"
-			v-on="click: model.visiblity = !model.visiblity" ></i>
+		<i class="uk-icon-{{model.visibility ? 'circle' : 'circle-thin'}}"
+			v-show="model.visibility !== undefined"
+			v-on="click: model.visibility = !model.visibility" ></i>
 		&nbsp;
 	</div>
-	<a class="uk-button uk-button-mini uk-float-left">
+	<div class="uk-float-left">
+		&nbsp;
+		<i v-if="model.type === 'image'" class="uk-icon-image"></i>
+		<i v-if="model.type === 'region'" class="uk-icon-image"></i>
+		{{model.type}}
 		{{model.name}}
-	</a>
+	</div>
 </div>
