@@ -1,23 +1,19 @@
 'use strict';
 
-var Vue = require('vue');
+var Vue = require('vue'),
+	Isomer = require('isomer'),
+	saveAs = require('filesaver.js'),
+	commands = require('./commands'),
+	Map = require('../../js/map');
 
 console.log('start');
-
-window.Isomer = require('isomer');
-
-window.commands = require('./commands');
-var Redactor = require('./redactor'),
-	Map = require('../../js/map'),
-	stage = new PIXI.Stage(0xFFFFFF, true);
-
+var stage = new PIXI.Stage(0xFFFFFF, true);
 
 var app = new Vue({
 	el: '#Redactor',
 	template: require('./app.html'),
 	data: {
 		active: -1,
-		w: 0, h: 0,
 		origin: {x: 0, y: 0},
 		current: 0,
 		commands: [],
@@ -114,13 +110,11 @@ var app = new Vue({
 		resize: function() {
 			var w = $('#canvas').width(),
 				h = $('#canvas').height();
-
 			this.$options.renderer.resize(w, h);
 			this.$options.iso.originX = w / 2 + this.originX;
 			this.$options.iso.originY = h * 0.9 + this.originY;
 		},
 		run: function(command) {
-			console.log('spliceX', this.current, this.commands.length - 1);
 			if (this.current < this.commands.length - 1) {
 				this.commands.splice(this.current);
 				console.log('splice');
@@ -128,10 +122,9 @@ var app = new Vue({
 			command.redo(this.$options.map);
 			this.commands.push(command);
 			this.current++;
-			//$.UIkit.notify(command.constructor.name, msgSuccess);
 			console.info('run', command.constructor.name);
 			this.syncList();
-			//this.setActive(this.active);
+			this.setActive(this.active);
 		},
 		syncList: function() {
 			if(this.$.objList) {
@@ -162,12 +155,9 @@ var app = new Vue({
 			console.info('redo ' + count + '(' + levels + ')');
 			this.syncList();
 			this.setActive(this.active);
-
 			return count;
 		},
-
 		setActive: function(id) {
-			console.info('setActive', id);
 			this.active = id;
 
 			var obj = this.$options.map.objects[id];
@@ -210,33 +200,30 @@ var app = new Vue({
 
 		iso.canvas.path_line = iso.canvas.pathLine = function(points) {
 			this.moveTo(points[0].x, points[0].y);
-
 			for (var i = 1; i < points.length; i++) {
 				this.lineTo(points[i].x, points[i].y);
 			}
-
 			this.lineTo(points[0].x, points[0].y);
 		}
 
 		iso.canvas.path = function(points, color) {
-			var c = color.r * 256 * 256 + color.g * 256 + color.b,
-				graphics = this; // for moar speed
-			graphics.beginFill(c, color.a).moveTo(points[0].x, points[0].y);
+			var c = color.r * 256 * 256 + color.g * 256 + color.b;
+			this.beginFill(c, color.a).moveTo(points[0].x, points[0].y);
 			for (var i = 1; i < points.length; i++) {
-				graphics.lineTo(points[i].x, points[i].y);
+				this.lineTo(points[i].x, points[i].y);
 			}
 			// XXX hack for pixi v1.6.0
 			if (points.length % 2) {
-				graphics.lineTo(points[0].x, points[0].y);
+				this.lineTo(points[0].x, points[0].y);
 			}
-			graphics.endFill();
+			this.endFill();
 		}
 
 		var map = this.$options.map = new Map(iso);
 
+		_initUI(this);
 
-		//window.redactor = new Redactor(new Map(iso));
-
+		// test map
 		Vue.nextTick((function() {
 			this.run(new commands.AddPrism([1, 0, 0], [4, 4, 2]));
 			this.run(new commands.AddPrism([0, 0, 0], [1, 4, 1]));
@@ -278,35 +265,6 @@ var app = new Vue({
 				[2, 3, 1],
 			], 0.3, [0, 0, 0], [1, 1, 1], [50, 160, 60, 0]));
 		}).bind(this))
-
-	var msgSuccess = {
-		pos: 'top-right',
-		timeout: 150,
-		status: 'success'
-	},
-	msgDanger = {
-		pos: 'top-right',
-		timeout: 150,
-		status: 'danger'
-	};
-	var that = this;
-		$('#undo').click(function(event) {
-			event.preventDefault();
-			if (that.undo(1)) {
-				$.UIkit.notify('undo', msgSuccess);
-			} else {
-				$.UIkit.notify('undo empty', msgDanger);
-			}
-		});
-		$('#redo').click(function(event) {
-			event.preventDefault();
-			if (that.redo(1)) {
-				$.UIkit.notify('redo', msgSuccess);
-			} else {
-				$.UIkit.notify('redo empty', msgDanger);
-			}
-		});
-
 	},
 });
 
@@ -345,3 +303,74 @@ function animate() {
 }
 requestAnimFrame(animate);
 
+function _initUI(that) {
+	var msgSuccess = {
+		pos: 'top-right',
+		timeout: 150,
+		status: 'success'
+	};
+	var msgDanger = {
+		pos: 'top-right',
+		timeout: 150,
+		status: 'danger'
+	};
+	$('#undo').click(function(event) {
+		event.preventDefault();
+		if (that.undo(1)) {
+			$.UIkit.notify('undo', msgSuccess);
+		} else {
+			$.UIkit.notify('undo empty', msgDanger);
+		}
+	});
+	$('#redo').click(function(event) {
+		event.preventDefault();
+		if (that.redo(1)) {
+			$.UIkit.notify('redo', msgSuccess);
+		} else {
+			$.UIkit.notify('redo empty', msgDanger);
+		}
+	});
+
+	$('#download').click(function() {
+		var blob = new Blob([JSON.stringify({
+			objects: that.$options.map.objects
+		})], {
+			type: 'text/json;charset=utf-8'
+		});
+		saveAs(blob, 'map.json');
+	});
+
+	function handleFileSelect(event) {
+		event.stopPropagation();
+		event.preventDefault();
+
+		var files = event.dataTransfer.files,
+			f = files[0];
+		console.log(f.name, f.size, f.lastModifiedDate);
+
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			that.$options.map.objects = JSON.parse(e.target.result).objects;
+		};
+		reader.readAsText(f);
+
+		$('#UploadModal a.uk-close').click();
+	}
+
+	function handleDragOver(event) {
+		event.stopPropagation();
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+		$('#upload-drop').addClass('uk-dragover');
+	}
+
+	function handleDragLeave(event) {
+		$('#upload-drop').removeClass('uk-dragover');
+	}
+
+	// Setup the dnd listeners.
+	var dropZone = document.getElementById('upload-drop');
+	dropZone.addEventListener('dragover', handleDragOver, false);
+	dropZone.addEventListener('dragleave', handleDragLeave, false);
+	dropZone.addEventListener('drop', handleFileSelect, false);
+}
