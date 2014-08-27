@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" class="uk-height-1-1">
+<head>
+	<title>Tilemap editor 2d</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/css/uikit.min.css" />
+	<link rel="stylesheet" href="/css/addons/uikit.addons.min.css">
+<style>
+html, body {
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.img {
+	width: 32px;
+	height:32px;
+	display: inline-block;
+	margin:0;
+}
+#tabs li {
+	line-height: 0;
+}
+
+</style>
+</head>
+<body class="uk-height-1-1">
+	<nav class="uk-navbar uk-position-absolute uk-width-1-1" style="z-index: 2">
+		<a class="uk-navbar-brand" href="">Tilemap editor</a>
+		<ul class="uk-navbar-nav">
+			<li><a href="/a2d.html">Animation editor</a></li>
+			<li><a href="/map.html">Map editor</a></li>
+		</ul>
+	</nav>
+
+
+<!-- CANVAS -->
+<div id="canvas" style="position: absolute;" class="uk-width-1-1 uk-height-1-1"></div>
+
+<div style="position: absolute; padding-top:3em;" class="uk-grid uk-grid-small uk-height-1-1 uk-width-1-5 uk-margin-remove">
+<!-- OBJECT -->
+		<div id="palete" class="uk-panel uk-panel-box uk-width-1-1">
+			<input type="radio" name="layer" value="first" v-model="layer">
+			<input type="radio" name="layer" value="second" v-model="layer">
+			<input type="radio" name="layer" value="third" v-model="layer">
+			``layer`` ``t`` ``v`` ``auto``
+			 isFill: <input type="checkbox" v-model="isFill">``isFill ? "yes" : "no"``
+			<ul class="uk-tab" data-uk-tab data-uk-switcher="{connect: '#tabs'}">
+				<li><a href="">A</a></li>
+				<li><a href="">3</a></li>
+				<li><a href="">4</a></li>
+				<li><a href="">5</a></li>
+				<li><a href="">B</a></li>
+				<li><a href="">C</a></li>
+				<li class="uk-disabled"><a href="">D</a></li>
+				<li class="uk-disabled"><a href="">E</a></li>
+			</ul>
+			<ul id="tabs" class="uk-switcher">
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="A1" v-on="click: setActive('A1', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+					<div class="img" v-repeat="A2" v-on="click: setActive('A2', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="A3" v-on="click: setActive('A3', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="A4" v-on="click: setActive('A4', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="A5" v-on="click: setActive('A5', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="B" v-on="click: setActive('B', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="C" v-on="click: setActive('C', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="D" v-on="click: setActive('D', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+				<li class="uk-scrollable-text">
+					<div class="img" v-repeat="E" v-on="click: setActive('E', $index)" v-style="
+						background: 'url(' + img + ') repeat scroll '+ x*32 +'px '+ y*32 +'px transparent'
+					"></div>
+				</li>
+			</ul>
+			<div id="xcanvas"></div>
+
+		</div>
+
+<!-- HACK -->
+</div>
+
+
+
+	<div id="app" class="uk-height-1-1"></div>
+	<script src="/js/jquery-2.1.1.min.js"></script>
+	<script src="/js/uikit.js"></script>
+	<script src="/js/addons/notify.min.js"></script>
+	<script src="/patched.pixi.js"></script>
+	<script src="/js/vue.js"></script>
+<script>
+Vue.config({
+	delimiters: ['`', '`'],
+});
+</script>
+	<script src="/tile-redactor.js"></script>
+</body>
+</html>
