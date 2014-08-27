@@ -115,6 +115,7 @@ function onAssetsLoaded() {
 
 	app = new Vue({
 		el: '#app',
+		template: require('./app.html'),
 		data: {
 			selected: {
 				type: '',
@@ -187,7 +188,6 @@ function onAssetsLoaded() {
 			Tools: require('./tools'),
 			Tree: require('./tree'),
 		},
-		template: require('./app.html'),
 		computed: {
 			Spine: function() { return Spine; },
 			Bones: function() {

@@ -1,0 +1,24 @@
+<canvas id="canvas" class="uk-width-1-1 uk-height-1-1 uk-position-absolute"></canvas>
+
+<div class="uk-grid uk-grid-small uk-height-1-1 uk-width-1-1 uk-position-absolute uk-margin-remove">
+	<div id="Tools" v-component="Tools" v-ref="Tools" class="uk-width-2-10 uk-width-large-1-10 uk-height-1-1"></div>
+	<div class="uk-width-3-10 uk-width-large-7-10 uk-height-1-1"></div>
+	<div id="obj-list" v-component="objList" v-ref="objList" class="uk-width-3-10 uk-width-large-2-10 uk-height-1-1"></div>
+</div>
+
+<!-- MODALS -->
+
+<div id="UploadModal" class="uk-modal">
+	<div class="uk-modal-dialog uk-modal-dialog-frameless">
+		<a class="uk-modal-close uk-close uk-close-alt"></a>
+		<div id="upload-drop" class="uk-placeholder uk-text-center">
+			<i class="uk-icon-upload uk-icon-large uk-text-muted uk-margin-small-right"></i>
+		</div>
+	</div>
+</div>
+
+<div v-component="prism" id="AddPrismModal" class="uk-modal"></div>
+<div v-component="pyramid" id="AddPyramidModal" class="uk-modal"></div>
+<div v-component="cylinder" id="AddCylinderModal" class="uk-modal"></div>
+<div v-component="shape" id="AddShapeModal" class="uk-modal"></div>
+<div v-component="path" id="AddPathModal" class="uk-modal"></div>

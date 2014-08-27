@@ -1,0 +1,7 @@
+<br/><br/>
+
+<div class="uk-panel uk-panel-box uk-scrollable-text uk-height-1-1">
+	<ul id="obj-list" class="uk-nav uk-nav-side">
+		<li v-repeat="list" v-on="click: setActiveClick($index)" v-class="uk-active: active === $index"><a href="#">{{$index}} {{type}}</a></li>
+	</ul>
+</div>

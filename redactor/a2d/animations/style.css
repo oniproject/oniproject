@@ -29,19 +29,19 @@
 	}
 
 	.key.linear {
-		-webkit-box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.75);
-		-moz-box-shadow:    0px 0px 10px 0px rgba(255, 255, 255, 0.75);
-		box-shadow:         0px 0px 10px 0px rgba(255, 255, 255, 0.75);
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.9);
+		-moz-box-shadow:    0px 0px 10px 0px rgba(255, 255, 255, 0.9);
+		box-shadow:         0px 0px 10px 0px rgba(255, 255, 255, 0.9);
 	}
 	.key.stepped {
-		-webkit-box-shadow: 0px 0px 10px 0px rgba(255, 50, 50, 0.75);
-		-moz-box-shadow:    0px 0px 10px 0px rgba(255, 50, 50, 0.75);
-		box-shadow:         0px 0px 10px 0px rgba(255, 50, 50, 0.75);
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(255, 50, 50, 0.9);
+		-moz-box-shadow:    0px 0px 10px 0px rgba(255, 50, 50, 0.9);
+		box-shadow:         0px 0px 10px 0px rgba(255, 50, 50, 0.9);
 	}
 	.key.bezier {
-		-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 255, 255, 0.75);
-		-moz-box-shadow:    0px 0px 10px 0px rgba(50, 255, 255, 0.75);
-		box-shadow:         0px 0px 10px 0px rgba(50, 255, 255, 0.75);
+		-webkit-box-shadow: 0px 0px 10px 0px rgba(50, 255, 255, 0.9);
+		-moz-box-shadow:    0px 0px 10px 0px rgba(50, 255, 255, 0.9);
+		box-shadow:         0px 0px 10px 0px rgba(50, 255, 255, 0.9);
 	}
 
 	.key.all {
