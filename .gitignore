@@ -2,6 +2,7 @@ node_modules
 *.bin
 
 public/main.js
+public/a2d.js
 public/redactor.js
 public/tile-redactor.js
 public/tredactor.js
