@@ -1,6 +1,7 @@
 var browserify = require('browserify'),
 	watchify = require('watchify'),
 	partialify = require('partialify'),
+	exorcist   = require('exorcist'),
 	gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
 	watch = require('gulp-watch'),
@@ -12,6 +13,12 @@ var apps = {
 	redactor:  {dest: 'redactor.js',  source: './redactor/map/main.js'},
 	tredactor: {dest: 'tredactor.js', source: './redactor/tile/main.js'},
 	a2d:       {dest: 'a2d.js',       source: './redactor/a2d/main.js'},
+}
+
+function handleErrors(err) {
+	var args = Array.prototype.slice.call(arguments);
+	console.error(err.toString());
+	this.emit('end');
 }
 
 var fn = function(app, isWatching) {
@@ -28,8 +35,7 @@ var fn = function(app, isWatching) {
 		var bundle = function() {
 			return bundler
 				.transform(partialify)
-				.bundle()
-				//.on('error', handleErrors)
+				.bundle().on('error', handleErrors)
 				.pipe(source(app.dest))
 				.pipe(gulp.dest(dest));
 		};
