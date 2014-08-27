@@ -4,3 +4,4 @@ node_modules
 public/main.js
 public/redactor.js
 public/tile-redactor.js
+public/tredactor.js
