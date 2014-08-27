@@ -1,5 +1,7 @@
 node_modules
+npm-debug.log
 *.bin
+*.map
 
 public/main.js
 public/a2d.js

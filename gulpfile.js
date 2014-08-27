@@ -2,6 +2,7 @@ var browserify = require('browserify'),
 	watchify = require('watchify'),
 	partialify = require('partialify'),
 	exorcist   = require('exorcist'),
+	transform =require('vinyl-transform'),
 	gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
 	watch = require('gulp-watch'),
@@ -37,6 +38,7 @@ var fn = function(app, isWatching) {
 				.transform(partialify)
 				.bundle().on('error', handleErrors)
 				.pipe(source(app.dest))
+				.pipe(transform(function () { return exorcist(dest+app.dest+'.map'); }))
 				.pipe(gulp.dest(dest));
 		};
 
