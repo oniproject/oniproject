@@ -7,10 +7,11 @@ var Vue = require('vue'),
 	Map = require('../../js/map');
 
 console.log('start');
-var stage = new PIXI.Stage(0xFFFFFF, true);
 
-var app = new Vue({
-	el: '#Redactor',
+
+//var app = new Vue({
+module.exports =  {
+	//el: '#Redactor',
 	template: require('./app.html'),
 	data: {
 		active: -1,
@@ -21,6 +22,7 @@ var app = new Vue({
 	iso: null,
 	renderer: null,
 	map: null,
+	stage: null,
 	computed: {
 		originX: {
 			$get: function() { return this.origin.x; },
@@ -190,8 +192,30 @@ var app = new Vue({
 				}
 			}
 		},
+		load: function(url) {
+			console.log('load start');
+			var r = new XMLHttpRequest();
+			r.open('GET', url, true);
+			var that = this;
+			r.onreadystatechange = function() {
+				if (r.readyState != 4 || r.status != 200) { return; }
+				var json = JSON.parse(r.responseText);
+				console.log('load end', json);
+				that.$options.map.objects = json.objects;
+				that.syncList();
+			};
+			r.send();
+		},
+	},
+	attached: function() {
+		Vue.nextTick(this.resize.bind(this));
 	},
 	created: function() {
+		this.$on('undo', this.undo);
+		this.$on('redo', this.redo);
+		this.$on('load', this.load);
+
+		var stage = this.$options.stage =  new PIXI.Stage(0xFFFFFF, true);
 		var renderer = this.$options.renderer = PIXI.autoDetectRenderer(1, 1, this.$el.getElementsByTagName('canvas')[0], true, true);
 
 		var iso = this.$options.iso = new Isomer(renderer.view);
@@ -224,7 +248,8 @@ var app = new Vue({
 		_initUI(this);
 
 		// test map
-		Vue.nextTick((function() {
+		/*Vue.nextTick((function() {
+			this.resize();
 			this.run(new commands.AddPrism([1, 0, 0], [4, 4, 2]));
 			this.run(new commands.AddPrism([0, 0, 0], [1, 4, 1]));
 			this.run(new commands.AddPrism([-1, 1, 0], [1, 2, 1]));
@@ -264,46 +289,13 @@ var app = new Vue({
 				[2, 1, 1],
 				[2, 3, 1],
 			], 0.3, [0, 0, 0], [1, 1, 1], [50, 160, 60, 0]));
-		}).bind(this))
+		}).bind(this))*/
 	},
-});
+}//);
 
-var originX = 0,
-	originY = 0,
-	moveSpeed = 30,
-	keyCodes = {
-	37: function(event) {
-		app.originX += moveSpeed;
-	},
-	38: function(event) {
-		app.originY += moveSpeed;
-	},
-	39: function(event) {
-		app.originX -= moveSpeed;
-	},
-	40: function(event) {
-		app.originY -= moveSpeed;
-	},
-}
-document.onkeydown = function(event) {
-	var f = keyCodes[event.keyCode];
-	if (f) {
-		event.preventDefault();
-		f(event);
-	}
-}
-window.onresize = app.resize.bind(app);
-app.resize();
-
-
-function animate() {
-	app.render();
-	app.$options.renderer.render(stage);
-	requestAnimFrame(animate);
-}
-requestAnimFrame(animate);
 
 function _initUI(that) {
+	/*
 	var msgSuccess = {
 		pos: 'top-right',
 		timeout: 150,
@@ -373,4 +365,42 @@ function _initUI(that) {
 	dropZone.addEventListener('dragover', handleDragOver, false);
 	dropZone.addEventListener('dragleave', handleDragLeave, false);
 	dropZone.addEventListener('drop', handleFileSelect, false);
+	*/
+
+var app = that;
+
+var originX = 0,
+	originY = 0,
+	moveSpeed = 30,
+	keyCodes = {
+	37: function(event) {
+		app.originX += moveSpeed;
+	},
+	38: function(event) {
+		app.originY += moveSpeed;
+	},
+	39: function(event) {
+		app.originX -= moveSpeed;
+	},
+	40: function(event) {
+		app.originY -= moveSpeed;
+	},
+}
+document.onkeydown = function(event) {
+	var f = keyCodes[event.keyCode];
+	if (f) {
+		event.preventDefault();
+		f(event);
+	}
+}
+window.onresize = app.resize.bind(app);
+app.resize();
+
+
+function animate() {
+	app.render();
+	app.$options.renderer.render(app.$options.stage);
+	requestAnimFrame(animate);
+}
+requestAnimFrame(animate);
 }
