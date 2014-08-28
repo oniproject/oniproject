@@ -50,4 +50,7 @@
 	<ul v-if="open">
 		<li v-repeat="model: model.children" v-component="dir"></li>
 	</ul>
+	<ul v-if="open && model.gen">
+		<li v-repeat="model: children" v-component="dir"></li>
+	</ul>
 </li>

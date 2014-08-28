@@ -13,13 +13,6 @@ html, body {
 	background: #cc0000;
 }
 
-.uk-position-relative {
-	position: relative;
-}
-.uk-position-absolute {
-	position: absolute;
-}
-
 .panel, .panelX {
 	background: #666666;
 	color: white;

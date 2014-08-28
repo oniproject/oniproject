@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
 	replace: true,
 	template: require('./dir.html'),

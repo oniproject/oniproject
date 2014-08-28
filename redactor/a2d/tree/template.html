@@ -46,8 +46,13 @@
 <div class="panel second hierarchy">
 	<div class="custom_scroll_bar">
 		<div class="native"><div class="content">
-			<ul class="uk-margin-remove uk-position-relative" style="padding: 0">
-				<li v-component="skeleton" v-with="model: skeleton"></li>
+			<ul class="uk-margin-remove uk-position-relative">
+				<li v-show="show.bones" v-component="bones"></li>
+				<li v-show="show.slots" v-component="draw_order"></li>
+				<li v-component="images"></li>
+				<li v-component="skins"></li>
+				<li v-component="animations"></li>
+				<li v-component="events"></li>
 			</ul>
 		</div></div>
 	</div>
