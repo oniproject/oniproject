@@ -100,8 +100,6 @@ module.exports = {
 		otherHeight: 0,
 	},
 	components: {
-		a: require('./component-a'),
-		b: require('./component-b'),
 		AnimationsComponent: require('./animations'),
 		Tools: require('./tools'),
 		Tree: require('./tree'),
