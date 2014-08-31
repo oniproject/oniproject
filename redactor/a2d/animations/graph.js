@@ -14,84 +14,81 @@ spine.Curves.prototype = {
 
 module.exports = {
 	id: 'graph',
-	ctx: null,
-	canvas: null,
+	components: {
+		svg: {
+			data: {
+				//p1: {x: 20,  y: 200-30},
+				//p2: {x: 350-20, y: 30},
+				c1: {x: 100, y: 30},
+				c2: {x: 200, y: 70},
+				dPoint: {x: 0, y: 0},
+				isDrag: '',
+				// offsets
+				left: 20,
+				right: 40,
+				top: 60,
+				bottom: 30,
+			},
+			methods: {
+				drag: function(event) {
+					event.preventDefault();
+					this.dPoint.x = event.pageX;
+					this.dPoint.y = event.pageY;
+					this.isDrag = event.target.id;
+				},
+				move: function(event) {
+					event.preventDefault();
+					var id = this.isDrag;
+					if(!this.$data[id]) return;
+					this.$data[id].x += event.pageX - this.dPoint.x;
+					this.$data[id].y += event.pageY - this.dPoint.y;
+					if(this.$data[id].x<this.left) this.$data[id].x=this.left;
+					if(this.$data[id].x>this.w-this.right) this.$data[id].x=this.w-this.right;
+					this.dPoint.x = event.pageX;
+					this.dPoint.y = event.pageY;
+				},
+				fromPoints: function(x1, y1, x2, y2) {
+					console.log(x1, y1, x2, y2);
+					this.x1 = x1;
+					this.y1 = y1;
+					this.x2 = x2;
+					this.y2 = y2;
+				},
+			},
+			computed: {
+				p1: function() { return {x: this.left, y: this.h-this.bottom}; },
+				p2: function() { return {x: this.w-this.right, y: this.top}; },
+				w: function() {
+					return parseFloat(window.getComputedStyle(this.$el, null).getPropertyValue('width'));
+				},
+				h: function() {
+					return parseFloat(window.getComputedStyle(this.$el, null).getPropertyValue('height'));
+				},
+				x1: {
+					$get: function(){ return (this.c1.x - 20)/(this.w - 20*2); },
+					$set: function(val){ this.c1.x = val*(this.w - 20*2)+20; },
+				},
+				x2: {
+					$get: function(){ return (this.c2.x - 20)/(this.w - 20*2); },
+					$set: function(val){ this.c2.x = val*(this.w - 20*2)+20; },
+				},
+				y1: {
+					$get: function(){ return -(this.c1.y -this.h + this.bottom)/(this.h -this.bottom - this.top); },
+					$set: function(val){ this.c1.y = this.h - val*(this.h -this.bottom - this.top) -this.bottom; },
+				},
+				y2: {
+					$get: function(){ return -(this.c2.y -this.h + this.bottom)/(this.h -this.bottom - this.top); },
+					$set: function(val){ this.c2.y = this.h - val*(this.h -this.bottom - this.top) -this.bottom; },
+				},
+			},
+		},
+	},
 	methods: {
 		redraw: function() {
-			var canvas = this.$options.canvas;
-			var ctx = this.$options.ctx;
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-			ctx.translate(0, canvas.height - 20);
-			ctx.scale(canvas.width, -100);
-
-			//ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.lineWidth = 0.004;
-
-			// h
-			ctx.beginPath();
-			ctx.strokeStyle = '#333333';
-			var n = 0.33/2;
-			for(var i=0; i<7; i++) {
-				ctx.moveTo(-2, n*i);
-				ctx.lineTo(2, n*i);
-			}
-			ctx.stroke();
-
-			ctx.translate(0.1, 0);
-			ctx.scale(0.8, 1);
-
-
-			// v
-			ctx.beginPath();
-			ctx.strokeStyle = '#333333';
-			var n = 0.30/4;
-			for(var i=0; i<14; i++) {
-				ctx.moveTo(n*i, -2);
-				ctx.lineTo(n*i, 2);
-			}
-			ctx.stroke();
-
-			// path
-			ctx.strokeStyle = '#00ff00';
-			ctx.beginPath();
-			ctx.moveTo(0, 0);
-			switch(this.type) {
-			case 'bezier':
-				ctx.bezierCurveTo(
-					this.cx1, this.cy1,
-					this.cx2, this.cy2,
-					1,1
-				);
-				ctx.moveTo(0, 0);
-				ctx.lineTo(this.cx1,this.cy1);
-				ctx.moveTo(1, 1);
-				ctx.lineTo(this.cx2,this.cy2);
-				ctx.lineWidth = 0.006;
-				ctx.rect(0-ctx.lineWidth, 0-ctx.lineWidth, ctx.lineWidth*2, ctx.lineWidth*2);
-				ctx.rect(1-ctx.lineWidth, 1-ctx.lineWidth, ctx.lineWidth*2, ctx.lineWidth*2);
-				ctx.rect(this.cx1-ctx.lineWidth, this.cy1-ctx.lineWidth, ctx.lineWidth*2, ctx.lineWidth*2);
-				ctx.rect(this.cx2-ctx.lineWidth, this.cy2-ctx.lineWidth, ctx.lineWidth*2, ctx.lineWidth*2);
-				break;
-			case 'linear':
-				ctx.lineTo(1,1);
-				break;
-			case 'stepped':
-				ctx.lineTo(1,0);
-				ctx.lineTo(1,1);
-				break;
-			}
-			ctx.stroke();
+			this.$.svg.fromPoints(this.cx1, this.cy1, this.cx2, this.cy2);
 		},
 	},
 	attached: function() {
-		var canvas = document.getElementById('graph-canvas');
-		var ctx = canvas.getContext("2d");
-		//ctx.clearRect(0, 0, canvas.width, canvas.height);
-		this.$options.canvas = canvas;
-		this.$options.ctx = ctx;
-
 		var that = this;
 		this.$on('updateCurve', function(curve, d){
 			that.type = curve.type;

@@ -9,10 +9,15 @@ module.exports = {
 	data: {
 		Dopesheet: false,
 		Graph: false,
+		isEnabled: true,
+		dirty: false,
 	},
 	methods: {
 		setCurve: function(curve) {
 			this.$broadcast('updateCurve', curve);
+		},
+		AnimationListCheck: function() {
+			this.dirty = true;
 		},
 	},
 	components: {
@@ -23,9 +28,9 @@ module.exports = {
 	},
 	computed: {
 		AnimationList: function() {
+			this.dirty;
 			var Spine = this.$parent.$get('Spine');
 			var getCurve = function(curves, i) {
-				//var type = curves.type[i];
 				var type;
 
 				var t = curves.curves[i*6];
@@ -65,11 +70,12 @@ module.exports = {
 					}
 
 					/*
-						this.curves = new spine.Curves(frameCount);
-						this.frames = []; // time, angle, ...
-						this.frames.length = frameCount * 2;
-						boneIndex: 0,
-						*/
+					this.curves = new spine.Curves(frameCount);
+					this.frames = []; // time, angle, ...
+					this.frames.length = frameCount * 2;
+					boneIndex: 0,
+					*/
+					continue;
 				}
 				if(timeline instanceof PIXI.Spine.spine.TranslateTimeline) {
 					var t = {type:'translate',
@@ -85,11 +91,12 @@ module.exports = {
 						});
 					}
 					/*
-						this.curves = new spine.Curves(frameCount);
-						this.frames = []; // time, x, y, ...
-						this.frames.length = frameCount * 3;
-						boneIndex: 0,
-						*/
+					this.curves = new spine.Curves(frameCount);
+					this.frames = []; // time, x, y, ...
+					this.frames.length = frameCount * 3;
+					boneIndex: 0,
+					*/
+					continue;
 				}
 				if(timeline instanceof PIXI.Spine.spine.ScaleTimeline) {
 					var t = {type:'scale',
@@ -105,11 +112,12 @@ module.exports = {
 						});
 					}
 					/*
-						this.curves = new spine.Curves(frameCount);
-						this.frames = []; // time, x, y, ...
-						this.frames.length = frameCount * 3;
-						boneIndex: 0,
-						*/
+					this.curves = new spine.Curves(frameCount);
+					this.frames = []; // time, x, y, ...
+					this.frames.length = frameCount * 3;
+					boneIndex: 0,
+					*/
+					continue;
 				}
 				if(timeline instanceof PIXI.Spine.spine.ColorTimeline) {
 					var t = {type:'color',
@@ -127,11 +135,12 @@ module.exports = {
 						});
 					}
 					/*
-						this.curves = new spine.Curves(frameCount);
-						this.frames = []; // time, r, g, b, a, ...
-						this.frames.length = frameCount * 5;
-						slotIndex: 0,
-						*/
+					this.curves = new spine.Curves(frameCount);
+					this.frames = []; // time, r, g, b, a, ...
+					this.frames.length = frameCount * 5;
+					slotIndex: 0,
+					*/
+					continue;
 				}
 				if(timeline instanceof PIXI.Spine.spine.AttachmentTimeline) {
 					var t = {type:'attachment',
@@ -146,14 +155,16 @@ module.exports = {
 						});
 					}
 					/*
-						this.curves = new spine.Curves(frameCount);
-						this.frames = []; // time, ...
-						this.frames.length = frameCount;
-						this.attachmentNames = []; // time, ...
-						this.attachmentNames.length = frameCount;
-						slotIndex: 0,
-						*/
+					this.curves = new spine.Curves(frameCount);
+					this.frames = []; // time, ...
+					this.frames.length = frameCount;
+					this.attachmentNames = []; // time, ...
+					this.attachmentNames.length = frameCount;
+					slotIndex: 0,
+					*/
+					continue;
 				}
+				console.error('fail type of', timeline);
 			}
 			return animations;
 		},

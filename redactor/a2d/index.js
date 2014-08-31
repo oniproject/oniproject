@@ -27,7 +27,7 @@ function makeBBDrawer(Spine) {
 		for(var i=0, l= Spine.skeleton.drawOrder.length; i<l; i++) {
 			var att = Spine.skeleton.drawOrder[i].currentSprite;
 			var bb = att.getBounds();
-			bbDrawer.lineStyle(0.4, 0x999999, 1);
+			bbDrawer.lineStyle(1, 0x999999, 1);
 			bbDrawer.drawRect(bb.x, bb.y, bb.width, bb.height);
 			bbDrawer.lineStyle(3, 0x999999, 1);
 			bbDrawer.drawRect(bb.x, bb.y, 1, 1);
@@ -89,18 +89,17 @@ module.exports = {
 			type: '',
 			name: '',
 		},
-		played: false,
+		played: true,
 		reversed: false,
 
 		Time: 0.4,
 		LoopStart: 0,
 		LoopEnd: 30,
-		speed: 1,
 
 		otherHeight: 0,
 	},
 	components: {
-		AnimationsComponent: require('./animations'),
+		Animations: require('./animations'),
 		Tools: require('./tools'),
 		Tree: require('./tree'),
 	},
@@ -138,59 +137,42 @@ module.exports = {
 				}
 			}).call(Spine);
 
-			//Spine.state.setAnimationByName('flying', true);
 			this.currentAnimation = 'flying';
-
-			this.Spine;
-			this.Bones;
-			this.$.Tree.root;
-			this.$.Tree.draw_order;
-
 		},
 		setVisibility: function(type, name, val) {
 			console.log('setVisibility', type, name, val);
 		},
 		resize: function() {
 			console.log('resize');
-			this.$broadcast('updateTree');
 			Vue.nextTick(window.resizeAnimations);
 		},
 		stop: function() {
+			this.played = this.reversed = false;
 			console.info('stop');
-			this.played = false;
-			this.reversed = false;
 
+			this.animationSpeed = 0;
 			var Spine = this.$options.Spine;
-			Spine.state.animationSpeed = 0;
 			Spine.state.currentTime -= Spine.state.currentTime|0;
 			this.$.Tools.transformEnable = true;
 		},
-		play: function() {
+		play: function(speed) {
+			this.played = speed > 0;
+			this.reversed = speed < 0;
+
 			console.info('play');
-			this.played = true;
-			this.reversed = false;
-
+			this.animationSpeed = speed;
 			var Spine = this.$options.Spine;
-			Spine.state.setAnimationByName('flying', true);
-			Spine.state.animationSpeed = this.speed;
 			Spine.state.currentTime -= Spine.state.currentTime|0;
+			if(speed < 0) {
+				Spine.state.currentTime += 10000;
+			}
 
 			this.$.Tools.transformEnable = false;
-		},
-		play_reverse: function() {
-			console.info('play_reverse');
-			this.played = false;
-			this.reversed = true;
-
-			var Spine = this.$options.Spine;
-			Spine.state.setAnimationByName('flying', true);
-			Spine.state.animationSpeed = -this.speed;
-			Spine.state.currentTime = Spine.state.currentTime - (Spine.state.currentTime|0) + 10000;
-
-			this.$.Tools.transformEnable = false;
+			if(!this.currentAnimation) this.currentAnimation = 'flying';
 		},
 		updateTransform: function(type, name) {
-			if(!this.played && !this.reversed) {
+			//if(!this.played && !this.reversed) {
+			if(this.animationSpeed === 0) {
 				this.$.Tools.transformEnable = type === 'bone';
 			}
 			if(!this.$.Tools.transformEnable) {
@@ -201,98 +183,29 @@ module.exports = {
 	},
 	computed: {
 		Spine: function() { return this.$options.Spine; },
+		isAnimations: {
+			$get: function() { return this.$.Animations.isEnabled; },
+			$set: function(val) {
+				this.$.Animations.isEnabled = val;
+				if(!val) {
+					this.stop();
+					this.$options.Spine.state.clearAnimation();
+					this.$options.Spine.skeleton.setToSetupPose();
+				}
+				this.resize();
+			},
+		},
 		currentAnimation: {
-			$get: function() { return this.$options.Spine.state.current.name },
+			$get: function() {
+				if(!this.$options.Spine.state.current) return '';
+				return this.$options.Spine.state.current.name
+			},
 			$set: function(val) { this.$options.Spine.state.setAnimationByName(val, true); }
 		},
 		animationSpeed: {
 			$get: function() { return this.$options.Spine.state.animationSpeed; },
-			$set: function(val) { this.$options.Spine.animationSpeed = val; }
+			$set: function(val) { this.$options.Spine.state.animationSpeed = val; Vue.nextTick((function(){this.played;}).bind(this)); }
 		},
-		Bones: function() {
-			var bones = [];
-			for(var i=0, l=this.$options.Spine.skeleton.bones.length; i<l;i++) {
-				var bone = this.$options.Spine.skeleton.bones[i];
-				bones.push({
-					name: bone.data.name,
-					parent: bone.parent? bone.parent.data.name: '',
-					length: bone.data.length,
-					data: {
-						rotation: bone.data.rotation,
-						position: {x: bone.data.x, y: bone.data.y},
-						scale: {x: bone.data.scaleX, y: bone.data.scaleY},
-					},
-					local: {
-						rotation: bone.rotation,
-						position: {x: bone.x, y: bone.y},
-						scale: {x: bone.scaleX, y: bone.scaleY},
-					},
-					world: {
-						rotation: bone.worldRotation,
-						position: {x: bone.worldX, y: bone.worldY},
-						scale: {x: bone.worldScaleX, y: bone.worldScaleY},
-					}
-				});
-			}
-			return bones;
-		},
-		Slots: function() {
-			var slots = [];
-			for(var i=0, l=this.$options.Spine.skeleton.drawOrder.length; i<l;i++) {
-				var slot = this.$options.Spine.skeleton.drawOrder[i];
-				var s = {
-					name: slot.data.name,
-					bone: slot.bone.data.name,
-					color: {r: slot.r, g: slot.g, b: slot.b, a: slot.a},
-					attachments: [],
-				};
-				slots.push(s);
-				// TODO find in animations ?
-				for(var k in slot.sprites) {
-					if(slot.sprites.hasOwnProperty(k)) {
-						s.attachments.push({
-							name: k,
-							visible: slot.sprites[k].visible
-						});
-					}
-				}
-			}
-			return slots;
-		},
-		Animations: function() {
-			var animations = [];
-			for(var i=0, l=this.$options.Spine.skeleton.data.animations.length; i<l; i++) {
-				var a = this.$options.Spine.skeleton.data.animations[i];
-				// TODO parse timelines
-				animations.push({name: a.name});
-			}
-			return animations;
-		},
-		Attachments: function() {
-			var attachments = [];
-			// TODO get current skin
-			var skin = this.$options.Spine.skeleton.data.defaultSkin;
-			for(var k in skin.attachments) {
-				if(skin.attachments.hasOwnProperty(k)) {
-					var a = skin.attachments[k];
-					attachments.push({
-						name: a.rendererObject.name,
-					});
-				}
-			}
-			return attachments;
-		},
-		Skins: function() {
-			var skins = [];
-			for(var i=0, l=this.$options.Spine.skeleton.data.skins.length; i<l;i++) {
-				var skin = this.$options.Spine.skeleton.data.skins[i];
-				//if(skin.name !== 'default') {
-					skins.push({name: skin.name});
-				//}
-			}
-			return skins;
-		},
-
 		// current time
 		Current: {
 			$get: function() {
@@ -317,7 +230,7 @@ module.exports = {
 			bones:[], slots:[], skins: {default: {}},  animations: {flying: {}, }});
 		PIXI.AnimCache['defaultSpine'] = skeletonData;
 		var Spine = window.Spine = this.$options.Spine = new PIXI.Spine('defaultSpine');
-		Spine.state.setAnimationByName('flying', true);
+		//Spine.state.setAnimationByName('flying', true);
 		stage.addChild(Spine);
 
 		Spine.UpdateSetup = function() {
@@ -325,11 +238,12 @@ module.exports = {
 			this.skeleton.setToSetupPose();
 		}
 
-		for(var i=0;i<100;i++) {
+		/*for(var i=0;i<100;i++) {
 			Spine.state.currentTime = i/100;
 			Spine.updateTransform();
 		}
 		Spine.stage.animationSpeed = 0;
+		*/
 
 		stage.addChild(makeBBDrawer(Spine));
 		stage.addChild(makeBoneDrawer(Spine));
@@ -354,7 +268,6 @@ module.exports = {
 		}
 
 		window.resizeAnimations = function(event) {
-			//console.log('oldHeight', app.animHeight);
 			var animHeight = getH(document.getElementById('animations'));
 			var otherHeight = window.innerHeight - animHeight;
 			that.otherHeight = otherHeight;

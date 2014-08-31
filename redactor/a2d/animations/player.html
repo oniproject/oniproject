@@ -12,23 +12,24 @@
 
 	<div class="uk-button-group">
 		<button class="uk-button uk-button-small uk-button-danger uk-text-small"
-			v-show="reversed"
-			v-on="click: stop">
+			v-on="click: stop"
+			v-if="reversed">
 			<i class="uk-icon-stop"></i>
 		</button>
 		<button class="uk-button uk-button-small uk-button-primary uk-text-large"
-			v-show="!reversed"
-			v-on="click: play_reverse">
+			v-on="click: play(-1)"
+			v-if="!reversed">
 			<i class="uk-icon-caret-left"></i>
 		</button>
+
 		<button class="uk-button uk-button-small uk-button-danger uk-text-small"
-			v-show="played"
-			v-on="click: stop">
+			v-on="click: stop()"
+			v-if="played">
 			<i class="uk-icon-stop"></i>
 		</button>
 		<button class="uk-button uk-button-small uk-button-primary uk-text-large"
-			v-show="!played"
-			v-on="click: play">
+			v-on="click: play(1)"
+			v-if="!played">
 			<i class="uk-icon-caret-right"></i>
 		</button>
 	</div>

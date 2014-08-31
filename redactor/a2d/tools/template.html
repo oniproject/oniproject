@@ -1,3 +1,14 @@
+<div class="uk-position-absolute" style="top: -2em">
+	<button class="uk-button uk-button-small"
+		v-on="click: isAnimations = false"
+		v-show="isAnimations">
+		Animation</button>
+	<button class="uk-button uk-button-small"
+		v-on="click: isAnimations = true"
+		v-show="!isAnimations">
+		Setup</button>
+</div>
+
 <div class="uk-grid uk-grid-preserve uk-text-center" data-uk-grid-match="{target: '.panel'}">
 	<div class="uk-width-1-6">
 		<div class="panel second">

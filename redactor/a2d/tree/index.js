@@ -26,11 +26,6 @@ module.exports = {
 			event.preventDefault();
 			alert(v);
 		},
-		updateTree: function() {
-			Vue.nextTick((function(){
-				this.dirty = !this.dirty;
-			}).bind(this))
-		},
 		select: function(type, name) {
 			console.log('select[%s] %s', type, name);
 			this.$parent.selected.type = type;
@@ -51,13 +46,6 @@ module.exports = {
 	},
 	created: function() {
 		console.log('created Skeleton tree');
-		this.$on('updateTree', (function() {
-			console.log('updateTree');
-			this.dirty = !this.dirty;
-		}).bind(this));
-		this.$watch('skeleton', function() {
-
-		});
 
 		this.$on('drag',  function(model) {
 			console.log('drag [%s]%s', model.type, model.name);

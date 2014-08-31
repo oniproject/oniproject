@@ -12,7 +12,7 @@ new Vue({
 	el: 'html',
 	data: {
 		apps: ['Home', 'Page1', 'Map', 'Animation'],
-		currentApp: 'Home',
+		currentApp: 'Animation',
 	},
 	methods: {
 		changeApp: function(id) {
