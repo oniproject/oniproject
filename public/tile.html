@@ -24,7 +24,7 @@ html, body {
 
 </style>
 </head>
-<body class="uk-height-1-1">
+<body id="app" class="uk-height-1-1">
 	<nav class="uk-navbar uk-position-absolute uk-width-1-1" style="z-index: 2">
 		<ul class="uk-navbar-nav">
 			<li><a href="/a2d.html">Animation editor</a></li>
@@ -44,7 +44,7 @@ html, body {
 
 <div style="position: absolute; padding-top:3em;" class="uk-grid uk-grid-small uk-height-1-1 uk-width-1-5 uk-margin-remove">
 <!-- OBJECT -->
-		<div id="palete" class="uk-panel uk-panel-box uk-width-1-1">
+		<div id="palete" v-component="palete" v-ref="palete" class="uk-panel uk-panel-box uk-width-1-1">
 			<input type="radio" name="layer" value="first" v-model="layer">
 			<input type="radio" name="layer" value="second" v-model="layer">
 			<input type="radio" name="layer" value="third" v-model="layer">
@@ -114,7 +114,7 @@ html, body {
 
 
 
-	<div id="app" class="uk-height-1-1"></div>
+	<div id="app-" class="uk-height-1-1"></div>
 	<script src="/js/jquery-2.1.1.min.js"></script>
 	<script src="/js/uikit.js"></script>
 	<script src="/js/addons/notify.min.js"></script>
@@ -125,6 +125,6 @@ Vue.config({
 	delimiters: ['`', '`'],
 });
 </script>
-	<script src="/tile-redactor.js"></script>
+	<script src="/tile.js"></script>
 </body>
 </html>

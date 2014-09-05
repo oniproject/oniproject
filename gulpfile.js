@@ -12,7 +12,6 @@ var dest = './public/';
 var apps = {
 	game:     {dest: 'main.js',     source: './js/main.js'},
 	tile:     {dest: 'tile.js',     source: './redactor/tile/main.js'},
-	//a2d:      {dest: 'a2d.js',      source: './redactor/a2d/main.js'},
 	redactor: {dest: 'redactor.js', source: './redactor/main.js'},
 }
 
