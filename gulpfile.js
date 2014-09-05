@@ -1,50 +1,86 @@
-var browserify = require('browserify');
+var browserify = require('browserify'),
+	watchify = require('watchify'),
+	partialify = require('partialify'),
+	exorcist   = require('exorcist'),
+	transform =require('vinyl-transform'),
+	gulp = require('gulp'),
+	livereload = require('gulp-livereload'),
+	watch = require('gulp-watch'),
+	source = require('vinyl-source-stream');
 
-var gulp = require('gulp'),
-    livereload = require('gulp-livereload'),
-    source = require('vinyl-source-stream'),
-    watch = require('gulp-watch');
+var dest = './public/';
+var apps = {
+	game:     {dest: 'main.js',     source: './js/main.js'},
+	tile:     {dest: 'tile.js',     source: './redactor/tile/main.js'},
+	redactor: {dest: 'redactor.js', source: './redactor/main.js'},
+}
 
-gulp.task('js-redactor', function() {
-  var bundleStream = browserify('./js/main-redactor.js').bundle();
+function handleErrors(err) {
+	var args = Array.prototype.slice.call(arguments);
+	console.error(err.toString());
+	this.emit('end');
+}
 
-  bundleStream
-    .pipe(source('redactor.js'))
-    .pipe(gulp.dest('./public'));
-});
+var fn = function(app, isWatching) {
+	return function() {
+		var bundler = browserify({
+			cache: {}, packageCache: {}, fullPaths: true,
+			entries: [app.source],
+			debug: true
+		});
 
-gulp.task('js-tredactor', function() {
-  var bundleStream = browserify('./js/main-tile-redactor.js').bundle();
+		var bundle = function() {
+			return bundler
+				.transform(partialify)
+				.bundle().on('error', handleErrors)
+				.pipe(source(app.dest))
+				.pipe(transform(function () { return exorcist(dest+app.dest+'.map'); }))
+				.pipe(gulp.dest(dest));
+		};
 
-  bundleStream
-    .pipe(source('tile-redactor.js'))
-    .pipe(gulp.dest('./public'));
-});
+		if(isWatching) {
+			bundler = watchify(bundler);
+			bundler.on('update', bundle);
+		}
 
-gulp.task('js', function() {
-  var bundleStream = browserify('./js/main.js').bundle();
+		return bundle();
+	}
+}
 
-  bundleStream
-    .pipe(source('main.js'))
-    .pipe(gulp.dest('./public'));
-});
+var w = [];
+var b = [];
+for(var k in apps) {
+	gulp.task('browserify-' + k, fn(apps[k], false));
+	gulp.task('watch-' + k, fn(apps[k], true));
+	b.push('browserify-' + k);
+	w.push('watch-' + k);
+}
 
-gulp.task('watch', ['js', 'js-redactor', 'js-tredactor'], function() {
-  gulp.watch('js/**', ['js', 'js-redactor', 'js-tredactor'])
-});
+gulp.task('watch', w);
+gulp.task('build', b);
 
 gulp.task('server', function(next) {
-  var connect = require('connect'),
-      server = connect();
-  server.use(connect.static('./')).listen(process.env.PORT || 9999, next);
+	var connect = require('connect');
+	connect()
+		.use(connect.static('./'))
+		.use(connect.static('public'))
+		.use(connect.directory('public'))
+		.use(function(req, res) {
+			if(req.method == 'POST') {
+				console.log(req.body);
+			} else {
+				res.end('FUCK U\n');
+			}
+		})
+		.listen(process.env.PORT || 9000, next);
 });
 
 gulp.task('reload', ['server'], function() {
-  var server = livereload();
-  gulp.watch('public/**').on('change', function(event) {
-      server.changed(event.path);
-      console.log('File '+event.path+' was '+event.type+', running tasks...');
-  });
+	var server = livereload();
+	gulp.watch('public/**').on('change', function(event) {
+		server.changed(event.path);
+		console.log('File '+event.path+' was '+event.type+', running tasks...');
+	});
 });
 
 gulp.task('default', ['watch']);

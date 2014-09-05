@@ -1,0 +1,59 @@
+<div v-show="isEnabled" v-component="head" class="uk-form uk-clearfix panel"></div>
+
+<div v-show="isEnabled" class="uk-grid uk-grid-preserve panel">
+	<div class="uk-width-{{Graph?'7':'10'}}-10 panel">
+
+		<div v-show="Dopesheet" v-component="ds_head"></div>
+
+		<div class="uk-grid uk-grid-preserve">
+			<div class="uk-width-1-1">
+
+				<div class="uk-grid uk-grid-preserve">
+					<div v-component="player" class="uk-width-{{Graph?'3':'2'}}-10"></div>
+
+					<div class="uk-width-{{Graph?'7':'8'}}-10">
+						<div class="uk-position-relative">
+							<div class="uk-progress uk-width-1-1 uk-position-absolute" style="left:-2%">
+								<div class="uk-progress-bar"
+									style="height: 2.5em;
+										-webkit-transition: none!important; transition:none!important;"
+									v-style="width: Time*100.0 + '%'"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr>
+
+				<div id="anim-list" v-show="Dopesheet" class="custom_scroll_bar">
+					<div class="native"><div class="content">
+						<div v-repeat="anim: AnimationList"
+							class="uk-grid uk-grid-preserve uk-margin-remove {{anim.type}}">
+							<div class="uk-width-{{Graph?'3':'2'}}-10">
+								<i v-if="anim.type==='rotate'" class="uk-icon-rotate-right"></i>
+								<i v-if="anim.type==='translate'" class="uk-icon-arrows"></i>
+								<i v-if="anim.type==='scale'" class="uk-icon-crop"></i>
+								<i v-if="anim.type==='attachment'" class="uk-icon-paperclip"></i>
+								<i v-if="anim.type==='color'" class="uk-icon-image"></i>
+								<span v-if="anim.bone" class="bone">{{anim.bone}}</span>
+								<span v-if="anim.slot" class="slot">{{anim.slot}}</span>
+							</div>
+							<div class="uk-width-{{Graph?'7':'8'}}-10">
+								<div class="uk-position-relative">
+									<div v-repeat="frame: anim.frames"
+										class="key {{anim.type}} {{frame.type}}"
+										title="{{anim.bone||anim.slot}} {{anim.type}} {{$index}}"
+										data-uk-tooltip
+										v-on="click: setCurve(frame.curve)"
+										v-style="left: (frame.time*100)-2 +'%'"></div>
+								</div>
+							</div>
+						</div>
+					</div></div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div v-show="Graph" v-component="graph" class="uk-width-3-10 panel"></div>
+</div>

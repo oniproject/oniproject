@@ -1,22 +1,36 @@
 {
-  "name": "oniproject",
-  "version": "0.0.0",
-  "description": "",
-  "dependencies": {},
-  "devDependencies": {
-    "browserify": "~4.1.6",
-    "connect": "~2.18.0",
-    "filesaver.js": "~0.1.0",
-    "gulp": "~3.8.0",
-    "gulp-buffer": "0.0.2",
-    "gulp-livereload": "~1.5.0",
-    "gulp-watch": "~0.6.5",
-    "isomer": "git+https://github.com/jdan/isomer.git",
-    "vinyl-source-stream": "~0.1.1"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "lain-dono",
-  "license": "MIT"
+	"name": "oniproject",
+	"version": "0.0.0",
+	"description": "",
+	"dependencies": {
+		"vue": "~0.10.6",
+		"vue-placeholders": "git://github.com/lithiumjake/vue-placeholders.git"
+	},
+	"devDependencies": {
+		"browserify": "latest",
+		"watchify": "~1.0.2",
+		"vinyl-source-stream": "~0.1.1",
+		"vinyl-transform": "~0.0.1",
+		"exorcist": "latest",
+		"gulp": "~3.8.0",
+		"connect": "~2.18.0",
+		"filesaver.js": "~0.1.0",
+		"gulp-buffer": "0.0.2",
+		"gulp-livereload": "~1.5.0",
+		"gulp-watch": "~0.6.5",
+		"isomer": "git+https://github.com/jdan/isomer.git",
+		"partialify": "~3.1.1",
+		"insert-css": "~0.2.0",
+		"http-server": "latest",
+		"less": "1.7.4"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "gulp build",
+		"watch": "gulp watch",
+		"reload": "gulp reload",
+		"redactor": "gulp server"
+	},
+	"author": "lain-dono",
+	"license": "MIT"
 }

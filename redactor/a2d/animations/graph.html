@@ -1,0 +1,55 @@
+<div class="panel">
+	Curve type:
+	<div class="uk-button-group">
+		<button class="uk-button uk-button-small uk-button-success"
+			v-on="click: type='linear'"
+			v-class="uk-active: type === 'linear'">L</button>
+		<button class="uk-button uk-button-small uk-button-success"
+			v-on="click: type='bezier'"
+			v-class="uk-active: type === 'bezier'">B</button>
+		<button class="uk-button uk-button-small uk-button-success"
+			v-on="click: type='stepped'"
+			v-class="uk-active: type === 'stepped'">S</button>
+	</div>
+	<button class="uk-button uk-button-small uk-button-success">Match</button>
+	<div class="panel uk-height-1-1">
+		<svg v-component="svg" v-ref="svg" id="svg" xmlns="http://www.w3.org/2000/svg" width="350" height="200" viewBox="0 0 350 200" preserveAspectRatio="xMidYMid meet"
+			v-on="
+			mousedown: drag($event),
+			mousemove: move($event),
+			mouseup: isDrag = ''"
+		>
+			<g id="main">
+				<rect v-attr="x: left, y: top, width: w-left-right, height: h -bottom -top" fill="#777" />
+				<text x="15" y="15">
+					M{{p1.x}},{{p1.y}}
+					C{{c1.x}},{{c1.y}}
+					{{c2.x}},{{c2.y}}
+					{{p2.x}},{{p2.y}}
+					{{isDrag}}
+				</text>
+				<text x="15" y="30">
+					x1 {{x1}}
+					y1 {{y1}}
+				</text>
+				<text x="15" y="45">
+					x2 {{x2}}
+					y2 {{y2}}
+				</text>
+				<line v-attr="x1: p1.x, y1: p1.y, x2: c1.x, y2: c1.y" />
+				<line v-attr="x1: p2.x, y1: p2.y, x2: c2.x, y2: c2.y" />
+				<path
+					d="M{{p1.x}},{{p1.y}}
+					C{{c1.x}},{{c1.y}}
+					{{c2.x}},{{c2.y}}
+					{{p2.x}},{{p2.y}}" />
+
+				<circle v-attr="cx: p1.x, cy: p1.y" r="1" />
+				<circle v-attr="cx: p2.x, cy: p2.y" r="1" />
+
+				<circle id="c1" v-attr="cx: c1.x, cy: c1.y" r="4" />
+				<circle id="c2" v-attr="cx: c2.x, cy: c2.y" r="4" />
+			</g>
+		</svg>
+	</div>
+</div>

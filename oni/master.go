@@ -40,6 +40,7 @@ func (master *Master) Run() {
 	m := martini.Classic()
 
 	store := sessions.NewCookieStore([]byte("secret123"))
+	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, Domain: "*.ngrok.com", HttpOnly: true})
 	m.Use(sessions.Sessions("ssid", store))
 	m.Use(render.Renderer(render.Options{
 		Layout: "layout",
@@ -58,14 +59,6 @@ func (master *Master) Run() {
 		r.HTML(200, "index", args)
 	})
 
-	m.Get("/redactor", func(user sessionauth.User, r render.Render) {
-		r.HTML(200, "redactor", map[string]interface{}{"title": "Redactor"}, render.HTMLOptions{""})
-	})
-
-	m.Get("/tile-redactor", func(user sessionauth.User, r render.Render) {
-		r.HTML(200, "tile-redactor", map[string]interface{}{"title": "Redactor"}, render.HTMLOptions{""})
-	})
-
 	m.Get("/game", sessionauth.LoginRequired, func(r render.Render) {
 		r.HTML(200, "game", map[string]interface{}{"title": "Game"}, render.HTMLOptions{""})
 	})
@@ -77,8 +70,13 @@ func (master *Master) Run() {
 		x := struct {
 			Id   int64
 			Host string
+			//}{account.AvatarId, "ngrok.com:49008"}
 		}{account.AvatarId, "localhost:2000"}
 		r.JSON(200, x)
+	})
+
+	m.Get("/x", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
+		r.JSON(200, map[string]interface{}{"user": user, "id": session.Get("id")})
 	})
 
 	m.Get("/logout", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
@@ -113,11 +111,13 @@ func (master *Master) Run() {
 			return
 		}
 
+		log.Println("login account", account)
+
 		session.Set("id", account.AvatarId)
 		session.Set("username", account.Username)
 
 		params := req.URL.Query()
-		log.Println(params, req.URL)
+		log.Println(params, req.URL, "AvatarId", session.Get("id"))
 		redirect := params.Get(sessionauth.RedirectParam)
 		r.Redirect(redirect)
 	})

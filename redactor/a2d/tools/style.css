@@ -1,0 +1,27 @@
+#tools {
+	width: 700px;
+	.rotation.active {
+		input {
+			border-color: green;
+		}
+		.uk-form-icon i {
+			color: green;
+		}
+	}
+	.translate.active {
+		input {
+			border-color: blue;
+		}
+		.uk-form-icon i {
+			color: blue;
+		}
+	}
+	.scale.active {
+		input {
+			border-color: red;
+		}
+		.uk-form-icon i {
+			color: red;
+		}
+	}
+}
