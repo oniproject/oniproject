@@ -1,6 +1,6 @@
-<div v-component="head" class="uk-form uk-clearfix panel"></div>
+<div v-show="isEnabled" v-component="head" class="uk-form uk-clearfix panel"></div>
 
-<div class="uk-grid uk-grid-preserve panel">
+<div v-show="isEnabled" class="uk-grid uk-grid-preserve panel">
 	<div class="uk-width-{{Graph?'7':'10'}}-10 panel">
 
 		<div v-show="Dopesheet" v-component="ds_head"></div>

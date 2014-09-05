@@ -1,6 +1,6 @@
 <div class="uk-float-left">
 	<button class="uk-button uk-button-primary"
-		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize">
+		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize(), click: AnimationListCheck()">
 		<i class="uk-icon-caret-{{Dopesheet? 'down': 'up'}}"></i>
 		Dopesheet</button>
 
@@ -35,7 +35,7 @@
 </div>
 <div class="uk-float-right">
 	<button class="uk-button uk-button-primary"
-		v-on="click: Graph = !Graph, click: Dopesheet = true, click: resize">
+		v-on="click: Graph = !Graph, click: Dopesheet = true, click: resize(), click: AnimationListCheck()">
 		<i class="uk-icon-caret-{{Graph? 'right': 'left'}}"></i>
 		Graph</button>
 </div>

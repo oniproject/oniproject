@@ -1,14 +1,13 @@
-<div class="uk-height-1-1">
+<div id="app" class="uk-height-1-1">
 	<div class="uk-grid uk-grid-preserve uk-position-relative"
 		v-style="height: otherHeight +'px'">
 		<div class="uk-position-absolute panel" v-text="selected.name" style="top: 6em;left:50%"></div>
 		<div class="panel uk-width-3-4 uk-position-absolute"
 			style="bottom: 0">
-			<div class="uk-container-center"
-				v-component="Tools" v-ref="Tools"></div>
+			<div class="uk-container-center" v-component="Tools" v-ref="Tools"></div>
 		</div>
 		<canvas id="canvas" class="uk-width-3-4 uk-height-1-1"></canvas>
-		<div v-component="Tree" class="panel uk-width-1-4 uk-height-1-1"></div>
-	<div v-component="AnimationsComponent" class="uk-width-1-1"></div>
+		<div v-component="Tree" v-ref="Tree" class="panel uk-width-1-4 uk-height-1-1"></div>
+		<div v-component="Animations" v-ref="Animations" class="uk-width-1-1"></div>
 	</div>
 </div>

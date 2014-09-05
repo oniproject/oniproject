@@ -1,0 +1,27 @@
+<div class="uk-modal-dialog">
+	<a class="uk-modal-close uk-close uk-close-alt"></a>
+	<form class="uk-form uk-form-stacked">
+		<fieldset>
+			<legend>Add Path</legend>
+
+			<div class="uk-form-row">
+				<a v-on="click: points.push({x:0,y:0,z:0})" class="uk-button uk-button-danger uk-width-1-1">Add Point</a>
+			</div>
+
+			<div v-repeat="points" class="uk-form-row">
+				<div class="uk-form-controls uk-form-controls-text">
+					<p class="uk-form-controls-condensed">
+						<label>X</label> <input v-model="x" class="uk-form-width-small uk-form-small" type="number">
+						<label>Y</label> <input v-model="y" class="uk-form-width-small uk-form-small" type="number">
+						<label>Z</label> <input v-model="z" class="uk-form-width-small uk-form-small" type="number">
+					</p>
+				</div>
+			</div>
+
+			<div class="uk-form-row">
+				<a v-on="click: add" class="uk-modal-close uk-button uk-button-primary uk-width-1-1">Add</a>
+			</div>
+
+		</fieldset>
+	</form>
+</div>

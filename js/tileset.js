@@ -1,6 +1,6 @@
 'use strict';
 
-function Tileset(url, w, h, size) {
+function Tileset(url, w, h, size, noAutoLoad) {
 	this.width = w;
 	this.height = h;
 	this.size = size;
@@ -20,7 +20,9 @@ function Tileset(url, w, h, size) {
 	}
 
 	this.tiles = tiles;
-	image.load();
+	if(!noAutoLoad) {
+		image.load();
+	}
 	this.image = image;
 }
 

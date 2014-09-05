@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="uk-height-1-1">
+<head>
+	<title>{{currentApp}} editor</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/css/uikit.min.css" />
+	<link rel="stylesheet" href="/css/addons/uikit.addons.min.css">
+</head>
+<body class="uk-height-1-1">
+	<nav class="uk-navbar uk-position-absolute uk-width-1-1" style="z-index: 2">
+		<a class="uk-navbar-brand" href="#" v-on="click: currentApp = 'home'">The Redactor</a>
+
+		<ul class="uk-navbar-nav">
+			<li v-repeat="apps" v-class="uk-active: currentApp === $value">
+				<a v-on="click: changeApp($value)"
+					v-class="uk-navbar-nav-subtitle: currentApp === $value" href="#">
+					{{$value}} editor
+					<div v-if="currentApp === $value" class="uk-text-center">
+						<i class="uk-icon-arrow-up"></i>
+					</div>
+				</a>
+			</li>
+		</ul>
+
+		<div class="uk-navbar-content">
+			<div class="uk-button-group">
+				<a data-uk-modal="{target:'#UploadModal'}" class="uk-button uk-button-primary" href="#" data-uk-tooltip title="Upload"><i class="uk-icon-upload"></i></a>
+				<a class="uk-button uk-button-primary" href="#" data-uk-tooltip title="Download"><i class="uk-icon-download"></i></a>
+			</div>
+
+			<div class="uk-button-group">
+				<a v-on="click: undo()" class="uk-button uk-button-danger" href="#" data-uk-tooltip title="Undo"><i class="uk-icon-reply"></i></a>
+				<a v-on="click: redo()" class="uk-button uk-button-success" href="#" data-uk-tooltip title="Redo"><i class="uk-icon-share"></i></a>
+			</div>
+		</div>
+	</nav>
+
+	<div v-view="currentApp" v-ref="{{currentApp}}" class="uk-height-1-1"></div>
+
+	<script src="/js/jquery-2.1.1.min.js"></script>
+	<script src="/js/uikit.js"></script>
+	<script src="/js/addons/notify.min.js"></script>
+	<script src="/patched.pixi.js"></script>
+	<script src="/js/vue.js"></script>
+	<script src="/redactor.js"></script>
+</body>
+</html>
