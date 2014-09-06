@@ -2,6 +2,10 @@
 
 MMORPG движок же!
 
+[on Bitbucket](https://bitbucket.org/lain-dono/oniproject)
+
+[issues](https://bitbucket.org/lain-dono/oniproject/issues)
+
 ## Как запустить?
 
 Собираем сервер:
