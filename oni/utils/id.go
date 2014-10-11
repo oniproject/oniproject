@@ -1,4 +1,4 @@
-package oni
+package utils
 
 type Id int64
 

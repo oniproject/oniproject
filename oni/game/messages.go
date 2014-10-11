@@ -1,9 +1,10 @@
-package oni
+package game
 
 import (
 	"errors"
 	"github.com/mitchellh/mapstructure"
 	"log"
+	"oniproject/oni/utils"
 )
 
 // command
@@ -93,7 +94,7 @@ func (m *SetVelocityMsg) Run(obj interface{}) {
 }
 
 type SetTargetMsg struct {
-	Target Id `mapstructure:"id"`
+	Target utils.Id `mapstructure:"id"`
 }
 
 func (m *SetTargetMsg) Run(obj interface{}) {
@@ -118,7 +119,7 @@ func (m *FireMsg) Run(obj interface{}) {
 	}
 
 	if m.Type == 0 {
-		a.game.Send(Id(a.Target), &CloseMsg{})
+		a.game.Send(utils.Id(a.Target), &CloseMsg{})
 	} else {
 		obj := a.game.GetObjById(a.Target).(*Avatar)
 		log.Println(a.data.Cast(int(m.Type), &obj.data))
@@ -136,7 +137,7 @@ func (m *CloseMsg) Run(obj interface{}) {
 }
 
 type DestroyMsg struct {
-	Id Id
+	Id utils.Id
 	T  uint // tick
 }
 

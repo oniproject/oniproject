@@ -1,4 +1,4 @@
-package oni
+package game
 
 import (
 	"github.com/go-martini/martini"
@@ -6,7 +6,16 @@ import (
 	"github.com/martini-contrib/sessions"
 	"log"
 	"net/http"
+	"oniproject/oni/utils"
 )
+
+type AvatarDB interface {
+	AvatarById(utils.Id) (*Actor, error)
+}
+
+type GameAddr interface {
+	GameAddr() string
+}
 
 type Game struct {
 	Addr, Rpc string
@@ -14,8 +23,8 @@ type Game struct {
 	adb       AvatarDB
 }
 
-func NewGame(config *Config, adb AvatarDB) *Game {
-	return &Game{Map: NewMap(), adb: adb, Addr: config.Game}
+func NewGame(config GameAddr, adb AvatarDB) *Game {
+	return &Game{Map: NewMap(), adb: adb, Addr: config.GameAddr()}
 }
 
 func (gm *Game) Run() {
@@ -49,7 +58,7 @@ func (gm *Game) Run() {
 			return 418, http.StatusText(418)
 		}
 
-		a, err := gm.adb.AvatarById(Id(id))
+		a, err := gm.adb.AvatarById(utils.Id(id))
 		if err != nil {
 			log.Println("get avatar", err)
 			return 500, http.StatusText(418)
@@ -69,9 +78,9 @@ func (gm *Game) Run() {
 	}
 }
 
-func (gm *Game) LoadMap(id Id) {
+func (gm *Game) LoadMap(id utils.Id) {
 	log.Println("LoadMap", id)
 }
-func (gm *Game) UnloadMap(id Id) {
+func (gm *Game) UnloadMap(id utils.Id) {
 	log.Println("UnloadMap", id)
 }

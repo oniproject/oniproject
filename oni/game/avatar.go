@@ -1,8 +1,8 @@
-package oni
+package game
 
 import (
 	"oniproject/oni/geom"
-	"oniproject/oni/mechanic"
+	"oniproject/oni/utils"
 	"time"
 )
 
@@ -15,7 +15,7 @@ const (
 
 type State struct {
 	Type      uint8
-	Id        Id
+	Id        utils.Id
 	Tick      uint
 	Lag       time.Duration
 	Position  geom.Coord
@@ -25,20 +25,21 @@ type State struct {
 type AvatarMapper interface {
 	Walkable(int, int) bool
 	Unregister(*Avatar)
-	Send(Id, Message)
-	GetObjById(Id) GameObject
+	Send(utils.Id, Message)
+	GetObjById(utils.Id) GameObject
 }
 
 type Avatar struct {
 	PositionComponent
-	data mechanic.Actor
+	//Parameters
+	data Actor
 	AvatarConnection
-	Target Id
+	Target utils.Id
 	game   AvatarMapper
 }
 
-func (a Avatar) Id() Id {
-	return Id(a.data.Id)
+func (a Avatar) Id() utils.Id {
+	return utils.Id(a.data.Id)
 }
 
 func (a *Avatar) Send(m Message) {
@@ -46,7 +47,7 @@ func (a *Avatar) Send(m Message) {
 }
 
 func (a Avatar) GetState(typ uint8, tick uint) *State {
-	return &State{typ, Id(a.data.Id), tick, a.Lag, a.Position(), a.Velocity()}
+	return &State{typ, utils.Id(a.data.Id), tick, a.Lag, a.Position(), a.Velocity()}
 }
 
 func (a *Avatar) Update(tick uint, t time.Duration) (state *State) {

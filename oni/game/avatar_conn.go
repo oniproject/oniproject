@@ -1,4 +1,4 @@
-package oni
+package game
 
 import (
 	"bytes"

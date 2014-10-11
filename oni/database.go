@@ -3,13 +3,14 @@ package oni
 import (
 	"github.com/jinzhu/gorm"
 	"log"
-	"oniproject/oni/mechanic"
+	"oniproject/oni/game"
+	"oniproject/oni/utils"
 )
 
 type AvatarDB interface {
-	AvatarById(id Id) (*mechanic.Actor, error)
-	SaveAvatar(a *mechanic.Actor) error
-	CreateAvatar() (*mechanic.Actor, error)
+	AvatarById(id utils.Id) (*game.Actor, error)
+	SaveAvatar(a *game.Actor) error
+	CreateAvatar() (*game.Actor, error)
 }
 
 type Database struct {
@@ -19,14 +20,14 @@ type Database struct {
 func NewDatabase(config *Config) AvatarDB {
 	db := &Database{db: config.DB()}
 
-	db.db.AutoMigrate(&mechanic.Actor{})
+	db.db.AutoMigrate(&game.Actor{})
 
 	return db
 }
 
-func (db *Database) AvatarById(id Id) (*mechanic.Actor, error) {
+func (db *Database) AvatarById(id utils.Id) (*game.Actor, error) {
 	// TODO choice database by Id
-	var a mechanic.Actor
+	var a game.Actor
 	err := db.db.First(&a, map[string]interface{}{"id": id}).Error
 	if err != nil {
 		log.Println("SelectOne failed", err)
@@ -36,12 +37,12 @@ func (db *Database) AvatarById(id Id) (*mechanic.Actor, error) {
 	// TODO sync AvatarData with mechanic database ?
 }
 
-func (db *Database) SaveAvatar(a *mechanic.Actor) error {
+func (db *Database) SaveAvatar(a *game.Actor) error {
 	return db.db.Save(a).Error
 }
 
-func (db *Database) CreateAvatar() (*mechanic.Actor, error) {
-	var a mechanic.Actor
+func (db *Database) CreateAvatar() (*game.Actor, error) {
+	var a game.Actor
 	a.X, a.Y = 1, 1
 	err := db.db.Save(&a).Error
 	return &a, err

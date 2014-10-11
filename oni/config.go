@@ -34,6 +34,10 @@ func NewConfig(config string) (c *Config) {
 	return
 }
 
+func (c *Config) GameAddr() string {
+	return c.Game
+}
+
 func (c *Config) DB() *gorm.DB {
 	if c.db != nil {
 		return c.db

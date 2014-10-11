@@ -10,6 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
+	"oniproject/oni/utils"
 )
 
 type Master struct {
@@ -65,7 +66,7 @@ func (master *Master) Run() {
 
 	m.Post("/game", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
 		account := user.(*Account)
-		a, err := master.balancer.AttachAvatar(Id(account.AvatarId))
+		a, err := master.balancer.AttachAvatar(utils.Id(account.AvatarId))
 		log.Println("AttachAvatar", a, err)
 		x := struct {
 			Id   int64

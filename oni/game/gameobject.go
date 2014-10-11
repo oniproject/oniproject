@@ -1,7 +1,8 @@
-package oni
+package game
 
 import (
 	"oniproject/oni/geom"
+	"oniproject/oni/utils"
 	"time"
 )
 
@@ -10,7 +11,7 @@ type GameObject interface {
 	GetState(typ uint8, tick uint) *State
 	Position() geom.Coord
 	Send(Message)
-	Id() Id
+	Id() utils.Id
 }
 
 type PositionComponent struct {

@@ -1,20 +1,21 @@
-package oni
+package game
 
 import (
 	"math/rand"
 	"oniproject/oni/geom"
+	"oniproject/oni/utils"
 	"time"
 )
 
 type Monster struct {
 	PositionComponent
-	Target Id
+	Target utils.Id
 	game   AvatarMapper
-	id     Id
+	id     utils.Id
 	Lag    time.Duration
 }
 
-func (a *Monster) Id() Id {
+func (a *Monster) Id() utils.Id {
 	return a.id
 }
 

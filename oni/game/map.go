@@ -1,11 +1,11 @@
-package oni
+package game
 
 import (
 	"github.com/gorilla/websocket"
 	"log"
 	"math/rand"
 	"oniproject/oni/jps"
-	"oniproject/oni/mechanic"
+	"oniproject/oni/utils"
 	"sync"
 	"time"
 )
@@ -18,7 +18,7 @@ const (
 
 // for message system
 type sender struct {
-	id Id
+	id utils.Id
 	m  Message
 }
 
@@ -26,7 +26,7 @@ type Map struct {
 	mtx sync.Mutex
 
 	tick                 uint
-	objects              map[Id]GameObject
+	objects              map[utils.Id]GameObject
 	register, unregister chan GameObject
 	sendTo               chan sender
 	Grid                 *jps.Grid
@@ -43,7 +43,7 @@ XXXXXX`
 	return &Map{
 		register:   make(chan GameObject),
 		unregister: make(chan GameObject),
-		objects:    make(map[Id]GameObject),
+		objects:    make(map[utils.Id]GameObject),
 		sendTo:     make(chan sender),
 		Grid:       jps.FromString(s, 8, 6),
 	}
@@ -55,19 +55,19 @@ func (m *Map) Walkable(x, y int) bool {
 func (m *Map) Unregister(a *Avatar) {
 	go func() { m.unregister <- a }()
 }
-func (gm *Map) Send(id Id, m Message) {
+func (gm *Map) Send(id utils.Id, m Message) {
 	go func() { gm.sendTo <- sender{id, m} }()
 	log.Println("Send: ", id, m)
 }
 
-func (gm *Map) GetObjById(id Id) (obj GameObject) {
+func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 	gm.mtx.Lock()
 	obj = gm.objects[id]
 	gm.mtx.Unlock()
 	return
 }
 
-func (m *Map) RunAvatar(ws *websocket.Conn, data mechanic.Actor) {
+func (m *Map) RunAvatar(ws *websocket.Conn, data Actor) {
 	conn := AvatarConnection{
 		ws:          ws,
 		sendMessage: make(chan interface{}, 256),
@@ -85,7 +85,7 @@ func (m *Map) SpawnMonster() {
 	m.register <- &Monster{
 		game:              m,
 		PositionComponent: NewPositionComponent(2, 2),
-		id:                NewId(int64(rand.Intn(10000))),
+		id:                utils.NewId(int64(rand.Intn(10000))),
 	}
 }
 
