@@ -121,22 +121,6 @@ func (_mr *_MockFeatureReceiverRecorder) SealSkill(arg0 interface{}) *gomock.Cal
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "SealSkill", arg0)
 }
 
-func (_m *MockFeatureReceiver) SetEquipSlot(_param0 int, _param1 bool) {
-	_m.ctrl.Call(_m, "SetEquipSlot", _param0, _param1)
-}
-
-func (_mr *_MockFeatureReceiverRecorder) SetEquipSlot(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "SetEquipSlot", arg0, arg1)
-}
-
-func (_m *MockFeatureReceiver) SetEquipType(_param0 int, _param1 bool) {
-	_m.ctrl.Call(_m, "SetEquipType", _param0, _param1)
-}
-
-func (_mr *_MockFeatureReceiverRecorder) SetEquipType(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "SetEquipType", arg0, arg1)
-}
-
 // Mock of SkillTarget interface
 type MockSkillTarget struct {
 	ctrl     *gomock.Controller

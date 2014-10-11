@@ -2,7 +2,7 @@ package game
 
 import (
 	"errors"
-	"gopkg.in/yaml.v1"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
@@ -17,71 +17,38 @@ const (
 	ITEM_ATTR_QUEST = ITEM_ATTR_DONTDROP | ITEM_ATTR_DONTTRADE | ITEM_ATTR_DONTSELL | ITEM_ATTR_DONTMOVETOSTORAGE
 )
 
-type ItemContainer struct {
-}
-
 type Item struct {
 	Name        string
 	Icon        string
 	Description string
 
-	//Type       int
 	Type       string
+	Class      string
 	Attributes int // see consts
 	Weight     int
 	PriceBuy   int
 	PriceSell  int
 
-	EquipTypeId int
-	SlotTypeId  int
-
-	Slot string
-
-	UseAnimation int
+	EquipTypeId  int
+	Slot1, Slot2 string
+	Dual         bool
 
 	Features string
 	features FeatureList
 
-	// fail if return false
 	//EquipScript   string
 	//UnEquipScript string
 
 	// usage
 	UseScript string
 	//useScript EffectList `db:"-"`
+
 	Range int // atk range for weapon
-	Def   int
-	Atk   int
+	DEF   int `yml:"def"`
+	ATK   int `yml:"atk"`
 
 	Level  int
 	PLevel int
-
-	// comment
-	Note string
-}
-
-/*
-func (item *Item) Drop() error          { return nil }
-func (item *Item) Use() error           { return nil }
-func (item *Item) Equip() error         { return nil }
-func (item *Item) Trade() error         { return nil }
-func (item *Item) Sell() error          { return nil }
-func (item *Item) MoveToStorage() error { return nil }
-*/
-
-func (item *Item) SlotType() int { return item.SlotTypeId }
-func (item *Item) TryEquip(actor *Actor) error {
-	// TODO check level and others
-	if !actor.TestEquipType(item.EquipTypeId) {
-		return errors.New("fail item type")
-	}
-	return nil
-}
-
-func (item *Item) ApplyFeatures(r FeatureReceiver) {
-	for _, f := range item.features {
-		f.Run(r)
-	}
 }
 
 func LoadItemYaml(fname string) (*Item, error) {
@@ -98,6 +65,25 @@ func LoadItemYaml(fname string) (*Item, error) {
 
 	return item, err
 }
+
+/*
+func (item *Item) Drop() error          { return nil }
+func (item *Item) Use() error           { return nil }
+func (item *Item) Equip() error         { return nil }
+func (item *Item) Trade() error         { return nil }
+func (item *Item) Sell() error          { return nil }
+func (item *Item) MoveToStorage() error { return nil }
+*/
+
+func (item *Item) TryEquip(actor *Actor) error {
+	// TODO check level and others
+	if !actor.TestEquipType(item.EquipTypeId) {
+		return errors.New("fail item type")
+	}
+	return nil
+}
+
+func (item *Item) ApplyFeatures(r FeatureReceiver) { item.features.Run(r) }
 
 /*
 #define ITEM_ATTR_DONTDROP 1

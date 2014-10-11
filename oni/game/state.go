@@ -16,9 +16,6 @@ type ActorState struct {
 
 	Features string
 	features FeatureList `db:"-"`
-
-	// comment
-	Note string
 }
 
 // db hook

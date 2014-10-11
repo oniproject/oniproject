@@ -1,5 +1,10 @@
 package game
 
+import (
+	"strconv"
+	"strings"
+)
+
 type EffectReceiver interface {
 	RecoverHP(int)
 	RecoverMP(int)
@@ -7,7 +12,39 @@ type EffectReceiver interface {
 	AddState(int)
 	RemoveState(int)
 }
+
+func ParseEffectList(src []string) (dst EffectList) {
+	for _, line := range src {
+		args := strings.Split(line, " ")
+		name := args[0]
+		value, err := strconv.ParseInt(args[1], 10, 32)
+		if err != nil {
+			continue
+		}
+		switch name {
+		case "hp":
+			dst = append(dst, RecoverHP{int(value)})
+		case "mp":
+			dst = append(dst, RecoverMP{int(value)})
+		case "tp":
+			dst = append(dst, RecoverTP{int(value)})
+		case "state":
+			dst = append(dst, AddState{int(value)})
+		case "rm-state":
+			dst = append(dst, RemoveState{int(value)})
+		}
+	}
+	return
+}
+
 type EffectList []Effect
+
+func (list EffectList) ApplyTo(r EffectReceiver) {
+	for _, e := range list {
+		e.ApplyTo(r)
+	}
+}
+
 type Effect interface {
 	ApplyTo(EffectReceiver)
 }
@@ -18,9 +55,9 @@ type RecoverHP struct{ Count int }
 type RecoverMP struct{ Count int }
 type RecoverTP struct{ Count int }
 
-func (e *RecoverHP) ApplyTo(r EffectReceiver) { r.RecoverHP(e.Count) }
-func (e *RecoverMP) ApplyTo(r EffectReceiver) { r.RecoverMP(e.Count) }
-func (e *RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
+func (e RecoverHP) ApplyTo(r EffectReceiver) { r.RecoverHP(e.Count) }
+func (e RecoverMP) ApplyTo(r EffectReceiver) { r.RecoverMP(e.Count) }
+func (e RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
 
 // Increases the TP by the amount specified.
 /*type GainTP struct {
@@ -35,8 +72,8 @@ func (e *RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
 type AddState struct{ State int }
 type RemoveState struct{ State int }
 
-func (e *AddState) ApplyTo(r EffectReceiver)    { r.AddState(e.State) }
-func (e *RemoveState) ApplyTo(r EffectReceiver) { r.RemoveState(e.State) }
+func (e AddState) ApplyTo(r EffectReceiver)    { r.AddState(e.State) }
+func (e RemoveState) ApplyTo(r EffectReceiver) { r.RemoveState(e.State) }
 
 // Param
 

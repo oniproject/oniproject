@@ -6,9 +6,25 @@ import (
 	"time"
 )
 
+const (
+	STATE_IDLE = iota
+	STATE_CREATE
+	STATE_DESTROY
+	STATE_MOVE
+)
+
+type GameObjectState struct {
+	Type      uint8
+	Id        utils.Id
+	Tick      uint
+	Lag       time.Duration
+	Position  geom.Coord
+	Veloctity geom.Coord
+}
+
 type GameObject interface {
-	Update(tick uint, t time.Duration) *State
-	GetState(typ uint8, tick uint) *State
+	Update(tick uint, t time.Duration) *GameObjectState
+	GetState(typ uint8, tick uint) *GameObjectState
 	Position() geom.Coord
 	Send(Message)
 	Id() utils.Id

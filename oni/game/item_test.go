@@ -10,10 +10,12 @@ import (
 const item_path = "../../data/items"
 
 var test_armor = &Item{
-	Name:        "xxx",
-	EquipTypeId: 1, // heavy armor ?
-	SlotTypeId:  2, // body ?
-	features:    FeatureList{&AddDEF{10}},
+	Name: "hauberk",
+	//EquipTypeId: 1, // heavy armor ?
+	//SlotTypeId:  2, // body ?
+	Slot1:    "body",
+	Slot2:    "",
+	features: FeatureList{&AddDEF{10}},
 }
 
 func TestArmorApplyFeatures(t *testing.T) {
@@ -36,7 +38,7 @@ func TestLoadItem(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		} else {
-			t.Logf("type:'%s'\tslot:'%s'\t%v", item.Type, item.Slot, item)
+			t.Logf("type:'%s'\tslot:'%s'\t%v", item.Type, item.Slot1+" "+item.Slot2, item)
 		}
 	}
 }

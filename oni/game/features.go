@@ -1,15 +1,50 @@
 package game
 
+import (
+	"strconv"
+	"strings"
+)
+
 type FeatureReceiver interface {
 	AddATK(int)
 	AddDEF(int)
 	AddSkill(int)
 	SealSkill(int)
 
-	SetEquipSlot(int, bool)
-	SetEquipType(int, bool)
+	//SetEquipSlot(int, bool)
+	//SetEquipType(int, bool)
 }
+
+func ParseFeatureList(src []string) (dst FeatureList) {
+	for _, line := range src {
+		args := strings.Split(line, " ")
+		name := args[0]
+		value, err := strconv.ParseInt(args[1], 10, 32)
+		if err != nil {
+			continue
+		}
+		switch name {
+		case "atk":
+			dst = append(dst, AddATK{int(value)})
+		case "def":
+			dst = append(dst, AddDEF{int(value)})
+		case "skill":
+			dst = append(dst, AddSkill{int(value)})
+		case "rm-skill":
+			dst = append(dst, SealSkill{int(value)})
+		}
+	}
+	return
+}
+
 type FeatureList []Feature
+
+func (list FeatureList) Run(r FeatureReceiver) {
+	for _, f := range list {
+		f.Run(r)
+	}
+}
+
 type Feature interface {
 	Run(FeatureReceiver)
 }
@@ -19,8 +54,8 @@ type Feature interface {
 type AddATK struct{ Value int }
 type AddDEF struct{ Value int }
 
-func (f *AddATK) Run(r FeatureReceiver) { r.AddATK(f.Value) }
-func (f *AddDEF) Run(r FeatureReceiver) { r.AddDEF(f.Value) }
+func (f AddATK) Run(r FeatureReceiver) { r.AddATK(f.Value) }
+func (f AddDEF) Run(r FeatureReceiver) { r.AddDEF(f.Value) }
 
 // Rate
 
@@ -108,13 +143,13 @@ type SealSkillType struct {
 type AddSkill struct{ SkillId int }
 type SealSkill struct{ SkillId int }
 
-func (f *AddSkill) Run(r FeatureReceiver)  { r.AddSkill(f.SkillId) }
-func (f *SealSkill) Run(r FeatureReceiver) { r.SealSkill(f.SkillId) }
+func (f AddSkill) Run(r FeatureReceiver)  { r.AddSkill(f.SkillId) }
+func (f SealSkill) Run(r FeatureReceiver) { r.SealSkill(f.SkillId) }
 
 // Equip
 
 // Enables the equipping of the specified type of slot.
-type AddEquipSlot struct{ SlotId int }
+/*type AddEquipSlot struct{ SlotId int }
 type SealEquipSlot struct{ SlotId int }
 
 func (f *AddEquipSlot) Run(r FeatureReceiver)  { r.SetEquipSlot(f.SlotId, true) }
@@ -126,6 +161,7 @@ type SealEquipType struct{ EquipTypeId int }
 
 func (f *AddEquipType) Run(r FeatureReceiver)  { r.SetEquipType(f.EquipTypeId, true) }
 func (f *SealEquipType) Run(r FeatureReceiver) { r.SetEquipType(f.EquipTypeId, false) }
+*/
 
 // Enables the equipping of the specified type of armor.
 /*type EquipArmor struct {

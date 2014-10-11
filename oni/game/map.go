@@ -73,8 +73,13 @@ func (m *Map) RunAvatar(ws *websocket.Conn, data Actor) {
 		sendMessage: make(chan interface{}, 256),
 		ping_pong:   time.Now(),
 	}
-	p := NewPositionComponent(data.X, data.Y)
-	c := &Avatar{p, data, conn, 0, m}
+	c := &Avatar{
+		PositionComponent: NewPositionComponent(data.X, data.Y),
+		AvatarConnection:  conn,
+		Target:            0,
+		data:              data,
+		game:              m,
+	}
 
 	m.register <- c
 	go c.writePump()

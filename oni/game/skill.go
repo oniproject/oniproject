@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-type SkillId int
-type SkillList []Skill
-
-type SkillType string
-type SkillTypeId int
-
 const (
 	TARGET_PASSIVE      = 0
 	TARGET_ANOTHER_RACE = 1
@@ -49,9 +43,6 @@ type Skill struct {
 	onTarget        EffectList `db:"-"`
 	EffectsOnCaster string     // json
 	onCaster        EffectList `db:"-"`
-
-	// comment
-	Note string
 }
 
 // db hook
@@ -95,12 +86,8 @@ func (s *Skill) Cast(caster, target SkillTarget, lastCast time.Time) error {
 	// TODO Required
 	// TODO Range
 
-	for _, e := range s.onCaster {
-		e.ApplyTo(caster)
-	}
-	for _, e := range s.onTarget {
-		e.ApplyTo(target)
-	}
+	s.onCaster.ApplyTo(caster)
+	s.onTarget.ApplyTo(target)
 
 	return nil
 }
