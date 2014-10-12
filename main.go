@@ -14,7 +14,8 @@ var database = flag.Bool("db", false, "this is a database")
 var circuit = flag.String("c", "", "circuit address")
 
 func main() {
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Llongfile)
+	log.SetPrefix("\033[01;07;38;05;196m[WAT?]\033[0m ")
 	flag.Parse()
 
 	conf := oni.NewConfig(*config)

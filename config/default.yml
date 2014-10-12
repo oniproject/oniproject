@@ -4,3 +4,5 @@ game: ":2000"
 driver: sqlite3
 db: development.bin
 
+level: debug
+

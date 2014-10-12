@@ -1,10 +1,10 @@
 package game
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/go-martini/martini"
 	"github.com/gorilla/websocket"
 	"github.com/martini-contrib/sessions"
-	"log"
 	"net/http"
 	"oniproject/oni/utils"
 )
@@ -36,6 +36,7 @@ func (gm *Game) Run() {
 	// run http server
 
 	m := martini.Classic()
+	m.Map(utils.CreateMartiniLogger())
 
 	store := sessions.NewCookieStore([]byte("secret123"))
 	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, Domain: "ngrok.com", HttpOnly: true})
@@ -47,7 +48,7 @@ func (gm *Game) Run() {
 			return 401, "Unauthorized"
 		}
 		id := _id.(int64)
-		log.Println("_ID", _id, "id", id)
+		log.Debug("_ID ", _id, " id ", id)
 
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -63,7 +64,7 @@ func (gm *Game) Run() {
 			log.Println("get avatar", err)
 			return 500, http.StatusText(418)
 		}
-		log.Println(a)
+		log.Debug(a)
 
 		gm.Map.RunAvatar(ws, *a)
 

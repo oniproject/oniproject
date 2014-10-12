@@ -1,6 +1,7 @@
 package oni
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/go-martini/martini"
 	"github.com/jinzhu/gorm"
 	"github.com/martini-contrib/binding"
@@ -8,7 +9,6 @@ import (
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
 	"net/http"
 	"oniproject/oni/utils"
 )
@@ -39,6 +39,7 @@ func (master *Master) Run() {
 	// TODO: init RPC
 
 	m := martini.Classic()
+	m.Map(utils.CreateMartiniLogger())
 
 	store := sessions.NewCookieStore([]byte("secret123"))
 	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, Domain: "*.ngrok.com", HttpOnly: true})

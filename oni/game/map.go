@@ -1,8 +1,8 @@
 package game
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
-	"log"
 	"math/rand"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
@@ -57,7 +57,7 @@ func (m *Map) Unregister(a *Avatar) {
 }
 func (gm *Map) Send(id utils.Id, m Message) {
 	go func() { gm.sendTo <- sender{id, m} }()
-	log.Println("Send: ", id, m)
+	log.Debug("Send: ", id, m)
 }
 
 func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
@@ -161,21 +161,21 @@ func (gm *Map) Run() {
 			}
 			gm.objects[obj.Id()] = obj
 			broadcast(obj.GetState(STATE_IDLE, gm.tick))
-			log.Println("register", obj.Id(), obj)
+			log.Debug("register", obj.Id(), obj)
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
 			if c, ok := obj.(*Avatar); ok {
 				close(c.sendMessage)
 			}
 			broadcastMsg(&DestroyMsg{obj.Id(), gm.tick})
-			log.Println("unregister", obj)
+			log.Debug("unregister", obj)
 
 		// message system
 		case s := <-gm.sendTo:
 			if obj, ok := gm.objects[s.id]; ok {
 				obj.Send(s.m)
 			} else {
-				log.Printf("fail sendTo: broken ID %v %T", s, s.m)
+				log.Warningf("fail sendTo: broken ID %v %T", s, s.m)
 			}
 		}
 		gm.mtx.Unlock()

@@ -13,7 +13,7 @@ var db = NewDB("", "")
 type DB struct {
 	db     *sql.DB
 	dbmap  *gorp.DbMap
-	States []*ActorState
+	States []*State
 	Skills []*Skill
 }
 
@@ -21,7 +21,7 @@ func NewDB(driver, source string) (db *DB) {
 	return
 	/*
 		db = &DB{
-			States: []*ActorState{},
+			States: []*State{},
 			Skills: []*Skill{},
 		}
 
@@ -38,7 +38,7 @@ func NewDB(driver, source string) (db *DB) {
 		db.dbmap = dbmap
 
 		dbmap.AddTableWithName(Skill{}, "skills")
-		dbmap.AddTableWithName(ActorState{}, "states")
+		dbmap.AddTableWithName(State{}, "states")
 		if err := dbmap.CreateTablesIfNotExists(); err != nil {
 			log.Fatalln("Create tables failed:", err)
 		}

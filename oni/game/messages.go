@@ -2,8 +2,8 @@ package game
 
 import (
 	"errors"
+	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
-	"log"
 	"oniproject/oni/utils"
 )
 
@@ -37,7 +37,7 @@ func WrapMessage(message interface{}) interface{} {
 	case *DestroyMsg:
 		return &MessageWraper{M_DestroyMsg, message}
 	}
-	log.Printf("fail type %T %v", message, message)
+	log.Warningf("fail type %T %v", message, message)
 	return message
 }
 
@@ -76,7 +76,7 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 
 	// XXX debug
 	if len(md.Unused) != 0 {
-		log.Println("have unused", md.Unused, value)
+		log.Debug("have unused", md.Unused, value)
 	}
 
 	return message, nil
@@ -100,7 +100,7 @@ type SetTargetMsg struct {
 func (m *SetTargetMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
-	log.Println("setTarget", a.Target)
+	log.Debug("setTarget", a.Target)
 }
 
 type FireMsg struct {
@@ -110,11 +110,11 @@ type FireMsg struct {
 func (m *FireMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
 	if a.Target == 0 {
-		log.Println("fire FAIL: zero target", m)
+		log.Warningf("fire FAIL: zero target", m)
 		return
 	}
 	if a.Target == a.Id() {
-		log.Println("fire FAIL: is you id", m)
+		log.Warningf("fire FAIL: is you id", m)
 		return
 	}
 
@@ -122,16 +122,16 @@ func (m *FireMsg) Run(obj interface{}) {
 		a.game.Send(utils.Id(a.Target), &CloseMsg{})
 	} else {
 		obj := a.game.GetObjById(a.Target).(*Avatar)
-		log.Println(a.data.Cast(int(m.Type), &obj.data))
+		log.Debug(a.data.Cast(int(m.Type), &obj.data))
 	}
 
-	log.Println("fire OK", m)
+	log.Debug("fire OK", m)
 }
 
 type CloseMsg struct{}
 
 func (m *CloseMsg) Run(obj interface{}) {
-	log.Println("UnregisterMsg", obj)
+	log.Debug("UnregisterMsg", obj)
 	a := obj.(*Avatar)
 	a.ws.Close()
 }
@@ -145,6 +145,6 @@ func (m *DestroyMsg) Run(obj interface{}) {
 	if a, ok := obj.(*Avatar); ok {
 		a.sendMessage <- WrapMessage(m)
 	} else {
-		log.Println("fail send: not a Avatar", obj)
+		log.Warningf("fail send: not a Avatar %T %v", obj, obj)
 	}
 }

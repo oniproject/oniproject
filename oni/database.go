@@ -1,8 +1,8 @@
 package oni
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
-	"log"
 	"oniproject/oni/game"
 	"oniproject/oni/utils"
 )
