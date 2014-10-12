@@ -9,18 +9,15 @@ type EffectReceiver interface {
 	RecoverHP(int)
 	RecoverMP(int)
 	RecoverTP(int)
-	AddState(int)
-	RemoveState(int)
+	AddState(string)
+	RemoveState(string)
 }
 
 func ParseEffectList(src []string) (dst EffectList) {
 	for _, line := range src {
 		args := strings.Split(line, " ")
 		name := args[0]
-		value, err := strconv.ParseInt(args[1], 10, 32)
-		if err != nil {
-			continue
-		}
+		value, _ := strconv.ParseInt(args[1], 10, 32)
 		switch name {
 		case "hp":
 			dst = append(dst, RecoverHP{int(value)})
@@ -29,9 +26,9 @@ func ParseEffectList(src []string) (dst EffectList) {
 		case "tp":
 			dst = append(dst, RecoverTP{int(value)})
 		case "state":
-			dst = append(dst, AddState{int(value)})
+			dst = append(dst, AddState{args[1]})
 		case "rm-state":
-			dst = append(dst, RemoveState{int(value)})
+			dst = append(dst, RemoveState{args[1]})
 		}
 	}
 	return
@@ -69,8 +66,8 @@ func (e RecoverTP) ApplyTo(r EffectReceiver) { r.RecoverTP(e.Count) }
 // Adds the specified state.
 // Removes the specified state.
 // Specifying a value over 100% enables success at a rate higher then the target's original effectiveness.
-type AddState struct{ State int }
-type RemoveState struct{ State int }
+type AddState struct{ State string }
+type RemoveState struct{ State string }
 
 func (e AddState) ApplyTo(r EffectReceiver)    { r.AddState(e.State) }
 func (e RemoveState) ApplyTo(r EffectReceiver) { r.RemoveState(e.State) }

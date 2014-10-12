@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	ITEM_PATH = "data/items"
+
 	ITEM_ATTR_DONTDROP          = 1 << iota // cant drop to ground
 	ITEM_ATTR_DONTUSE                       // cant be used like a potion
 	ITEM_ATTR_DONTEQUIP                     // isnt clothing or weapon
@@ -32,7 +34,7 @@ type Item struct {
 	Slot1, Slot2 string
 	Dual         bool
 
-	Features string
+	Features []string
 	features FeatureList
 
 	//EquipScript   string
@@ -42,9 +44,9 @@ type Item struct {
 	UseScript string
 	//useScript EffectList `db:"-"`
 
-	Range int // atk range for weapon
-	DEF   int `yml:"def"`
-	ATK   int `yml:"atk"`
+	//Range int // atk range for weapon
+	//DEF   int `yml:"def"`
+	//ATK   int `yml:"atk"`
 
 	Level  int
 	PLevel int
@@ -61,6 +63,8 @@ func LoadItemYaml(fname string) (*Item, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	item.features = ParseFeatureList(item.Features)
 
 	return item, err
 }

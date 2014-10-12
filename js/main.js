@@ -131,6 +131,7 @@ var UI = new Vue({
 	},
 	methods: {
 		cast: function(spell) {
+			game.net.FireMsg({t: ""+spell.$value});
 			console.info('cast', spell.$value);
 		},
 	},

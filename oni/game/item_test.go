@@ -7,16 +7,7 @@ import (
 	"testing"
 )
 
-const item_path = "../../data/items"
-
-var test_armor = &Item{
-	Name: "hauberk",
-	//EquipTypeId: 1, // heavy armor ?
-	//SlotTypeId:  2, // body ?
-	Slot1:    "body",
-	Slot2:    "",
-	features: FeatureList{&AddDEF{10}},
-}
+var test_armor, _ = LoadItemYaml(path.Join(ITEM_PATH, "hauberk.yml"))
 
 func TestArmorApplyFeatures(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -34,7 +25,7 @@ var files = []string{
 
 func TestLoadItem(t *testing.T) {
 	for _, fname := range files {
-		item, err := LoadItemYaml(path.Join(item_path, fname))
+		item, err := LoadItemYaml(path.Join(ITEM_PATH, fname))
 		if err != nil {
 			t.Error(err)
 		} else {

@@ -28,7 +28,7 @@ func (_m *MockEffectReceiver) EXPECT() *_MockEffectReceiverRecorder {
 	return _m.recorder
 }
 
-func (_m *MockEffectReceiver) AddState(_param0 int) {
+func (_m *MockEffectReceiver) AddState(_param0 string) {
 	_m.ctrl.Call(_m, "AddState", _param0)
 }
 
@@ -60,7 +60,7 @@ func (_mr *_MockEffectReceiverRecorder) RecoverTP(arg0 interface{}) *gomock.Call
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RecoverTP", arg0)
 }
 
-func (_m *MockEffectReceiver) RemoveState(_param0 int) {
+func (_m *MockEffectReceiver) RemoveState(_param0 string) {
 	_m.ctrl.Call(_m, "RemoveState", _param0)
 }
 
@@ -105,7 +105,7 @@ func (_mr *_MockFeatureReceiverRecorder) AddDEF(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "AddDEF", arg0)
 }
 
-func (_m *MockFeatureReceiver) AddSkill(_param0 int) {
+func (_m *MockFeatureReceiver) AddSkill(_param0 string) {
 	_m.ctrl.Call(_m, "AddSkill", _param0)
 }
 
@@ -113,7 +113,7 @@ func (_mr *_MockFeatureReceiverRecorder) AddSkill(arg0 interface{}) *gomock.Call
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "AddSkill", arg0)
 }
 
-func (_m *MockFeatureReceiver) SealSkill(_param0 int) {
+func (_m *MockFeatureReceiver) SealSkill(_param0 string) {
 	_m.ctrl.Call(_m, "SealSkill", _param0)
 }
 
@@ -142,7 +142,7 @@ func (_m *MockSkillTarget) EXPECT() *_MockSkillTargetRecorder {
 	return _m.recorder
 }
 
-func (_m *MockSkillTarget) AddState(_param0 int) {
+func (_m *MockSkillTarget) AddState(_param0 string) {
 	_m.ctrl.Call(_m, "AddState", _param0)
 }
 
@@ -184,7 +184,7 @@ func (_mr *_MockSkillTargetRecorder) RecoverTP(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RecoverTP", arg0)
 }
 
-func (_m *MockSkillTarget) RemoveState(_param0 int) {
+func (_m *MockSkillTarget) RemoveState(_param0 string) {
 	_m.ctrl.Call(_m, "RemoveState", _param0)
 }
 

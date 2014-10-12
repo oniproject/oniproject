@@ -2,33 +2,32 @@ package game
 
 import (
 	"math/rand"
-	"oniproject/oni/geom"
 	"oniproject/oni/utils"
 	"time"
 )
 
 type Monster struct {
 	PositionComponent
+	StateComponent
+	Parameters
 	Target utils.Id
 	game   AvatarMapper
 	id     utils.Id
-	Lag    time.Duration
 }
 
-func (a *Monster) Id() utils.Id {
-	return a.id
+func NewMonster() *Monster {
+	return &Monster{
+		StateComponent: NewStateComponent(),
+	}
 }
 
-func (a *Monster) Position() geom.Coord {
-	return a.position
-}
-
-func (a *Monster) Send(m Message) {
-	m.Run(a)
-}
+func (a Monster) Lag() time.Duration { return 0 }
+func (a Monster) Id() utils.Id       { return a.id }
+func (a Monster) Race() int          { return 0 }
+func (a *Monster) Send(m Message)    { m.Run(a) }
 
 func (a *Monster) GetState(typ uint8, tick uint) *GameObjectState {
-	return &GameObjectState{typ, a.id, tick, a.Lag, a.position, a.veloctity}
+	return &GameObjectState{typ, a.id, tick, 0, a.position, a.veloctity}
 }
 
 func (m *Monster) Update(tick uint, t time.Duration) *GameObjectState {

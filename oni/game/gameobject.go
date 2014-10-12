@@ -28,6 +28,7 @@ type GameObject interface {
 	Position() geom.Coord
 	Send(Message)
 	Id() utils.Id
+	SkillTarget
 }
 
 type PositionComponent struct {
@@ -40,8 +41,9 @@ func NewPositionComponent(x, y float64) PositionComponent {
 	return PositionComponent{position: geom.Coord{x, y}}
 }
 
-func (c *PositionComponent) Position() geom.Coord { return c.position }
-func (c *PositionComponent) Velocity() geom.Coord { return c.veloctity }
+func (c *PositionComponent) Position() geom.Coord     { return c.position }
+func (c *PositionComponent) Velocity() geom.Coord     { return c.veloctity }
+func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{x, y} }
 func (c *PositionComponent) SetVelocity(x, y float64) {
 	coord := geom.Coord{x, y}
 	c.veloctity = coord.Unit()

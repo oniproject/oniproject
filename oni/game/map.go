@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
-	"sync"
 	"time"
 )
 
@@ -23,8 +22,6 @@ type sender struct {
 }
 
 type Map struct {
-	mtx sync.Mutex
-
 	tick                 uint
 	objects              map[utils.Id]GameObject
 	register, unregister chan GameObject
@@ -61,10 +58,7 @@ func (gm *Map) Send(id utils.Id, m Message) {
 }
 
 func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
-	gm.mtx.Lock()
-	obj = gm.objects[id]
-	gm.mtx.Unlock()
-	return
+	return gm.objects[id]
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
@@ -76,11 +70,12 @@ func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
 }
 
 func (m *Map) SpawnMonster() {
-	m.register <- &Monster{
-		game:              m,
-		PositionComponent: NewPositionComponent(2, 2),
-		id:                utils.NewId(int64(rand.Intn(10000))),
-	}
+	mo := NewMonster()
+	mo.position.X = 2
+	mo.position.Y = 2
+	mo.id = utils.NewId(-int64(rand.Intn(10000)))
+	mo.game = m
+	m.register <- mo
 }
 
 func (gm *Map) Run() {
@@ -115,7 +110,6 @@ func (gm *Map) Run() {
 	go gm.SpawnMonster()
 
 	for {
-		gm.mtx.Lock()
 		select {
 		// replication
 		case <-t.C:
@@ -167,6 +161,5 @@ func (gm *Map) Run() {
 				log.Warningf("fail sendTo: broken ID %v %T", s, s.m)
 			}
 		}
-		gm.mtx.Unlock()
 	}
 }

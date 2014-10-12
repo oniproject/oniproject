@@ -8,30 +8,24 @@ import (
 type FeatureReceiver interface {
 	AddATK(int)
 	AddDEF(int)
-	AddSkill(int)
-	SealSkill(int)
-
-	//SetEquipSlot(int, bool)
-	//SetEquipType(int, bool)
+	AddSkill(string)
+	SealSkill(string)
 }
 
 func ParseFeatureList(src []string) (dst FeatureList) {
 	for _, line := range src {
 		args := strings.Split(line, " ")
 		name := args[0]
-		value, err := strconv.ParseInt(args[1], 10, 32)
-		if err != nil {
-			continue
-		}
+		value, _ := strconv.ParseInt(args[1], 10, 32)
 		switch name {
 		case "atk":
 			dst = append(dst, AddATK{int(value)})
 		case "def":
 			dst = append(dst, AddDEF{int(value)})
 		case "skill":
-			dst = append(dst, AddSkill{int(value)})
+			dst = append(dst, AddSkill{args[1]})
 		case "rm-skill":
-			dst = append(dst, SealSkill{int(value)})
+			dst = append(dst, SealSkill{args[1]})
 		}
 	}
 	return
@@ -140,11 +134,11 @@ type SealSkillType struct {
 }*/
 
 // Set the specified skills as being learned.
-type AddSkill struct{ SkillId int }
-type SealSkill struct{ SkillId int }
+type AddSkill struct{ Skill string }
+type SealSkill struct{ Skill string }
 
-func (f AddSkill) Run(r FeatureReceiver)  { r.AddSkill(f.SkillId) }
-func (f SealSkill) Run(r FeatureReceiver) { r.SealSkill(f.SkillId) }
+func (f AddSkill) Run(r FeatureReceiver)  { r.AddSkill(f.Skill) }
+func (f SealSkill) Run(r FeatureReceiver) { r.SealSkill(f.Skill) }
 
 // Equip
 

@@ -14,15 +14,15 @@ func TestFeatures(t *testing.T) {
 		"atk 1",
 		"vndfjk vndfjksl", // continue
 		"def 2",
-		"skill 3",
-		"rm-skill 4",
+		"skill heal",
+		"rm-skill heal",
 	})
 
 	target := mock.NewMockFeatureReceiver(mockCtrl)
 	target.EXPECT().AddATK(1)
 	target.EXPECT().AddDEF(2)
-	target.EXPECT().AddSkill(3)
-	target.EXPECT().SealSkill(4)
+	target.EXPECT().AddSkill("heal")
+	target.EXPECT().SealSkill("heal")
 
 	features.Run(target)
 }

@@ -3,17 +3,12 @@ package game
 import (
 	"./mock"
 	gomock "code.google.com/p/gomock/gomock"
+	"path"
 	"testing"
 	"time"
 )
 
-var healing = &Skill{
-	Name:      "Healing",
-	Target:    TARGET_SAME_RACE,
-	CastDealy: 10 * time.Second,
-	onTarget:  EffectList{&RecoverHP{Count: 50}},
-	onCaster:  EffectList{&RecoverMP{Count: -10}},
-}
+var healing, _ = LoadSkillYaml(path.Join(SKILL_PATH, "healing.yml"))
 
 func TestHealing(t *testing.T) {
 	mockCtrl := gomock.NewController(t)

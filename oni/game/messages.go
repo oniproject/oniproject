@@ -55,6 +55,7 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 		var mm FireMsg
 		message = &mm
 	default:
+		log.Error("ParseMessage fail type ", _type)
 		return nil, errors.New("fail type")
 	}
 
@@ -66,11 +67,13 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 	}
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
+		log.Error("ParseMessage mapstructure ", err)
 		return nil, err
 	}
 
 	// init message form value
 	if err := decoder.Decode(value); err != nil {
+		log.Error("ParseMessage decode ", err)
 		return nil, err
 	}
 
@@ -100,39 +103,42 @@ type SetTargetMsg struct {
 func (m *SetTargetMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
-	log.Debug("setTarget", a.Target)
+	log.Debug("setTarget ", a.Target)
 }
 
 type FireMsg struct {
-	Type uint64 `mapstructure:"t"`
+	Type string `mapstructure:"t"`
 }
 
 func (m *FireMsg) Run(obj interface{}) {
 	a := obj.(*Avatar)
 	if a.Target == 0 {
-		log.Warningf("fire FAIL: zero target", m)
+		log.Warningf("fire FAIL: zero target %v", m)
 		return
 	}
 	if a.Target == a.Id() {
-		log.Warningf("fire FAIL: is you id", m)
+		log.Warningf("fire FAIL: is you id %v", m)
 		return
 	}
 
-	if m.Type == 0 {
+	if m.Type == "" {
 		a.game.Send(utils.Id(a.Target), &CloseMsg{})
 	} else {
-		obj := a.game.GetObjById(a.Target).(*Avatar)
-		//log.Debug(a.data.Cast(int(m.Type), &obj.data))
-		log.Error("No Cast Method", obj)
+		obj := a.game.GetObjById(a.Target)
+		err := a.Cast(m.Type, a, obj)
+		if err != nil {
+			log.Error("cast ", err)
+			return
+		}
 	}
 
-	log.Debug("fire OK", m)
+	log.Info("fire OK ", m, " ", a.Target)
 }
 
 type CloseMsg struct{}
 
 func (m *CloseMsg) Run(obj interface{}) {
-	log.Debug("UnregisterMsg", obj)
+	log.Debug("UnregisterMsg ", obj)
 	a := obj.(*Avatar)
 	a.ws.Close()
 }

@@ -1,0 +1,10 @@
+name: Screaming
+icon: screaming
+cast-dealy: 2000 # Millisecond
+target: 4 # to monster
+ontarget:
+    - hp -50
+    # TODO agressive in AI
+oncaster:
+    - mp -10
+

@@ -1,20 +1,62 @@
 package game
 
 import (
-	"encoding/json"
 	"errors"
-	"github.com/coopernurse/gorp"
-	"log"
+	log "github.com/Sirupsen/logrus"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"path"
 	"time"
 )
 
 const (
+	SKILL_PATH = "data/skills"
+
 	TARGET_PASSIVE      = 0
 	TARGET_ANOTHER_RACE = 1
 	TARGET_SAME_RACE    = 2
 	TARGET_MONSTER      = 4
 	TARGET_ANYWHERE     = TARGET_ANOTHER_RACE | TARGET_SAME_RACE | TARGET_MONSTER
 )
+
+type SkillComponent struct {
+	Skills          map[string]*Skill
+	skills_lastCast map[string]time.Time
+}
+
+func NewSkillComponent() SkillComponent {
+	return SkillComponent{
+		Skills:          make(map[string]*Skill),
+		skills_lastCast: make(map[string]time.Time),
+	}
+}
+
+func (s *SkillComponent) AddSkill(name string) {
+	skill, err := LoadSkillYaml(path.Join(SKILL_PATH, name+".yml"))
+	if err != nil {
+		log.Error("AddSkill ", err)
+		return
+	}
+	s.Skills[name] = skill
+	s.skills_lastCast[name] = time.Now()
+}
+func (s *SkillComponent) SealSkill(name string) {
+	delete(s.Skills, name)
+}
+func (s *SkillComponent) Cast(name string, caster, target SkillTarget) error {
+	skill, ok := s.Skills[name]
+	if !ok {
+		err := errors.New("skill notfound")
+		log.Error("Cast ", err, s)
+		return err
+	}
+	err := skill.Cast(caster, target, s.skills_lastCast[name])
+	if err != nil {
+		return err
+	}
+	s.skills_lastCast[name] = time.Now()
+	return nil
+}
 
 type SkillTarget interface {
 	// race == 0 is a Monster
@@ -29,35 +71,43 @@ type Skill struct {
 	Icon        string
 	Description string
 
-	SkillType int
+	SkillType string `yaml:"type"`
 
 	Target int
 	//Range  int
 	//Required  int
 
-	CastDealy time.Duration `cooldown time`
+	CastDealy time.Duration `yaml:"cast-dealy"`
 
 	Animation int
 
-	EffectsOnTarget string     // json
-	onTarget        EffectList `db:"-"`
-	EffectsOnCaster string     // json
-	onCaster        EffectList `db:"-"`
+	//EffectsOnTarget string     // json
+	OnTarget []string   `yaml:"ontarget"`
+	onTarget EffectList `db:"-"`
+	//EffectsOnCaster string     // json
+	OnCaster []string   `yaml:"oncaster"`
+	onCaster EffectList `db:"-"`
 }
 
-// db hook
-func (s *Skill) PostGet(sql gorp.SqlExecutor) (err error) {
-	// EffectsOnTarget -> onTarget
-	err = json.Unmarshal([]byte(s.EffectsOnTarget), &(s.onTarget))
+func LoadSkillYaml(fname string) (*Skill, error) {
+	file, err := ioutil.ReadFile(fname)
 	if err != nil {
-		return
+		log.Error("LoadSkillYaml ", err)
+		return nil, err
 	}
-	// EffectsOnCaster -> onCaster
-	err = json.Unmarshal([]byte(s.EffectsOnCaster), &(s.onCaster))
+
+	skill := &Skill{}
+	err = yaml.Unmarshal(file, skill)
 	if err != nil {
-		return
+		log.Error("LoadSkillYaml ", err)
+		return nil, err
 	}
-	return
+
+	skill.onCaster = ParseEffectList(skill.OnCaster)
+	skill.onTarget = ParseEffectList(skill.OnTarget)
+	skill.CastDealy *= time.Millisecond
+
+	return skill, err
 }
 
 func (s *Skill) Cast(caster, target SkillTarget, lastCast time.Time) error {

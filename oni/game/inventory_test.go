@@ -3,13 +3,14 @@ package game
 import "testing"
 import "path"
 
-var test_hauberk, _ = LoadItemYaml(path.Join(item_path, "hauberk.yml"))
-var test_bow, _ = LoadItemYaml(path.Join(item_path, "bow.yml"))
-var test_knife1, _ = LoadItemYaml(path.Join(item_path, "knife.yml"))
-var test_knife2, _ = LoadItemYaml(path.Join(item_path, "knife.yml"))
+var test_hauberk, _ = LoadItemYaml(path.Join(ITEM_PATH, "hauberk.yml"))
+var test_bow, _ = LoadItemYaml(path.Join(ITEM_PATH, "bow.yml"))
+var test_knife1, _ = LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
+var test_knife2, _ = LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
 
 func TestInventory(t *testing.T) {
-	inv := NewInventory()
+	i := NewInventory()
+	inv := &i
 	inv.AddItem(test_hauberk)
 
 	// equip

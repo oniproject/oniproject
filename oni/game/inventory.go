@@ -32,6 +32,18 @@ func (inv *Inventory) removeItem(index int) {
 	inv.Inventory = append(inv.Inventory[:index], inv.Inventory[index+1:]...)
 }
 
+func (inv *Inventory) RemoveItem(index int) {
+	defer inv.inv_mutex.Unlock()
+	inv.inv_mutex.Lock()
+	inv.removeItem(index)
+}
+
+func (inv *Inventory) AddItem(item *Item) {
+	defer inv.inv_mutex.Unlock()
+	inv.inv_mutex.Lock()
+	inv.addItem(item)
+}
+
 func (inv *Inventory) EquipItem(index int) error {
 	defer inv.inv_mutex.Unlock()
 	inv.inv_mutex.Lock()
@@ -108,16 +120,4 @@ func (inv *Inventory) UnequipItem(slot string) error {
 	}
 	inv.addItem(item)
 	return nil
-}
-
-func (inv *Inventory) RemoveItem(index int) {
-	defer inv.inv_mutex.Unlock()
-	inv.inv_mutex.Lock()
-	inv.removeItem(index)
-}
-
-func (inv *Inventory) AddItem(item *Item) {
-	defer inv.inv_mutex.Unlock()
-	inv.inv_mutex.Lock()
-	inv.addItem(item)
 }

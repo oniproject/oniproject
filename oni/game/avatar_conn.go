@@ -27,8 +27,10 @@ type AvatarConnection struct {
 	ws          *websocket.Conn
 	sendMessage chan interface{}
 	ping_pong   time.Time
-	Lag         time.Duration
+	lag         time.Duration
 }
+
+func (c *Avatar) Lag() time.Duration { return c.lag }
 
 func (c *Avatar) readPump() {
 	defer func() {
@@ -40,7 +42,7 @@ func (c *Avatar) readPump() {
 	c.ws.SetReadDeadline(time.Now().Add(pongWait))
 	c.ws.SetPongHandler(func(string) error {
 		c.ws.SetReadDeadline(time.Now().Add(pongWait))
-		c.Lag = time.Now().Sub(c.ping_pong)
+		c.lag = time.Now().Sub(c.ping_pong)
 		return nil
 	})
 

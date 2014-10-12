@@ -44,7 +44,7 @@ func (db *Database) SaveAvatar(a *game.Avatar) error {
 
 func (db *Database) CreateAvatar() (*game.Avatar, error) {
 	a := game.NewAvatar()
-	a.X, a.Y = 1, 1
+	a.X, a.Y = 2, 2
 	err := db.db.Save(a).Error
 	return a, err
 }
