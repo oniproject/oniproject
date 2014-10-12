@@ -42,7 +42,7 @@ func (master *Master) Run() {
 	m.Map(utils.CreateMartiniLogger())
 
 	store := sessions.NewCookieStore([]byte("secret123"))
-	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, Domain: "*.ngrok.com", HttpOnly: true})
+	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, HttpOnly: true})
 	m.Use(sessions.Sessions("ssid", store))
 	m.Use(render.Renderer(render.Options{
 		Layout: "layout",
@@ -146,7 +146,7 @@ func (master *Master) Run() {
 			return 500, err.Error()
 		}
 
-		account.AvatarId = actor.Id
+		account.AvatarId = int64(actor.Id())
 
 		err = master.authdb.Create(&account).Error
 		if err != nil {

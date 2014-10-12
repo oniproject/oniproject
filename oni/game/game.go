@@ -7,10 +7,11 @@ import (
 	"github.com/martini-contrib/sessions"
 	"net/http"
 	"oniproject/oni/utils"
+	"time"
 )
 
 type AvatarDB interface {
-	AvatarById(utils.Id) (*Actor, error)
+	AvatarById(utils.Id) (*Avatar, error)
 }
 
 type GameAddr interface {
@@ -39,7 +40,7 @@ func (gm *Game) Run() {
 	m.Map(utils.CreateMartiniLogger())
 
 	store := sessions.NewCookieStore([]byte("secret123"))
-	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, Domain: "ngrok.com", HttpOnly: true})
+	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, HttpOnly: true})
 	m.Use(sessions.Sessions("ssid", store))
 
 	m.Get("/ws", func(sessions sessions.Session, w http.ResponseWriter, r *http.Request) (int, string) {
@@ -52,7 +53,7 @@ func (gm *Game) Run() {
 
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Println(err)
+			log.Error(err)
 			if _, ok := err.(websocket.HandshakeError); !ok {
 				return 500, "fail HandshakeError"
 			}
@@ -61,12 +62,18 @@ func (gm *Game) Run() {
 
 		a, err := gm.adb.AvatarById(utils.Id(id))
 		if err != nil {
-			log.Println("get avatar", err)
+			log.Error("get avatar", err)
 			return 500, http.StatusText(418)
+		}
+
+		a.AvatarConnection = AvatarConnection{
+			ws:          ws,
+			sendMessage: make(chan interface{}, 256),
+			ping_pong:   time.Now(),
 		}
 		log.Debug(a)
 
-		gm.Map.RunAvatar(ws, *a)
+		gm.Map.RunAvatar(ws, a)
 
 		return 200, "game over"
 	})

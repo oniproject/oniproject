@@ -20,8 +20,8 @@ type Inventory struct {
 	inv_mutex sync.Mutex
 }
 
-func NewInventory() *Inventory {
-	return &Inventory{
+func NewInventory() Inventory {
+	return Inventory{
 		Inventory: []*Item{},
 		Equip:     make(map[string]*Item),
 	}

@@ -33,7 +33,7 @@ func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	return
 }
 
-func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Actor, err error) {
+func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Avatar, err error) {
 	a, err = b.adb.AvatarById(id)
 	if err != nil {
 		a = nil
@@ -55,7 +55,7 @@ func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Actor, err error) {
 		return
 	}
 
-	if _, ok := m.Avatars[utils.Id(a.Id)]; ok {
+	if _, ok := m.Avatars[a.Id()]; ok {
 		// avatar is avilable
 		// unload it!
 		// send disconnect rpc call to Game
@@ -63,17 +63,17 @@ func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Actor, err error) {
 		return
 	}
 
-	m.Avatars[utils.Id(a.Id)] = true
+	m.Avatars[a.Id()] = true
 
 	// attach
 
 	return
 }
 
-func (b *Balancer) DetachAvatar(a *game.Actor) error {
+func (b *Balancer) DetachAvatar(a *game.Avatar) error {
 	if m, ok := b.Maps[utils.Id(a.MapId)]; ok {
-		if _, ok := m.Avatars[utils.Id(a.Id)]; ok {
-			delete(m.Avatars, utils.Id(a.Id))
+		if _, ok := m.Avatars[a.Id()]; ok {
+			delete(m.Avatars, a.Id())
 			// TODO send it to Game
 		}
 	}

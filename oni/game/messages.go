@@ -122,7 +122,8 @@ func (m *FireMsg) Run(obj interface{}) {
 		a.game.Send(utils.Id(a.Target), &CloseMsg{})
 	} else {
 		obj := a.game.GetObjById(a.Target).(*Avatar)
-		log.Debug(a.data.Cast(int(m.Type), &obj.data))
+		//log.Debug(a.data.Cast(int(m.Type), &obj.data))
+		log.Error("No Cast Method", obj)
 	}
 
 	log.Debug("fire OK", m)

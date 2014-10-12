@@ -8,9 +8,9 @@ import (
 )
 
 type AvatarDB interface {
-	AvatarById(id utils.Id) (*game.Actor, error)
-	SaveAvatar(a *game.Actor) error
-	CreateAvatar() (*game.Actor, error)
+	AvatarById(id utils.Id) (*game.Avatar, error)
+	SaveAvatar(a *game.Avatar) error
+	CreateAvatar() (*game.Avatar, error)
 }
 
 type Database struct {
@@ -20,30 +20,31 @@ type Database struct {
 func NewDatabase(config *Config) AvatarDB {
 	db := &Database{db: config.DB()}
 
-	db.db.AutoMigrate(&game.Actor{})
+	db.db.AutoMigrate(&game.Avatar{})
 
 	return db
 }
 
-func (db *Database) AvatarById(id utils.Id) (*game.Actor, error) {
+func (db *Database) AvatarById(id utils.Id) (*game.Avatar, error) {
 	// TODO choice database by Id
-	var a game.Actor
-	err := db.db.First(&a, map[string]interface{}{"id": id}).Error
+	a := game.NewAvatar()
+	//err := db.db.First(&a, map[string]interface{}{"id": id}).Error
+	err := db.db.First(a, int64(id)).Error
 	if err != nil {
-		log.Println("SelectOne failed", err)
+		log.Error("SelectOne failed", err)
 		return nil, err
 	}
-	return &a, nil
+	return a, nil
 	// TODO sync AvatarData with mechanic database ?
 }
 
-func (db *Database) SaveAvatar(a *game.Actor) error {
+func (db *Database) SaveAvatar(a *game.Avatar) error {
 	return db.db.Save(a).Error
 }
 
-func (db *Database) CreateAvatar() (*game.Actor, error) {
-	var a game.Actor
+func (db *Database) CreateAvatar() (*game.Avatar, error) {
+	a := game.NewAvatar()
 	a.X, a.Y = 1, 1
-	err := db.db.Save(&a).Error
-	return &a, err
+	err := db.db.Save(a).Error
+	return a, err
 }

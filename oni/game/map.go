@@ -67,20 +67,9 @@ func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 	return
 }
 
-func (m *Map) RunAvatar(ws *websocket.Conn, data Actor) {
-	conn := AvatarConnection{
-		ws:          ws,
-		sendMessage: make(chan interface{}, 256),
-		ping_pong:   time.Now(),
-	}
-	c := &Avatar{
-		PositionComponent: NewPositionComponent(data.X, data.Y),
-		AvatarConnection:  conn,
-		Target:            0,
-		data:              data,
-		game:              m,
-	}
-
+func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
+	c.game = m
+	c.PositionComponent = NewPositionComponent(c.X, c.Y)
 	m.register <- c
 	go c.writePump()
 	c.readPump()

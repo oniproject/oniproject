@@ -40,14 +40,11 @@ func NewPositionComponent(x, y float64) PositionComponent {
 	return PositionComponent{position: geom.Coord{x, y}}
 }
 
-func (c *PositionComponent) Position() geom.Coord {
-	return c.position
-}
-func (c *PositionComponent) Velocity() geom.Coord {
-	return c.veloctity
-}
+func (c *PositionComponent) Position() geom.Coord { return c.position }
+func (c *PositionComponent) Velocity() geom.Coord { return c.veloctity }
 func (c *PositionComponent) SetVelocity(x, y float64) {
-	c.veloctity = geom.Coord{x, y}
+	coord := geom.Coord{x, y}
+	c.veloctity = coord.Unit()
 }
 
 type Walkabler interface {

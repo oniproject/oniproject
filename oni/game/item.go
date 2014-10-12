@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -66,6 +65,8 @@ func LoadItemYaml(fname string) (*Item, error) {
 	return item, err
 }
 
+func (item *Item) ApplyFeatures(r FeatureReceiver) { item.features.Run(r) }
+
 /*
 func (item *Item) Drop() error          { return nil }
 func (item *Item) Use() error           { return nil }
@@ -74,16 +75,6 @@ func (item *Item) Trade() error         { return nil }
 func (item *Item) Sell() error          { return nil }
 func (item *Item) MoveToStorage() error { return nil }
 */
-
-func (item *Item) TryEquip(actor *Actor) error {
-	// TODO check level and others
-	if !actor.TestEquipType(item.EquipTypeId) {
-		return errors.New("fail item type")
-	}
-	return nil
-}
-
-func (item *Item) ApplyFeatures(r FeatureReceiver) { item.features.Run(r) }
 
 /*
 #define ITEM_ATTR_DONTDROP 1
