@@ -67,7 +67,7 @@ func TestInventoryComponent(t *testing.T) {
 	printIventory(t, "end", inv)
 }
 
-func printIventory(t *testing.T, s string, inv *Inventory) {
+func printIventory(t *testing.T, s string, inv *InventoryComponent) {
 	t.Logf("\t%s %v %v", s, inv.Inventory, inv.Equip)
 	for k, v := range inv.Inventory {
 		t.Log(k, v.Name)

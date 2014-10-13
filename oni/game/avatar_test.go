@@ -1,13 +1,21 @@
 package game
 
 import (
+	"./mock"
+	gomock "code.google.com/p/gomock/gomock"
 	"testing"
 	"time"
 )
 
 func TestAvatarUpdateIDLE(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	w := mock.NewMockWalkabler(mockCtrl)
+	w.EXPECT().Walkable(1, 1).AnyTimes()
+
 	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 0)}
-	state := avatar.Update(1, 0)
+	state := avatar.Update(w, 1, 0)
 
 	if state.Type != STATE_IDLE {
 		t.Fail()
@@ -15,8 +23,14 @@ func TestAvatarUpdateIDLE(t *testing.T) {
 }
 
 func TestAvatarUpdateSimple(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	w := mock.NewMockWalkabler(mockCtrl)
+	w.EXPECT().Walkable(1, 1).AnyTimes()
+
 	avatar := &Avatar{PositionComponent: NewPositionComponent(1, 2)}
-	state := avatar.Update(1, 1*time.Second)
+	state := avatar.Update(w, 1, 1*time.Second)
 	t.Log(state)
 
 	if state == nil {
@@ -28,8 +42,14 @@ func TestAvatarUpdateSimple(t *testing.T) {
 }
 
 func TestAvatarUpdateOnlyX(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	w := mock.NewMockWalkabler(mockCtrl)
+	w.EXPECT().Walkable(1, 1).AnyTimes()
+
 	avatar := &Avatar{PositionComponent: NewPositionComponent(2, 0)}
-	state := avatar.Update(1, 1*time.Second)
+	state := avatar.Update(w, 1, 1*time.Second)
 	t.Log(state)
 
 	if state == nil {
@@ -41,8 +61,14 @@ func TestAvatarUpdateOnlyX(t *testing.T) {
 }
 
 func TestAvatarUpdateOnlyY(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	w := mock.NewMockWalkabler(mockCtrl)
+	w.EXPECT().Walkable(1, 1).AnyTimes()
+
 	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 2)}
-	state := avatar.Update(1, 1*time.Second)
+	state := avatar.Update(w, 1, 1*time.Second)
 	t.Log(state)
 
 	if state == nil {
@@ -54,9 +80,15 @@ func TestAvatarUpdateOnlyY(t *testing.T) {
 }
 
 func TestAvatarUpdateZero(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	w := mock.NewMockWalkabler(mockCtrl)
+	w.EXPECT().Walkable(1, 1).AnyTimes()
+
 	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 2)}
 	avatar.PositionComponent.position.Y = 1
-	state := avatar.Update(1, 1*time.Second)
+	state := avatar.Update(w, 1, 1*time.Second)
 
 	if state == nil {
 		t.Fail()

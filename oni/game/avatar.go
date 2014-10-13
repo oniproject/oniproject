@@ -48,8 +48,6 @@ func NewAvatar() *Avatar {
 func (a Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
 func (a Avatar) Race() int    { return a.RaceId }
 
-//func (a *Avatar) Send(m Message) { m.Run(a) }
-
 // for debug print
 func (a *Avatar) String() string {
 	return fmt.Sprintf(`Avatar[%d]'%s' pos[%f:%f] pc:%s param:%s inv:%s`,

@@ -4,7 +4,6 @@ package game
 // TODO check item parameters (maybe in message?)
 
 import "errors"
-import "sync"
 
 var (
 	ItemNotfound  = errors.New("Item not found")
@@ -17,7 +16,6 @@ var (
 type InventoryComponent struct {
 	Inventory []*Item
 	Equip     map[string]*Item
-	inv_mutex sync.Mutex
 }
 
 func NewInventoryComponent() InventoryComponent {
@@ -27,31 +25,12 @@ func NewInventoryComponent() InventoryComponent {
 	}
 }
 
-func (inv *InventoryComponent) addItem(item *Item) { inv.Inventory = append(inv.Inventory, item) }
-func (inv *InventoryComponent) removeItem(index int) {
+func (inv *InventoryComponent) AddItem(item *Item) { inv.Inventory = append(inv.Inventory, item) }
+func (inv *InventoryComponent) RemoveItem(index int) {
 	inv.Inventory = append(inv.Inventory[:index], inv.Inventory[index+1:]...)
 }
 
-func (inv *InventoryComponent) RemoveItem(index int) {
-	//go func() {
-	//defer inv.inv_mutex.Unlock()
-	//inv.inv_mutex.Lock()
-	inv.removeItem(index)
-	//}()
-}
-
-func (inv *InventoryComponent) AddItem(item *Item) {
-	//go func() {
-	//defer inv.inv_mutex.Unlock()
-	//inv.inv_mutex.Lock()
-	inv.addItem(item)
-	//}()
-}
-
 func (inv *InventoryComponent) EquipItem(index int) error {
-	defer inv.inv_mutex.Unlock()
-	inv.inv_mutex.Lock()
-
 	if index >= len(inv.Inventory) {
 		return ItemNotfound
 	}
@@ -68,10 +47,10 @@ func (inv *InventoryComponent) EquipItem(index int) error {
 
 	if item.Dual {
 		if slot, ok := inv.Equip[item.Slot1]; ok {
-			inv.addItem(slot)
+			inv.AddItem(slot)
 		}
 		if slot, ok := inv.Equip[item.Slot2]; ok {
-			inv.addItem(slot)
+			inv.AddItem(slot)
 		}
 		inv.Equip[item.Slot1] = item
 		inv.Equip[item.Slot2] = item
@@ -80,9 +59,9 @@ func (inv *InventoryComponent) EquipItem(index int) error {
 		slot2, ok2 := inv.Equip[item.Slot2]
 		switch {
 		case ok1 && ok2:
-			inv.addItem(slot1)
+			inv.AddItem(slot1)
 			if slot1 != slot2 {
-				inv.addItem(slot2)
+				inv.AddItem(slot2)
 			}
 			inv.Equip[item.Slot1] = item
 			delete(inv.Equip, item.Slot2)
@@ -90,28 +69,25 @@ func (inv *InventoryComponent) EquipItem(index int) error {
 			if item.Slot1 == "" {
 				return ItemFailSlot1
 			}
-			inv.addItem(slot1)
+			inv.AddItem(slot1)
 			inv.Equip[item.Slot1] = item
 		case ok2:
 			if item.Slot2 == "" {
 				return ItemFailSlot2
 			}
-			inv.addItem(slot2)
+			inv.AddItem(slot2)
 			inv.Equip[item.Slot2] = item
 		default:
 			inv.Equip[item.Slot1] = item
 		}
 	}
 
-	inv.removeItem(index)
+	inv.RemoveItem(index)
 
 	return nil
 }
 
 func (inv *InventoryComponent) UnequipItem(slot string) error {
-	defer inv.inv_mutex.Unlock()
-	inv.inv_mutex.Lock()
-
 	item, ok := inv.Equip[slot]
 	if !ok {
 		return ItemNotfound
@@ -122,6 +98,6 @@ func (inv *InventoryComponent) UnequipItem(slot string) error {
 	} else {
 		delete(inv.Equip, slot)
 	}
-	inv.addItem(item)
+	inv.AddItem(item)
 	return nil
 }

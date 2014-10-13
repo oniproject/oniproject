@@ -68,11 +68,12 @@ func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
 }
 
 func (m *Map) SpawnMonster() {
-	mo := NewMonster()
-	mo.position.X = 2
-	mo.position.Y = 2
-	mo.id = utils.NewId(-int64(rand.Intn(10000)))
-	m.register <- mo
+	monster := NewMonster()
+	monster.position.X = 2
+	monster.position.Y = 2
+	monster.id = utils.NewId(-int64(rand.Intn(10000)))
+	m.register <- monster
+	monster.RunAI()
 }
 
 func (gm *Map) Run() {

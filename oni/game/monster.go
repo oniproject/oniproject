@@ -29,11 +29,21 @@ func (a *Monster) GetState(typ uint8, tick uint) *GameObjectState {
 }
 
 func (m *Monster) Update(w Walkabler, tick uint, t time.Duration) *GameObjectState {
-	m.veloctity.X = (rand.Float64() - 0.5) * 5
-	m.veloctity.Y = (rand.Float64() - 0.5) * 5
 	if m.PositionComponent.Update(w, t) {
 		return m.GetState(STATE_MOVE, tick)
 	} else {
 		return m.GetState(STATE_IDLE, tick)
+	}
+}
+
+func (m *Monster) RunAI() {
+	t := time.NewTicker(1 * time.Second)
+	for {
+		select {
+		case <-t.C:
+			x := (rand.Float64() - 0.5) * 5
+			y := (rand.Float64() - 0.5) * 5
+			m.SetVelocity(x, y)
+		}
 	}
 }
