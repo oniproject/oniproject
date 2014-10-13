@@ -56,7 +56,7 @@ XXXXXX`
 func (m *Map) Walkable(x, y int) bool {
 	return m.Grid.Walkable(x, y)
 }
-func (m *Map) Unregister(a *Avatar) {
+func (m *Map) Unregister(a GameObject) {
 	go func() { m.unregister <- a }()
 }
 func (gm *Map) Send(id utils.Id, m Message) {
@@ -94,6 +94,24 @@ func (m *Map) SpawnMonster() {
 	monster.id = utils.NewId(-int64(rand.Intn(10000)))
 	m.register <- monster
 	monster.RunAI()
+}
+
+func (m *Map) DropItem(x, y float64, item *Item) {
+	go func() { m.register <- NewDroppedItem(x, y, item) }()
+}
+
+func (m *Map) PickupItem(id utils.Id) *Item {
+	obj, ok := m.objects[id]
+	if !ok {
+		return nil
+	}
+	if item, ok := obj.(*DroppedItem); ok {
+		m.Unregister(obj)
+		return item.Item
+	} else {
+		log.Error("try PickupItem: item is NOT item")
+		return nil
+	}
 }
 
 func (gm *Map) Run() {

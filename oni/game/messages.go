@@ -9,13 +9,20 @@ import (
 
 type Sender interface {
 	Send(utils.Id, Message)
+}
+
+type MessageToMapInterface interface {
 	// XXX
 	GetObjById(utils.Id) GameObject
+
+	Sender
+	Dropper
+	Pickuper
 }
 
 // command
 type Message interface {
-	Run(Sender, interface{})
+	Run(MessageToMapInterface, interface{})
 }
 
 const (
@@ -25,6 +32,9 @@ const (
 	M_SetTargetMsg
 	M_CastMsg
 	M_DestroyMsg
+
+	M_DropItem
+	M_PickupItem
 )
 
 // to client
@@ -42,6 +52,10 @@ func WrapMessage(message interface{}) interface{} {
 		return &MessageWraper{M_CastMsg, message}
 	case *DestroyMsg:
 		return &MessageWraper{M_DestroyMsg, message}
+	case *DropItemMsg:
+		return &MessageWraper{M_DropItem, message}
+	case *PickupItemMsg:
+		return &MessageWraper{M_PickupItem, message}
 	}
 	log.Warningf("fail type %T %v", message, message)
 	return message
@@ -59,6 +73,12 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 		message = &mm
 	case M_CastMsg:
 		var mm CastMsg
+		message = &mm
+	case M_DropItem:
+		var mm DropItemMsg
+		message = &mm
+	case M_PickupItem:
+		var mm PickupItemMsg
 		message = &mm
 	default:
 		log.Error("ParseMessage fail type ", _type)
@@ -97,7 +117,7 @@ type SetVelocityMsg struct {
 	NotUsed float64 `mapstructure:"z"`
 }
 
-func (m *SetVelocityMsg) Run(s Sender, obj interface{}) {
+func (m *SetVelocityMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	a.SetVelocity(m.X, m.Y)
 }
@@ -106,7 +126,7 @@ type SetTargetMsg struct {
 	Target utils.Id `mapstructure:"id"`
 }
 
-func (m *SetTargetMsg) Run(s Sender, obj interface{}) {
+func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
 	log.Debug("setTarget ", a.Target)
@@ -116,7 +136,7 @@ type CastMsg struct {
 	Type string `mapstructure:"t"`
 }
 
-func (m *CastMsg) Run(s Sender, obj interface{}) {
+func (m *CastMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	if a.Target == 0 {
 		log.Warningf("fire FAIL: zero target %v", m)
@@ -143,7 +163,7 @@ func (m *CastMsg) Run(s Sender, obj interface{}) {
 
 type CloseMsg struct{}
 
-func (m *CloseMsg) Run(s Sender, obj interface{}) {
+func (m *CloseMsg) Run(s MessageToMapInterface, obj interface{}) {
 	log.Debug("UnregisterMsg ", obj)
 	a := obj.(*Avatar)
 	a.ws.Close()
@@ -154,10 +174,39 @@ type DestroyMsg struct {
 	T  uint // tick
 }
 
-func (m *DestroyMsg) Run(s Sender, obj interface{}) {
+func (m *DestroyMsg) Run(s MessageToMapInterface, obj interface{}) {
 	if a, ok := obj.(*Avatar); ok {
 		a.sendMessage <- WrapMessage(m)
 	} else {
 		log.Warningf("fail send: not a Avatar %T %v", obj, obj)
 	}
+}
+
+type DropItemMsg struct {
+	Id int
+}
+
+func (m *DropItemMsg) Run(s MessageToMapInterface, obj interface{}) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Error("fail DropItemMsg: item notfound")
+		}
+	}()
+	a := obj.(*Avatar)
+	item := a.Inventory[m.Id]
+	a.RemoveItem(m.Id)
+	pos := a.Position()
+	s.DropItem(pos.X, pos.Y, item)
+}
+
+type PickupItemMsg struct{}
+
+func (m *PickupItemMsg) Run(s MessageToMapInterface, obj interface{}) {
+	a := obj.(*Avatar)
+	item := s.PickupItem(a.Target)
+	if item == nil {
+		log.Error("fail PickupItem: item notfound")
+		return
+	}
+	a.AddItem(item)
 }

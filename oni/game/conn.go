@@ -11,7 +11,7 @@ import (
 
 type ConnToMapInterface interface {
 	Sender
-	Unregister(*Avatar)
+	Unregister(GameObject)
 }
 
 const (
@@ -103,6 +103,7 @@ func (c *Connection) writePump() {
 	}()
 
 	if err := c.ping(); err != nil {
+		log.Error("ping failure ", err)
 		return
 	}
 
@@ -123,6 +124,7 @@ func (c *Connection) writePump() {
 			}
 		case <-ticker.C:
 			if err := c.ping(); err != nil {
+				log.Warn("ping failure ", err)
 				return
 			}
 		}
