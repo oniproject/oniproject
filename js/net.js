@@ -62,6 +62,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case 4:
 			this.emit('DestroyMsg', value);
 			break;
+		case 8:
+			this.emit('InventoryMsg', value);
+			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -83,6 +86,12 @@ Net.prototype.FireMsg = function(data) {
 	this.send({
 		T: 3,
 		V: data
+	});
+}
+Net.prototype.RequestInventoryMsg = function() {
+	this.send({
+		T: 7,
+		V: {I:"r"}
 	});
 }
 

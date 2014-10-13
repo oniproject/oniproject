@@ -34,8 +34,8 @@ type Item struct {
 	Slot1, Slot2 string
 	Dual         bool
 
-	Features []string
-	features FeatureList
+	Features  []string
+	Xfeatures FeatureList `json:"-"`
 
 	//EquipScript   string
 	//UnEquipScript string
@@ -64,12 +64,12 @@ func LoadItemYaml(fname string) (*Item, error) {
 		return nil, err
 	}
 
-	item.features = ParseFeatureList(item.Features)
+	item.Xfeatures = ParseFeatureList(item.Features)
 
 	return item, err
 }
 
-func (item *Item) ApplyFeatures(r FeatureReceiver) { item.features.Run(r) }
+func (item *Item) ApplyFeatures(r FeatureReceiver) { item.Xfeatures.Run(r) }
 
 /*
 func (item *Item) Drop() error          { return nil }

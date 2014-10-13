@@ -30,15 +30,19 @@ const (
 	// Client <-> Server only
 	M_SetVelocityMsg
 	M_SetTargetMsg
+
 	M_CastMsg
 	M_DestroyMsg
 
 	M_DropItem
 	M_PickupItem
+
+	M_RequestInventory
+	M_Inventory
 )
 
 // to client
-func WrapMessage(message interface{}) interface{} {
+func WrapMessage(message Message) interface{} {
 	type MessageWraper struct {
 		T uint8
 		V interface{}
@@ -56,6 +60,10 @@ func WrapMessage(message interface{}) interface{} {
 		return &MessageWraper{M_DropItem, message}
 	case *PickupItemMsg:
 		return &MessageWraper{M_PickupItem, message}
+	case *InventoryMsg:
+		return &MessageWraper{M_Inventory, message}
+	case *RequestInventoryMsg:
+		return &MessageWraper{M_RequestInventory, message}
 	}
 	log.Warningf("fail type %T %v", message, message)
 	return message
@@ -79,6 +87,12 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 		message = &mm
 	case M_PickupItem:
 		var mm PickupItemMsg
+		message = &mm
+	case M_Inventory:
+		var mm InventoryMsg
+		message = &mm
+	case M_RequestInventory:
+		var mm RequestInventoryMsg
 		message = &mm
 	default:
 		log.Error("ParseMessage fail type ", _type)
@@ -105,7 +119,7 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 
 	// XXX debug
 	if len(md.Unused) != 0 {
-		log.Debug("have unused", md.Unused, value)
+		log.Warn("have unused", md.Unused, value)
 	}
 
 	return message, nil
@@ -209,4 +223,23 @@ func (m *PickupItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 		return
 	}
 	a.AddItem(item)
+}
+
+type RequestInventoryMsg struct {
+	I string
+}
+
+func (m *RequestInventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
+	a := obj.(*Avatar)
+	log.Printf("%q %q", a.Inventory, a.Equip)
+	a.sendMessage <- WrapMessage(&InventoryMsg{Inventory: a.Inventory, Equip: a.Equip})
+}
+
+type InventoryMsg struct {
+	Inventory []*Item          `mapstructure:"inv"`
+	Equip     map[string]*Item `mapstructure:"equip"`
+}
+
+func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
+	log.Panic("InventoryMsg Run")
 }

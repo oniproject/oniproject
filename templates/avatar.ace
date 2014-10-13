@@ -1,0 +1,153 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    meta http-equiv=Content-Type content="text/html;charset=UTF-8"
+    meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    title Avatar
+    = css
+      code {
+        margin: 0 3em;
+        padding: 1em;
+        background: #233;
+        color: white;
+        display: block;
+        font-size: x-small;
+      }
+      pre {
+        width: 150px;
+        floar:left;
+        box-sizing: border-box;
+        display: inline-block;
+        margin: 0 1em;
+      }
+      pre code {
+        margin: 0;
+        padding: 0;
+        padding: 1em;
+        width: 100%;
+      }
+      section {
+        margin: 0 3em;
+        padding: 1em;
+        background: #dda;
+      }
+      .clearfix:after {
+        content:"";
+        display:table;
+        clear:both;
+      }
+
+      dt {
+        font-weight: bold;
+      }
+      dd {
+        margin-left: 1em;
+      }
+      dl {
+        /*outline: 1px solid  #344;*/
+      }
+      dl.inline dt, dl.inline dd {
+        display: inline;
+      }
+
+      .h {
+        font-size: xx-large;
+      }
+
+  body
+    h1
+      | User {{.user.Username}} #{{.id}}
+    code {{.user}}
+    section
+      h2 Avatar
+      code {{.avatar}}
+      h3 Parameters
+      code {{.avatar.Parameters}}
+      code
+        {{with .avatar.Parameters}}
+          div HP {{.HP}}/{{.MHP}}
+          div MP {{.MP}}/{{.MMP}}
+          div TP {{.TP}}/{{.MTP}}
+          br
+          div ATK {{.ATK}}
+          div DEF {{.DEF}}
+        {{end}}
+      h3 Inventory
+      code {{.avatar.Inventory}}
+      hr
+      div.clearfix
+        {{range .avatar.Inventory}}
+          {{template "item" .}}
+        {{end}}
+      h3 Equip
+      code {{.avatar.Equip}}
+      hr
+      div.clearfix
+        {{range .avatar.Equip}}
+          {{template "item" .}}
+        {{end}}
+      h3 Skills
+      code {{.avatar.Skills}}
+    = javascript
+
+{{define "item"}}
+pre.left
+  code
+    .h {{.Name}}
+    dl
+      dt Icon
+      dd {{.Icon}}
+      dt Description
+      dd {{.Description}}
+
+    dl.inline
+      dt Type
+      dd {{.Type}}
+    dl.inline
+      dt Class
+      dd {{.Class}}
+    dl.inline
+      dt Attributes
+      dd {{.Attributes}}
+    dl.inline
+      dt Weight
+      dd {{.Weight}}
+    dl.inline
+      dt Price
+      dd {{.PriceBuy}}/{{.PriceSell}}
+
+    dl
+      dt Slot1, Slot2
+      dd {{.Slot1}} {{.Slot2}}
+    dl.inline
+      dt Dual
+      dd {{.Dual}}
+
+    dl
+      dt Features
+      dd
+        i {{.Features}}
+      {{range .Features}}
+      dd {{.}}
+      {{end}}
+
+    dl.inline
+      dt Level
+      dd {{.Level}}
+    dl.inline
+      dt PLevel
+      dd {{.PLevel}}
+/
+    EquipTypeId  {{.EquipTypeId}}
+  //EquipScript   string
+  //UnEquipScript string
+
+  // usage
+  //UseScript string
+  //useScript EffectList `db:"-"`
+
+  //Range int // atk range for weapon
+  //DEF   int `yml:"def"`
+  //ATK   int `yml:"atk"`
+{{end}}

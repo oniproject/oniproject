@@ -86,6 +86,15 @@ function run(player, host) {
 	}
 
 	setInterval(animate, 50);
+	setTimeout(function(){
+        game.net.RequestInventoryMsg();
+    }, 1000);
+
+	game.net.on('InventoryMsg', function(inv) {
+        console.log(inv.Inventory);
+        UI.inventory = inv.Inventory;
+    });
+
 
 	function animate() {
 		game.animate(0.05);
@@ -103,6 +112,12 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
+		inventory: [
+			{Name: "43"},
+			{Name: "1k"},
+			{Name: "4njki32"},
+			{Name: "PPPPvndfsj"},
+		],
 		spells: [
 			'all-for-one',
 			'all-for-one',

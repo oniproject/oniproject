@@ -46,6 +46,13 @@ html lang=en
         position:absolute;
         padding: 3px;
       }
+      #top-right {
+        position:absolute;
+        padding: 3px;
+        right: 0;
+        color: white;
+        background: #332;
+      }
       .level {
         float:left;
         color: white;
@@ -93,6 +100,11 @@ html lang=en
             div v-style="width: mp/mmp*100 + '%'"
           .points.tp
             div v-style="width: tp/mtp*100 + '%'"
+      #top-right
+        | vfndjs
+        div v-repeat="inventory"
+          strong v-text="Name"
+
       #bottom
         #spells
           img v-repeat="spells" v-on="click: cast(this)" src="/icons/lorc/originals/svg/``$value``.svg"

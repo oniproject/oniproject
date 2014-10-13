@@ -117,7 +117,10 @@ func (c *Connection) writePump() {
 
 			buf := bytes.NewBuffer([]byte{})
 			encoder := cbor.NewEncoder(buf)
-			encoder.Write(message)
+			if err := encoder.Write(message); err != nil {
+				log.Error("cbor encode: ", err)
+				return
+			}
 
 			if err := c.write(websocket.BinaryMessage, buf.Bytes()); err != nil {
 				return
