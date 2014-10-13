@@ -7,9 +7,15 @@ import (
 	"oniproject/oni/utils"
 )
 
+type Sender interface {
+	Send(utils.Id, Message)
+	// XXX
+	GetObjById(utils.Id) GameObject
+}
+
 // command
 type Message interface {
-	Run(interface{})
+	Run(Sender, interface{})
 }
 
 const (
@@ -17,7 +23,7 @@ const (
 	// Client <-> Server only
 	M_SetVelocityMsg
 	M_SetTargetMsg
-	M_FireMsg
+	M_CastMsg
 	M_DestroyMsg
 )
 
@@ -32,8 +38,8 @@ func WrapMessage(message interface{}) interface{} {
 		return &MessageWraper{M_SetVelocityMsg, message}
 	case *SetTargetMsg:
 		return &MessageWraper{M_SetTargetMsg, message}
-	case *FireMsg:
-		return &MessageWraper{M_FireMsg, message}
+	case *CastMsg:
+		return &MessageWraper{M_CastMsg, message}
 	case *DestroyMsg:
 		return &MessageWraper{M_DestroyMsg, message}
 	}
@@ -51,8 +57,8 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 	case M_SetTargetMsg:
 		var mm SetTargetMsg
 		message = &mm
-	case M_FireMsg:
-		var mm FireMsg
+	case M_CastMsg:
+		var mm CastMsg
 		message = &mm
 	default:
 		log.Error("ParseMessage fail type ", _type)
@@ -91,7 +97,7 @@ type SetVelocityMsg struct {
 	NotUsed float64 `mapstructure:"z"`
 }
 
-func (m *SetVelocityMsg) Run(obj interface{}) {
+func (m *SetVelocityMsg) Run(s Sender, obj interface{}) {
 	a := obj.(*Avatar)
 	a.SetVelocity(m.X, m.Y)
 }
@@ -100,17 +106,17 @@ type SetTargetMsg struct {
 	Target utils.Id `mapstructure:"id"`
 }
 
-func (m *SetTargetMsg) Run(obj interface{}) {
+func (m *SetTargetMsg) Run(s Sender, obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
 	log.Debug("setTarget ", a.Target)
 }
 
-type FireMsg struct {
+type CastMsg struct {
 	Type string `mapstructure:"t"`
 }
 
-func (m *FireMsg) Run(obj interface{}) {
+func (m *CastMsg) Run(s Sender, obj interface{}) {
 	a := obj.(*Avatar)
 	if a.Target == 0 {
 		log.Warningf("fire FAIL: zero target %v", m)
@@ -122,9 +128,9 @@ func (m *FireMsg) Run(obj interface{}) {
 	}
 
 	if m.Type == "" {
-		a.game.Send(utils.Id(a.Target), &CloseMsg{})
+		s.Send(utils.Id(a.Target), &CloseMsg{})
 	} else {
-		obj := a.game.GetObjById(a.Target)
+		obj := s.GetObjById(a.Target)
 		err := a.Cast(m.Type, a, obj)
 		if err != nil {
 			log.Error("cast ", err)
@@ -137,7 +143,7 @@ func (m *FireMsg) Run(obj interface{}) {
 
 type CloseMsg struct{}
 
-func (m *CloseMsg) Run(obj interface{}) {
+func (m *CloseMsg) Run(s Sender, obj interface{}) {
 	log.Debug("UnregisterMsg ", obj)
 	a := obj.(*Avatar)
 	a.ws.Close()
@@ -148,7 +154,7 @@ type DestroyMsg struct {
 	T  uint // tick
 }
 
-func (m *DestroyMsg) Run(obj interface{}) {
+func (m *DestroyMsg) Run(s Sender, obj interface{}) {
 	if a, ok := obj.(*Avatar); ok {
 		a.sendMessage <- WrapMessage(m)
 	} else {

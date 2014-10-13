@@ -3,11 +3,16 @@ package game
 import (
 	"bytes"
 	"code.google.com/p/cbor/go"
+	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 	"time"
 )
+
+type ConnToMapInterface interface {
+	Sender
+	Unregister(*Avatar)
+}
 
 const (
 	writeWait      = 10 * time.Second
@@ -23,18 +28,18 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-type AvatarConnection struct {
+type Connection struct {
 	ws          *websocket.Conn
 	sendMessage chan interface{}
 	ping_pong   time.Time
 	lag         time.Duration
 }
 
-func (c *Avatar) Lag() time.Duration { return c.lag }
+func (c *Connection) Lag() time.Duration { return c.lag }
 
-func (c *Avatar) readPump() {
+func (c *Avatar) readPump(game ConnToMapInterface, avatar GameObject) {
 	defer func() {
-		c.game.Unregister(c)
+		game.Unregister(c)
 		c.ws.Close()
 	}()
 
@@ -64,32 +69,32 @@ Loop:
 
 			buf := bytes.NewBuffer(message)
 			if err := cbor.NewDecoder(buf).Decode(&val); err != nil {
-				log.Println(err)
+				log.Error(err)
 				continue Loop
 			}
 			if m, err := ParseMessage(val.T, val.V); err == nil {
-				c.Send(m)
+				game.Send(avatar.Id(), m)
 			} else {
-				log.Println(err)
+				log.Error(err)
 			}
 		}
 	}
 }
 
-func (c *Avatar) writeMessage(message interface{}) error {
+func (c *Connection) writeMessage(message interface{}) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteJSON(message)
 }
-func (c *Avatar) write(mt int, payload []byte) error {
+func (c *Connection) write(mt int, payload []byte) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteMessage(mt, payload)
 }
-func (c *Avatar) ping() error {
+func (c *Connection) ping() error {
 	c.ping_pong = time.Now()
 	return c.write(websocket.PingMessage, []byte{})
 }
 
-func (c *Avatar) writePump() {
+func (c *Connection) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 
 	defer func() {

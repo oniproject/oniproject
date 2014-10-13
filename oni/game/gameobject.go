@@ -13,6 +13,10 @@ const (
 	STATE_MOVE
 )
 
+type Walkabler interface {
+	Walkable(int, int) bool
+}
+
 type GameObjectState struct {
 	Type      uint8
 	Id        utils.Id
@@ -23,10 +27,9 @@ type GameObjectState struct {
 }
 
 type GameObject interface {
-	Update(tick uint, t time.Duration) *GameObjectState
+	Update(w Walkabler, tick uint, t time.Duration) *GameObjectState
 	GetState(typ uint8, tick uint) *GameObjectState
 	Position() geom.Coord
-	Send(Message)
 	Id() utils.Id
 	SkillTarget
 }
@@ -47,10 +50,6 @@ func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{
 func (c *PositionComponent) SetVelocity(x, y float64) {
 	coord := geom.Coord{x, y}
 	c.veloctity = coord.Unit()
-}
-
-type Walkabler interface {
-	Walkable(int, int) bool
 }
 
 func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {

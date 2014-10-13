@@ -5,15 +5,9 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"oniproject/oni/utils"
+	"path"
 	"time"
 )
-
-type AvatarMapper interface {
-	Walkable(int, int) bool
-	Unregister(*Avatar)
-	Send(utils.Id, Message)
-	GetObjById(utils.Id) GameObject
-}
 
 type Avatar struct {
 	AvatarId int64 `gorm:"column:id; primary_key:yes"`
@@ -24,49 +18,51 @@ type Avatar struct {
 	MapId    int64
 	X, Y     float64
 
-	PositionComponent     `sql:"-"`
-	PositionComponentJson []byte
-	Parameters            `sql:"-"`
-	ParametersJson        []byte
-	Inventory             `sql:"-"`
-	InventoryJson         []byte
-	StateComponent        `sql:"-"`
-	StateComponentJson    []byte
-	SkillComponent        `sql:"-"`
-	SkillComponentJson    []byte
+	PositionComponent      `sql:"-"`
+	PositionComponentJson  []byte
+	Parameters             `sql:"-"`
+	ParametersJson         []byte
+	InventoryComponent     `sql:"-"`
+	InventoryComponentJson []byte
+	StateComponent         `sql:"-"`
+	StateComponentJson     []byte
+	SkillComponent         `sql:"-"`
+	SkillComponentJson     []byte
+	Soul                   `sql:"-"`
+	SoulJson               []byte
 
-	AvatarConnection `sql:"-"`
+	Connection `sql:"-"`
 
-	Target utils.Id     `sql:"-"`
-	game   AvatarMapper `sql:"-"`
+	Target utils.Id `sql:"-"`
 }
 
 func NewAvatar() *Avatar {
 	a := &Avatar{
-		Inventory:      NewInventory(),
-		SkillComponent: NewSkillComponent(),
-		StateComponent: NewStateComponent(),
+		InventoryComponent: NewInventoryComponent(),
+		SkillComponent:     NewSkillComponent(),
+		StateComponent:     NewStateComponent(),
 	}
 	return a
 }
 
-func (a Avatar) Id() utils.Id    { return utils.Id(a.AvatarId) }
-func (a Avatar) Race() int       { return a.RaceId }
-func (a *Avatar) Send(m Message) { m.Run(a) }
+func (a Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
+func (a Avatar) Race() int    { return a.RaceId }
+
+//func (a *Avatar) Send(m Message) { m.Run(a) }
 
 // for debug print
 func (a *Avatar) String() string {
 	return fmt.Sprintf(`Avatar[%d]'%s' pos[%f:%f] pc:%s param:%s inv:%s`,
 		a.AvatarId, a.Nickname, a.X, a.Y,
-		string(a.PositionComponentJson), string(a.ParametersJson), string(a.InventoryJson))
+		string(a.PositionComponentJson), string(a.ParametersJson), string(a.InventoryComponentJson))
 }
 
 func (a Avatar) GetState(typ uint8, tick uint) *GameObjectState {
 	return &GameObjectState{typ, utils.Id(a.AvatarId), tick, a.lag, a.Position(), a.Velocity()}
 }
 
-func (a *Avatar) Update(tick uint, t time.Duration) (state *GameObjectState) {
-	if a.PositionComponent.Update(a.game, t) {
+func (a *Avatar) Update(w Walkabler, tick uint, t time.Duration) (state *GameObjectState) {
+	if a.PositionComponent.Update(w, t) {
 		return a.GetState(STATE_MOVE, tick)
 	} else {
 		return a.GetState(STATE_IDLE, tick)
@@ -84,9 +80,24 @@ func (a *Avatar) BeforeUpdate() (err error) {
 }
 func (a *Avatar) AfterFind() (err error) {
 	a.position.X, a.position.Y = a.X, a.Y
+	err = a.unmarshal()
+
 	// XXX
 	a.AddSkill("screaming")
-	return a.unmarshal()
+	a.HP, a.MHP = 90, 100
+	a.MP, a.MMP = 15, 50
+	a.TP, a.MTP = 25, 30
+	a.ATK = 15
+	a.DEF = 10
+	test_hauberk, _ := LoadItemYaml(path.Join(ITEM_PATH, "hauberk.yml"))
+	test_bow, _ := LoadItemYaml(path.Join(ITEM_PATH, "bow.yml"))
+	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
+	a.AddItem(test_hauberk)
+	log.Debug(a.EquipItem(0))
+	a.AddItem(test_bow)
+	log.Debug(a.EquipItem(0))
+	a.AddItem(test_knife)
+	return
 }
 
 func (a *Avatar) marshal() (err error) {
@@ -100,7 +111,7 @@ func (a *Avatar) marshal() (err error) {
 		log.Error("BeforeSave ", err)
 		return
 	}
-	a.InventoryJson, err = json.Marshal(&(a.Inventory))
+	a.InventoryComponentJson, err = json.Marshal(&(a.InventoryComponent))
 	if err != nil {
 		log.Error("BeforeSave ", err)
 		return
@@ -111,6 +122,11 @@ func (a *Avatar) marshal() (err error) {
 		return
 	}
 	a.StateComponentJson, err = json.Marshal(&(a.StateComponent))
+	if err != nil {
+		log.Error("BeforeSave ", err)
+		return
+	}
+	a.SoulJson, err = json.Marshal(&(a.Soul))
 	if err != nil {
 		log.Error("BeforeSave ", err)
 		return
@@ -128,9 +144,9 @@ func (a *Avatar) unmarshal() (err error) {
 		log.Errorf("AfterFind PositionComponent %s '%s'", err, string(a.PositionComponentJson))
 		return
 	}
-	err = json.Unmarshal(a.InventoryJson, &(a.Inventory))
+	err = json.Unmarshal(a.InventoryComponentJson, &(a.InventoryComponent))
 	if err != nil {
-		log.Errorf("AfterFind InventoryJson %s '%s'", err, string(a.InventoryJson))
+		log.Errorf("AfterFind InventoryComponentJson %s '%s'", err, string(a.InventoryComponentJson))
 		return
 	}
 	err = json.Unmarshal(a.SkillComponentJson, &(a.SkillComponent))
@@ -138,10 +154,14 @@ func (a *Avatar) unmarshal() (err error) {
 		log.Errorf("AfterFind SkillComponentJson %s '%s'", err, string(a.SkillComponentJson))
 		return
 	}
-
 	err = json.Unmarshal(a.StateComponentJson, &(a.StateComponent))
 	if err != nil {
 		log.Errorf("AfterFind StateComponentJson %s '%s'", err, string(a.StateComponentJson))
+		return
+	}
+	err = json.Unmarshal(a.SoulJson, &(a.Soul))
+	if err != nil {
+		log.Errorf("AfterFind Soul %s '%s'", err, string(a.SoulJson))
 		return
 	}
 	return

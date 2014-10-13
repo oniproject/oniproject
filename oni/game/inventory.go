@@ -14,37 +14,41 @@ var (
 	ItemIsNil     = errors.New("Item is nil")
 )
 
-type Inventory struct {
+type InventoryComponent struct {
 	Inventory []*Item
 	Equip     map[string]*Item
 	inv_mutex sync.Mutex
 }
 
-func NewInventory() Inventory {
-	return Inventory{
+func NewInventoryComponent() InventoryComponent {
+	return InventoryComponent{
 		Inventory: []*Item{},
 		Equip:     make(map[string]*Item),
 	}
 }
 
-func (inv *Inventory) addItem(item *Item) { inv.Inventory = append(inv.Inventory, item) }
-func (inv *Inventory) removeItem(index int) {
+func (inv *InventoryComponent) addItem(item *Item) { inv.Inventory = append(inv.Inventory, item) }
+func (inv *InventoryComponent) removeItem(index int) {
 	inv.Inventory = append(inv.Inventory[:index], inv.Inventory[index+1:]...)
 }
 
-func (inv *Inventory) RemoveItem(index int) {
-	defer inv.inv_mutex.Unlock()
-	inv.inv_mutex.Lock()
+func (inv *InventoryComponent) RemoveItem(index int) {
+	//go func() {
+	//defer inv.inv_mutex.Unlock()
+	//inv.inv_mutex.Lock()
 	inv.removeItem(index)
+	//}()
 }
 
-func (inv *Inventory) AddItem(item *Item) {
-	defer inv.inv_mutex.Unlock()
-	inv.inv_mutex.Lock()
+func (inv *InventoryComponent) AddItem(item *Item) {
+	//go func() {
+	//defer inv.inv_mutex.Unlock()
+	//inv.inv_mutex.Lock()
 	inv.addItem(item)
+	//}()
 }
 
-func (inv *Inventory) EquipItem(index int) error {
+func (inv *InventoryComponent) EquipItem(index int) error {
 	defer inv.inv_mutex.Unlock()
 	inv.inv_mutex.Lock()
 
@@ -104,7 +108,7 @@ func (inv *Inventory) EquipItem(index int) error {
 	return nil
 }
 
-func (inv *Inventory) UnequipItem(slot string) error {
+func (inv *InventoryComponent) UnequipItem(slot string) error {
 	defer inv.inv_mutex.Unlock()
 	inv.inv_mutex.Lock()
 

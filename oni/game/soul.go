@@ -16,5 +16,5 @@ type Soul struct {
 		Max     int
 		Current int
 	}
-	Abilities map[string]Ability `sql:"-"`
+	Abilities map[string]Ability
 }

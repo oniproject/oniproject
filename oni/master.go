@@ -9,6 +9,8 @@ import (
 	"github.com/martini-contrib/sessionauth"
 	"github.com/martini-contrib/sessions"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/yosssi/ace"
+	"github.com/yosssi/martini-acerender"
 	"net/http"
 	"oniproject/oni/utils"
 )
@@ -40,6 +42,10 @@ func (master *Master) Run() {
 
 	m := martini.Classic()
 	m.Map(utils.CreateMartiniLogger())
+	m.Use(acerender.Renderer(&acerender.Options{AceOptions: &ace.Options{
+		DynamicReload: true,
+		BaseDir:       "templates",
+	}}))
 
 	store := sessions.NewCookieStore([]byte("secret123"))
 	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, HttpOnly: true})
@@ -61,8 +67,8 @@ func (master *Master) Run() {
 		r.HTML(200, "index", args)
 	})
 
-	m.Get("/game", sessionauth.LoginRequired, func(r render.Render) {
-		r.HTML(200, "game", map[string]interface{}{"title": "Game"}, render.HTMLOptions{""})
+	m.Get("/game", sessionauth.LoginRequired, func(r acerender.Render) {
+		r.HTML(200, "game", map[string]interface{}{"title": "Game"}, nil)
 	})
 
 	m.Post("/game", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
@@ -77,6 +83,16 @@ func (master *Master) Run() {
 		r.JSON(200, x)
 	})
 
+	m.Get("/avatar", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r acerender.Render) {
+		u := user.(*Account)
+		avatar, _ := master.balancer.adb.AvatarById(utils.Id(u.AvatarId))
+		r.HTML(200, "avatar", map[string]interface{}{
+			"id":     session.Get("id"),
+			"user":   user,
+			"avatar": avatar,
+		}, nil)
+	})
+
 	m.Get("/x", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r render.Render) {
 		r.JSON(200, map[string]interface{}{"user": user, "id": session.Get("id")})
 	})
@@ -87,8 +103,8 @@ func (master *Master) Run() {
 		r.Redirect("/")
 	})
 
-	m.Get("/login", func(r render.Render) {
-		r.HTML(200, "login", map[string]interface{}{"title": "Login"})
+	m.Get("/login", func(r acerender.Render) {
+		r.HTML(200, "login", map[string]interface{}{"Title": "Login", "IsLogin": true}, nil)
 	})
 
 	m.Post("/login", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) {
@@ -124,8 +140,8 @@ func (master *Master) Run() {
 		r.Redirect(redirect)
 	})
 
-	m.Get("/signup", func(r render.Render) {
-		r.HTML(200, "signup", map[string]interface{}{"title": "Sign-up"})
+	m.Get("/signup", func(r acerender.Render) {
+		r.HTML(200, "login", map[string]interface{}{"Title": "Sign-up", "IsLogin": false}, nil)
 	})
 
 	m.Post("/signup", binding.Bind(Account{}), func(account Account, session sessions.Session, r render.Render, req *http.Request) (int, string) {

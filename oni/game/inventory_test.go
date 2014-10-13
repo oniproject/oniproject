@@ -8,8 +8,8 @@ var test_bow, _ = LoadItemYaml(path.Join(ITEM_PATH, "bow.yml"))
 var test_knife1, _ = LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
 var test_knife2, _ = LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
 
-func TestInventory(t *testing.T) {
-	i := NewInventory()
+func TestInventoryComponent(t *testing.T) {
+	i := NewInventoryComponent()
 	inv := &i
 	inv.AddItem(test_hauberk)
 

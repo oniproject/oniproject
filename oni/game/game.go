@@ -66,7 +66,7 @@ func (gm *Game) Run() {
 			return 500, http.StatusText(418)
 		}
 
-		a.AvatarConnection = AvatarConnection{
+		a.Connection = Connection{
 			ws:          ws,
 			sendMessage: make(chan interface{}, 256),
 			ping_pong:   time.Now(),

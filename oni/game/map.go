@@ -54,7 +54,6 @@ func (m *Map) Unregister(a *Avatar) {
 }
 func (gm *Map) Send(id utils.Id, m Message) {
 	go func() { gm.sendTo <- sender{id, m} }()
-	log.Debug("Send: ", id, m)
 }
 
 func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
@@ -62,11 +61,10 @@ func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
-	c.game = m
 	c.PositionComponent = NewPositionComponent(c.X, c.Y)
 	m.register <- c
 	go c.writePump()
-	c.readPump()
+	c.readPump(m, c)
 }
 
 func (m *Map) SpawnMonster() {
@@ -74,7 +72,6 @@ func (m *Map) SpawnMonster() {
 	mo.position.X = 2
 	mo.position.Y = 2
 	mo.id = utils.NewId(-int64(rand.Intn(10000)))
-	mo.game = m
 	m.register <- mo
 }
 
@@ -95,8 +92,8 @@ func (gm *Map) Run() {
 		}
 	}
 	broadcastMsg := func(m Message) {
-		for _, c := range gm.objects {
-			c.Send(m)
+		for id := range gm.objects {
+			gm.Send(id, m)
 		}
 	}
 
@@ -118,7 +115,7 @@ func (gm *Map) Run() {
 			broadcast(gm.tick)
 
 			for _, obj := range gm.objects {
-				if state := obj.Update(gm.tick, TickRate); state != nil {
+				if state := obj.Update(gm, gm.tick, TickRate); state != nil {
 					for _, c := range gm.objects {
 						if avatar, ok := c.(*Avatar); ok {
 							r := state.Position.DistanceFrom(avatar.Position())
@@ -127,7 +124,7 @@ func (gm *Map) Run() {
 								send(avatar, state)
 							// XXX for not send double messages
 							case r < ReplicRange+float64(SpeedOfLight*0.05):
-								avatar.Send(&DestroyMsg{state.Id, gm.tick})
+								gm.Send(avatar.Id(), &DestroyMsg{state.Id, gm.tick})
 							}
 						}
 					}
@@ -156,7 +153,7 @@ func (gm *Map) Run() {
 		// message system
 		case s := <-gm.sendTo:
 			if obj, ok := gm.objects[s.id]; ok {
-				obj.Send(s.m)
+				s.m.Run(gm, obj)
 			} else {
 				log.Warningf("fail sendTo: broken ID %v %T", s, s.m)
 			}
