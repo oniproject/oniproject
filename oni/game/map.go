@@ -1,9 +1,12 @@
 package game
 
+// TODO use qtree
+
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"math/rand"
+	"oniproject/oni/geom"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
 	"time"
@@ -19,6 +22,10 @@ const (
 type sender struct {
 	id utils.Id
 	m  Message
+}
+
+type AroundController interface {
+	ObjectsAround(x, y, r float64, exclude func(GameObject) bool) []GameObject
 }
 
 type Map struct {
@@ -58,6 +65,19 @@ func (gm *Map) Send(id utils.Id, m Message) {
 
 func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 	return gm.objects[id]
+}
+
+func (gm *Map) ObjectsAround(x, y, r float64, exclude func(GameObject) bool) []GameObject {
+	objects := []GameObject{}
+	center := geom.Coord{X: x, Y: y}
+	for _, obj := range gm.objects {
+		if r <= obj.Position().DistanceFrom(center) {
+			if !exclude(obj) {
+				objects = append(objects, obj)
+			}
+		}
+	}
+	return objects
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {

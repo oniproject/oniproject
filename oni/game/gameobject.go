@@ -41,14 +41,14 @@ type PositionComponent struct {
 }
 
 func NewPositionComponent(x, y float64) PositionComponent {
-	return PositionComponent{position: geom.Coord{x, y}}
+	return PositionComponent{position: geom.Coord{X: x, Y: y}}
 }
 
 func (c *PositionComponent) Position() geom.Coord     { return c.position }
 func (c *PositionComponent) Velocity() geom.Coord     { return c.veloctity }
-func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{x, y} }
+func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{X: x, Y: y} }
 func (c *PositionComponent) SetVelocity(x, y float64) {
-	coord := geom.Coord{x, y}
+	coord := geom.Coord{X: x, Y: y}
 	c.veloctity = coord.Unit()
 }
 
@@ -66,7 +66,7 @@ func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
 	}
 
 	if c.lastvel.X != 0 || c.lastvel.Y != 0 {
-		c.lastvel = geom.Coord{0, 0}
+		c.lastvel = geom.Coord{X: 0, Y: 0}
 		return true
 	}
 
