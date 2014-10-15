@@ -26,15 +26,34 @@ html lang=en
         font-size: 0;
         padding:3px;
       }
-      #spells img {
-        margin:0;
+      #spells .img {
+        position: relative;
+        display: inline-block;
         width:32px;
         height:32px;
         padding: 1px;
       }
-      #spells img:hover {
+      #spells .img:hover {
         outline: 1px solid rgba(255, 255, 255, 1);
       }
+      #spells img {
+        margin:0;
+        width:32px;
+        height:32px;
+      }
+      #spells .img .text {
+        position: absolute;
+        display: none;
+        top: 0;
+        bottom: 0;
+        z-index: 999;
+        background: red;
+      }
+      #spells .img:hover .text {
+        display: block;
+      }
+
+
       #exp {
         width:100%;
       }
@@ -77,6 +96,8 @@ html lang=en
       .points div {
         height: 7px;
         border-radius:6px;
+        transition: .4s ease;
+        transition: 1.1s linear;
       }
       .points.hp div {
         background: red;
@@ -107,7 +128,10 @@ html lang=en
 
       #bottom
         #spells
-          img v-repeat="spells" v-on="click: cast(this)" src="/icons/lorc/originals/svg/``$value``.svg"
+          .img v-repeat="spells" v-on="click: cast(this)"
+            .text
+              span v-text="Name"
+            img src="/icons/lorc/originals/svg/``Icon``.svg"
         #exp
           div v-style="width: exp + '%'"
     script src="/js/pixi.js"

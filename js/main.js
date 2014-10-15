@@ -86,13 +86,32 @@ function run(player, host) {
 	}
 
 	setInterval(animate, 50);
-	setTimeout(function(){
+	setInterval(function(){
+        game.net.RequestParametersMsg();
         game.net.RequestInventoryMsg();
     }, 1000);
+    game.net.on('open', function() {
+        game.net.RequestParametersMsg();
+        game.net.RequestInventoryMsg();
+    });
 
 	game.net.on('InventoryMsg', function(inv) {
-        console.log(inv.Inventory);
         UI.inventory = inv.Inventory;
+    });
+	game.net.on('ParametersMsg', function(p) {
+        UI.hp = p.Parameters.HP;
+        UI.mhp = p.Parameters.MHP;
+        UI.mp = p.Parameters.MP;
+        UI.mmp = p.Parameters.MMP;
+        UI.tp = p.Parameters.TP;
+        UI.mtp = p.Parameters.MTP;
+        UI.spells = [];
+        for(var k in p.Skills) {
+            if(p.Skills.hasOwnProperty(k)) {
+                var skill = p.Skills[k]
+                UI.spells.push(skill);
+            }
+        }
     });
 
 
@@ -119,35 +138,35 @@ var UI = new Vue({
 			{Name: "PPPPvndfsj"},
 		],
 		spells: [
-			'all-for-one',
-			'all-for-one',
-			'all-for-one',
-			'all-for-one',
-			'all-for-one',
+            {Icon:'all-for-one'},
+            {Icon:'all-for-one'},
+            {Icon:'all-for-one'},
+            {Icon:'all-for-one'},
+            {Icon:'all-for-one'},
 
-			'screaming',
-			'screaming',
-			'screaming',
-			'screaming',
-			'screaming',
+            {Icon:'screaming'},
+            {Icon:'screaming'},
+            {Icon:'screaming'},
+            {Icon:'screaming'},
+            {Icon:'screaming'},
 
-			'spiral-thrust',
-			'spiral-thrust',
-			'spiral-thrust',
-			'spiral-thrust',
-			'spiral-thrust',
+            {Icon:'spiral-thrust'},
+            {Icon:'spiral-thrust'},
+            {Icon:'spiral-thrust'},
+            {Icon:'spiral-thrust'},
+            {Icon:'spiral-thrust'},
 
-			'rune-sword',
-			'rune-sword',
-			'rune-sword',
-			'rune-sword',
-			'rune-sword',
+            {Icon:'rune-sword'},
+            {Icon:'rune-sword'},
+            {Icon:'rune-sword'},
+            {Icon:'rune-sword'},
+            {Icon:'rune-sword'},
 		],
 	},
 	methods: {
 		cast: function(spell) {
-			game.net.FireMsg({t: ""+spell.$value});
-			console.info('cast', spell.$value);
+			console.info('cast', spell.Name);
+			game.net.FireMsg({t: ""+spell.Icon});
 		},
 	},
 }),

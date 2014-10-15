@@ -46,6 +46,7 @@ func (gm *Game) Run() {
 	m.Get("/ws", func(sessions sessions.Session, w http.ResponseWriter, r *http.Request) (int, string) {
 		_id := sessions.Get("id")
 		if _id == nil {
+			log.Warn("Unauthorized ", sessions)
 			return 401, "Unauthorized"
 		}
 		id := _id.(int64)

@@ -27,11 +27,18 @@ type GameObjectState struct {
 }
 
 type GameObject interface {
-	Update(w Walkabler, tick uint, t time.Duration) *GameObjectState
-	GetState(typ uint8, tick uint) *GameObjectState
+	Update(w Walkabler, tick uint, t time.Duration) bool
 	Position() geom.Coord
+	Velocity() geom.Coord
+	Lag() time.Duration
 	Id() utils.Id
+
 	SkillTarget
+
+	HPbar() (int, int)
+	MPbar() (int, int)
+	TPbar() (int, int)
+	Regeneration()
 }
 
 type PositionComponent struct {

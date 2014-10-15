@@ -46,7 +46,9 @@ func NewAvatar() *Avatar {
 }
 
 func (a Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
-func (a Avatar) Race() int    { return a.RaceId }
+
+//func (a Avatar) Race() int    { return a.RaceId }
+func (a Avatar) Race() int { return 5 }
 
 // for debug print
 func (a *Avatar) String() string {
@@ -55,16 +57,8 @@ func (a *Avatar) String() string {
 		string(a.PositionComponentJson), string(a.ParametersJson), string(a.InventoryComponentJson))
 }
 
-func (a Avatar) GetState(typ uint8, tick uint) *GameObjectState {
-	return &GameObjectState{typ, utils.Id(a.AvatarId), tick, a.lag, a.Position(), a.Velocity()}
-}
-
-func (a *Avatar) Update(w Walkabler, tick uint, t time.Duration) (state *GameObjectState) {
-	if a.PositionComponent.Update(w, t) {
-		return a.GetState(STATE_MOVE, tick)
-	} else {
-		return a.GetState(STATE_IDLE, tick)
-	}
+func (a *Avatar) Update(w Walkabler, tick uint, t time.Duration) bool {
+	return a.PositionComponent.Update(w, t)
 }
 
 // db hooks
@@ -82,9 +76,9 @@ func (a *Avatar) AfterFind() (err error) {
 
 	// XXX
 	a.AddSkill("screaming")
-	a.HP, a.MHP = 90, 100
-	a.MP, a.MMP = 15, 50
-	a.TP, a.MTP = 25, 30
+	a.HP, a.MHP, a.HRG = 90, 100, 1
+	a.MP, a.MMP, a.MRG = 15, 50, 1
+	a.TP, a.MTP, a.TRG = 25, 30, 1
 	a.ATK = 15
 	a.DEF = 10
 	test_hauberk, _ := LoadItemYaml(path.Join(ITEM_PATH, "hauberk.yml"))

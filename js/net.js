@@ -1,6 +1,18 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
+var M_SetVelocityMsg   =1,
+    M_SetTargetMsg     =2,
+    M_CastMsg          =3,
+    M_DestroyMsg       =4,
+    M_DropItem         =5,
+    M_PickupItem       =6,
+    M_RequestInventory =7,
+    M_Inventory        =8,
+    M_TargetData       =9,
+    M_RequestParameters=10,
+    M_Parameters       =11,
+    ___ =0;
 
 function Net(url) {
 	var websocket = new WebSocket(url);
@@ -50,20 +62,23 @@ Net.prototype.send = function(message) {
 
 Net.prototype._ParseMessages = function(type, value, event) {
 	switch (type) {
-		case 1:
+		case M_SetVelocityMsg:
 			this.emit('SetVelocityMsg', value);
 			break;
-		case 2:
+		case M_SetTargetMsg:
 			this.emit('SetTargetMsg', value);
 			break;
-		case 3:
+		case M_CastMsg:
 			this.emit('FireMsg', value);
 			break;
-		case 4:
+		case M_DestroyMsg:
 			this.emit('DestroyMsg', value);
 			break;
-		case 8:
+		case M_Inventory:
 			this.emit('InventoryMsg', value);
+			break;
+		case M_Parameters:
+			this.emit('ParametersMsg', value);
 			break;
 		default:
 			this.emit('event', type, value, event);
@@ -72,26 +87,32 @@ Net.prototype._ParseMessages = function(type, value, event) {
 
 Net.prototype.SetVelocityMsg = function(data) {
 	this.send({
-		T: 1,
+		T: M_SetVelocityMsg,
 		V: data
 	});
 }
 Net.prototype.SetTargetMsg = function(data) {
 	this.send({
-		T: 2,
+		T: M_SetTargetMsg,
 		V: data
 	});
 }
 Net.prototype.FireMsg = function(data) {
 	this.send({
-		T: 3,
+		T: M_CastMsg,
 		V: data
 	});
 }
 Net.prototype.RequestInventoryMsg = function() {
 	this.send({
-		T: 7,
-		V: {I:"r"}
+		T: M_RequestInventory,
+		V: {}
+	});
+}
+Net.prototype.RequestParametersMsg = function() {
+	this.send({
+		T: M_RequestParameters,
+		V: {}
 	});
 }
 

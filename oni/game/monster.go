@@ -10,8 +10,8 @@ type Monster struct {
 	PositionComponent
 	StateComponent
 	Parameters
-	Target utils.Id
-	id     utils.Id
+
+	id utils.Id
 }
 
 func NewMonster() *Monster {
@@ -24,16 +24,8 @@ func (a Monster) Lag() time.Duration { return 0 }
 func (a Monster) Id() utils.Id       { return a.id }
 func (a Monster) Race() int          { return 0 }
 
-func (a *Monster) GetState(typ uint8, tick uint) *GameObjectState {
-	return &GameObjectState{typ, a.id, tick, 0, a.position, a.veloctity}
-}
-
-func (m *Monster) Update(w Walkabler, tick uint, t time.Duration) *GameObjectState {
-	if m.PositionComponent.Update(w, t) {
-		return m.GetState(STATE_MOVE, tick)
-	} else {
-		return m.GetState(STATE_IDLE, tick)
-	}
+func (m *Monster) Update(w Walkabler, tick uint, t time.Duration) bool {
+	return m.PositionComponent.Update(w, t)
 }
 
 func (m *Monster) RunAI() {

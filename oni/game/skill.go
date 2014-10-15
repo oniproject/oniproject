@@ -12,11 +12,17 @@ import (
 const (
 	SKILL_PATH = "data/skills"
 
-	TARGET_PASSIVE      = 0
-	TARGET_ANOTHER_RACE = 1
-	TARGET_SAME_RACE    = 2
-	TARGET_MONSTER      = 4
-	TARGET_ANYWHERE     = TARGET_ANOTHER_RACE | TARGET_SAME_RACE | TARGET_MONSTER
+	_ = iota
+	TARGET_ANOTHER_RACE
+	TARGET_SAME_RACE
+	TARGET_MONSTER
+	TARGET_SELF
+	TARGET_ANYWHERE = TARGET_ANOTHER_RACE | TARGET_SAME_RACE | TARGET_MONSTER
+)
+
+var (
+	SkillFailTarget   = errors.New("fail target")
+	SkillFailCooldown = errors.New("fail cooldown")
 )
 
 type SkillComponent struct {
@@ -43,14 +49,14 @@ func (s *SkillComponent) AddSkill(name string) {
 func (s *SkillComponent) SealSkill(name string) {
 	delete(s.Skills, name)
 }
-func (s *SkillComponent) Cast(name string, caster, target SkillTarget) error {
+func (s *SkillComponent) Cast(name string, target SkillTarget) error {
 	skill, ok := s.Skills[name]
 	if !ok {
 		err := errors.New("skill notfound")
 		log.Error("Cast ", err, s)
 		return err
 	}
-	err := skill.Cast(caster, target, s.skills_lastCast[name])
+	err := skill.Cast(target, s.skills_lastCast[name])
 	if err != nil {
 		return err
 	}
@@ -71,7 +77,7 @@ type Skill struct {
 	Icon        string
 	Description string
 
-	SkillType string `yaml:"type"`
+	Type string `yaml:"type"`
 
 	Target int
 	//Range  int
@@ -82,11 +88,14 @@ type Skill struct {
 	Animation int
 
 	//EffectsOnTarget string     // json
-	OnTarget []string   `yaml:"ontarget"`
-	onTarget EffectList `db:"-"`
-	//EffectsOnCaster string     // json
-	OnCaster []string   `yaml:"oncaster"`
-	onCaster EffectList `db:"-"`
+	OnTarget  []string   `yaml:"effects"`
+	EonTarget EffectList `db:"-"`
+
+	HPused int `yaml:"hp"`
+	MPused int `yaml:"mp"`
+	TPused int `yaml:"tp"`
+
+	UsableWith []string `yaml:"with"`
 }
 
 func LoadSkillYaml(fname string) (*Skill, error) {
@@ -103,41 +112,24 @@ func LoadSkillYaml(fname string) (*Skill, error) {
 		return nil, err
 	}
 
-	skill.onCaster = ParseEffectList(skill.OnCaster)
-	skill.onTarget = ParseEffectList(skill.OnTarget)
+	skill.EonTarget = ParseEffectList(skill.OnTarget)
 	skill.CastDealy *= time.Millisecond
 
 	return skill, err
 }
 
-func (s *Skill) Cast(caster, target SkillTarget, lastCast time.Time) error {
-	if s.Target == TARGET_PASSIVE {
-		return errors.New("fail target TARGET_PASSIVE")
-	}
-	if target.Race() == 0 {
-		if s.Target&TARGET_MONSTER == 0 {
-			return errors.New("fail target TARGET_MONSTER")
-		}
-	} else {
-		switch {
-		case caster.Race() != target.Race() && s.Target&TARGET_ANOTHER_RACE == 0:
-			return errors.New("fail target TARGET_ANOTHER_RACE")
-		case caster.Race() == target.Race() && s.Target&TARGET_SAME_RACE == 0:
-			return errors.New("fail target TARGET_SAME_RACE")
-		}
+func (s *Skill) Cast(target SkillTarget, lastCast time.Time) error {
+	if s.Target == 0 {
+		return SkillFailTarget
 	}
 
 	if time.Now().Sub(lastCast) < s.CastDealy {
-		return errors.New("fail cooldown")
+		return SkillFailCooldown
 	}
 
 	log.Println("Cast Skill", s)
 
-	// TODO Required
-	// TODO Range
-
-	s.onCaster.ApplyTo(caster)
-	s.onTarget.ApplyTo(target)
+	s.EonTarget.ApplyTo(target)
 
 	return nil
 }
