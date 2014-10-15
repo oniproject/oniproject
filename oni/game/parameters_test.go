@@ -44,4 +44,12 @@ func TestParameters(t *testing.T) {
 	if p.HP != 0 || p.MP != 0 || p.TP != 0 {
 		t.Error("fail Recover")
 	}
+
+	hp, mhp := p.HPbar()
+	mp, mmp := p.MPbar()
+	tp, mtp := p.TPbar()
+	if mhp-hp != 10 || mmp-mp != 10 || mtp-tp != 10 {
+		t.Error("fail bars")
+
+	}
 }

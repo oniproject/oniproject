@@ -17,11 +17,8 @@ func TestHealing(t *testing.T) {
 	target := mock.NewMockSkillTarget(mockCtrl)
 	target.EXPECT().Race().Return(4).AnyTimes()
 	target.EXPECT().RecoverHP(50)
-	caster := mock.NewMockSkillTarget(mockCtrl)
-	caster.EXPECT().Race().Return(4).AnyTimes()
-	caster.EXPECT().RecoverMP(-10)
 
-	err := healing.Cast(caster, target, time.Now().Add(-30*time.Second))
+	err := healing.Cast(target, time.Now().Add(-30*time.Second))
 	if err != nil {
 		t.Error(err)
 	}
@@ -33,10 +30,8 @@ func TestHealingCooldown(t *testing.T) {
 
 	target := mock.NewMockSkillTarget(mockCtrl)
 	target.EXPECT().Race().Return(4).AnyTimes()
-	caster := mock.NewMockSkillTarget(mockCtrl)
-	caster.EXPECT().Race().Return(4).AnyTimes()
 
-	err := healing.Cast(caster, target, time.Now())
+	err := healing.Cast(target, time.Now())
 	if err == nil {
 		t.Fail()
 	}
