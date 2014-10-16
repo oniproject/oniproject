@@ -18,12 +18,12 @@ type Walkabler interface {
 }
 
 type GameObjectState struct {
-	Type      uint8
-	Id        utils.Id
-	Tick      uint
-	Lag       time.Duration
-	Position  geom.Coord
-	Veloctity geom.Coord
+	Type     uint8
+	Id       utils.Id
+	Tick     uint
+	Lag      time.Duration
+	Position geom.Coord
+	Velocity geom.Coord
 }
 
 type GameObject interface {
@@ -44,9 +44,9 @@ type GameObject interface {
 }
 
 type PositionComponent struct {
-	position  geom.Coord
-	veloctity geom.Coord
-	lastvel   geom.Coord
+	position geom.Coord
+	velocity geom.Coord
+	lastvel  geom.Coord
 }
 
 func NewPositionComponent(x, y float64) PositionComponent {
@@ -54,18 +54,18 @@ func NewPositionComponent(x, y float64) PositionComponent {
 }
 
 func (c *PositionComponent) Position() geom.Coord     { return c.position }
-func (c *PositionComponent) Velocity() geom.Coord     { return c.veloctity }
+func (c *PositionComponent) Velocity() geom.Coord     { return c.velocity }
 func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{X: x, Y: y} }
 func (c *PositionComponent) SetVelocity(x, y float64) {
 	coord := geom.Coord{X: x, Y: y}
-	c.veloctity = coord.Unit()
+	c.velocity = coord.Unit()
 }
 
 func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
-	if c.veloctity.X != 0 || c.veloctity.Y != 0 {
-		delta := c.veloctity.Times(t.Seconds())
+	if c.velocity.X != 0 || c.velocity.Y != 0 {
+		delta := c.velocity.Times(t.Seconds())
 		pos := c.position.Plus(delta)
-		c.lastvel = c.veloctity.Times(1) // just copy
+		c.lastvel = c.velocity.Times(1) // just copy
 
 		// XXX {nil} for testing
 		if w == nil || w.Walkable(int(pos.X), int(pos.Y)) {

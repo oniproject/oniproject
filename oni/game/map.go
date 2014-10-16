@@ -9,6 +9,7 @@ import (
 	"oniproject/oni/geom"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
+	"path"
 	"time"
 )
 
@@ -140,6 +141,9 @@ func (gm *Map) Run() {
 	go gm.SpawnMonster()
 	go gm.SpawnMonster()
 	go gm.SpawnMonster()
+
+	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
+	go gm.DropItem(3, 2, test_knife)
 
 	t_replication := time.NewTicker(TickRate)
 	t_regeneration := time.NewTicker(1 * time.Second)

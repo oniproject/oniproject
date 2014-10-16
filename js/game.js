@@ -224,7 +224,7 @@ Game.prototype.state_msg = function(state) {
 				delete this.avatars[state.Id];
 				break;
 			case 1: // create
-				this.avatars[state.Id] = new Avatar(state.Position, state.Veloctity)
+				this.avatars[state.Id] = new Avatar(state.Position, state.Velocity)
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
 					state.Type = 1;
@@ -238,13 +238,24 @@ Game.prototype.state_msg = function(state) {
 					return this.state_msg(state);
 				}
 				var avatar = this.avatars[state.Id];
+                if(state.Id == this.player) {
+                    this.suika.animation = 'idle';
+                }
 				if (state.Type == 3) {
 					avatar.rot = 3;
+                    if(state.Id == this.player) {
+                        this.suika.animation = 'walk';
+                    }
+                    if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
+                        avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
+                    }
 				}
 				avatar.position.x = state.Position.X;
 				avatar.position.y = state.Position.Y;
-				avatar.velocity.x = state.Veloctity.X;
-				avatar.velocity.y = state.Veloctity.Y;
+
+				avatar.velocity.x = state.Velocity.X ||0;
+				avatar.velocity.y = state.Velocity.Y ||0;
+
                 if(avatar.rm_timer) {
                     clearTimeout(avatar.rm_timer);
                 }

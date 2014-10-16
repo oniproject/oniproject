@@ -5,6 +5,8 @@ console.log('fuck');
 var Tileset = require('./tileset'),
 	Tilemap = require('./tilemap');
 
+var Suika = require('./suika');
+
 function run(player, host) {
 	var w = window.innerWidth,
 		h = window.innerHeight,
@@ -66,6 +68,13 @@ function run(player, host) {
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
 	stage.addChild(scene);
 
+    var suika = new Suika();
+    suika.position.x = 440;
+    suika.position.y = 300;
+    game.suika = suika;
+    suika.animation = 'walk';
+    stage.addChild(suika);
+
 	window.onresize = resize;
 	resize();
 
@@ -83,6 +92,12 @@ function run(player, host) {
 		requestAnimFrame(render);
 		game.render();
 		renderer.render(stage);
+        var a = game.avatars[game.player];
+        if(a) {
+            var d = Math.atan2(a.lastvel.x||0, a.lastvel.y||0);
+            var dd = d/Math.PI * 180 - 45;
+            suika.direction = dd;
+        }
 	}
 
 	setInterval(animate, 50);

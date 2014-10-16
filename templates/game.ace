@@ -65,6 +65,17 @@ html lang=en
         position:absolute;
         padding: 3px;
       }
+      #top-center {
+        position:absolute;
+        width: 30%;
+        right: 35%;
+        left: 35%;
+        text-align: center;
+        background: #ccf;
+      }
+      #top-center .points {
+        width: 100%;
+      }
       #top-right {
         position:absolute;
         padding: 3px;
@@ -91,7 +102,8 @@ html lang=en
         border-radius:6px;
         border: 1px solid black;
         background: silver;
-        margin: 2px;
+        margin: 2px 0;
+        box-sizing: border-box;
       }
       .points div {
         height: 7px;
@@ -121,10 +133,15 @@ html lang=en
             div v-style="width: mp/mmp*100 + '%'"
           .points.tp
             div v-style="width: tp/mtp*100 + '%'"
+      #top-center
+        strong v-text="target.Name"
+        .points.hp
+          div v-style="width: target.HP/target.MHP*100 + '%'"
+
       #top-right
-        | vfndjs
+        strong Inventory
         div v-repeat="inventory"
-          strong v-text="Name"
+          span v-text="Name"
 
       #bottom
         #spells

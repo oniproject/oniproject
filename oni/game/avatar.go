@@ -82,12 +82,10 @@ func (a *Avatar) AfterFind() (err error) {
 	a.DEF = 10
 	test_hauberk, _ := LoadItemYaml(path.Join(ITEM_PATH, "hauberk.yml"))
 	test_bow, _ := LoadItemYaml(path.Join(ITEM_PATH, "bow.yml"))
-	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
 	a.AddItem(test_hauberk)
 	log.Debug(a.EquipItem(0))
 	a.AddItem(test_bow)
 	log.Debug(a.EquipItem(0))
-	a.AddItem(test_knife)
 	a.Nickname = "Avatar"
 	return
 }
