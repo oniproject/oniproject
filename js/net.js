@@ -74,6 +74,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_DestroyMsg:
 			this.emit('DestroyMsg', value);
 			break;
+		case M_TargetData:
+			this.emit('TargetDataMsg', value);
+			break;
 		case M_Inventory:
 			this.emit('InventoryMsg', value);
 			break;
@@ -113,6 +116,18 @@ Net.prototype.RequestParametersMsg = function() {
 	this.send({
 		T: M_RequestParameters,
 		V: {}
+	});
+}
+Net.prototype.PickupItemMsg = function() {
+	this.send({
+		T: M_PickupItem,
+		V: {}
+	});
+}
+Net.prototype.DropItemMsg = function(data) {
+	this.send({
+		T: M_DropItem,
+		V: data
 	});
 }
 

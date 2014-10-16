@@ -86,15 +86,15 @@ function run(player, host) {
 	}
 
 	setInterval(animate, 50);
-	setInterval(function(){
-        game.net.RequestParametersMsg();
-        game.net.RequestInventoryMsg();
-    }, 1000);
     game.net.on('open', function() {
         game.net.RequestParametersMsg();
         game.net.RequestInventoryMsg();
     });
 
+	game.net.on('TargetDataMsg', function(target) {
+        console.log('TargetDataMsg');
+        UI.target = target;
+    });
 	game.net.on('InventoryMsg', function(inv) {
         UI.inventory = inv.Inventory;
     });
@@ -137,6 +137,7 @@ var UI = new Vue({
 			{Name: "4njki32"},
 			{Name: "PPPPvndfsj"},
 		],
+        target: { Race: 0, HP: 0, MHP:0, Name: "vnfdjsk" },
 		spells: [
             {Icon:'all-for-one'},
             {Icon:'all-for-one'},

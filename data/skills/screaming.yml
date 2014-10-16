@@ -4,5 +4,5 @@ cast-dealy: 2000 # Millisecond
 target: 4 # to monster
 mp: 10
 effects:
-    - hp -50
+    - hp -8
     # TODO agressive in AI

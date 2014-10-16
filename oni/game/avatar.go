@@ -45,10 +45,9 @@ func NewAvatar() *Avatar {
 	return a
 }
 
+func (a Avatar) Name() string { return a.Nickname }
 func (a Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
-
-//func (a Avatar) Race() int    { return a.RaceId }
-func (a Avatar) Race() int { return 5 }
+func (a Avatar) Race() int    { return 5 }
 
 // for debug print
 func (a *Avatar) String() string {
@@ -89,6 +88,7 @@ func (a *Avatar) AfterFind() (err error) {
 	a.AddItem(test_bow)
 	log.Debug(a.EquipItem(0))
 	a.AddItem(test_knife)
+	a.Nickname = "Avatar"
 	return
 }
 

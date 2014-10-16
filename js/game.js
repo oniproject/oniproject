@@ -73,6 +73,9 @@ function Game(renderer, stage, player, url, map) {
 					net.SetTargetMsg({
 						id: id
 					});
+                    if(a.isItem) {
+                        net.PickupItemMsg();
+                    }
 				}
 			}
 		}
@@ -242,6 +245,13 @@ Game.prototype.state_msg = function(state) {
 				avatar.position.y = state.Position.Y;
 				avatar.velocity.x = state.Veloctity.X;
 				avatar.velocity.y = state.Veloctity.Y;
+                if(avatar.rm_timer) {
+                    clearTimeout(avatar.rm_timer);
+                }
+                avatar.rm_timer = setTimeout(function() {
+                    delete this.avatars[state.Id];
+                }.bind(this), 200);
+                avatar.state = state;
 				break;
 		}
 		return true;

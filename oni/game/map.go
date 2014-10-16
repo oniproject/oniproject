@@ -28,6 +28,13 @@ type AroundController interface {
 	ObjectsAround(x, y, r float64, exclude func(GameObject) bool) []GameObject
 }
 
+func avatarFilter(obj GameObject) bool {
+	if _, ok := obj.(*Avatar); ok {
+		return false
+	}
+	return true
+}
+
 type Map struct {
 	tick                 uint
 	objects              map[utils.Id]GameObject
@@ -74,10 +81,9 @@ func (gm *Map) ObjectsAround(x, y, r float64, exclude func(GameObject) bool) []G
 	objects := []GameObject{}
 	center := geom.Coord{X: x, Y: y}
 	for _, obj := range gm.objects {
-		if r <= obj.Position().DistanceFrom(center) {
-			if !exclude(obj) {
-				objects = append(objects, obj)
-			}
+		d := center.DistanceFrom(obj.Position())
+		if d <= r && !exclude(obj) {
+			objects = append(objects, obj)
 		}
 	}
 	return objects
@@ -94,14 +100,14 @@ func (m *Map) SpawnMonster() {
 	monster := NewMonster()
 	monster.SetPosition(2, 3)
 	monster.id = utils.NewId(-int64(rand.Intn(10000)))
-	monster.HP, monster.MHP = 20, 20
+	monster.HP, monster.MHP, monster.HRG = 20, 20, 1
 	m.register <- monster
 	monster.RunAI()
 }
 
 func (m *Map) DropItem(x, y float64, item *Item) {
 	ditem := NewDroppedItem(x, y, item)
-	ditem.id = utils.NewId(-int64(rand.Intn(10000) - 10000))
+	ditem.id = utils.NewId(-int64(rand.Intn(10000) - 20000))
 	m.Register(ditem)
 }
 
@@ -128,19 +134,6 @@ func (gm *Map) Run() {
 		}
 	}
 
-	broadcast := func(m interface{}) {
-		for _, c := range gm.objects {
-			if ava, ok := c.(*Avatar); ok {
-				send(ava, m)
-			}
-		}
-	}
-	broadcastMsg := func(m Message) {
-		for id := range gm.objects {
-			gm.Send(id, m)
-		}
-	}
-
 	rand.Seed(time.Now().UnixNano())
 
 	go gm.SpawnMonster()
@@ -153,37 +146,57 @@ func (gm *Map) Run() {
 
 	for {
 		select {
-		// replication
 		case <-t_regeneration.C:
+			avatars := []*Avatar{}
+
+			// update all Regeneration
 			for _, obj := range gm.objects {
 				obj.Regeneration()
+				if avatar, ok := obj.(*Avatar); ok {
+					send(avatar, WrapMessage(&ParametersMsg{
+						Parameters: avatar.Parameters,
+						Skills:     avatar.Skills,
+					}))
+					avatars = append(avatars, avatar)
+				}
 			}
 
+			// target data
+			for _, avatar := range avatars {
+				gm.Send(avatar.Id(), &SetTargetMsg{avatar.Target})
+			}
+
+		// replication
 		case <-t_replication.C:
 			// send tick
 			gm.tick++
-			broadcast(gm.tick)
 
-			for _, obj := range gm.objects {
-				updated := obj.Update(gm, gm.tick, TickRate)
+			// update position
+			updated := map[utils.Id]bool{}
+			for id, obj := range gm.objects {
+				if ok := obj.Update(gm, gm.tick, TickRate); ok {
+					updated[id] = true
+				}
+			}
+
+			// send states to obj
+			for id, obj := range gm.objects {
 				state := &GameObjectState{
 					STATE_IDLE,
 					obj.Id(), gm.tick,
 					obj.Lag(), obj.Position(), obj.Velocity()}
-				if updated {
+
+				if updated[id] {
 					state.Type = STATE_MOVE
 				}
-				for _, c := range gm.objects {
-					if avatar, ok := c.(*Avatar); ok {
-						r := state.Position.DistanceFrom(avatar.Position())
-						switch {
-						case r < ReplicRange:
-							send(avatar, state)
-						// XXX for not send double messages
-						case r < ReplicRange+float64(SpeedOfLight*0.05):
-							gm.Send(avatar.Id(), &DestroyMsg{state.Id, gm.tick})
-						}
-					}
+
+				pos := obj.Position()
+				around := gm.ObjectsAround(pos.X, pos.Y, ReplicRange, avatarFilter)
+
+				for _, a := range around {
+					avatar := a.(*Avatar)
+					send(avatar, gm.tick)
+					send(avatar, state)
 				}
 			}
 
@@ -191,25 +204,14 @@ func (gm *Map) Run() {
 		case obj := <-gm.register:
 			if c, ok := obj.(*Avatar); ok {
 				send(c, gm.tick)
-				for _, ava := range gm.objects {
-					send(c, &GameObjectState{
-						STATE_CREATE,
-						ava.Id(), gm.tick,
-						ava.Lag(), ava.Position(), ava.Velocity()})
-				}
 			}
 			gm.objects[obj.Id()] = obj
-			broadcast(&GameObjectState{
-				STATE_IDLE,
-				obj.Id(), gm.tick,
-				obj.Lag(), obj.Position(), obj.Velocity()})
 			log.Debug("register", obj.Id(), obj)
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
 			if c, ok := obj.(*Avatar); ok {
 				close(c.sendMessage)
 			}
-			broadcastMsg(&DestroyMsg{obj.Id(), gm.tick})
 			log.Debug("unregister", obj)
 
 		// message system

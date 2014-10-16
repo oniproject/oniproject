@@ -14,6 +14,7 @@ type Sender interface {
 type MessageToMapInterface interface {
 	// XXX
 	GetObjById(utils.Id) GameObject
+	Unregister(GameObject)
 
 	Sender
 	Dropper
@@ -61,18 +62,8 @@ func WrapMessage(message Message) interface{} {
 		return &MessageWraper{M_CastMsg, message}
 	case *DestroyMsg:
 		return &MessageWraper{M_DestroyMsg, message}
-	/*
-		case *DropItemMsg:
-			return &MessageWraper{M_DropItem, message}
-		case *PickupItemMsg:
-			return &MessageWraper{M_PickupItem, message}
-	*/
 	case *InventoryMsg:
 		return &MessageWraper{M_Inventory, message}
-		/*
-			case *RequestInventoryMsg:
-				return &MessageWraper{M_RequestInventory, message}
-		*/
 	case *TargetDataMsg:
 		return &MessageWraper{M_TargetData, message}
 	case *ParametersMsg:
@@ -96,11 +87,6 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 		message = &DropItemMsg{}
 	case M_PickupItem:
 		message = &PickupItemMsg{}
-	/*
-		case M_Inventory:
-			var mm InventoryMsg
-			message = &mm
-	*/
 	case M_RequestInventory:
 		message = &RequestInventoryMsg{}
 	case M_RequestParameters:
@@ -154,14 +140,20 @@ type SetTargetMsg struct {
 func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
-	log.Debug("setTarget ", a.Target)
 	target := s.GetObjById(a.Target)
 	if target == nil {
-		log.Error("setTarget fail ", a.Target)
+		a.Target = 0
 		return
 	}
+
+	// XXX remove target if distance > ReplicRange
+	if target.Position().DistanceFrom(a.Position()) > ReplicRange {
+		a.Target = 0
+		return
+	}
+
 	hp, mhp := target.HPbar()
-	a.sendMessage <- &TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp}
+	a.sendMessage <- WrapMessage(&TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp, Name: target.Name()})
 }
 
 type CastMsg struct {
@@ -220,10 +212,19 @@ func (m *CastMsg) Run(s MessageToMapInterface, obj interface{}) {
 
 	caster.sendMessage <- WrapMessage(&ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills})
 
-	if target != caster {
-		if avatar, ok := target.(*Avatar); ok {
-			avatar.sendMessage <- WrapMessage(&ParametersMsg{Parameters: avatar.Parameters, Skills: avatar.Skills})
+	if hp, _ := target.HPbar(); hp == 0 {
+		switch t := target.(type) {
+		case *Avatar:
+			t.HRG = 0
+		case *Monster:
+			t.HRG = 0
 		}
+		s.Unregister(target)
+	}
+
+	if target != caster {
+		hp, mhp := target.HPbar()
+		caster.sendMessage <- WrapMessage(&TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp, Name: target.Name()})
 	}
 
 	log.Infof("cast OK: %v %d", m, caster.Target)
@@ -265,6 +266,8 @@ func (m *DropItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a.RemoveItem(m.Id)
 	pos := a.Position()
 	s.DropItem(pos.X, pos.Y, item)
+
+	a.sendMessage <- WrapMessage(&InventoryMsg{Inventory: a.Inventory, Equip: a.Equip})
 }
 
 type PickupItemMsg struct{}
@@ -277,6 +280,8 @@ func (m *PickupItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 		return
 	}
 	a.AddItem(item)
+
+	a.sendMessage <- WrapMessage(&InventoryMsg{Inventory: a.Inventory, Equip: a.Equip})
 }
 
 type RequestInventoryMsg struct{}
@@ -299,6 +304,7 @@ func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 type TargetDataMsg struct {
 	Race    int
 	HP, MHP int
+	Name    string
 }
 
 func (m *TargetDataMsg) Run(s MessageToMapInterface, obj interface{}) {

@@ -20,7 +20,6 @@ type DroppedItem struct {
 
 	Item *Item
 
-	//Target utils.Id
 	id utils.Id
 }
 
@@ -31,6 +30,7 @@ func NewDroppedItem(x, y float64, item *Item) *DroppedItem {
 	}
 }
 
+func (item DroppedItem) Name() string       { return item.Item.Name }
 func (item DroppedItem) Lag() time.Duration { return 0 }
 func (item DroppedItem) Id() utils.Id       { return item.id }
 func (item DroppedItem) Race() int          { return 0 }

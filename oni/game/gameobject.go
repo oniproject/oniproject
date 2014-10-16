@@ -39,6 +39,8 @@ type GameObject interface {
 	MPbar() (int, int)
 	TPbar() (int, int)
 	Regeneration()
+
+	Name() string
 }
 
 type PositionComponent struct {
@@ -68,8 +70,9 @@ func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
 		// XXX {nil} for testing
 		if w == nil || w.Walkable(int(pos.X), int(pos.Y)) {
 			c.position = pos
+			return true
 		}
-		return true
+		return false
 	}
 
 	if c.lastvel.X != 0 || c.lastvel.Y != 0 {

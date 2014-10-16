@@ -20,6 +20,7 @@ func NewMonster() *Monster {
 	}
 }
 
+func (a Monster) Name() string       { return "Monster" }
 func (a Monster) Lag() time.Duration { return 0 }
 func (a Monster) Id() utils.Id       { return a.id }
 func (a Monster) Race() int          { return 0 }
