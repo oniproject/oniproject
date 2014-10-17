@@ -44,7 +44,7 @@ func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Avatar, err error) {
 	if !ok {
 		b.Game.LoadMap(utils.Id(a.MapId))
 		m = BalancerMap{
-			Max:     2,
+			Max:     2000,
 			Avatars: make(map[utils.Id]bool),
 		}
 		b.Maps[utils.Id(a.MapId)] = m
