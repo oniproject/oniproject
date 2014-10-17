@@ -79,7 +79,7 @@ func (master *Master) Run() {
 			Id   int64
 			Host string
 			//}{account.AvatarId, "ngrok.com:49008"}
-		}{account.AvatarId, master.Addr}
+		}{account.AvatarId, "oniproject-lain.rhcloud.com"}
 		r.JSON(200, x)
 	})
 
