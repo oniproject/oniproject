@@ -2,9 +2,3 @@ node_modules
 npm-debug.log
 *.bin
 *.map
-
-public/main.js
-public/a2d.js
-public/redactor.js
-public/tile-redactor.js
-public/tredactor.js
