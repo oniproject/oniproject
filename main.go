@@ -37,7 +37,7 @@ func main() {
 
 		module := oni.NewMaster(conf, balancer)
 
-		go module.Run()
-		balancer.Game.Run()
+		go balancer.Game.Run()
+		module.Run()
 	}
 }
