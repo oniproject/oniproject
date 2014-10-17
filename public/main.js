@@ -365,6 +365,9 @@ function Game(renderer, stage, player, url, map) {
 					net.SetTargetMsg({
 						id: id
 					});
+					if(a.isItem) {
+						net.PickupItemMsg();
+					}
 				}
 			}
 		}
@@ -513,7 +516,7 @@ Game.prototype.state_msg = function(state) {
 				delete this.avatars[state.Id];
 				break;
 			case 1: // create
-				this.avatars[state.Id] = new Avatar(state.Position, state.Veloctity)
+				this.avatars[state.Id] = new Avatar(state.Position, state.Velocity)
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
 					state.Type = 1;
@@ -527,13 +530,34 @@ Game.prototype.state_msg = function(state) {
 					return this.state_msg(state);
 				}
 				var avatar = this.avatars[state.Id];
+				if(state.Id == this.player) {
+					this.suika.animation = 'idle';
+				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
+					if(state.Id == this.player) {
+						this.suika.animation = 'walk';
+					}
+					if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
+						avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
+					}
 				}
+
+				if(avatar.rm_timer) {
+					clearTimeout(avatar.rm_timer);
+				}
+				avatar.rm_timer = setTimeout(function() {
+					delete this.avatars[state.Id];
+				}.bind(this), 200);
+
+				avatar.state = state;
 				avatar.position.x = state.Position.X;
 				avatar.position.y = state.Position.Y;
-				avatar.velocity.x = state.Veloctity.X;
-				avatar.velocity.y = state.Veloctity.Y;
+
+				if(state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
+					avatar.velocity.x = state.Velocity.X;
+					avatar.velocity.y = state.Velocity.Y;
+				}
 				break;
 		}
 		return true;
@@ -1040,7 +1064,7 @@ Suika.prototype.updateTransform = function() {
 module.exports = Suika;
 
 },{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
 },{}],"/home/lain/gocode/src/oniproject/js/tilemap.js":[function(require,module,exports){
 'use strict';
 
