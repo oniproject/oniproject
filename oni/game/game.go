@@ -72,7 +72,7 @@ func (gm *Game) Run() {
 
 		a.Connection = Connection{
 			ws:          ws,
-			sendMessage: make(chan interface{}, 256),
+			sendMessage: make(chan interface{}, 2560),
 			ping_pong:   time.Now(),
 		}
 		log.Debug(a)
