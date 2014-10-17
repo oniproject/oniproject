@@ -23,7 +23,7 @@ func main() {
 
 	host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
-	if port != nil {
+	if port != "" {
 		conf.Addr = host + ":" + port
 	}
 

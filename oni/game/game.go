@@ -84,10 +84,10 @@ func (gm *Game) Run() {
 
 	http.Handle("/ws", m)
 
-	err := http.ListenAndServe(gm.Addr, nil)
+	/*err := http.ListenAndServe(gm.Addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
-	}
+	}*/
 }
 
 func (gm *Game) LoadMap(id utils.Id) {
