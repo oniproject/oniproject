@@ -73,9 +73,9 @@ function Game(renderer, stage, player, url, map) {
 					net.SetTargetMsg({
 						id: id
 					});
-                    if(a.isItem) {
-                        net.PickupItemMsg();
-                    }
+					if(a.isItem) {
+						net.PickupItemMsg();
+					}
 				}
 			}
 		}
@@ -238,17 +238,17 @@ Game.prototype.state_msg = function(state) {
 					return this.state_msg(state);
 				}
 				var avatar = this.avatars[state.Id];
-                if(state.Id == this.player) {
-                    this.suika.animation = 'idle';
-                }
+				if(state.Id == this.player) {
+					this.suika.animation = 'idle';
+				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
-                    if(state.Id == this.player) {
-                        this.suika.animation = 'walk';
-                    }
-                    if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
-                        avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
-                    }
+					if(state.Id == this.player) {
+						this.suika.animation = 'walk';
+					}
+					if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
+						avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
+					}
 				}
 				avatar.position.x = state.Position.X;
 				avatar.position.y = state.Position.Y;
@@ -256,13 +256,13 @@ Game.prototype.state_msg = function(state) {
 				avatar.velocity.x = state.Velocity.X ||0;
 				avatar.velocity.y = state.Velocity.Y ||0;
 
-                if(avatar.rm_timer) {
-                    clearTimeout(avatar.rm_timer);
-                }
-                avatar.rm_timer = setTimeout(function() {
-                    delete this.avatars[state.Id];
-                }.bind(this), 200);
-                avatar.state = state;
+				if(avatar.rm_timer) {
+					clearTimeout(avatar.rm_timer);
+				}
+				avatar.rm_timer = setTimeout(function() {
+					delete this.avatars[state.Id];
+				}.bind(this), 200);
+				avatar.state = state;
 				break;
 		}
 		return true;
