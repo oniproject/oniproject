@@ -1,7 +1,7 @@
 package game
 
 import (
-	"oniproject/oni/geom"
+	"github.com/oniproject/geom"
 	"oniproject/oni/utils"
 	"time"
 )

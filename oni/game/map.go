@@ -5,8 +5,8 @@ package game
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
+	"github.com/oniproject/geom"
 	"math/rand"
-	"oniproject/oni/geom"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
 	"path"
