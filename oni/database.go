@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"oniproject/oni/game"
 	"oniproject/oni/utils"
+	"path"
 )
 
 type AvatarDB interface {
@@ -45,6 +46,22 @@ func (db *Database) SaveAvatar(a *game.Avatar) error {
 func (db *Database) CreateAvatar() (*game.Avatar, error) {
 	a := game.NewAvatar()
 	a.X, a.Y = 2, 2
+
+	// XXX
+	a.AddSkill("screaming")
+	a.HP, a.MHP, a.HRG = 90, 100, 1
+	a.MP, a.MMP, a.MRG = 15, 50, 1
+	a.TP, a.MTP, a.TRG = 25, 30, 1
+	a.ATK = 15
+	a.DEF = 10
+	test_hauberk, _ := game.LoadItemYaml(path.Join(game.ITEM_PATH, "hauberk.yml"))
+	test_bow, _ := game.LoadItemYaml(path.Join(game.ITEM_PATH, "bow.yml"))
+	a.AddItem(test_hauberk)
+	log.Debug(a.EquipItem(0))
+	a.AddItem(test_bow)
+	log.Debug(a.EquipItem(0))
+	a.Nickname = "Avatar"
+
 	err := db.db.Save(a).Error
 	return a, err
 }

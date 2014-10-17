@@ -10,13 +10,13 @@ func TestFeatures(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	features := ParseFeatureList([]string{
+	features := FeatureList{
 		"atk 1",
 		"vndfjk vndfjksl", // continue
 		"def 2",
 		"skill heal",
 		"rm-skill heal",
-	})
+	}
 
 	target := mock.NewMockFeatureReceiver(mockCtrl)
 	target.EXPECT().AddATK(1)

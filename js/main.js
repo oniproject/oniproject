@@ -112,6 +112,7 @@ function run(player, host) {
     });
 	game.net.on('InventoryMsg', function(inv) {
         UI.inventory = inv.Inventory;
+        UI.equip = inv.Equip
     });
 	game.net.on('ParametersMsg', function(p) {
         UI.hp = p.Parameters.HP;
@@ -120,13 +121,7 @@ function run(player, host) {
         UI.mmp = p.Parameters.MMP;
         UI.tp = p.Parameters.TP;
         UI.mtp = p.Parameters.MTP;
-        UI.spells = [];
-        for(var k in p.Skills) {
-            if(p.Skills.hasOwnProperty(k)) {
-                var skill = p.Skills[k]
-                UI.spells.push(skill);
-            }
-        }
+        UI.spells = p.Skills;
     });
 
 
@@ -146,6 +141,7 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
+        equip: {},
 		inventory: [
 			{Name: "43"},
 			{Name: "1k"},
@@ -181,9 +177,12 @@ var UI = new Vue({
 	},
 	methods: {
 		cast: function(spell) {
-			console.info('cast', spell.Name);
-			game.net.FireMsg({t: ""+spell.Icon});
+			console.info('cast', spell);
+			game.net.FireMsg({t: ""+spell});
 		},
+        drop: function(index) {
+            game.net.DropItemMsg({Id:index});
+        },
 	},
 }),
 

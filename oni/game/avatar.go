@@ -5,7 +5,6 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"oniproject/oni/utils"
-	"path"
 	"time"
 )
 
@@ -18,8 +17,8 @@ type Avatar struct {
 	MapId    int64
 	X, Y     float64
 
-	PositionComponent      `sql:"-"`
-	PositionComponentJson  []byte
+	PositionComponent `sql:"-"`
+	//PositionComponentJson  []byte
 	Parameters             `sql:"-"`
 	ParametersJson         []byte
 	InventoryComponent     `sql:"-"`
@@ -51,9 +50,9 @@ func (a Avatar) Race() int    { return 5 }
 
 // for debug print
 func (a *Avatar) String() string {
-	return fmt.Sprintf(`Avatar[%d]'%s' pos[%f:%f] pc:%s param:%s inv:%s`,
+	return fmt.Sprintf(`Avatar[%d]'%s' pos[%f:%f] param:%s inv:%s`,
 		a.AvatarId, a.Nickname, a.X, a.Y,
-		string(a.PositionComponentJson), string(a.ParametersJson), string(a.InventoryComponentJson))
+		string(a.ParametersJson), string(a.InventoryComponentJson))
 }
 
 func (a *Avatar) Update(w Walkabler, tick uint, t time.Duration) bool {
@@ -72,21 +71,6 @@ func (a *Avatar) BeforeUpdate() (err error) {
 func (a *Avatar) AfterFind() (err error) {
 	a.position.X, a.position.Y = a.X, a.Y
 	err = a.unmarshal()
-
-	// XXX
-	a.AddSkill("screaming")
-	a.HP, a.MHP, a.HRG = 90, 100, 1
-	a.MP, a.MMP, a.MRG = 15, 50, 1
-	a.TP, a.MTP, a.TRG = 25, 30, 1
-	a.ATK = 15
-	a.DEF = 10
-	test_hauberk, _ := LoadItemYaml(path.Join(ITEM_PATH, "hauberk.yml"))
-	test_bow, _ := LoadItemYaml(path.Join(ITEM_PATH, "bow.yml"))
-	a.AddItem(test_hauberk)
-	log.Debug(a.EquipItem(0))
-	a.AddItem(test_bow)
-	log.Debug(a.EquipItem(0))
-	a.Nickname = "Avatar"
 	return
 }
 
@@ -96,11 +80,11 @@ func (a *Avatar) marshal() (err error) {
 		log.Error("BeforeSave ", err)
 		return
 	}
-	a.PositionComponentJson, err = json.Marshal(&(a.PositionComponent))
+	/*a.PositionComponentJson, err = json.Marshal(&(a.PositionComponent))
 	if err != nil {
 		log.Error("BeforeSave ", err)
 		return
-	}
+	}*/
 	a.InventoryComponentJson, err = json.Marshal(&(a.InventoryComponent))
 	if err != nil {
 		log.Error("BeforeSave ", err)
@@ -129,11 +113,11 @@ func (a *Avatar) unmarshal() (err error) {
 		log.Errorf("AfterFind Parameters %s '%s'", err, string(a.ParametersJson))
 		return
 	}
-	err = json.Unmarshal(a.PositionComponentJson, &(a.PositionComponent))
+	/*err = json.Unmarshal(a.PositionComponentJson, &(a.PositionComponent))
 	if err != nil {
 		log.Errorf("AfterFind PositionComponent %s '%s'", err, string(a.PositionComponentJson))
 		return
-	}
+	}*/
 	err = json.Unmarshal(a.InventoryComponentJson, &(a.InventoryComponent))
 	if err != nil {
 		log.Errorf("AfterFind InventoryComponentJson %s '%s'", err, string(a.InventoryComponentJson))

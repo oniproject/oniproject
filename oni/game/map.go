@@ -42,9 +42,10 @@ type Map struct {
 	register, unregister chan GameObject
 	sendTo               chan sender
 	Grid                 *jps.Grid
+	game                 *Game
 }
 
-func NewMap() *Map {
+func NewMap(game *Game) *Map {
 	// TODO remove it
 	s := `XXXXXX
 X....X
@@ -58,6 +59,7 @@ XXXXXX`
 		objects:    make(map[utils.Id]GameObject),
 		sendTo:     make(chan sender),
 		Grid:       jps.FromString(s, 8, 6),
+		game:       game,
 	}
 }
 
@@ -213,8 +215,9 @@ func (gm *Map) Run() {
 			log.Debug("register", obj.Id(), obj)
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
-			if c, ok := obj.(*Avatar); ok {
-				close(c.sendMessage)
+			if avatar, ok := obj.(*Avatar); ok {
+				close(avatar.sendMessage)
+				gm.game.adb.SaveAvatar(avatar)
 			}
 			log.Debug("unregister", obj)
 

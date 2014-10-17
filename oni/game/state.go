@@ -45,8 +45,8 @@ type State struct {
 
 	AutoRemovalTiming time.Duration `yaml:"timing"`
 
-	Features []string
-	features FeatureList `db:"-"`
+	Features FeatureList
+	//features FeatureList `db:"-"`
 }
 
 func LoadStateYaml(fname string) (*State, error) {
@@ -63,13 +63,13 @@ func LoadStateYaml(fname string) (*State, error) {
 		return nil, err
 	}
 
-	state.features = ParseFeatureList(state.Features)
+	//state.features = ParseFeatureList(state.Features)
 	state.AutoRemovalTiming *= time.Millisecond
 
 	return state, err
 }
 
-func (s *State) ApplyFeatures(r FeatureReceiver) { s.features.Run(r) }
+func (s *State) ApplyFeatures(r FeatureReceiver) { s.Features.Run(r) }
 
 func (s *State) CheckAutoRemoval(add_time, now time.Time) bool {
 	if s.AutoRemovalTiming == 0 {

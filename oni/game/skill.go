@@ -87,15 +87,16 @@ type Skill struct {
 
 	Animation int
 
-	//EffectsOnTarget string     // json
-	OnTarget  []string   `yaml:"effects"`
-	EonTarget EffectList `db:"-"`
+	OnTarget EffectList `yaml:"effects"`
 
 	HPused int `yaml:"hp"`
 	MPused int `yaml:"mp"`
 	TPused int `yaml:"tp"`
 
 	UsableWith []string `yaml:"with"`
+
+	// stackoverflow? nowai
+	unmarshaled bool `json:"-"`
 }
 
 func LoadSkillYaml(fname string) (*Skill, error) {
@@ -112,7 +113,6 @@ func LoadSkillYaml(fname string) (*Skill, error) {
 		return nil, err
 	}
 
-	skill.EonTarget = ParseEffectList(skill.OnTarget)
 	skill.CastDealy *= time.Millisecond
 
 	return skill, err
@@ -129,7 +129,7 @@ func (s *Skill) Cast(target SkillTarget, lastCast time.Time) error {
 
 	log.Println("Cast Skill", s)
 
-	s.EonTarget.ApplyTo(target)
+	s.OnTarget.ApplyTo(target)
 
 	return nil
 }

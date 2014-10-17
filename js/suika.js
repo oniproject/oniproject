@@ -46,7 +46,7 @@ function Suika() {
     this._direction = '↓';
 
     this.currentFrame = 0;
-    this.animationSpeed = 0.1;
+    this.animationSpeed = 0.3;
 
     PIXI.Sprite.call(this, a['idle ↓'][0]);
 

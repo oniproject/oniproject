@@ -10,14 +10,14 @@ func TestEffects(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	effects := ParseEffectList([]string{
+	effects := EffectList{
 		"hp 1",
 		"vndfjk vndfjksl", // continue
 		"mp 2",
 		"tp 3",
 		"state death",
 		"rm-state death",
-	})
+	}
 
 	target := mock.NewMockEffectReceiver(mockCtrl)
 	target.EXPECT().RecoverHP(1)

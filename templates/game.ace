@@ -139,13 +139,17 @@ html lang=en
           div v-style="width: target.HP/target.MHP*100 + '%'"
 
       #top-right
+        strong Equip
+        div v-repeat="equip"
+          span v-text="$key +': '"
+          span v-text="Name"
         strong Inventory
         div v-repeat="inventory"
-          span v-text="Name"
+          a v-text="Name" v-on="click: drop($index)"
 
       #bottom
         #spells
-          .img v-repeat="spells" v-on="click: cast(this)"
+          .img v-repeat="spells" v-on="click: cast($key)"
             .text
               span v-text="Name"
             img src="/icons/lorc/originals/svg/``Icon``.svg"

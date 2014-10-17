@@ -12,6 +12,7 @@ import (
 
 type AvatarDB interface {
 	AvatarById(utils.Id) (*Avatar, error)
+	SaveAvatar(*Avatar) error
 }
 
 type GameAddr interface {
@@ -25,7 +26,9 @@ type Game struct {
 }
 
 func NewGame(config GameAddr, adb AvatarDB) *Game {
-	return &Game{Map: NewMap(), adb: adb, Addr: config.GameAddr()}
+	game := &Game{adb: adb, Addr: config.GameAddr()}
+	game.Map = NewMap(game)
+	return game
 }
 
 func (gm *Game) Run() {

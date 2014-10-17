@@ -1,6 +1,8 @@
 package game
 
 import (
+	//"encoding/json"
+	//log "github.com/Sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -34,8 +36,8 @@ type Item struct {
 	Slot1, Slot2 string
 	Dual         bool
 
-	Features  []string
-	Xfeatures FeatureList `json:"-"`
+	Features FeatureList
+	//Xfeatures FeatureList `json:"-"`
 
 	//EquipScript   string
 	//UnEquipScript string
@@ -50,6 +52,9 @@ type Item struct {
 
 	Level  int
 	PLevel int
+
+	// stackoverflow? nowai
+	unmarshaled bool `json:"-"`
 }
 
 func LoadItemYaml(fname string) (*Item, error) {
@@ -64,12 +69,23 @@ func LoadItemYaml(fname string) (*Item, error) {
 		return nil, err
 	}
 
-	item.Xfeatures = ParseFeatureList(item.Features)
+	//item.Xfeatures = ParseFeatureList(item.Features)
 
 	return item, err
 }
 
-func (item *Item) ApplyFeatures(r FeatureReceiver) { item.Xfeatures.Run(r) }
+func (item *Item) ApplyFeatures(r FeatureReceiver) { item.Features.Run(r) }
+
+/*func (item Item) UnmarshalJSON(b []byte) (err error) {
+	if item.unmarshaled {
+		return
+	}
+	item.unmarshaled = true
+	err = json.Unmarshal(b, &item)
+	item.Xfeatures = ParseFeatureList(item.Features)
+	log.Warnf("UnmarshalJSON %s %v %s", b, item, err)
+	return
+}*/
 
 /*
 func (item *Item) Drop() error          { return nil }
