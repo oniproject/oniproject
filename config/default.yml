@@ -2,7 +2,7 @@ addr: ":8000"
 game: ":2000"
 
 driver: sqlite3
-db: development.bin
+db: ../data/development.bin
 
 level: info
 

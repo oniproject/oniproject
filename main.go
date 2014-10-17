@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"oniproject/oni"
+	"os"
 )
 
 var config = flag.String("conf", "default", "config file")
@@ -19,6 +20,12 @@ func main() {
 	flag.Parse()
 
 	conf := oni.NewConfig(*config)
+
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+	if port != nil {
+		conf.Addr = host + ":" + port
+	}
 
 	switch {
 	case *master:
