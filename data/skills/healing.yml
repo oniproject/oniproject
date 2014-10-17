@@ -1,0 +1,6 @@
+name: Healing
+cast-dealy: 1000 # Millisecond
+target: 2 # same race
+mp: 10
+effects:
+    - hp 50

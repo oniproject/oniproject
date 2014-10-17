@@ -1,0 +1,5 @@
+name: HP potion +100
+type: potion
+#use:
+#    - skill _hp
+#    - hp +100

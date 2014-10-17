@@ -1,0 +1,11 @@
+name: Bow
+type: weapon
+class: range
+slot1: right
+slot2: left
+dual: true
+#use:
+#    - skill _attack
+#features:
+#    - atk 15
+#    - speed 5

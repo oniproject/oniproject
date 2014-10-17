@@ -1,0 +1,10 @@
+name: Knife
+type: weapon
+class: assasin
+slot1: right
+slot2: left
+#use:
+#    - skill _attack
+#features:
+#    - atk 10
+#    - speed 8
