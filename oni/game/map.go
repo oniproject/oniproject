@@ -136,6 +136,14 @@ func (gm *Map) Run() {
 			go func() { gm.unregister <- c }()
 		}
 	}
+	closeChan := func(avatar *Avatar) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Error(err)
+			}
+		}()
+		close(avatar.sendMessage)
+	}
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -216,7 +224,7 @@ func (gm *Map) Run() {
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
 			if avatar, ok := obj.(*Avatar); ok {
-				close(avatar.sendMessage)
+				closeChan(avatar)
 				gm.game.adb.SaveAvatar(avatar)
 			}
 			log.Debug("unregister", obj)
