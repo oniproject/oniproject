@@ -73,14 +73,16 @@ func (master *Master) Run() {
 
 	m.Post("/game", sessionauth.LoginRequired, func(user sessionauth.User, r render.Render) {
 		account := user.(*Account)
-		a, err := master.balancer.AttachAvatar(utils.Id(account.AvatarId))
-		log.Println("AttachAvatar", a, err)
-		x := struct {
-			Id   int64
-			Host string
-			//}{account.AvatarId, "ngrok.com:49008"}
-		}{account.AvatarId, "localhost:2000"}
-		r.JSON(200, x)
+		host, mapId, a, err := master.balancer.AttachAvatar(utils.Id(account.AvatarId))
+		if err != nil {
+			log.Panic("AttachAvatar ", err)
+		}
+		log.Println("AttachAvatar", host, mapId, a, err)
+		r.JSON(200, map[string]interface{}{
+			"Id":    account.AvatarId,
+			"Host":  host,
+			"MapId": mapId,
+		})
 	})
 
 	m.Get("/avatar", sessionauth.LoginRequired, func(session sessions.Session, user sessionauth.User, r acerender.Render) {

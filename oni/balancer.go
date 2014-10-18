@@ -3,17 +3,16 @@ package oni
 // todo mutex for avatars
 
 import (
-	"errors"
+	log "github.com/Sirupsen/logrus"
 	"github.com/gocircuit/circuit/client"
 	"oniproject/oni/game"
 	"oniproject/oni/utils"
 )
 
 type Balancer struct {
-	c    *client.Client
-	Maps map[utils.Id]BalancerMap
-	Game *game.Game
-	adb  AvatarDB
+	c     *client.Client
+	games []*BalancerGame
+	adb   AvatarDB
 }
 
 type BalancerMap struct {
@@ -21,11 +20,22 @@ type BalancerMap struct {
 	Avatars map[utils.Id]bool
 }
 
+type BalancerGame struct {
+	Addr         string
+	Rpc          string
+	Minid, Maxid int64
+	Maps         map[int64]*BalancerMap
+	game         *game.Game
+}
+
+func (g *BalancerGame) LoadMap(id int64) {
+	g.game.LoadMap(utils.Id(id))
+}
+
 func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	b = &Balancer{
-		Maps: make(map[utils.Id]BalancerMap),
-		Game: game.NewGame(config, adb),
-		adb:  adb,
+		adb:   adb,
+		games: config.Games,
 	}
 	if config.Circuit != "" {
 		b.c = client.Dial(config.Circuit, nil)
@@ -33,43 +43,29 @@ func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	return
 }
 
-func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Avatar, err error) {
+func (b *Balancer) AttachAvatar(id utils.Id) (host string, mapId int64, a *game.Avatar, err error) {
 	a, err = b.adb.AvatarById(id)
 	if err != nil {
 		a = nil
 		return
 	}
 
-	m, ok := b.Maps[utils.Id(a.MapId)]
-	if !ok {
-		b.Game.LoadMap(utils.Id(a.MapId))
-		m = BalancerMap{
-			Max:     2,
-			Avatars: make(map[utils.Id]bool),
-		}
-		b.Maps[utils.Id(a.MapId)] = m
-	}
-
-	if len(m.Avatars) == m.Max {
-		err = errors.New("fail attach: Map is full")
-		return
-	}
+	m, game := b.findMap(a.MapId)
 
 	if _, ok := m.Avatars[a.Id()]; ok {
-		// avatar is avilable
-		// unload it!
-		// send disconnect rpc call to Game
-		err = errors.New("fail attach: avatar is avilable")
-		return
+		game.game.DetachAvatar(a.Id(), a.MapId)
 	}
 
 	m.Avatars[a.Id()] = true
+	host = game.Addr
+	mapId = a.MapId
 
 	// attach
 
 	return
 }
 
+/* TODO
 func (b *Balancer) DetachAvatar(a *game.Avatar) error {
 	if m, ok := b.Maps[utils.Id(a.MapId)]; ok {
 		if _, ok := m.Avatars[a.Id()]; ok {
@@ -78,4 +74,39 @@ func (b *Balancer) DetachAvatar(a *game.Avatar) error {
 		}
 	}
 	return nil
+}*/
+
+func (b *Balancer) findMap(id int64) (*BalancerMap, *BalancerGame) {
+	for _, g := range b.games {
+		if m, ok := g.Maps[id]; ok {
+			if len(m.Avatars) >= m.Max {
+				log.Errorf("Map is full %v %v", m, g)
+				continue
+			}
+			return m, g
+		}
+	}
+
+	log.Info("create map ", id)
+
+	// FIXME find free Map
+
+	g := b.games[0]
+	if g.game == nil {
+		// XXX
+		g.game = game.NewGame(b.adb)
+		go g.game.Run("")
+	}
+	if g.Maps == nil {
+		g.Maps = make(map[int64]*BalancerMap)
+	}
+
+	m := &BalancerMap{
+		Max:     2000,
+		Avatars: make(map[utils.Id]bool),
+	}
+	g.Maps[id] = m
+	g.LoadMap(id)
+
+	return m, g
 }

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"oniproject/oni"
+	"os"
 )
 
 var config = flag.String("conf", "default", "config file")
@@ -20,6 +21,12 @@ func main() {
 
 	conf := oni.NewConfig(*config)
 
+	host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+	if port != "" {
+		conf.Addr = host + ":" + port
+	}
+
 	switch {
 	case *master:
 	case *game:
@@ -30,7 +37,6 @@ func main() {
 
 		module := oni.NewMaster(conf, balancer)
 
-		go module.Run()
-		balancer.Game.Run()
+		module.Run()
 	}
 }

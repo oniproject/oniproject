@@ -152,7 +152,7 @@ html lang=en
           .img v-repeat="spells" v-on="click: cast($key)"
             .text
               span v-text="Name"
-            img src="/icons/lorc/originals/svg/``Icon``.svg"
+            img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
         #exp
           div v-style="width: exp + '%'"
     script src="/js/pixi.js"

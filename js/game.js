@@ -250,19 +250,22 @@ Game.prototype.state_msg = function(state) {
 						avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
 					}
 				}
-				avatar.position.x = state.Position.X;
-				avatar.position.y = state.Position.Y;
-
-				avatar.velocity.x = state.Velocity.X ||0;
-				avatar.velocity.y = state.Velocity.Y ||0;
 
 				if(avatar.rm_timer) {
 					clearTimeout(avatar.rm_timer);
 				}
 				avatar.rm_timer = setTimeout(function() {
 					delete this.avatars[state.Id];
-				}.bind(this), 200);
+				}.bind(this), 800);
+
 				avatar.state = state;
+				avatar.position.x = state.Position.X;
+				avatar.position.y = state.Position.Y;
+
+				if(state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
+					avatar.velocity.x = state.Velocity.X;
+					avatar.velocity.y = state.Velocity.Y;
+				}
 				break;
 		}
 		return true;

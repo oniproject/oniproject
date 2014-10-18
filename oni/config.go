@@ -15,9 +15,9 @@ type Config struct {
 	Driver  string
 	Db      string
 	Addr    string
-	Game    string
 	Circuit string
 	Level   string
+	Games   []*BalancerGame
 	db      *gorm.DB
 }
 
@@ -49,10 +49,6 @@ func NewConfig(config string) (c *Config) {
 	}
 
 	return
-}
-
-func (c *Config) GameAddr() string {
-	return c.Game
 }
 
 func (c *Config) DB() *gorm.DB {
