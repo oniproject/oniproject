@@ -25,9 +25,35 @@ function Avatar() {
 
 Avatar.prototype.draw = function(iso) {
 	var pos = this.position;
-	//iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)), this.color);
-	iso.add(Octahedron(new Point(pos.x - 0.5, pos.y - 0.5, pos.z))
-		.rotateZ(new Point(pos.x, pos.y, pos.z + 0.5), this.angle), this.color);
+
+	if(this.hasOwnProperty('state')) {
+		// is avatar or monster
+		if(this.state.Id > -10000) {
+			iso.add(Octahedron(new Point(pos.x - 0.5, pos.y - 0.5, pos.z))
+				.rotateZ(new Point(pos.x, pos.y, pos.z + 0.5), this.angle)
+				.scale(new Point(pos.x, pos.y, pos.z), 0.7, 0.7, 0.7), this.color);
+		}
+		// is avatar or item
+		if(this.state.Id < -10000 || this.state.Id > 0) {
+			iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)).scale(new Point(pos.x, pos.y), 0.2, 0.2, 0.2), this.color);
+		}
+	}
+}
+
+Avatar.prototype.isAvatar = function() {
+	if(this.hasOwnProperty('state')) {
+		return this.state.Id > 0;
+	}
+}
+Avatar.prototype.isMonster = function() {
+	if(this.hasOwnProperty('state')) {
+		return this.state.Id < 0 && this.state.Id > -10000;
+	}
+}
+Avatar.prototype.isItem = function() {
+	if(this.hasOwnProperty('state')) {
+		return this.state.Id < -10000;
+	}
 }
 
 Avatar.prototype.update = function(time) {

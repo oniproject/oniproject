@@ -1,0 +1,11 @@
+name: Staff
+type: weapon
+class: wizard
+slot1: right
+slot2: left
+dual: true
+#use:
+#    - skill _attack
+#features:
+#    - atk 2
+#    - speed 2

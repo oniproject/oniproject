@@ -1,0 +1,172 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    meta http-equiv=Content-Type content="text/html;charset=UTF-8"
+    meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    title {{.Title}}
+    = css
+      html, body {
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #bottom {
+        position:absolute;
+        bottom:0;
+        width:100%;
+        background: gray;
+      }
+      #spells {
+        margin:auto;
+        width:340px;
+        background:black;
+        font-size: 0;
+        padding:3px;
+      }
+      #spells .img {
+        position: relative;
+        display: inline-block;
+        width:32px;
+        height:32px;
+        padding: 1px;
+      }
+      #spells .img:hover {
+        outline: 1px solid rgba(255, 255, 255, 1);
+      }
+      #spells img {
+        margin:0;
+        width:32px;
+        height:32px;
+      }
+      #spells .img .text {
+        position: absolute;
+        display: none;
+        top: 0;
+        bottom: 0;
+        z-index: 999;
+        background: red;
+      }
+      #spells .img:hover .text {
+        display: block;
+      }
+
+
+      #exp {
+        width:100%;
+      }
+      #exp div {
+        background: silver;
+        height: 7px;
+      }
+      #top-left {
+        position:absolute;
+        padding: 3px;
+      }
+      #top-center {
+        position:absolute;
+        width: 30%;
+        right: 35%;
+        left: 35%;
+        text-align: center;
+        background: #ccf;
+      }
+      #top-center .points {
+        width: 100%;
+      }
+      #top-right {
+        position:absolute;
+        padding: 3px;
+        right: 0;
+        color: white;
+        background: #332;
+      }
+      .level {
+        float:left;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        background: blue;
+        color: white;
+        padding: 7px;
+        border-radius:20px 6px 20px 20px;
+        border: 2px solid silver;
+      }
+      .bars {
+        float:right;
+      }
+      .points {
+        width:200px;
+        border-radius:6px;
+        border: 1px solid black;
+        background: silver;
+        margin: 2px 0;
+        box-sizing: border-box;
+      }
+      .points div {
+        height: 7px;
+        border-radius:6px;
+        transition: .4s ease;
+        transition: 1.1s linear;
+      }
+      .points.hp div {
+        background: red;
+      }
+      .points.mp div {
+        height: 4px;
+        background: blue;
+      }
+      .points.tp div {
+        height: 4px;
+        background: yellow;
+      }
+  body
+    #ui
+      #top-left
+        .level v-text="level"
+        .bars
+          .points.hp
+            div v-style="width: hp/mhp*100 + '%'"
+          .points.mp
+            div v-style="width: mp/mmp*100 + '%'"
+          .points.tp
+            div v-style="width: tp/mtp*100 + '%'"
+      #top-center
+        strong v-text="target.Name"
+        .points.hp
+          div v-style="width: target.HP/target.MHP*100 + '%'"
+
+      #top-right
+        strong Equip
+        div v-repeat="equip"
+          span v-text="$key +': '"
+          span v-text="Name"
+        strong Inventory
+        div v-repeat="inventory"
+          a v-text="Name" v-on="click: drop($index)"
+
+      #bottom
+        #spells
+          .img v-repeat="spells" v-on="click: cast($key)"
+            .text
+              span v-text="Name"
+            img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
+        #exp
+          div v-style="width: exp + '%'"
+    script src="/js/pixi.js"
+    script src="/js/keypress-2.0.2.min.js"
+    script src="/js/cbor.js"
+    script src="/js/vue.js"
+    = javascript
+      Vue.config({
+          delimiters: ['`', '`'],
+      });
+    script src="/main.js"
+    / h1 Base Template : {{.Msg}}
+    / #container.wrapper
+      = yield main
+      = yield sub
+    / = javascript
+      alert('{{.Msg}}');

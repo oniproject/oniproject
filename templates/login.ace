@@ -1,0 +1,64 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    meta http-equiv=Content-Type content="text/html;charset=UTF-8"
+    meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    link rel="stylesheet" href="/css/uikit.min.css"
+    link rel="stylesheet" href="/css/addons/uikit.addons.min.css"
+    title {{ .Title }}
+  body
+    .uk-vertical-align.uk-text-center.uk-height-1-1
+      .uk-vertical-align-middle style="width: 300px;"
+        form#form.uk-panel.uk-panel-box.uk-form method="POST"
+          .uk-form-row
+            input.uk-width-1-1.uk-form-large tabindex="1" id="login" name="login" type="text" placeholder="Username"
+          .uk-form-row
+            input.uk-width-1-1.uk-form-large tabindex="2" id="password" name="password" class="" type="password" placeholder="Password"
+          {{if .IsLogin}}
+            .uk-form-row
+              label.uk-float-left
+                input type="checkbox"
+                |  Remember Me
+              a.uk-float-right.uk-link.uk-link-muted href="#" Forgot Password
+          {{end}}
+          .uk-form-row
+            input.uk-width-1-1.uk-button.uk-button-primary.uk-button-large type="submit" value="{{.Title}}"
+          {{if .IsLogin}}
+            .uk-form-row
+              a.uk-text-center.uk-link.uk-link-muted href="/signup" Sign-up
+              / a.uk-width-1-1.uk-button.uk-button-danger href="/signup" To Sign-up
+          {{else}}
+            .uk-form-row
+              a.uk-text-center.uk-link.uk-link-muted href="/login" Login
+          {{end}}
+
+    script src="/js/jquery-2.1.1.min.js"
+    script src="/js/uikit.min.js"
+    script src="/js/addons/notify.min.js"
+    = javascript
+      document.querySelector('html').style.height = '100%';
+      document.querySelector('body').style.height = '100%';
+
+      /*
+      var form = document.getElementById('form');
+      var login = document.getElementById('login');
+      var password = document.getElementById('password');
+
+      form.onsubmit = function(event) {
+          event.preventDefault();
+          var r = new XMLHttpRequest();
+          r.open("POST", "/login", true);
+          r.onreadystatechange = function () {
+              if (r.readyState != 4 || r.status != 200) return;
+              var json = JSON.parse(r.responseText);
+              form.parentNode.removeChild(form);
+              console.log("Success:", json);
+              //run(json.Id, json.Host);
+          };
+          var params = "login="+encodeURIComponent(login.value)+"&password="+encodeURIComponent(password.value);
+          r.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          console.log(params);
+          r.send(params);
+      }
+      */

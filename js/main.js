@@ -5,6 +5,8 @@ console.log('fuck');
 var Tileset = require('./tileset'),
 	Tilemap = require('./tilemap');
 
+var Suika = require('./suika');
+
 function run(player, host) {
 	var w = window.innerWidth,
 		h = window.innerHeight,
@@ -66,6 +68,13 @@ function run(player, host) {
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
 	stage.addChild(scene);
 
+	var suika = new Suika();
+	suika.position.x = 440;
+	suika.position.y = 300;
+	game.suika = suika;
+	suika.animation = 'walk';
+	stage.addChild(suika);
+
 	window.onresize = resize;
 	resize();
 
@@ -83,9 +92,38 @@ function run(player, host) {
 		requestAnimFrame(render);
 		game.render();
 		renderer.render(stage);
+		var a = game.avatars[game.player];
+		if(a) {
+			var d = Math.atan2(a.lastvel.x||0, a.lastvel.y||0);
+			var dd = d/Math.PI * 180 - 45;
+			suika.direction = dd;
+		}
 	}
 
 	setInterval(animate, 50);
+	game.net.on('open', function() {
+		game.net.RequestParametersMsg();
+		game.net.RequestInventoryMsg();
+	});
+
+	game.net.on('TargetDataMsg', function(target) {
+		console.log('TargetDataMsg');
+		UI.target = target;
+	});
+	game.net.on('InventoryMsg', function(inv) {
+		UI.inventory = inv.Inventory;
+		UI.equip = inv.Equip
+	});
+	game.net.on('ParametersMsg', function(p) {
+		UI.hp = p.Parameters.HP;
+		UI.mhp = p.Parameters.MHP;
+		UI.mp = p.Parameters.MP;
+		UI.mmp = p.Parameters.MMP;
+		UI.tp = p.Parameters.TP;
+		UI.mtp = p.Parameters.MTP;
+		UI.spells = p.Skills;
+	});
+
 
 	function animate() {
 		game.animate(0.05);
@@ -103,35 +141,47 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
+        equip: {},
+		inventory: [
+			{Name: "43"},
+			{Name: "1k"},
+			{Name: "4njki32"},
+			{Name: "PPPPvndfsj"},
+		],
+        target: { Race: 0, HP: 0, MHP:0, Name: "vnfdjsk" },
 		spells: [
-			'all-for-one',
-			'all-for-one',
-			'all-for-one',
-			'all-for-one',
-			'all-for-one',
+			{Icon:'all-for-one'},
+			{Icon:'all-for-one'},
+			{Icon:'all-for-one'},
+			{Icon:'all-for-one'},
+			{Icon:'all-for-one'},
 
-			'screaming',
-			'screaming',
-			'screaming',
-			'screaming',
-			'screaming',
+			{Icon:'screaming'},
+			{Icon:'screaming'},
+			{Icon:'screaming'},
+			{Icon:'screaming'},
+			{Icon:'screaming'},
 
-			'spiral-thrust',
-			'spiral-thrust',
-			'spiral-thrust',
-			'spiral-thrust',
-			'spiral-thrust',
+			{Icon:'spiral-thrust'},
+			{Icon:'spiral-thrust'},
+			{Icon:'spiral-thrust'},
+			{Icon:'spiral-thrust'},
+			{Icon:'spiral-thrust'},
 
-			'rune-sword',
-			'rune-sword',
-			'rune-sword',
-			'rune-sword',
-			'rune-sword',
+			{Icon:'rune-sword'},
+			{Icon:'rune-sword'},
+			{Icon:'rune-sword'},
+			{Icon:'rune-sword'},
+			{Icon:'rune-sword'},
 		],
 	},
 	methods: {
 		cast: function(spell) {
-			console.info('cast', spell.$value);
+			console.info('cast', spell);
+			game.net.FireMsg({t: ""+spell});
+		},
+		drop: function(index) {
+			game.net.DropItemMsg({Id:index});
 		},
 	},
 }),

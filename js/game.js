@@ -73,6 +73,9 @@ function Game(renderer, stage, player, url, map) {
 					net.SetTargetMsg({
 						id: id
 					});
+					if(a.isItem) {
+						net.PickupItemMsg();
+					}
 				}
 			}
 		}
@@ -221,7 +224,7 @@ Game.prototype.state_msg = function(state) {
 				delete this.avatars[state.Id];
 				break;
 			case 1: // create
-				this.avatars[state.Id] = new Avatar(state.Position, state.Veloctity)
+				this.avatars[state.Id] = new Avatar(state.Position, state.Velocity)
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
 					state.Type = 1;
@@ -235,13 +238,34 @@ Game.prototype.state_msg = function(state) {
 					return this.state_msg(state);
 				}
 				var avatar = this.avatars[state.Id];
+				if(state.Id == this.player) {
+					this.suika.animation = 'idle';
+				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
+					if(state.Id == this.player) {
+						this.suika.animation = 'walk';
+					}
+					if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
+						avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
+					}
 				}
+
+				if(avatar.rm_timer) {
+					clearTimeout(avatar.rm_timer);
+				}
+				avatar.rm_timer = setTimeout(function() {
+					delete this.avatars[state.Id];
+				}.bind(this), 800);
+
+				avatar.state = state;
 				avatar.position.x = state.Position.X;
 				avatar.position.y = state.Position.Y;
-				avatar.velocity.x = state.Veloctity.X;
-				avatar.velocity.y = state.Veloctity.Y;
+
+				if(state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
+					avatar.velocity.x = state.Velocity.X;
+					avatar.velocity.y = state.Velocity.Y;
+				}
 				break;
 		}
 		return true;

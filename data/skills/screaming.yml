@@ -1,0 +1,8 @@
+name: Screaming
+icon: screaming
+cast-dealy: 2000 # Millisecond
+target: 4 # to monster
+mp: 3
+effects:
+    - hp -8
+    # TODO agressive in AI
