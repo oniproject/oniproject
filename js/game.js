@@ -256,7 +256,7 @@ Game.prototype.state_msg = function(state) {
 				}
 				avatar.rm_timer = setTimeout(function() {
 					delete this.avatars[state.Id];
-				}.bind(this), 200);
+				}.bind(this), 800);
 
 				avatar.state = state;
 				avatar.position.x = state.Position.X;
