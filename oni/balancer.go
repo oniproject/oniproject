@@ -10,10 +10,11 @@ import (
 )
 
 type Balancer struct {
-	c    *client.Client
-	Maps map[utils.Id]BalancerMap
-	Game *game.Game
-	adb  AvatarDB
+	c     *client.Client
+	Maps  map[utils.Id]BalancerMap
+	Game  *game.Game
+	games []BalancerGame
+	adb   AvatarDB
 }
 
 type BalancerMap struct {
@@ -21,11 +22,18 @@ type BalancerMap struct {
 	Avatars map[utils.Id]bool
 }
 
+type BalancerGame struct {
+	Addr         string
+	Rpc          string
+	Minid, Maxid int64
+}
+
 func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	b = &Balancer{
-		Maps: make(map[utils.Id]BalancerMap),
-		Game: game.NewGame(config, adb),
-		adb:  adb,
+		Maps:  make(map[utils.Id]BalancerMap),
+		Game:  game.NewGame(config, adb),
+		adb:   adb,
+		games: config.Games,
 	}
 	if config.Circuit != "" {
 		b.c = client.Dial(config.Circuit, nil)
@@ -33,7 +41,7 @@ func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	return
 }
 
-func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Avatar, err error) {
+func (b *Balancer) AttachAvatar(id utils.Id) (host string, mapId int64, a *game.Avatar, err error) {
 	a, err = b.adb.AvatarById(id)
 	if err != nil {
 		a = nil
@@ -64,6 +72,8 @@ func (b *Balancer) AttachAvatar(id utils.Id) (a *game.Avatar, err error) {
 	}
 
 	m.Avatars[a.Id()] = true
+	host = b.games[0].Addr
+	mapId = a.MapId
 
 	// attach
 
