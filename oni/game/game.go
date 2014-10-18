@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/go-martini/martini"
 	"github.com/gorilla/websocket"
@@ -20,19 +21,18 @@ type GameAddr interface {
 }
 
 type Game struct {
-	Addr, Rpc string
-	Map       *Map
-	adb       AvatarDB
+	Map *Map
+	adb AvatarDB
 }
 
-func NewGame(config GameAddr, adb AvatarDB) *Game {
-	game := &Game{adb: adb, Addr: config.GameAddr()}
+func NewGame(adb AvatarDB) *Game {
+	game := &Game{adb: adb}
 	game.Map = NewMap(game)
 	return game
 }
 
-func (gm *Game) Run() {
-	log.Println("run GAME:", gm.Addr, "rpc:", gm.Rpc)
+func (gm *Game) Run(addr string) {
+	log.Println("run GAME:", addr)
 
 	// TODO: init RPC
 
@@ -84,10 +84,12 @@ func (gm *Game) Run() {
 
 	http.Handle("/ws", m)
 
-	/*err := http.ListenAndServe(gm.Addr, nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}*/
+	if addr != "" {
+		err := http.ListenAndServe(addr, nil)
+		if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
+	}
 }
 
 func (gm *Game) LoadMap(id utils.Id) {
@@ -95,4 +97,16 @@ func (gm *Game) LoadMap(id utils.Id) {
 }
 func (gm *Game) UnloadMap(id utils.Id) {
 	log.Println("UnloadMap", id)
+}
+
+func (gm *Game) DetachAvatar(id utils.Id, mapId int64) error {
+	obj := gm.Map.GetObjById(id)
+	if obj == nil {
+		return errors.New("Avatar not found")
+	}
+	if avatar, ok := obj.(*Avatar); ok {
+		gm.Map.Unregister(avatar)
+		return nil
+	}
+	return errors.New("Avatar not found")
 }

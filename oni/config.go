@@ -18,7 +18,7 @@ type Config struct {
 	Game    string
 	Circuit string
 	Level   string
-	Games   []BalancerGame
+	Games   []*BalancerGame
 	db      *gorm.DB
 }
 
