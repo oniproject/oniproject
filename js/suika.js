@@ -26,7 +26,7 @@ function Suika() {
 		for (var j = 0, ll=aa.length; j<ll; j++) {
 			var y = aa[j];
 			var rect = {
-				x: x * 96, y:  y * 96,
+				x: x * 96 + 4, y:  y * 96 + 4,
 				width: 96, height: 96,
 			};
 			var t = new PIXI.Texture(image.texture.baseTexture, rect);
@@ -42,6 +42,83 @@ function Suika() {
 	a['idle ↓'] = [a['walk ↓'][1]];
 	a['idle ↙'] = [a['walk ↙'][1]];
 	a['idle ←'] = [a['walk ←'][1]];
+
+	var keys = [
+		'boom ↙',
+		'boom ↓',
+		'boom ↘',
+
+		'boom ↖',
+		'boom ↑',
+		'boom ↗',
+
+		'boom →',
+		'boom ←',
+	];
+
+    var rect = {
+        /*x: x* 96 -3,*/ y:  96*3 +4,
+        width: 96, height: 124,
+    };
+
+    var t, k, w;
+
+    w = 96;
+    k = 'boom ↙';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = x*w -3;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↓';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +3)*w -3;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↘';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +6)*w -3;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+
+    rect.y += 124;
+    rect.height = 104;
+    k = 'boom ↖';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = x*w;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↓';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +3)*w;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↗';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +6)*w;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+
+    rect.y += 104;
+
+    /*k = 'boom →';
+    rect.x = (x +6)*w -3;
+    t = new PIXI.Texture(image.texture.baseTexture, rect);
+    a[k].push(t);
+    k = 'boom ←';*/
+
+
 
 	this._animation = 'idle';
 	this._direction = '↓';
@@ -86,6 +163,7 @@ Suika.prototype.updateTransform = function() {
 		break
 	case 'walk':
 	case 'idle':
+	case 'boom':
 		anim = this._anim[this._animation +' '+ this._direction];
 	}
 

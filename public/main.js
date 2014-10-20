@@ -6,6 +6,8 @@ console.log('fuck');
 var Tileset = require('./tileset'),
 	Tilemap = require('./tilemap');
 
+var Tiled = require('./tiled');
+
 var Suika = require('./suika');
 
 function run(player, host) {
@@ -68,6 +70,13 @@ function run(player, host) {
 	var Game = require('./game');
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
 	stage.addChild(scene);
+
+	var ttt = new Tiled('/maps/', 'desert.json');
+	ttt.load();
+	ttt.position.x = 30;
+	ttt.position.y = 200;
+	game.ttt = ttt;
+	stage.addChild(ttt);
 
 	var suika = new Suika();
 	suika.position.x = 440;
@@ -199,7 +208,7 @@ r.onreadystatechange = function() {
 };
 r.send();
 
-},{"./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./test-map":"/home/lain/gocode/src/oniproject/js/test-map.json","./tilemap":"/home/lain/gocode/src/oniproject/js/tilemap.js","./tileset":"/home/lain/gocode/src/oniproject/js/tileset.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
+},{"./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./test-map":"/home/lain/gocode/src/oniproject/js/test-map.json","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","./tilemap":"/home/lain/gocode/src/oniproject/js/tilemap.js","./tileset":"/home/lain/gocode/src/oniproject/js/tileset.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
 'use strict';
 
 var Isomer = require('isomer'),
@@ -531,7 +540,7 @@ Game.prototype.state_msg = function(state) {
 				}
 				var avatar = this.avatars[state.Id];
 				if(state.Id == this.player) {
-					this.suika.animation = 'idle';
+					//this.suika.animation = 'idle';
 				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
@@ -985,7 +994,7 @@ function Suika() {
 		for (var j = 0, ll=aa.length; j<ll; j++) {
 			var y = aa[j];
 			var rect = {
-				x: x * 96, y:  y * 96,
+				x: x * 96 + 4, y:  y * 96 + 4,
 				width: 96, height: 96,
 			};
 			var t = new PIXI.Texture(image.texture.baseTexture, rect);
@@ -1001,6 +1010,83 @@ function Suika() {
 	a['idle ↓'] = [a['walk ↓'][1]];
 	a['idle ↙'] = [a['walk ↙'][1]];
 	a['idle ←'] = [a['walk ←'][1]];
+
+	var keys = [
+		'boom ↙',
+		'boom ↓',
+		'boom ↘',
+
+		'boom ↖',
+		'boom ↑',
+		'boom ↗',
+
+		'boom →',
+		'boom ←',
+	];
+
+    var rect = {
+        /*x: x* 96 -3,*/ y:  96*3 +4,
+        width: 96, height: 124,
+    };
+
+    var t, k, w;
+
+    w = 96;
+    k = 'boom ↙';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = x*w -3;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↓';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +3)*w -3;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↘';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +6)*w -3;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+
+    rect.y += 124;
+    rect.height = 104;
+    k = 'boom ↖';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = x*w;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↓';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +3)*w;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+    k = 'boom ↗';
+	a[k]=[];
+    for(var x = 0; x<3; x++) {
+        rect.x = (x +6)*w;
+        t = new PIXI.Texture(image.texture.baseTexture, rect);
+        a[k].push(t);
+    }
+
+    rect.y += 104;
+
+    /*k = 'boom →';
+    rect.x = (x +6)*w -3;
+    t = new PIXI.Texture(image.texture.baseTexture, rect);
+    a[k].push(t);
+    k = 'boom ←';*/
+
+
 
 	this._animation = 'idle';
 	this._direction = '↓';
@@ -1045,6 +1131,7 @@ Suika.prototype.updateTransform = function() {
 		break
 	case 'walk':
 	case 'idle':
+	case 'boom':
 		anim = this._anim[this._animation +' '+ this._direction];
 	}
 
@@ -1064,7 +1151,353 @@ Suika.prototype.updateTransform = function() {
 module.exports = Suika;
 
 },{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
+module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
+'use strict';
+
+function ImageLayer(data, path) {
+	var image = this.image = new PIXI.ImageLoader(path + data.image);
+	PIXI.Sprite.call(this, image.texture);
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+}
+
+ImageLayer.prototype = Object.create(PIXI.Sprite.prototype);
+ImageLayer.constructor = ImageLayer;
+
+ImageLayer.prototype.load = function(fn) {
+	if(fn) { this.image.on('loaded', fn); }
+	this.image.load();
+}
+
+module.exports = ImageLayer;
+
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/index.js":[function(require,module,exports){
+'use strict';
+
+var Tileset = require('./tileset');
+var TileLayer = require('./tilelayer');
+var ObjectGroup = require('./objectgroup');
+var ImageLayer = require('./imagelayer');
+
+function Tiled(path, uri) {
+	PIXI.DisplayObjectContainer.call(this);
+
+	this.path = path
+
+	var loader = this.loader = new PIXI.JsonLoader(path + uri);
+
+	this.tilesets = [];
+	this.layers = [];
+}
+
+Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+Tiled.constructor = Tiled;
+
+Tiled.prototype.load = function(fn) {
+	var that = this;
+	this.loader.on('loaded', function() {
+		var json = that.data = that.loader.json;
+
+		var tilesets_count = json.tilesets.length;
+		for (var i=0, l=json.tilesets.length; i<l; i++) {
+			var t = new Tileset(json.tilesets[i], that.path, null, null)
+			that.tilesets.push(t);
+
+			t.load(function() {
+				tilesets_count--;
+				console.log(tilesets_count);
+				if(!tilesets_count) {
+					console.info('tilesets loaded');
+					if(fn) { fn(); }
+				}
+			});
+		}
+
+		for (var i=0, l=json.layers.length; i<l; i++) {
+			var layer = json.layers[i];
+			var obj = undefined;
+			switch(layer.type) {
+			case 'tilelayer':
+				obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
+				break;
+			case 'objectgroup':
+				obj = new ObjectGroup(layer, that.tilesets);
+				break;
+			case 'imagelayer':
+				obj = new ImageLayer(layer, that.path);
+				obj.load();
+				break;
+			}
+			if(obj !== undefined) {
+				console.log('addChild', layer);
+				that.layers.push(obj);
+				that.addChild(obj);
+			}
+		}
+
+	});
+	this.loader.load();
+}
+
+module.exports = Tiled;
+
+},{"./imagelayer":"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js","./objectgroup":"/home/lain/gocode/src/oniproject/js/tiled/objectgroup.js","./tilelayer":"/home/lain/gocode/src/oniproject/js/tiled/tilelayer.js","./tileset":"/home/lain/gocode/src/oniproject/js/tiled/tileset.js"}],"/home/lain/gocode/src/oniproject/js/tiled/objectgroup.js":[function(require,module,exports){
+'use strict';
+
+function ObjectGroup(data, tilesets) {
+	PIXI.DisplayObjectContainer.call(this);
+	var graphics = this.graphics = new PIXI.Graphics();
+	this.addChild(graphics);
+
+	this.data = data;
+	this.tilesets = tilesets;
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+
+	if(data.color) {
+		var c = parseInt(data.color.slice(1), 16);
+		graphics.lineStyle(2, c, 1);
+	}
+
+	for(var i=0, l=data.objects.length; i<l; i++) {
+		var obj = data.objects[i];
+		if(!obj.visible) {
+			continue;
+		}
+
+		var x = obj.x, y = obj.y, w = obj.width, h = obj.height, r = obj.rotation;
+		var w2 = w/2, h2 = h/2;
+		if (obj.gid) {
+			for (var j=0, ll = tilesets.length; j<ll; j++) {
+				var t = tilesets[j];
+				var sprite = t.CreateSprite(obj.gid);
+
+				if(sprite) {
+					sprite.position.x = x;
+					sprite.position.y = y - sprite.height; // XXX
+
+					if(t.data.tileoffset) {
+						sprite.position.x += t.data.tileoffset.x;
+						sprite.position.y += t.data.tileoffset.y;
+					}
+
+					this.addChild(sprite);
+					break;
+				}
+			}
+		} else if (obj.polyline) {
+			// TODO
+		} else if (obj.ellipse) {
+			// TODO
+			graphics.drawEllipse(x + w2, y + h2, w2, h2);
+		} else if (obj.polygon) {
+			// TODO
+		} else {
+			// TODO rect
+			graphics.drawRect(x, y, w, h);
+		}
+	}
+}
+
+ObjectGroup.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+ObjectGroup.constructor = ObjectGroup;
+
+module.exports = ObjectGroup;
+
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/tilelayer.js":[function(require,module,exports){
+'use strict';
+
+function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
+	PIXI.SpriteBatch.call(this);
+
+	this.data = data;
+	this.tilesets = tilesets;
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+
+	var x_start = 0, x_end = data.width,  x_add = 1;
+	var y_start = 0, y_end = data.height, y_add = 1;
+
+	/*if(renderorder) {
+		if(renderorder.indexOf('up') != -1) {
+			y_start = data.height;
+			y_end = 0;
+			y_add = -1;
+		}
+		if(renderorder.indexOf('left') != -1) {
+			x_start = data.width;
+			x_end = 0;
+			x_add = -1;
+		}
+	}*/
+
+	this._animated = [];
+
+	for (var y = y_start; y < y_end; y += y_add) {
+		for (var x = x_start; x < x_end; x += x_add) {
+			var iii = y*data.width + x;
+			var id = data.data[iii];
+			found:
+			for (var i=0, l = tilesets.length; i<l; i++) {
+				var t = tilesets[i];
+				var sprite = t.CreateSprite(id);
+
+				if(sprite) {
+					sprite.position.x = x*tilewidth + data.x;
+					sprite.position.y = y*tileheight + data.y;
+
+					if(t.data.tileoffset) {
+						sprite.position.x += t.data.tileoffset.x;
+						sprite.position.y += t.data.tileoffset.y;
+					}
+
+					if(sprite.textures) {
+						this._animated.push(sprite);
+					}
+
+					this.addChild(sprite);
+					break found;
+				}
+			}
+		}
+	}
+}
+
+TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
+TileLayer.constructor = TileLayer;
+
+TileLayer.prototype.updateTransform = function() {
+	var _animated = this._animated;
+	for(var i=0, l=_animated.length; i<l; i++) {
+		_animated[i].updateTransform();
+	}
+	PIXI.SpriteBatch.prototype.updateTransform.call(this);
+}
+
+
+module.exports = TileLayer;
+
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/tileset.js":[function(require,module,exports){
+'use strict';
+
+function Tileset(data, path, tilewidth, tileheight) {
+	this.data = data;
+
+	if(!tilewidth)  { tilewidth  = data.tilewidth; }
+	if(!tileheight) { tileheight = data.tileheight; }
+
+	var image = this.image = new PIXI.ImageLoader(path + data.image);
+
+	var tiles = this.tiles = [];
+
+	var ww=0, hh=0;
+	for (var y = data.margin; y < data.imageheight; y += tileheight + data.spacing) {
+		hh++;
+		for (var x = data.margin; x < data.imagewidth; x += tilewidth + data.spacing) {
+			var rect = {
+				x: x, y: y,
+				width: data.tilewidth,
+				height: data.tileheight,
+			};
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			tiles.push(t);
+		}
+	}
+
+
+	/*for (var y = 0; y < h; y++) {
+		for (var x = 0; x < w; x++) {
+			var rect = {
+				x: x * size.width,
+				y: y * size.height,
+				width: size.width,
+				height: size.height,
+			};
+			tiles.push(new PIXI.Texture(image.texture.baseTexture, rect));
+		}
+	}*/
+
+	/*this.name = "nvfjdklsvnfdjkls";
+	this.firstgid = 1;
+	this.image = "nvjfkdls";
+	this.imagewidth = 423423;
+	this.imageheight = 423423;
+
+	this.margin = 1;
+	this.spacing = 1;
+
+	this.tilewidth = 32;
+	this.tileheight = 32;
+
+	this.tiles = [];
+	*/
+}
+
+Tileset.prototype.load = function(fn) {
+	if(fn) { this.image.on('loaded', fn); }
+	this.image.load();
+}
+
+
+Tileset.prototype.CreateSprite = function(id) {
+	var data = this.data;
+	id -= data.firstgid;
+	var texture = this.tiles[id];
+
+
+	if(!texture) { return; }
+
+	var sprite = new PIXI.Sprite(texture);
+	sprite.data = data.tiles[id];
+
+
+	if(sprite.data && sprite.data.animation) {
+		sprite.last = window.performance.now();
+		sprite.currentFrame = 0;
+		sprite.updateTransform = updateTransform;
+
+		sprite.textures = [];
+		for(var i=0, l=sprite.data.animation.length; i<l; i++) {
+			var t = sprite.data.animation[i];
+			sprite.textures.push(this.tiles[t.tileid]);
+		}
+	}
+
+	return sprite;
+}
+
+function updateTransform() {
+	PIXI.Sprite.prototype.updateTransform.call(this);
+
+	if(!this.textures) return;
+
+	var time = window.performance.now();
+	var frame = this.data.animation[this.currentFrame];
+
+	if (time - this.last > frame.duration) {
+		this.currentFrame++;
+		if(this.currentFrame >= this.data.animation.length) {
+			this.currentFrame = 0;
+		}
+
+		this.setTexture(this.textures[this.currentFrame]);
+
+		this.last += frame.duration;
+	}
+}
+
+module.exports = Tileset;
+
 },{}],"/home/lain/gocode/src/oniproject/js/tilemap.js":[function(require,module,exports){
 'use strict';
 

@@ -239,7 +239,7 @@ Game.prototype.state_msg = function(state) {
 				}
 				var avatar = this.avatars[state.Id];
 				if(state.Id == this.player) {
-					this.suika.animation = 'idle';
+					//this.suika.animation = 'idle';
 				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
