@@ -37,17 +37,17 @@ module.exports = {
 		},
 		Move: function(e) {
 			this.$parent.run(new commands.Move(
-				this.$parent.active, [+this.pos.x, +this.pos.y, +this.pos.z]
+			this.$parent.active, [+this.pos.x, +this.pos.y, +this.pos.z]
 			));
 		},
 		Resize: function(e) {
 			this.$parent.run(new commands.Resize(
-				this.$parent.active, [+this.size.x, +this.size.y, +this.size.z], +this.size.v
+			this.$parent.active, [+this.size.x, +this.size.y, +this.size.z], +this.size.v
 			));
 		},
 		Rotate: function(e) {
 			this.$parent.run(new commands.Rotate(
-				this.$parent.active, +this.rotate.z
+			this.$parent.active, +this.rotate.z
 			));
 		},
 	},

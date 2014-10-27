@@ -1,6 +1,6 @@
 'use strict';
 
-require('less').render(require('./app.css'), function (e, css) {
+require('less').render(require('./app.css'), function(e, css) {
 	require('insert-css')(css)
 });
 
@@ -8,10 +8,10 @@ function makeGrid() {
 	var backGrid = new PIXI.Graphics();
 	var n = 50;
 	var nn = 32;
-	for(var x = -n; x<n; x++) {
-		for(var y = -n; y<n; y++) {
-			backGrid.beginFill(0x000000, ((x+y)%2)?0.4:0.8);
-			backGrid.drawRect(x*nn, y*nn, nn,nn);
+	for (var x = -n; x < n; x++) {
+		for (var y = -n; y < n; y++) {
+			backGrid.beginFill(0x000000, ((x + y) % 2) ? 0.4 : 0.8);
+			backGrid.drawRect(x * nn, y * nn, nn, nn);
 			backGrid.endFill();
 		}
 	}
@@ -24,7 +24,7 @@ function makeBBDrawer(Spine) {
 		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
 		bbDrawer.clear();
 
-		for(var i=0, l= Spine.skeleton.drawOrder.length; i<l; i++) {
+		for (var i = 0, l = Spine.skeleton.drawOrder.length; i < l; i++) {
 			var att = Spine.skeleton.drawOrder[i].currentSprite;
 			var bb = att.getBounds();
 			bbDrawer.lineStyle(1, 0x999999, 1);
@@ -51,27 +51,27 @@ function makeBoneDrawer(Spine) {
 		var ox = Spine.position.x;
 		var oy = Spine.position.y;
 
-		for(var i=0, l= Spine.skeleton.bones.length;i<l;i++) {
+		for (var i = 0, l = Spine.skeleton.bones.length; i < l; i++) {
 			var bone = Spine.skeleton.bones[i];
 
 			boneDrawer.lineStyle(0, 0x999999, 1);
 			boneDrawer.beginFill(0x9999ff, 0.8);
-			boneDrawer.drawCircle(bone.worldX +ox, bone.worldY +oy, nn/4);
+			boneDrawer.drawCircle(bone.worldX + ox, bone.worldY + oy, nn / 4);
 			boneDrawer.endFill();
 
-			if(bone.data.length) {
+			if (bone.data.length) {
 				boneDrawer.lineStyle(1, 0x9999ff, 1);
-				var rot = bone.worldRotation * Math.PI/180;
+				var rot = bone.worldRotation * Math.PI / 180;
 				var x = Math.cos(rot) * bone.data.length;
 				var y = Math.sin(rot) * bone.data.length;
-				boneDrawer.moveTo(bone.worldX +ox +x, bone.worldY +oy -y);
-				boneDrawer.lineTo(bone.worldX +ox, bone.worldY +oy);
+				boneDrawer.moveTo(bone.worldX + ox + x, bone.worldY + oy - y);
+				boneDrawer.lineTo(bone.worldX + ox, bone.worldY + oy);
 			} else {
 				boneDrawer.lineStyle(1, 0xff9999, 1);
-				boneDrawer.moveTo(bone.worldX +ox -nn, bone.worldY +oy);
-				boneDrawer.lineTo(bone.worldX +ox +nn, bone.worldY +oy);
-				boneDrawer.moveTo(bone.worldX +ox, bone.worldY -nn +oy);
-				boneDrawer.lineTo(bone.worldX +ox, bone.worldY +nn +oy);
+				boneDrawer.moveTo(bone.worldX + ox - nn, bone.worldY + oy);
+				boneDrawer.lineTo(bone.worldX + ox + nn, bone.worldY + oy);
+				boneDrawer.moveTo(bone.worldX + ox, bone.worldY - nn + oy);
+				boneDrawer.lineTo(bone.worldX + ox, bone.worldY + nn + oy);
 			}
 		}
 	}
@@ -106,8 +106,9 @@ module.exports = {
 	methods: {
 		load: function(data) {
 			var Spine = this.$options.Spine;
-			if(Spine.children.length)
+			if (Spine.children.length) {
 				Spine.removeChildren();
+			}
 			Spine.spineData = data;
 			var spine = PIXI.Spine.spine;
 
@@ -152,7 +153,7 @@ module.exports = {
 
 			this.animationSpeed = 0;
 			var Spine = this.$options.Spine;
-			Spine.state.currentTime -= Spine.state.currentTime|0;
+			Spine.state.currentTime -= Spine.state.currentTime | 0;
 			this.$.Tools.transformEnable = true;
 		},
 		play: function(speed) {
@@ -162,32 +163,38 @@ module.exports = {
 			console.info('play');
 			this.animationSpeed = speed;
 			var Spine = this.$options.Spine;
-			Spine.state.currentTime -= Spine.state.currentTime|0;
-			if(speed < 0) {
+			Spine.state.currentTime -= Spine.state.currentTime | 0;
+			if (speed < 0) {
 				Spine.state.currentTime += 10000;
 			}
 
 			this.$.Tools.transformEnable = false;
-			if(!this.currentAnimation) this.currentAnimation = 'flying';
+			if (!this.currentAnimation) {
+				this.currentAnimation = 'flying';
+			}
 		},
 		updateTransform: function(type, name) {
 			//if(!this.played && !this.reversed) {
-			if(this.animationSpeed === 0) {
+			if (this.animationSpeed === 0) {
 				this.$.Tools.transformEnable = type === 'bone';
 			}
-			if(!this.$.Tools.transformEnable) {
+			if (!this.$.Tools.transformEnable) {
 				this.$.Tools.toolT = 'none';
 			}
 			console.log('updateTransform[%s] %s', type, name);
 		},
 	},
 	computed: {
-		Spine: function() { return this.$options.Spine; },
+		Spine: function() {
+			return this.$options.Spine;
+		},
 		isAnimations: {
-			$get: function() { return this.$.Animations.isEnabled; },
+			$get: function() {
+				return this.$.Animations.isEnabled;
+			},
 			$set: function(val) {
 				this.$.Animations.isEnabled = val;
-				if(!val) {
+				if (!val) {
 					this.stop();
 					this.$options.Spine.state.clearAnimation();
 					this.$options.Spine.skeleton.setToSetupPose();
@@ -197,23 +204,31 @@ module.exports = {
 		},
 		currentAnimation: {
 			$get: function() {
-				if(!this.$options.Spine.state.current) return '';
+				if (!this.$options.Spine.state.current) return '';
 				return this.$options.Spine.state.current.name
 			},
-			$set: function(val) { this.$options.Spine.state.setAnimationByName(val, true); }
+			$set: function(val) {
+				this.$options.Spine.state.setAnimationByName(val, true);
+			}
 		},
 		animationSpeed: {
-			$get: function() { return this.$options.Spine.state.animationSpeed; },
-			$set: function(val) { this.$options.Spine.state.animationSpeed = val; Vue.nextTick((function(){this.played;}).bind(this)); }
+			$get: function() {
+				return this.$options.Spine.state.animationSpeed;
+			},
+			$set: function(val) {
+				this.$options.Spine.state.animationSpeed = val; Vue.nextTick((function() {
+					this.played;
+				}).bind(this));
+			}
 		},
 		// current time
 		Current: {
 			$get: function() {
-				return (this.Time*31) |0;
+				return (this.Time * 31) | 0;
 			},
 			$set: function(val) {
-				if (val<0) {
-					val=0;
+				if (val < 0) {
+					val = 0;
 				}
 				this.$options.Spine.state.currentTime = val / 31;
 			},
@@ -227,7 +242,15 @@ module.exports = {
 
 		var spineJsonParser = new PIXI.Spine.spine.SkeletonJson();
 		var skeletonData = spineJsonParser.readSkeletonData({
-			bones:[], slots:[], skins: {default: {}},  animations: {flying: {}, }});
+			bones: [],
+			slots: [],
+			skins: {
+				default: {}
+			},
+			animations: {
+				flying: {},
+			}
+		});
 		PIXI.AnimCache['defaultSpine'] = skeletonData;
 		var Spine = window.Spine = this.$options.Spine = new PIXI.Spine('defaultSpine');
 		//Spine.state.setAnimationByName('flying', true);
@@ -251,8 +274,8 @@ module.exports = {
 		var xxxx = Spine;
 		var scale = 1;
 		//xxxx.scale.x = xxxx.scale.y = scale;
-		xxxx.position.x = window.innerWidth/4;
-		xxxx.position.y = window.innerHeight/4 + (450 * scale);
+		xxxx.position.x = window.innerWidth / 4;
+		xxxx.position.y = window.innerHeight / 4 + (450 * scale);
 
 		var canvas = this.$el.getElementsByTagName('canvas')[0];
 		console.log('canvas', canvas);
@@ -271,7 +294,7 @@ module.exports = {
 			var animHeight = getH(document.getElementById('animations'));
 			var otherHeight = window.innerHeight - animHeight;
 			that.otherHeight = otherHeight;
-			Vue.nextTick(function(){
+			Vue.nextTick(function() {
 				renderer.resize(getW(canvas), getH(canvas));
 			});
 		}
@@ -283,8 +306,8 @@ module.exports = {
 		requestAnimFrame(animate);
 		function animate() {
 			requestAnimFrame(animate);
-			if(Spine) {
-				var time = Spine.state.currentTime - (Spine.state.currentTime|0);
+			if (Spine) {
+				var time = Spine.state.currentTime - (Spine.state.currentTime | 0);
 				that.Time = time;
 			}
 			renderer.render(stage);
@@ -292,7 +315,7 @@ module.exports = {
 
 		var assetsToLoader = [
 			"data/dragonBones.json",
-			"data/dragonBonesData.json"];
+		"data/dragonBonesData.json"];
 		var loader = new PIXI.AssetLoader(assetsToLoader);
 		loader.onComplete = onAssetsLoaded
 		loader.load();

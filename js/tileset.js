@@ -20,7 +20,7 @@ function Tileset(url, w, h, size, noAutoLoad) {
 	}
 
 	this.tiles = tiles;
-	if(!noAutoLoad) {
+	if (!noAutoLoad) {
 		image.load();
 	}
 	this.image = image;

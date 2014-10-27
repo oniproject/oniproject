@@ -18,38 +18,38 @@ function run(player, host) {
 	document.body.appendChild(renderer.view);
 
 	var WH = {
-		width: 32,
-		height: 32
-	},
-	World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
-	World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
-	World_B = new Tileset('/game/World_B.png', 16, 16, WH),
-	Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
-	Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
-	Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
-	Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
-	Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
-	Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
-	Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
-	nn = 31,
-	data = [
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, 0, nn, nn, nn, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, nn, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, nn, nn, nn, 0, nn, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, 0, nn, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-	];
+			width: 32,
+			height: 32
+		},
+		World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
+		World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
+		World_B = new Tileset('/game/World_B.png', 16, 16, WH),
+		Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
+		Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
+		Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
+		Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
+		Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
+		Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
+		Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
+		nn = 31,
+		data = [
+			[0, 0, 0, 0, 0, 0, 0],
+			[0, nn, 0, nn, nn, nn, 0],
+			[0, nn, 0, nn, 0, 0, 0],
+			[0, nn, 0, nn, 0, 0, 0],
+			[0, nn, nn, nn, nn, nn, 0],
+			[0, 0, 0, nn, 0, nn, 0],
+			[0, 0, 0, nn, 0, nn, 0],
+			[0, nn, nn, nn, 0, nn, 0],
+			[0, 0, 0, 0, 0, 0, 0],
+			[0, nn, nn, nn, 0, 0, 0],
+			[0, nn, 0, nn, 0, 0, 0],
+			[0, nn, nn, nn, 0, 0, 0],
+			[0, 0, nn, nn, nn, 0, 0],
+			[0, 0, 0, nn, nn, 0, 0],
+			[0, 0, 0, nn, nn, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0],
+		];
 
 	window.Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
 
@@ -103,9 +103,9 @@ function run(player, host) {
 		game.render();
 		renderer.render(stage);
 		var a = game.avatars[game.player];
-		if(a) {
-			var d = Math.atan2(a.lastvel.x||0, a.lastvel.y||0);
-			var dd = d/Math.PI * 180 - 45;
+		if (a) {
+			var d = Math.atan2(a.lastvel.x || 0, a.lastvel.y || 0);
+			var dd = d / Math.PI * 180 - 45;
 			suika.direction = dd;
 		}
 	}
@@ -141,65 +141,124 @@ function run(player, host) {
 }
 
 var UI = new Vue({
-	el: '#ui',
-	data: {
-		level: 88,
-		exp: 77,
-		hp: 190,
-		mhp: 300,
-		mp: 50,
-		mmp: 300,
-		tp: 50,
-		mtp: 100,
-        equip: {},
-		inventory: [
-			{Name: "43"},
-			{Name: "1k"},
-			{Name: "4njki32"},
-			{Name: "PPPPvndfsj"},
-		],
-        target: { Race: 0, HP: 0, MHP:0, Name: "vnfdjsk" },
-		spells: [
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
+		el: '#ui',
+		data: {
+			level: 88,
+			exp: 77,
+			hp: 190,
+			mhp: 300,
+			mp: 50,
+			mmp: 300,
+			tp: 50,
+			mtp: 100,
+			equip: {},
+			inventory: [
+				{
+					Name: "43"
+				},
+				{
+					Name: "1k"
+				},
+				{
+					Name: "4njki32"
+				},
+				{
+					Name: "PPPPvndfsj"
+				},
+			],
+			target: {
+				Race: 0,
+				HP: 0,
+				MHP: 0,
+				Name: "vnfdjsk"
+			},
+			spells: [
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
 
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
 
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
 
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-		],
-	},
-	methods: {
-		cast: function(spell) {
-			console.info('cast', spell);
-			game.net.FireMsg({t: ""+spell});
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+			],
 		},
-		drop: function(index) {
-			game.net.DropItemMsg({Id:index});
+		methods: {
+			cast: function(spell) {
+				console.info('cast', spell);
+				game.net.FireMsg({
+					t: "" + spell
+				});
+			},
+			drop: function(index) {
+				game.net.DropItemMsg({
+					Id: index
+				});
+			},
 		},
-	},
-}),
+	}),
 
 	r = new XMLHttpRequest();
 r.open('POST', '/game', true);
 r.onreadystatechange = function() {
-	if (r.readyState != 4 || r.status != 200) { return; }
+	if (r.readyState != 4 || r.status != 200) {
+		return;
+	}
 	var json = JSON.parse(r.responseText);
 	if (json.Id !== undefined) {
 		console.log('Success:', json);
@@ -237,32 +296,32 @@ function Avatar() {
 Avatar.prototype.draw = function(iso) {
 	var pos = this.position;
 
-	if(this.hasOwnProperty('state')) {
+	if (this.hasOwnProperty('state')) {
 		// is avatar or monster
-		if(this.state.Id > -10000) {
+		if (this.state.Id > -10000) {
 			iso.add(Octahedron(new Point(pos.x - 0.5, pos.y - 0.5, pos.z))
 				.rotateZ(new Point(pos.x, pos.y, pos.z + 0.5), this.angle)
 				.scale(new Point(pos.x, pos.y, pos.z), 0.7, 0.7, 0.7), this.color);
 		}
 		// is avatar or item
-		if(this.state.Id < -10000 || this.state.Id > 0) {
-			iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)).scale(new Point(pos.x, pos.y), 0.2, 0.2, 0.2), this.color);
+		if (this.state.Id < -10000 || this.state.Id > 0) {
+			iso.add(Knot(new Point(pos.x - 0.5, pos.y - 0.5)).scale(new Point(pos.x, pos.y), 0.2, 0.2, 0.2), this.color);
 		}
 	}
 }
 
 Avatar.prototype.isAvatar = function() {
-	if(this.hasOwnProperty('state')) {
+	if (this.hasOwnProperty('state')) {
 		return this.state.Id > 0;
 	}
 }
 Avatar.prototype.isMonster = function() {
-	if(this.hasOwnProperty('state')) {
+	if (this.hasOwnProperty('state')) {
 		return this.state.Id < 0 && this.state.Id > -10000;
 	}
 }
 Avatar.prototype.isItem = function() {
-	if(this.hasOwnProperty('state')) {
+	if (this.hasOwnProperty('state')) {
 		return this.state.Id < -10000;
 	}
 }
@@ -374,7 +433,7 @@ function Game(renderer, stage, player, url, map) {
 					net.SetTargetMsg({
 						id: id
 					});
-					if(a.isItem) {
+					if (a.isItem) {
 						net.PickupItemMsg();
 					}
 				}
@@ -539,20 +598,23 @@ Game.prototype.state_msg = function(state) {
 					return this.state_msg(state);
 				}
 				var avatar = this.avatars[state.Id];
-				if(state.Id == this.player) {
+				if (state.Id == this.player) {
 					//this.suika.animation = 'idle';
 				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
-					if(state.Id == this.player) {
+					if (state.Id == this.player) {
 						this.suika.animation = 'walk';
 					}
-					if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
-						avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
+					if (!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
+						avatar.lastvel = {
+							x: avatar.velocity.x,
+							y: avatar.velocity.y
+						};
 					}
 				}
 
-				if(avatar.rm_timer) {
+				if (avatar.rm_timer) {
 					clearTimeout(avatar.rm_timer);
 				}
 				avatar.rm_timer = setTimeout(function() {
@@ -563,7 +625,7 @@ Game.prototype.state_msg = function(state) {
 				avatar.position.x = state.Position.X;
 				avatar.position.y = state.Position.Y;
 
-				if(state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
+				if (state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
 					avatar.velocity.x = state.Velocity.X;
 					avatar.velocity.y = state.Velocity.Y;
 				}
@@ -736,18 +798,18 @@ module.exports = Map;
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
-var M_SetVelocityMsg   =1,
-    M_SetTargetMsg     =2,
-    M_CastMsg          =3,
-    M_DestroyMsg       =4,
-    M_DropItem         =5,
-    M_PickupItem       =6,
-    M_RequestInventory =7,
-    M_Inventory        =8,
-    M_TargetData       =9,
-    M_RequestParameters=10,
-    M_Parameters       =11,
-    ___ =0;
+var M_SetVelocityMsg = 1,
+	M_SetTargetMsg = 2,
+	M_CastMsg = 3,
+	M_DestroyMsg = 4,
+	M_DropItem = 5,
+	M_PickupItem = 6,
+	M_RequestInventory = 7,
+	M_Inventory = 8,
+	M_TargetData = 9,
+	M_RequestParameters = 10,
+	M_Parameters = 11,
+	___ = 0;
 
 function Net(url) {
 	var websocket = new WebSocket(url);
@@ -776,7 +838,7 @@ function Net(url) {
 				if (message.hasOwnProperty('T')) {
 					that._ParseMessages(message.T | 0, message.V, event);
 					break;
-				}
+			}
 			default:
 				that.emit('message', message, event);
 		}
@@ -969,7 +1031,8 @@ module.exports = Stairs;
 'use strict';
 
 function Suika() {
-	var w = 880, h = 720;
+	var w = 880,
+		h = 720;
 	var image = new PIXI.ImageLoader('/suika.png');
 
 
@@ -987,15 +1050,17 @@ function Suika() {
 		'death'
 	];
 
-	for(var x = 0, l=keys.length; x<l; x++) {
+	for (var x = 0, l = keys.length; x < l; x++) {
 		var k = keys[x];
-		this._anim[k]=[]
-		var aa=[0, 1, 2, 1];
-		for (var j = 0, ll=aa.length; j<ll; j++) {
+		this._anim[k] = []
+		var aa = [0, 1, 2, 1];
+		for (var j = 0, ll = aa.length; j < ll; j++) {
 			var y = aa[j];
 			var rect = {
-				x: x * 96 + 4, y:  y * 96 + 4,
-				width: 96, height: 96,
+				x: x * 96 + 4,
+				y: y * 96 + 4,
+				width: 96,
+				height: 96,
 			};
 			var t = new PIXI.Texture(image.texture.baseTexture, rect);
 			a[k].push(t);
@@ -1024,67 +1089,69 @@ function Suika() {
 		'boom ←',
 	];
 
-    var rect = {
-        /*x: x* 96 -3,*/ y:  96*3 +4,
-        width: 96, height: 124,
-    };
+	var rect = {
+		/*x: x* 96 -3,*/
+		y: 96 * 3 + 4,
+		width: 96,
+		height: 124,
+	};
 
-    var t, k, w;
+	var t, k, w;
 
-    w = 96;
-    k = 'boom ↙';
-	a[k]=[];
-    for(var x = 0; x<3; x++) {
-        rect.x = x*w -3;
-        t = new PIXI.Texture(image.texture.baseTexture, rect);
-        a[k].push(t);
-    }
-    k = 'boom ↓';
-	a[k]=[];
-    for(var x = 0; x<3; x++) {
-        rect.x = (x +3)*w -3;
-        t = new PIXI.Texture(image.texture.baseTexture, rect);
-        a[k].push(t);
-    }
-    k = 'boom ↘';
-	a[k]=[];
-    for(var x = 0; x<3; x++) {
-        rect.x = (x +6)*w -3;
-        t = new PIXI.Texture(image.texture.baseTexture, rect);
-        a[k].push(t);
-    }
+	w = 96;
+	k = 'boom ↙';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = x * w - 3;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↓';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 3) * w - 3;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↘';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 6) * w - 3;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
 
-    rect.y += 124;
-    rect.height = 104;
-    k = 'boom ↖';
-	a[k]=[];
-    for(var x = 0; x<3; x++) {
-        rect.x = x*w;
-        t = new PIXI.Texture(image.texture.baseTexture, rect);
-        a[k].push(t);
-    }
-    k = 'boom ↓';
-	a[k]=[];
-    for(var x = 0; x<3; x++) {
-        rect.x = (x +3)*w;
-        t = new PIXI.Texture(image.texture.baseTexture, rect);
-        a[k].push(t);
-    }
-    k = 'boom ↗';
-	a[k]=[];
-    for(var x = 0; x<3; x++) {
-        rect.x = (x +6)*w;
-        t = new PIXI.Texture(image.texture.baseTexture, rect);
-        a[k].push(t);
-    }
+	rect.y += 124;
+	rect.height = 104;
+	k = 'boom ↖';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = x * w;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↓';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 3) * w;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↗';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 6) * w;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
 
-    rect.y += 104;
+	rect.y += 104;
 
-    /*k = 'boom →';
-    rect.x = (x +6)*w -3;
-    t = new PIXI.Texture(image.texture.baseTexture, rect);
-    a[k].push(t);
-    k = 'boom ←';*/
+	/*k = 'boom →';
+	rect.x = (x +6)*w -3;
+	t = new PIXI.Texture(image.texture.baseTexture, rect);
+	a[k].push(t);
+	k = 'boom ←';*/
 
 
 
@@ -1095,6 +1162,7 @@ function Suika() {
 	this.animationSpeed = 0.3;
 
 	PIXI.Sprite.call(this, a['idle ↓'][0]);
+	this.scale.x = this.scale.y = 0.5;
 
 	image.load();
 	this.image = image;
@@ -1103,36 +1171,44 @@ function Suika() {
 Suika.prototype = Object.create(PIXI.Sprite.prototype);
 Suika.prototype.constructor = Suika;
 
-Object.defineProperty( Suika.prototype, 'direction', {
-	get: function()  { return this._direction; },
+Object.defineProperty(Suika.prototype, 'direction', {
+	get: function() {
+		return this._direction;
+	},
 	set: function(v) {
 		var dir = '↑↗→↘↓↙←↖';
-		if(typeof v == 'number') {
-			var x = (v / (360/8)) %8;
-			if(x<0) x = 8+x;
-			v = dir[x|0];
+		if (typeof v == 'number') {
+			var x = (v / (360 / 8)) % 8;
+			if (x < 0) {
+				x = 8 + x;
+			}
+			v = dir[x | 0];
 		}
 		this._direction = v;
 	},
 });
 
-Object.defineProperty( Suika.prototype, 'animation', {
-	get: function()  { return this._animation; },
-	set: function(v) { this._animation = v; },
+Object.defineProperty(Suika.prototype, 'animation', {
+	get: function() {
+		return this._animation;
+	},
+	set: function(v) {
+		this._animation = v;
+	},
 });
 
 Suika.prototype.updateTransform = function() {
 	PIXI.Sprite.prototype.updateTransform.call(this);
 
 	var anim;
-	switch(this._animation) {
-	case 'death':
-		anim = this._anim['death'];
+	switch (this._animation) {
+		case 'death':
+			anim = this._anim['death'];
 		break
-	case 'walk':
-	case 'idle':
-	case 'boom':
-		anim = this._anim[this._animation +' '+ this._direction];
+		case 'walk':
+		case 'idle':
+		case 'boom':
+			anim = this._anim[this._animation + ' ' + this._direction];
 	}
 
 	this.currentFrame += this.animationSpeed;
@@ -1141,7 +1217,7 @@ Suika.prototype.updateTransform = function() {
 
 	this.currentFrame = this.currentFrame % anim.length;
 
-	if(/*this.loop ||*/ round < anim.length) {
+	if ( /*this.loop ||*/ round < anim.length) {
 		this.setTexture(anim[round % anim.length]);
 	} /*else if(round >= anim.length) {
 		this.gotoAndStop(this.textures.length - 1);
@@ -1151,7 +1227,7 @@ Suika.prototype.updateTransform = function() {
 module.exports = Suika;
 
 },{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
 },{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
 'use strict';
 
@@ -1169,7 +1245,9 @@ ImageLayer.prototype = Object.create(PIXI.Sprite.prototype);
 ImageLayer.constructor = ImageLayer;
 
 ImageLayer.prototype.load = function(fn) {
-	if(fn) { this.image.on('loaded', fn); }
+	if (fn) {
+		this.image.on('loaded', fn);
+	}
 	this.image.load();
 }
 
@@ -1203,36 +1281,38 @@ Tiled.prototype.load = function(fn) {
 		var json = that.data = that.loader.json;
 
 		var tilesets_count = json.tilesets.length;
-		for (var i=0, l=json.tilesets.length; i<l; i++) {
+		for (var i = 0, l = json.tilesets.length; i < l; i++) {
 			var t = new Tileset(json.tilesets[i], that.path, null, null)
 			that.tilesets.push(t);
 
 			t.load(function() {
 				tilesets_count--;
 				console.log(tilesets_count);
-				if(!tilesets_count) {
+				if (!tilesets_count) {
 					console.info('tilesets loaded');
-					if(fn) { fn(); }
+					if (fn) {
+						fn();
+					}
 				}
 			});
 		}
 
-		for (var i=0, l=json.layers.length; i<l; i++) {
+		for (var i = 0, l = json.layers.length; i < l; i++) {
 			var layer = json.layers[i];
 			var obj = undefined;
-			switch(layer.type) {
-			case 'tilelayer':
-				obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
-				break;
-			case 'objectgroup':
-				obj = new ObjectGroup(layer, that.tilesets);
-				break;
-			case 'imagelayer':
-				obj = new ImageLayer(layer, that.path);
-				obj.load();
-				break;
+			switch (layer.type) {
+				case 'tilelayer':
+					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
+					break;
+				case 'objectgroup':
+					obj = new ObjectGroup(layer, that.tilesets);
+					break;
+				case 'imagelayer':
+					obj = new ImageLayer(layer, that.path);
+					obj.load();
+					break;
 			}
-			if(obj !== undefined) {
+			if (obj !== undefined) {
 				console.log('addChild', layer);
 				that.layers.push(obj);
 				that.addChild(obj);
@@ -1261,29 +1341,34 @@ function ObjectGroup(data, tilesets) {
 	this.alpha = data.opacity || 1;
 	this.visible = !!data.visible;
 
-	if(data.color) {
+	if (data.color) {
 		var c = parseInt(data.color.slice(1), 16);
 		graphics.lineStyle(2, c, 1);
 	}
 
-	for(var i=0, l=data.objects.length; i<l; i++) {
+	for (var i = 0, l = data.objects.length; i < l; i++) {
 		var obj = data.objects[i];
-		if(!obj.visible) {
+		if (!obj.visible) {
 			continue;
 		}
 
-		var x = obj.x, y = obj.y, w = obj.width, h = obj.height, r = obj.rotation;
-		var w2 = w/2, h2 = h/2;
+		var x = obj.x,
+			y = obj.y,
+			w = obj.width,
+			h = obj.height,
+			r = obj.rotation;
+		var w2 = w / 2,
+			h2 = h / 2;
 		if (obj.gid) {
-			for (var j=0, ll = tilesets.length; j<ll; j++) {
+			for (var j = 0, ll = tilesets.length; j < ll; j++) {
 				var t = tilesets[j];
 				var sprite = t.CreateSprite(obj.gid);
 
-				if(sprite) {
+				if (sprite) {
 					sprite.position.x = x;
 					sprite.position.y = y - sprite.height; // XXX
 
-					if(t.data.tileoffset) {
+					if (t.data.tileoffset) {
 						sprite.position.x += t.data.tileoffset.x;
 						sprite.position.y += t.data.tileoffset.y;
 					}
@@ -1293,12 +1378,12 @@ function ObjectGroup(data, tilesets) {
 				}
 			}
 		} else if (obj.polyline) {
-			// TODO
+		// TODO
 		} else if (obj.ellipse) {
 			// TODO
 			graphics.drawEllipse(x + w2, y + h2, w2, h2);
 		} else if (obj.polygon) {
-			// TODO
+		// TODO
 		} else {
 			// TODO rect
 			graphics.drawRect(x, y, w, h);
@@ -1325,8 +1410,12 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 	this.alpha = data.opacity || 1;
 	this.visible = !!data.visible;
 
-	var x_start = 0, x_end = data.width,  x_add = 1;
-	var y_start = 0, y_end = data.height, y_add = 1;
+	var x_start = 0,
+		x_end = data.width,
+		x_add = 1;
+	var y_start = 0,
+		y_end = data.height,
+		y_add = 1;
 
 	/*if(renderorder) {
 		if(renderorder.indexOf('up') != -1) {
@@ -1345,23 +1434,23 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 
 	for (var y = y_start; y < y_end; y += y_add) {
 		for (var x = x_start; x < x_end; x += x_add) {
-			var iii = y*data.width + x;
+			var iii = y * data.width + x;
 			var id = data.data[iii];
 			found:
-			for (var i=0, l = tilesets.length; i<l; i++) {
+			for (var i = 0, l = tilesets.length; i < l; i++) {
 				var t = tilesets[i];
 				var sprite = t.CreateSprite(id);
 
-				if(sprite) {
-					sprite.position.x = x*tilewidth + data.x;
-					sprite.position.y = y*tileheight + data.y;
+				if (sprite) {
+					sprite.position.x = x * tilewidth + data.x;
+					sprite.position.y = y * tileheight + data.y;
 
-					if(t.data.tileoffset) {
+					if (t.data.tileoffset) {
 						sprite.position.x += t.data.tileoffset.x;
 						sprite.position.y += t.data.tileoffset.y;
 					}
 
-					if(sprite.textures) {
+					if (sprite.textures) {
 						this._animated.push(sprite);
 					}
 
@@ -1378,7 +1467,7 @@ TileLayer.constructor = TileLayer;
 
 TileLayer.prototype.updateTransform = function() {
 	var _animated = this._animated;
-	for(var i=0, l=_animated.length; i<l; i++) {
+	for (var i = 0, l = _animated.length; i < l; i++) {
 		_animated[i].updateTransform();
 	}
 	PIXI.SpriteBatch.prototype.updateTransform.call(this);
@@ -1393,19 +1482,25 @@ module.exports = TileLayer;
 function Tileset(data, path, tilewidth, tileheight) {
 	this.data = data;
 
-	if(!tilewidth)  { tilewidth  = data.tilewidth; }
-	if(!tileheight) { tileheight = data.tileheight; }
+	if (!tilewidth) {
+		tilewidth = data.tilewidth;
+	}
+	if (!tileheight) {
+		tileheight = data.tileheight;
+	}
 
 	var image = this.image = new PIXI.ImageLoader(path + data.image);
 
 	var tiles = this.tiles = [];
 
-	var ww=0, hh=0;
+	var ww = 0,
+		hh = 0;
 	for (var y = data.margin; y < data.imageheight; y += tileheight + data.spacing) {
 		hh++;
 		for (var x = data.margin; x < data.imagewidth; x += tilewidth + data.spacing) {
 			var rect = {
-				x: x, y: y,
+				x: x,
+				y: y,
 				width: data.tilewidth,
 				height: data.tileheight,
 			};
@@ -1444,7 +1539,9 @@ function Tileset(data, path, tilewidth, tileheight) {
 }
 
 Tileset.prototype.load = function(fn) {
-	if(fn) { this.image.on('loaded', fn); }
+	if (fn) {
+		this.image.on('loaded', fn);
+	}
 	this.image.load();
 }
 
@@ -1455,19 +1552,21 @@ Tileset.prototype.CreateSprite = function(id) {
 	var texture = this.tiles[id];
 
 
-	if(!texture) { return; }
+	if (!texture) {
+		return;
+	}
 
 	var sprite = new PIXI.Sprite(texture);
 	sprite.data = data.tiles[id];
 
 
-	if(sprite.data && sprite.data.animation) {
+	if (sprite.data && sprite.data.animation) {
 		sprite.last = window.performance.now();
 		sprite.currentFrame = 0;
 		sprite.updateTransform = updateTransform;
 
 		sprite.textures = [];
-		for(var i=0, l=sprite.data.animation.length; i<l; i++) {
+		for (var i = 0, l = sprite.data.animation.length; i < l; i++) {
 			var t = sprite.data.animation[i];
 			sprite.textures.push(this.tiles[t.tileid]);
 		}
@@ -1479,14 +1578,14 @@ Tileset.prototype.CreateSprite = function(id) {
 function updateTransform() {
 	PIXI.Sprite.prototype.updateTransform.call(this);
 
-	if(!this.textures) return;
+	if (!this.textures) return;
 
 	var time = window.performance.now();
 	var frame = this.data.animation[this.currentFrame];
 
 	if (time - this.last > frame.duration) {
 		this.currentFrame++;
-		if(this.currentFrame >= this.data.animation.length) {
+		if (this.currentFrame >= this.data.animation.length) {
 			this.currentFrame = 0;
 		}
 
@@ -1557,7 +1656,9 @@ Tilemap.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 Tilemap.constructor = Tilemap;
 
 function cleanLastSprites(layer, tile) {
-	if (!tile) { return; }
+	if (!tile) {
+		return;
+	}
 	if (tile.hasOwnProperty('s')) {
 		try {
 			if (tile.s instanceof Array) {
@@ -1567,7 +1668,7 @@ function cleanLastSprites(layer, tile) {
 			} else {
 				layer.removeChild(tile.s);
 			}
-		} catch (e) {
+		} catch ( e ) {
 			console.error(e);
 		}
 		delete tile.s;
@@ -1642,8 +1743,7 @@ Tilemap.prototype.redrawAt = function(x, y, layer) {
 	try {
 		var tile = this.data[layer][y][x];
 		this._setAt(x, y, layer, tile.t, tile.v, tile.auto);
-	}
-	catch (e) {}
+	} catch ( e ) {}
 }
 
 Tilemap.prototype.setAt = function(x, y, layer, t, v, auto) {
@@ -1687,7 +1787,10 @@ Tilemap.prototype._setAt = function(x, y, layer, t, v, auto) {
 	}
 
 	if (!this.data[layer][y][x]) {
-		this.data[layer][y][x] = {t: 0, v: 0};
+		this.data[layer][y][x] = {
+			t: 0,
+			v: 0
+		};
 	}
 
 	var tile = this.data[layer][y][x];
@@ -1741,7 +1844,9 @@ Tilemap.prototype.updateTransform = function() {
 		w = this.w,
 		h = this.h;
 
-	if (round == this.lastRount) { return; }
+	if (round == this.lastRount) {
+		return;
+	}
 	this.lastRount = round;
 
 	for (var y = 0; y < h; y++) {
@@ -1775,19 +1880,32 @@ Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
 	var layer = this.data[_layer],
 		north,
 		south,
-		Q = [{x: x, y: y}],
+		Q = [{
+			x: x,
+			y: y
+		}],
 		empty = (layer[y][x]) ? layer[y][x].v : null,
 		check = function(x, y) {
-			if (y < 0 || y >= layer.length) { return false; }
-			if (x < 0 || x >= layer[y].length) { return false; }
-			if (!layer[y][x] && !empty) { return true; }
-			if (!layer[y][x]) { return false; }
+			if (y < 0 || y >= layer.length) {
+				return false;
+			}
+			if (x < 0 || x >= layer[y].length) {
+				return false;
+			}
+			if (!layer[y][x] && !empty) {
+				return true;
+			}
+			if (!layer[y][x]) {
+				return false;
+			}
 
 			var v = layer[y][x].v;
 			if (typeof v === 'number' && typeof empty === 'number') {
 				return v === empty;
 			} else if (typeof v !== 'number' && typeof empty !== 'number') {
-				if (!empty) { return false; }
+				if (!empty) {
+					return false;
+				}
 				for (var i = 0, l = v.length; i < l; i++) {
 					if (v[i] !== empty[i]) {
 						return false;
@@ -1856,7 +1974,7 @@ function Tileset(url, w, h, size, noAutoLoad) {
 	}
 
 	this.tiles = tiles;
-	if(!noAutoLoad) {
+	if (!noAutoLoad) {
 		image.load();
 	}
 	this.image = image;

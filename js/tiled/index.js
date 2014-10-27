@@ -25,36 +25,38 @@ Tiled.prototype.load = function(fn) {
 		var json = that.data = that.loader.json;
 
 		var tilesets_count = json.tilesets.length;
-		for (var i=0, l=json.tilesets.length; i<l; i++) {
+		for (var i = 0, l = json.tilesets.length; i < l; i++) {
 			var t = new Tileset(json.tilesets[i], that.path, null, null)
 			that.tilesets.push(t);
 
 			t.load(function() {
 				tilesets_count--;
 				console.log(tilesets_count);
-				if(!tilesets_count) {
+				if (!tilesets_count) {
 					console.info('tilesets loaded');
-					if(fn) { fn(); }
+					if (fn) {
+						fn();
+					}
 				}
 			});
 		}
 
-		for (var i=0, l=json.layers.length; i<l; i++) {
+		for (var i = 0, l = json.layers.length; i < l; i++) {
 			var layer = json.layers[i];
 			var obj = undefined;
-			switch(layer.type) {
-			case 'tilelayer':
-				obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
-				break;
-			case 'objectgroup':
-				obj = new ObjectGroup(layer, that.tilesets);
-				break;
-			case 'imagelayer':
-				obj = new ImageLayer(layer, that.path);
-				obj.load();
-				break;
+			switch (layer.type) {
+				case 'tilelayer':
+					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
+					break;
+				case 'objectgroup':
+					obj = new ObjectGroup(layer, that.tilesets);
+					break;
+				case 'imagelayer':
+					obj = new ImageLayer(layer, that.path);
+					obj.load();
+					break;
 			}
-			if(obj !== undefined) {
+			if (obj !== undefined) {
 				console.log('addChild', layer);
 				that.layers.push(obj);
 				that.addChild(obj);

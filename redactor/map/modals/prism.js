@@ -14,7 +14,7 @@ module.exports = {
 	methods: {
 		add: function(e) {
 			this.$parent.run(new commands.AddPrism(
-				[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz]
+			[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz]
 			));
 		},
 	},

@@ -17,38 +17,38 @@ function run(player, host) {
 	document.body.appendChild(renderer.view);
 
 	var WH = {
-		width: 32,
-		height: 32
-	},
-	World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
-	World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
-	World_B = new Tileset('/game/World_B.png', 16, 16, WH),
-	Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
-	Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
-	Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
-	Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
-	Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
-	Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
-	Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
-	nn = 31,
-	data = [
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, 0, nn, nn, nn, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, nn, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, nn, nn, nn, 0, nn, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, 0, nn, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-	];
+			width: 32,
+			height: 32
+		},
+		World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
+		World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
+		World_B = new Tileset('/game/World_B.png', 16, 16, WH),
+		Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
+		Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
+		Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
+		Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
+		Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
+		Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
+		Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
+		nn = 31,
+		data = [
+			[0, 0, 0, 0, 0, 0, 0],
+			[0, nn, 0, nn, nn, nn, 0],
+			[0, nn, 0, nn, 0, 0, 0],
+			[0, nn, 0, nn, 0, 0, 0],
+			[0, nn, nn, nn, nn, nn, 0],
+			[0, 0, 0, nn, 0, nn, 0],
+			[0, 0, 0, nn, 0, nn, 0],
+			[0, nn, nn, nn, 0, nn, 0],
+			[0, 0, 0, 0, 0, 0, 0],
+			[0, nn, nn, nn, 0, 0, 0],
+			[0, nn, 0, nn, 0, 0, 0],
+			[0, nn, nn, nn, 0, 0, 0],
+			[0, 0, nn, nn, nn, 0, 0],
+			[0, 0, 0, nn, nn, 0, 0],
+			[0, 0, 0, nn, nn, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0],
+		];
 
 	window.Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
 
@@ -102,9 +102,9 @@ function run(player, host) {
 		game.render();
 		renderer.render(stage);
 		var a = game.avatars[game.player];
-		if(a) {
-			var d = Math.atan2(a.lastvel.x||0, a.lastvel.y||0);
-			var dd = d/Math.PI * 180 - 45;
+		if (a) {
+			var d = Math.atan2(a.lastvel.x || 0, a.lastvel.y || 0);
+			var dd = d / Math.PI * 180 - 45;
 			suika.direction = dd;
 		}
 	}
@@ -140,65 +140,124 @@ function run(player, host) {
 }
 
 var UI = new Vue({
-	el: '#ui',
-	data: {
-		level: 88,
-		exp: 77,
-		hp: 190,
-		mhp: 300,
-		mp: 50,
-		mmp: 300,
-		tp: 50,
-		mtp: 100,
-        equip: {},
-		inventory: [
-			{Name: "43"},
-			{Name: "1k"},
-			{Name: "4njki32"},
-			{Name: "PPPPvndfsj"},
-		],
-        target: { Race: 0, HP: 0, MHP:0, Name: "vnfdjsk" },
-		spells: [
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
+		el: '#ui',
+		data: {
+			level: 88,
+			exp: 77,
+			hp: 190,
+			mhp: 300,
+			mp: 50,
+			mmp: 300,
+			tp: 50,
+			mtp: 100,
+			equip: {},
+			inventory: [
+				{
+					Name: "43"
+				},
+				{
+					Name: "1k"
+				},
+				{
+					Name: "4njki32"
+				},
+				{
+					Name: "PPPPvndfsj"
+				},
+			],
+			target: {
+				Race: 0,
+				HP: 0,
+				MHP: 0,
+				Name: "vnfdjsk"
+			},
+			spells: [
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
+				{
+					Icon: 'all-for-one'
+				},
 
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
+				{
+					Icon: 'screaming'
+				},
 
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
+				{
+					Icon: 'spiral-thrust'
+				},
 
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-		],
-	},
-	methods: {
-		cast: function(spell) {
-			console.info('cast', spell);
-			game.net.FireMsg({t: ""+spell});
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+				{
+					Icon: 'rune-sword'
+				},
+			],
 		},
-		drop: function(index) {
-			game.net.DropItemMsg({Id:index});
+		methods: {
+			cast: function(spell) {
+				console.info('cast', spell);
+				game.net.FireMsg({
+					t: "" + spell
+				});
+			},
+			drop: function(index) {
+				game.net.DropItemMsg({
+					Id: index
+				});
+			},
 		},
-	},
-}),
+	}),
 
 	r = new XMLHttpRequest();
 r.open('POST', '/game', true);
 r.onreadystatechange = function() {
-	if (r.readyState != 4 || r.status != 200) { return; }
+	if (r.readyState != 4 || r.status != 200) {
+		return;
+	}
 	var json = JSON.parse(r.responseText);
 	if (json.Id !== undefined) {
 		console.log('Success:', json);

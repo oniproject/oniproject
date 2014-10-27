@@ -13,29 +13,34 @@ function ObjectGroup(data, tilesets) {
 	this.alpha = data.opacity || 1;
 	this.visible = !!data.visible;
 
-	if(data.color) {
+	if (data.color) {
 		var c = parseInt(data.color.slice(1), 16);
 		graphics.lineStyle(2, c, 1);
 	}
 
-	for(var i=0, l=data.objects.length; i<l; i++) {
+	for (var i = 0, l = data.objects.length; i < l; i++) {
 		var obj = data.objects[i];
-		if(!obj.visible) {
+		if (!obj.visible) {
 			continue;
 		}
 
-		var x = obj.x, y = obj.y, w = obj.width, h = obj.height, r = obj.rotation;
-		var w2 = w/2, h2 = h/2;
+		var x = obj.x,
+			y = obj.y,
+			w = obj.width,
+			h = obj.height,
+			r = obj.rotation;
+		var w2 = w / 2,
+			h2 = h / 2;
 		if (obj.gid) {
-			for (var j=0, ll = tilesets.length; j<ll; j++) {
+			for (var j = 0, ll = tilesets.length; j < ll; j++) {
 				var t = tilesets[j];
 				var sprite = t.CreateSprite(obj.gid);
 
-				if(sprite) {
+				if (sprite) {
 					sprite.position.x = x;
 					sprite.position.y = y - sprite.height; // XXX
 
-					if(t.data.tileoffset) {
+					if (t.data.tileoffset) {
 						sprite.position.x += t.data.tileoffset.x;
 						sprite.position.y += t.data.tileoffset.y;
 					}
@@ -45,12 +50,12 @@ function ObjectGroup(data, tilesets) {
 				}
 			}
 		} else if (obj.polyline) {
-			// TODO
+		// TODO
 		} else if (obj.ellipse) {
 			// TODO
 			graphics.drawEllipse(x + w2, y + h2, w2, h2);
 		} else if (obj.polygon) {
-			// TODO
+		// TODO
 		} else {
 			// TODO rect
 			graphics.drawRect(x, y, w, h);

@@ -14,7 +14,9 @@ ImageLayer.prototype = Object.create(PIXI.Sprite.prototype);
 ImageLayer.constructor = ImageLayer;
 
 ImageLayer.prototype.load = function(fn) {
-	if(fn) { this.image.on('loaded', fn); }
+	if (fn) {
+		this.image.on('loaded', fn);
+	}
 	this.image.load();
 }
 

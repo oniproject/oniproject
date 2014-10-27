@@ -3,7 +3,10 @@
 module.exports = {
 	replace: true,
 	template: require('./dir.html'),
-	data: {open: false, rename: false},
+	data: {
+		open: false,
+		rename: false
+	},
 	methods: {
 		swapStuff: function(index1, index2) {
 			//console.log('swap %s -> %s', index1, index2, this.$parent);
@@ -58,4 +61,3 @@ module.exports = {
 		this.$el.addEventListener('drop', drop, false);
 	},
 };
-

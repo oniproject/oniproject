@@ -1,18 +1,18 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
-var M_SetVelocityMsg   =1,
-    M_SetTargetMsg     =2,
-    M_CastMsg          =3,
-    M_DestroyMsg       =4,
-    M_DropItem         =5,
-    M_PickupItem       =6,
-    M_RequestInventory =7,
-    M_Inventory        =8,
-    M_TargetData       =9,
-    M_RequestParameters=10,
-    M_Parameters       =11,
-    ___ =0;
+var M_SetVelocityMsg = 1,
+	M_SetTargetMsg = 2,
+	M_CastMsg = 3,
+	M_DestroyMsg = 4,
+	M_DropItem = 5,
+	M_PickupItem = 6,
+	M_RequestInventory = 7,
+	M_Inventory = 8,
+	M_TargetData = 9,
+	M_RequestParameters = 10,
+	M_Parameters = 11,
+	___ = 0;
 
 function Net(url) {
 	var websocket = new WebSocket(url);
@@ -41,7 +41,7 @@ function Net(url) {
 				if (message.hasOwnProperty('T')) {
 					that._ParseMessages(message.T | 0, message.V, event);
 					break;
-				}
+			}
 			default:
 				that.emit('message', message, event);
 		}

@@ -1,8 +1,8 @@
 var browserify = require('browserify'),
 	watchify = require('watchify'),
 	partialify = require('partialify'),
-	exorcist   = require('exorcist'),
-	transform =require('vinyl-transform'),
+	exorcist = require('exorcist'),
+	transform = require('vinyl-transform'),
 	gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
 	watch = require('gulp-watch'),
@@ -10,9 +10,18 @@ var browserify = require('browserify'),
 
 var dest = './public/';
 var apps = {
-	game:     {dest: 'main.js',     source: './js/main.js'},
-	tile:     {dest: 'tile.js',     source: './redactor/tile/main.js'},
-	redactor: {dest: 'redactor.js', source: './redactor/main.js'},
+	game: {
+		dest: 'main.js',
+		source: './js/main.js'
+	},
+	tile: {
+		dest: 'tile.js',
+		source: './redactor/tile/main.js'
+	},
+	redactor: {
+		dest: 'redactor.js',
+		source: './redactor/main.js'
+	},
 }
 
 function handleErrors(err) {
@@ -24,7 +33,9 @@ function handleErrors(err) {
 var fn = function(app, isWatching) {
 	return function() {
 		var bundler = browserify({
-			cache: {}, packageCache: {}, fullPaths: true,
+			cache: {},
+			packageCache: {},
+			fullPaths: true,
 			entries: [app.source],
 			debug: true
 		});
@@ -34,11 +45,13 @@ var fn = function(app, isWatching) {
 				.transform(partialify)
 				.bundle().on('error', handleErrors)
 				.pipe(source(app.dest))
-				.pipe(transform(function () { return exorcist(dest+app.dest+'.map'); }))
+				.pipe(transform(function() {
+					return exorcist(dest + app.dest + '.map');
+				}))
 				.pipe(gulp.dest(dest));
 		};
 
-		if(isWatching) {
+		if (isWatching) {
 			bundler = watchify(bundler);
 			bundler.on('update', bundle);
 		}
@@ -49,7 +62,7 @@ var fn = function(app, isWatching) {
 
 var w = [];
 var b = [];
-for(var k in apps) {
+for (var k in apps) {
 	gulp.task('browserify-' + k, fn(apps[k], false));
 	gulp.task('watch-' + k, fn(apps[k], true));
 	b.push('browserify-' + k);
@@ -66,7 +79,7 @@ gulp.task('server', function(next) {
 		.use(connect.static('public'))
 		.use(connect.directory('public'))
 		.use(function(req, res) {
-			if(req.method == 'POST') {
+			if (req.method == 'POST') {
 				console.log(req.body);
 			} else {
 				res.end('FUCK U\n');
@@ -79,8 +92,9 @@ gulp.task('reload', ['server'], function() {
 	var server = livereload();
 	gulp.watch('public/**').on('change', function(event) {
 		server.changed(event.path);
-		console.log('File '+event.path+' was '+event.type+', running tasks...');
+		console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 	});
 });
 
 gulp.task('default', ['watch']);
+

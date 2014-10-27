@@ -11,8 +11,12 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 	this.alpha = data.opacity || 1;
 	this.visible = !!data.visible;
 
-	var x_start = 0, x_end = data.width,  x_add = 1;
-	var y_start = 0, y_end = data.height, y_add = 1;
+	var x_start = 0,
+		x_end = data.width,
+		x_add = 1;
+	var y_start = 0,
+		y_end = data.height,
+		y_add = 1;
 
 	/*if(renderorder) {
 		if(renderorder.indexOf('up') != -1) {
@@ -31,23 +35,23 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 
 	for (var y = y_start; y < y_end; y += y_add) {
 		for (var x = x_start; x < x_end; x += x_add) {
-			var iii = y*data.width + x;
+			var iii = y * data.width + x;
 			var id = data.data[iii];
 			found:
-			for (var i=0, l = tilesets.length; i<l; i++) {
+			for (var i = 0, l = tilesets.length; i < l; i++) {
 				var t = tilesets[i];
 				var sprite = t.CreateSprite(id);
 
-				if(sprite) {
-					sprite.position.x = x*tilewidth + data.x;
-					sprite.position.y = y*tileheight + data.y;
+				if (sprite) {
+					sprite.position.x = x * tilewidth + data.x;
+					sprite.position.y = y * tileheight + data.y;
 
-					if(t.data.tileoffset) {
+					if (t.data.tileoffset) {
 						sprite.position.x += t.data.tileoffset.x;
 						sprite.position.y += t.data.tileoffset.y;
 					}
 
-					if(sprite.textures) {
+					if (sprite.textures) {
 						this._animated.push(sprite);
 					}
 
@@ -64,7 +68,7 @@ TileLayer.constructor = TileLayer;
 
 TileLayer.prototype.updateTransform = function() {
 	var _animated = this._animated;
-	for(var i=0, l=_animated.length; i<l; i++) {
+	for (var i = 0, l = _animated.length; i < l; i++) {
 		_animated[i].updateTransform();
 	}
 	PIXI.SpriteBatch.prototype.updateTransform.call(this);

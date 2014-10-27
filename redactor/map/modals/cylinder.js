@@ -15,7 +15,7 @@ module.exports = {
 	methods: {
 		add: function(e) {
 			this.$parent.run(new commands.AddCylinder(
-				[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz], +this.vertices
+			[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz], +this.vertices
 			));
 		},
 	},

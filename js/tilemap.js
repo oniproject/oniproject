@@ -56,7 +56,9 @@ Tilemap.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 Tilemap.constructor = Tilemap;
 
 function cleanLastSprites(layer, tile) {
-	if (!tile) { return; }
+	if (!tile) {
+		return;
+	}
 	if (tile.hasOwnProperty('s')) {
 		try {
 			if (tile.s instanceof Array) {
@@ -66,7 +68,7 @@ function cleanLastSprites(layer, tile) {
 			} else {
 				layer.removeChild(tile.s);
 			}
-		} catch (e) {
+		} catch ( e ) {
 			console.error(e);
 		}
 		delete tile.s;
@@ -141,8 +143,7 @@ Tilemap.prototype.redrawAt = function(x, y, layer) {
 	try {
 		var tile = this.data[layer][y][x];
 		this._setAt(x, y, layer, tile.t, tile.v, tile.auto);
-	}
-	catch (e) {}
+	} catch ( e ) {}
 }
 
 Tilemap.prototype.setAt = function(x, y, layer, t, v, auto) {
@@ -186,7 +187,10 @@ Tilemap.prototype._setAt = function(x, y, layer, t, v, auto) {
 	}
 
 	if (!this.data[layer][y][x]) {
-		this.data[layer][y][x] = {t: 0, v: 0};
+		this.data[layer][y][x] = {
+			t: 0,
+			v: 0
+		};
 	}
 
 	var tile = this.data[layer][y][x];
@@ -240,7 +244,9 @@ Tilemap.prototype.updateTransform = function() {
 		w = this.w,
 		h = this.h;
 
-	if (round == this.lastRount) { return; }
+	if (round == this.lastRount) {
+		return;
+	}
 	this.lastRount = round;
 
 	for (var y = 0; y < h; y++) {
@@ -274,19 +280,32 @@ Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
 	var layer = this.data[_layer],
 		north,
 		south,
-		Q = [{x: x, y: y}],
+		Q = [{
+			x: x,
+			y: y
+		}],
 		empty = (layer[y][x]) ? layer[y][x].v : null,
 		check = function(x, y) {
-			if (y < 0 || y >= layer.length) { return false; }
-			if (x < 0 || x >= layer[y].length) { return false; }
-			if (!layer[y][x] && !empty) { return true; }
-			if (!layer[y][x]) { return false; }
+			if (y < 0 || y >= layer.length) {
+				return false;
+			}
+			if (x < 0 || x >= layer[y].length) {
+				return false;
+			}
+			if (!layer[y][x] && !empty) {
+				return true;
+			}
+			if (!layer[y][x]) {
+				return false;
+			}
 
 			var v = layer[y][x].v;
 			if (typeof v === 'number' && typeof empty === 'number') {
 				return v === empty;
 			} else if (typeof v !== 'number' && typeof empty !== 'number') {
-				if (!empty) { return false; }
+				if (!empty) {
+					return false;
+				}
 				for (var i = 0, l = v.length; i < l; i++) {
 					if (v[i] !== empty[i]) {
 						return false;

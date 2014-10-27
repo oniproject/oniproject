@@ -12,8 +12,7 @@ var app = new Vue(require('./index'));
 
 window.scene = app.$options.scene;
 
-var
-	nn = 31,
+var nn = 31,
 	data = [
 		[0, 0, 0, 0, 0, 0, 0],
 		[0, nn, 0, nn, nn, nn, 0],
@@ -45,8 +44,7 @@ for (var y = 0, ml = data.length; y < ml; y++) {
 	}
 }
 
-var
-	w = $('#canvas').width(),
+var w = $('#canvas').width(),
 	h = $('#canvas').height(),
 	stage = new PIXI.Stage(0xFFFFFF, true),
 	renderer = PIXI.autoDetectRenderer(w, h);
@@ -59,23 +57,23 @@ var originX = 32 * 10,
 	originY = 32 * 2,
 	moveSpeed = 32,
 	keyCodes = {
-	37: function(event) {
-		originX += moveSpeed;
-		resize();
-	},
-	38: function(event) {
-		originY += moveSpeed;
-		resize();
-	},
-	39: function(event) {
-		originX -= moveSpeed;
-		resize();
-	},
-	40: function(event) {
-		originY -= moveSpeed;
-		resize();
-	},
-}
+		37: function(event) {
+			originX += moveSpeed;
+			resize();
+		},
+		38: function(event) {
+			originY += moveSpeed;
+			resize();
+		},
+		39: function(event) {
+			originX -= moveSpeed;
+			resize();
+		},
+		40: function(event) {
+			originY -= moveSpeed;
+			resize();
+		},
+	}
 document.onkeydown = function(event) {
 	var f = keyCodes[event.keyCode];
 	if (f) {

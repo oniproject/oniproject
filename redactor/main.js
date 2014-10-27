@@ -3,8 +3,12 @@ var Vue = require('vue');
 Vue.directive('phimg', require('vue-placeholders/src/vue-placeholders-image'))
 Vue.directive('phtxt', require('vue-placeholders/src/vue-placeholders-text'))
 
-Vue.component('Home', { template: '<br><br>HOME' })
-Vue.component('Page1', { template: '<br><br>PAGE1' })
+Vue.component('Home', {
+	template: '<br><br>HOME'
+})
+Vue.component('Page1', {
+	template: '<br><br>PAGE1'
+})
 Vue.component('Map', require('./map'))
 Vue.component('Animation', require('./a2d'))
 
@@ -17,7 +21,7 @@ new Vue({
 	methods: {
 		changeApp: function(id) {
 			this.currentApp = id;
-			if(this.currentApp == 'Map') {
+			if (this.currentApp == 'Map') {
 				Vue.nextTick((function() {
 					this.$[this.currentApp].$emit('load', '/data/map.json');
 				}).bind(this));
