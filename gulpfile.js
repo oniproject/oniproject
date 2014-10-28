@@ -5,6 +5,8 @@ var browserify = require('browserify'),
 	transform = require('vinyl-transform'),
 	gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
+	jshint = require('gulp-jshint'),
+	jsfmt = require('gulp-jsfmt'),
 	watch = require('gulp-watch'),
 	source = require('vinyl-source-stream');
 
@@ -72,6 +74,18 @@ for (var k in apps) {
 gulp.task('watch', w);
 gulp.task('build', b);
 
+gulp.task('lint', function() {
+	return gulp.src('./js/**/*.js')
+		.pipe(jshint())
+		.pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('fmt', function() {
+	return gulp.src('./js/**/*.js')
+		.pipe(jsfmt.format())
+	//.pipe(jshint.reporter('jshint-stylish'));
+});
+
 gulp.task('server', function(next) {
 	var connect = require('connect');
 	connect()
@@ -97,4 +111,3 @@ gulp.task('reload', ['server'], function() {
 });
 
 gulp.task('default', ['watch']);
-
