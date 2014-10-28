@@ -3,6 +3,10 @@
 function Tileset(data, path, tilewidth, tileheight) {
 	this.data = data;
 
+	if (!data.tiles) {
+		data.tiles = {};
+	}
+
 	if (!tilewidth) {
 		tilewidth = data.tilewidth;
 	}

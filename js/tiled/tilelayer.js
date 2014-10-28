@@ -8,7 +8,10 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 
 	this.position.x = data.x || 0;
 	this.position.y = data.y || 0;
-	this.alpha = data.opacity || 1;
+	if (data.opacity === undefined) {
+		data.opacity = 1;
+	}
+	this.alpha = data.opacity;
 	this.visible = !!data.visible;
 
 	var x_start = 0,

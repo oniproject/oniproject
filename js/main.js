@@ -66,16 +66,15 @@ function run(player, host) {
 		}
 	}
 
+	var ttt = new Tiled('/maps/', 'test.json');
+	ttt.load();
+	stage.addChild(ttt);
+
 	var Game = require('./game');
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
 	stage.addChild(scene);
 
-	var ttt = new Tiled('/maps/', 'desert.json');
-	ttt.load();
-	ttt.position.x = 30;
-	ttt.position.y = 200;
 	game.ttt = ttt;
-	stage.addChild(ttt);
 
 	var suika = new Suika();
 	suika.position.x = 440;

@@ -67,16 +67,15 @@ function run(player, host) {
 		}
 	}
 
+	var ttt = new Tiled('/maps/', 'test.json');
+	ttt.load();
+	stage.addChild(ttt);
+
 	var Game = require('./game');
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
 	stage.addChild(scene);
 
-	var ttt = new Tiled('/maps/', 'desert.json');
-	ttt.load();
-	ttt.position.x = 30;
-	ttt.position.y = 200;
 	game.ttt = ttt;
-	stage.addChild(ttt);
 
 	var suika = new Suika();
 	suika.position.x = 440;
@@ -1227,7 +1226,7 @@ Suika.prototype.updateTransform = function() {
 module.exports = Suika;
 
 },{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
 },{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
 'use strict';
 
@@ -1407,7 +1406,10 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 
 	this.position.x = data.x || 0;
 	this.position.y = data.y || 0;
-	this.alpha = data.opacity || 1;
+	if (data.opacity === undefined) {
+		data.opacity = 1;
+	}
+	this.alpha = data.opacity;
 	this.visible = !!data.visible;
 
 	var x_start = 0,
@@ -1481,6 +1483,10 @@ module.exports = TileLayer;
 
 function Tileset(data, path, tilewidth, tileheight) {
 	this.data = data;
+
+	if (!data.tiles) {
+		data.tiles = {};
+	}
 
 	if (!tilewidth) {
 		tilewidth = data.tilewidth;

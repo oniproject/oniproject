@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="54" height="40" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" source="tilesets/Terrain.tsx"/>
+ <tileset firstgid="1025" name="build_atlas" tilewidth="32" tileheight="32">
+  <image source="tilesets/build_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <tileset firstgid="2049" name="obj_misk_atlas" tilewidth="32" tileheight="32">
+  <image source="tilesets/obj_misk_atlas.png" width="1024" height="1024"/>
+ </tileset>
+ <layer name="ground" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztmNEKwyAMRYN/qdWX/ln1R7ewXCIt7cpYsSl5OGwWGbm9miWZiWh2HMdxHMcEMYyP4QryQ3UtN4jhCtLbryq+scYoa6aJ7rLylPf2+/EbizH/F9EIzaxjCp81a26iJwqTMDruX4jiWZN1CVtfLRJF09T5xb5Wsn1nF9LzllY+4TnuocX/Ej57lVQf/MK9g0Z+3uR5Cnp+rYAcyfHz9z7H9LmGdVbaem0Jjj3v+IQcavlOOo7jOI5zPRZqBdRx3/ZxTcSUk/tHglq7r0URN3qsRlrnVVJNqNnvqDPL+89B+wvU5ZW0R0adipoVjI7/CPSDOI+Ya/R9pKXZzFpbCtoroUd8wvyi731xHkfH9A8wW4N/1vr2I7/4E3nk7nnhDCXoDPSOeftXn1gP5oOj49njBd86Rjw=
+  </data>
+ </layer>
+ <layer name="Слой тайлов 7" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztWG1uGjEQHW9J7gEtvQdtkjssgR8LIScp3IOmyT1aKblHW7XnqEfrVz8GAuvFoFXVkUb7Ya/Hb769Iv/pX6VpIXLreeK5DNfPUr8bm/uHMH9K8zGmz2up3+k8Zf12HOZj7VPSOsgdBzll2FtZxHtgmtJzGfaOva7DWsDG6wLHhPSA8YfMeG5PrK8mpLpaZ1wPPtNVamvD3LbPTYjHLtGV5+sj+EZiHHaJ7jwvPD8afvL8JYzh3rLOu5c6RrrmU588X0rEwLgWEvcPbE80plfFNSlifu4Sqc2wZ7bRo0RcjAlz9ApcZQdxqc2WUtsNe4fdGAOewReeV1Jj6lreYILdOM6AYSHbcTiUOm+gXrepReq/PSdSeL6gq+WCxt64dFyIHWsjxsiYkTfKljlR7dz3+1wWzXjl+X0iLptDOJcwHs4pigt9aoovoi/Vb9/5fT4WzfjJ89tEXMC2JEbMWdshDhlXSm+sOijPiOsQTsaK+oW+OQXXbdCFfpeKK9UPmxLiEH6Is0FKDcMZSu3Vz2QvnLXaEttw1X6ZvzbLhQsxnqvmtD27oDYA13MDftnjh1gvV+9zzFla/ebK7/MD8fWB680ruGCrruDKQYhVnO9z0DH6yXVeHhfxXNHFHpwJ54RxA1vgnxPy7MTMRb5GP4C5uK7DFWNd+z/B/dw5zhjcu+7qcVN72X10Tl3P/L4Hnheeh4Z17Ids9++2j7e9/r7+vndgPCcuxjEPjPeKuQrvMAfzBi7qhZ/xvdYzxA1iq09rQmenwFeFPVSEqXLx/bPEGmXrla1h9r3WM/yXxn/dkX/3EuQOg5xT9JVYe0B6h0y939ejf28hT78ZBewvQX6Oc4ClIekN98CotrI9RBssr9Eo2PXjCe01J/4m0Y+UvmaUx3rpue3/CrliDX7H8Z/L392OfHnpIp7fEnMIfCSXbPY/5AvNU7yXgvbUlHph33O3GcO69k+JspBj4f+/JE3OPlx3bjM/3ZP+BiRXZTbxE7WT7h25x9YRthHwcX1ROcf6JGRXbrP+sByMa9y9dhZh6rvNesf1sHLb9Y9txz55jO2s7iCP9TpLwGRtxXvGusBs9bZrXtt441rFcriXSKmd6CfYh9l21i9YdzO36btVgu9bmu9Yk30Feb9JjYGt2K+t/qsdeNgfWcfQRRt//AMSCz0W
+  </data>
+ </layer>
+ <layer name="Слой тайлов 5" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzdmEFOwzAQRS1lxSFgzyHgJMAOJDgDZcslgB1wiZCz0VH71dffSVshhG2+9BUndcA/M54Zz1RKmZb8WjPGiyVH3I/4fWHkfD7T/BHv8W+Ma042f5FcJ6N+03tPZRecz/+ldZ4u+VqRZ/YdR1D6Ml1fZVcPtbwl7/wlXspKm+wz2Ti0ua6rstFMf8n010Roy+woW3C9oemybPxXc8JWtW10DGRH1/VYNlrku71oEkJDpouxpjdNAWmQLvkgY8XFkjdVVvdzhK6ICbH267LSxNg+F1dah+xF+zBmKq736IdZrlbe6s1OAmOE1ydz+boHMGe7L/Zsr4DvMdYZvetSrURbHdJ1MhzHWlDsYI0r++3TdT6s+DFsxuT7+loL8sPsDPVf/JDnQNUaka+zeuN+2ObHsPvsvgF7yQ+5z3RWzex2t9YSvAMfjLXguvy8P1f3Pg/bbAVR46om5FmatXyM5+rez2GbtzP8a6jm9X4JfbDHuoM1FGOFrme47+msorzF3hXzmGosae9FG9dNXdIReCzbPR7FfbIlrYwZ7G3SDwPq97CfxXwwp7UWL0veQ2XMIOb6WdyfzHckYy2/C3uYpPeRs+9OH8p6zlkNr/tDyLT+Frk/6EP7+uC8Tjbmd6sJ+j/3fNZT9/66+wBz8ljaQFbjuUbWR/wGmd/6/qoFnjVE7y/RN7P9Ptp7LcDjsdZ+yH60D3XV3l8O9tyzWOC5J4ul0t4aVCNkcZ32cPt4D7E1yGY8I7rfcbwouU+2CO43xjpe+dz9skV7EdxvHh88H/t5uXVwv2X5eK5eaR3sVWcxkjGRua4HeCzxesrjRjz/BoaTyig=
+  </data>
+ </layer>
+ <layer name="Слой тайлов 10" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztmM9Kw0AQxheXHkrv2idRb/YprCfbo7aeVRDRo219AxE9+u8BFAt61GfQB9C38EM2MFmyIWxns1k6PxiWZLKT+TZfApvTFfVPz4xF3CF3X5LPGGilhrp47hbO90xuHeMGYtNxLQfXqPOKmJfU+0Duk+RX0c8aoqvz/Zzh+FwXz6WatzH2ETs6r5feh0PjF+Z/WzVeSH8/yP2SvL3eWT83OL4157J+s7lU8yHGI8Sxzuul97HXclF2K9Si6037ecPxuzlne5JqplC91Af2WtYBXW8XtiepZgrV63rvfBkGWBfX87Ghem0fcPLMVNP1fMqo4gNBEASBl5NWtZi3YncahivRlRSiKy1S0OWzV01Bl89eNQVdMfaqghCSUVupsYmDduxu+JhCy8zEZWRdnP9dm6SL85/kA7Q8mniKrKvO7zynN5qEyxt7HaX2ESPEuFN/X4vi8sYFtEwQU8QsQV1CGizb9yJ1lmXPwO3LED73qcntyxA+96nJ7csQPm/Cu/MHfK51Qg==
+  </data>
+ </layer>
+ <layer name="add" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztmNsuA1EUhncyyRR1JngS3PEUzsEDtNyh7UU9QMv1LlFvwjMgXOHO+dDilvia9KLajtrtHvZs8ydf2qTJmvV1ZU9mjRC1mXWEmIN5p86PAU4CnySkLPOS+ORgxzKvc3wu4NIyr3d8PmDB5ZwZxqLbul+eGknDSGvwShvg4YdXaV45w9A1L9Oi2tMQ94lhGKm4B+YN9FLtaRSfMRg33Et1XlP4TMOMZV5r+KzDRoWXDefLrxq602xPE8xr0mmthp9p9mws4bTstFbDzzTbUxqnTQvnlcdp38J5HeB0aPC8dD0fmhYdXruu+n6kGtX6exq8EuXdIFf1WUJ67BE1/03k+2t47SNez/MpjV7yBz7Sw6tR6tWVZQfpo1ejfaj62qpR2b2kJq8wYf5zrjqEuIYbuIU7uIcHeIQneIYCFOEFXuGtjKlxo0JEoA3aoQOi0Ald0A090At90A8DMBj9687VU+DZrhjg989H9H4MJ87X70H2itF33INTOAuoV4a+sxXEOC9xWIHVAJ4dr2RwycIWbFvkFSZMmDC/mU92XMft
+  </data>
+ </layer>
+ <layer name="Слой тайлов 7" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztz8EJwCAABEHB/gtKKzGVxDy8HgyIMgP3vy0FAADY3VVXP/jfnaaWPYe1venp2XdYFwAAAAAwZwA5+AZR
+  </data>
+ </layer>
+ <layer name="walls" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztl9tKAlEUhqe0vC6huuglStIgqKAnKOkoVK9Q0tFOr5BdlXR4hfQq6ET1AupdZYn1AupdZfULY9iw3e5h1h5lMz98OOBi7/9fa2aPapp6GnM12oEcObkcOXJkVVnFnre7Sh53Q2040qXa/fUnm++veLumJdqt11jVLOY5B0IEc03CawqkOZ5Faii0gTybIEKQKw+vBVDkeBapodAh8hyBGEGuDo+mdQKvx1pNs6kPXvuBj+NZpIZKVGfmOLxOgCDHs0gNmdw02ZbgdRmEOZ5Faqj0UM5E8D7Yh9coOOB4Fqmh0jvRfXgOr3GQAH4QYFBd04waQS9GDf1IwmsKpMEQ2ALb4BJcgWHP/xorupf0O2oB6y4a1q6eRQj0gpJOBswTzuutTq6ci937etpF/R5nXhFwbGCHcF4iYvW+3vl4iu/POPOKMXyfEM1L9Oxm9b5yPuZq5L3B563huzy8FkCR45lVY+YdkzVxdrN6X1My/h+YWdNELav39dTmYl87Qj9b5K7fhX53gx7F+u5HngAY1HMN2JzvWtLcppBjGszoeSYVmdsqcqyBdUXylJVBlhfwqlCmskrI8w1+FMulqi4UnBPr2Sq2yt0zaEMfWc+WV7+WNcewjffHI/Z6As/AJ3nfKNZfsSnbB/b5BF+KPGu/NxZ66w==
+  </data>
+ </layer>
+ <layer name="Слой тайлов 4" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztlzsvBUEYhidOdgsFcYlrhZ5C4lrhHyjcSez5Bwp3EtHS6FwT56DiHyBxrSi0KPgDxK1wjsIr2WLNmTN7mz1rx7zJk83sZL7ve/fbyc4SEn0ZMULiFmTRf/Elizfly58WNEJ2wC6DPbCoic2XK1/bqPscXDC4BMmI+jpB3acczhz4es/LJJty5asGdddyqHPgqzSWSTYlMJe0YLjwtaQTsqw7G3eg7k4OXYLfQ1oJF772UfOB7mw8iroNDvGAfbnRFWq+Bg/a7zE9r6SkxNajJOcqJSUlJaXw9JEfdgVKf1Ev+A995fyLRlVFODsVezg/vUn4LH5UIulZsjECvoZQ4zAYiUCtbjQLP3NgXjJfG/CzCbYk83UIP0fgOCRfZchbDirM/DcC6uhHjAEwGICnJ3wLnh18D5qQuxm0CKxhCrGmwYxNzG4POQuwptBcR/fEqh7c6wV9An2tItYaWKdifuI5p0DafN5jHnLWY02DuY7Xk3HcmwCTAbwztI9K5KgC1WauFQ85rT1i9YTVQ15fvYj20YprG2j3Ed/aI1ZPWD0UvddoH7e43oF7H/Ht9g1rPoi9ZlUKcdPgy0d8u33Dmhe1174BMxx0WA==
+  </data>
+ </layer>
+ <layer name="Слой тайлов 8" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztmMsuA1EYx09bJu7UtauGjarEpRFtV9gINm5N2u54AopEu8ILaFmxoksWeADismOBB+ABWLrs+U/MpCdj2jMjc9qZml/yDyd0zvc/3zlf5zuE2NiYmxsXId2uUkfxmyMnIcfOwv+TcPCZ21fJ57kit/B0x/AlQ/vr1PiZQkxw9PWC+F4NiLFBIKQRaoLcAntsFpR78RxrcSGthxfr3o9YB6BBKCCwxyJVFYRUQzUV7Pk/FGvfZuDa0N6eMM+zNNcIfE1jnhloFpoT2GMfvPRAfny2V/LlL7AvWxS1aRjP+HTmxIslzLMMJaAVgT0WmYSfKcqL/LtDJX9D8NUOdUAe14+vVldOSrTUQxFWTUxjngy0A+0K7HE+auGpK8++DCL+EBSWfIm042cH5FE8U089LDVR+IlBcWgePiJQEApBYWkckfwZVQ+LwTr8JKEUtIr416AoFIPi0nhNRz3h9b3Mky8LxTyKPI3pfGfTWj9KyQI8Ler0Vah+mGUfbsLTlk5fWupHXYnf2w8xf1ZHDKwzZpZ8XcHTtQl7IjMi5swsefvPeE1e28uZrAXW/i9n9FrF1zhVF3mde6Of6y9SfuRertyQezmjSKKXSDH6iW3kLA1lOOZO7uWMYg+e9hm+TuDnFDrj6Evu5ZTwvDu7h58H6JGjr408uVK7O5MJWOA8HlAx0r2d8u6Mpt4Cvi6pGOneTu3uTKbPAr5o6N5O692ZFWD1dm845+8WeO9Rwurt3Phbs8X2oI2NjfF8A1mJYW8=
+  </data>
+ </layer>
+ <layer name="Слой тайлов 9" width="54" height="40">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRQA3gz4RfnoeFgYEXiPlYMOXusdHGTbiAPTMDgwMzhJ1PwN2EgA7QP7pArIfFX/9w+GsFFrX4xIkF8UA/JTBTZgYM+ADd4kuke3YB/bkbiE/gUI9LnFhQD/RTA5X8BQM5FLqJGmA+0E8LqOSvbcDw3w7EO6BpTpWVOuaSA/YD/XSASv66BvTPdSC+AfWX6wD5qxpYTtRQWFbQAnyl0E2zgfrnDEJ/iVI5v48C6gPTYRpHocPUX/9B+Rzqt91A9p5BmO9JATD/yAOxAtRft4Fid5D8VQlkVw0xfyL7BxeYCfTTLBL8FU/FMMDWXqd3Gx4ZJFDJb9ja67ja8KNgFBAL4vCkz4YhVjaNglEwCkbBKBgFo2Bkg9pB3nYhd2x/7iD3Fy5A6VzGKBgFQwUAAEY/Jo4=
+  </data>
+ </layer>
+ <objectgroup color="#00ff00" name="collision">
+  <object x="632" y="704" width="112" height="112">
+   <ellipse/>
+  </object>
+  <object x="920" y="704" width="112" height="112">
+   <ellipse/>
+  </object>
+  <object x="896" y="880">
+   <polygon points="0,0 96,0 120,32 168,40 176,128 216,128 256,112 448,112 448,48 512,48 552,-72 0,-72"/>
+  </object>
+  <object x="1408" y="832" width="216" height="360"/>
+  <object x="1416" y="1024">
+   <polygon points="0,0 -264,0 -296,16 -256,16 -248,72 -208,112 -160,120 -128,152 -120,200 -64,256 24,256"/>
+  </object>
+  <object x="896" y="648" width="544" height="120"/>
+  <object x="224" y="648" width="544" height="120"/>
+  <object x="224" y="144" width="32" height="536"/>
+  <object x="224" y="136" width="1208" height="120"/>
+  <object x="1408" y="160" width="32" height="496"/>
+  <object x="256" y="424" width="344" height="224"/>
+  <object x="296" y="256" width="664" height="96"/>
+  <object x="776" y="328" width="72" height="48"/>
+  <object x="1056" y="232" width="136" height="104"/>
+  <object x="1088" y="336" width="104" height="72"/>
+  <object x="1176" y="224" width="128" height="80"/>
+  <object x="1304" y="240" width="104" height="48"/>
+  <object x="1192" y="368" width="80" height="48"/>
+  <object x="1328" y="368" width="80" height="48"/>
+  <object x="280" y="808" width="488" height="72"/>
+  <object x="0" y="768" width="344" height="88"/>
+ </objectgroup>
+</map>
