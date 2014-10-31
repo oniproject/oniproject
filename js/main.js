@@ -24,9 +24,9 @@ function run(player, host) {
 
 	var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 	colorMatrixFilter.matrix = [
-		0.2, 0, 0, 0,
-		0, 0.2, 0, 0,
-		0, 0, 0.5, 0,
+		0.4, 0, 0, 0,
+		0, 0.4, 0, 0,
+		0, 0, 0.7, 0,
 		0, 0, 0, 1,
 	];
 	game.container.filters = [colorMatrixFilter];
@@ -35,16 +35,16 @@ function run(player, host) {
 	game.ttt = ttt;
 
 	var suika = new Suika();
-	suika.position.x = 440;
-	suika.position.y = 300;
+	suika.position.x = 40;
+	suika.position.y = 130;
 	game.suika = suika;
 	suika.animation = 'walk';
 	stage.addChild(suika);
 
 	var bat = new Bat();
 	game.bat = bat;
-	bat.position.x = 400;
-	bat.position.y = 350;
+	bat.position.x = 10;
+	bat.position.y = 150;
 	bat.animation = 'walk';
 	stage.addChild(bat);
 
@@ -67,7 +67,6 @@ function run(player, host) {
 		renderer.render(stage);
 		var a = game.avatars[game.player];
 		if (a) {
-
 			var d = Math.atan2(a.lastvel.x || 0, a.lastvel.y || 0);
 			var dd = -d / Math.PI * 180 + 180;
 			suika.direction = dd;

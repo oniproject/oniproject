@@ -13,6 +13,11 @@ function Avatar(obj) {
 	this.rot = 1;
 
 	this.obj = obj;
+	obj.buttonMode = true;
+	obj.interactive = true;
+	obj.click = obj.tap = function(event) {
+		console.info("tapped");
+	};
 }
 
 Avatar.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
