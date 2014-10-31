@@ -17,7 +17,7 @@ import (
 const (
 	TickRate     = 50 * time.Millisecond
 	SpeedOfLight = 2
-	ReplicRange  = 490
+	ReplicRange  = 4
 )
 
 // for message system

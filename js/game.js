@@ -135,9 +135,10 @@ Game.prototype.state_msg = function(state) {
 				var obj;
 				if (state.Id > 0) {
 					obj = new Suika();
-					this.container.addChild(obj);
 				} else if (state.Id > -20000) {
 					obj = new Bat();
+				}
+				if (obj) {
 					this.container.addChild(obj);
 				}
 				this.avatars[state.Id] = new Avatar(obj, state.Position, state.Velocity);
@@ -175,6 +176,10 @@ Game.prototype.state_msg = function(state) {
 					clearTimeout(avatar.rm_timer);
 				}
 				avatar.rm_timer = setTimeout(function() {
+					var a = this.avatars[state.Id];
+					if (a.obj) {
+						this.container.removeChild(a.obj);
+					}
 					delete this.avatars[state.Id];
 				}.bind(this), 800);
 

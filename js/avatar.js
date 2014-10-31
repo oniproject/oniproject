@@ -1,42 +1,33 @@
 'use strict';
 
-var Isomer = require('isomer'),
-	Octahedron = require('./octahedron'),
-	Knot = require('./knot'),
-	/* Some convenient renames */
-	Point = Isomer.Point,
-	Path = Isomer.Path,
-	Shape = Isomer.Shape,
-	Color = Isomer.Color;
-
 function Avatar(obj) {
-	this.position = new Point(0, 0, 0);
-	this.velocity = new Point(0, 0, 0);
+	PIXI.DisplayObjectContainer.call(this);
+
+	this.velocity = {
+		x: 0,
+		y: 0
+	};
+
 	this.speed = 1.0;
 	this.angle = 0;
 	this.rot = 1;
-	var c = new Color();
-	c.h = Math.random();
-	c.s = 0.8;
-	c.l = 0.3;
-	c.loadRGB();
-	this.color = c;
+
 	this.obj = obj;
 }
 
-Avatar.prototype.draw = function(iso) {
+Avatar.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+Avatar.constructor = Avatar;
+
+Avatar.prototype.draw = function() {
+	return;
 	var pos = this.position;
 
 	if (this.hasOwnProperty('state')) {
 		// is avatar or monster
 		if (this.state.Id > -10000) {
-			iso.add(Octahedron(new Point(pos.x - 0.5, pos.y - 0.5, pos.z))
-				.rotateZ(new Point(pos.x, pos.y, pos.z + 0.5), this.angle)
-				.scale(new Point(pos.x, pos.y, pos.z), 0.7, 0.7, 0.7), this.color);
 		}
 		// is avatar or item
 		if (this.state.Id < -10000 || this.state.Id > 0) {
-			iso.add(Knot(new Point(pos.x - 0.5, pos.y - 0.5)).scale(new Point(pos.x, pos.y), 0.2, 0.2, 0.2), this.color);
 		}
 	}
 }
@@ -61,7 +52,6 @@ Avatar.prototype.update = function(time) {
 	this.angle += this.rot * Math.PI * time;
 	this.position.x += this.velocity.x * time;
 	this.position.y += this.velocity.y * time;
-	this.position.z += this.velocity.z * time;
 
 	if (this.obj) {
 		this.obj.position.x = this.position.x * 32;
@@ -70,6 +60,12 @@ Avatar.prototype.update = function(time) {
 			this.obj.animation = 'walk';
 		} else {
 			this.obj.animation = 'idle';
+		}
+
+		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+			this.obj.direction = -Math.atan2(this.velocity.x, this.velocity.y) / Math.PI * 180 + 180;
+		} else if (this.lastvel !== undefined) {
+			this.obj.direction = -Math.atan2(this.lastvel.x, this.lastvel.y) / Math.PI * 180 + 180;
 		}
 	}
 }
@@ -81,16 +77,16 @@ Avatar.prototype.move = function(dir) {
 		var to = dir[i];
 		switch (to) {
 			case 'N':
-				this.velocity.x += this.speed;
+				this.velocity.y -= this.speed;
 				break;
 			case 'W':
-				this.velocity.y += this.speed;
-				break;
-			case 'S':
 				this.velocity.x -= this.speed;
 				break;
+			case 'S':
+				this.velocity.y += this.speed;
+				break;
 			case 'E':
-				this.velocity.y -= this.speed;
+				this.velocity.x += this.speed;
 				break;
 		}
 	}

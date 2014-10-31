@@ -29,7 +29,6 @@ function run(player, host) {
 
 	var Game = require('./game');
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
-	stage.addChild(scene);
 
 	game.ttt = ttt;
 
