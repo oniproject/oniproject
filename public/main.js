@@ -3,9 +3,6 @@
 
 console.log('fuck');
 
-var Tileset = require('./tileset'),
-	Tilemap = require('./tilemap');
-
 var Tiled = require('./tiled');
 
 var Suika = require('./suika');
@@ -17,56 +14,6 @@ function run(player, host) {
 		stage = new PIXI.Stage(0xFFFFFF, true),
 		renderer = PIXI.autoDetectRenderer(w, h);
 	document.body.appendChild(renderer.view);
-
-	var WH = {
-			width: 32,
-			height: 32
-		},
-		World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
-		World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
-		World_B = new Tileset('/game/World_B.png', 16, 16, WH),
-		Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
-		Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
-		Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
-		Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
-		Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
-		Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
-		Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
-		nn = 31,
-		data = [
-			[0, 0, 0, 0, 0, 0, 0],
-			[0, nn, 0, nn, nn, nn, 0],
-			[0, nn, 0, nn, 0, 0, 0],
-			[0, nn, 0, nn, 0, 0, 0],
-			[0, nn, nn, nn, nn, nn, 0],
-			[0, 0, 0, nn, 0, nn, 0],
-			[0, 0, 0, nn, 0, nn, 0],
-			[0, nn, nn, nn, 0, nn, 0],
-			[0, 0, 0, 0, 0, 0, 0],
-			[0, nn, nn, nn, 0, 0, 0],
-			[0, nn, 0, nn, 0, 0, 0],
-			[0, nn, nn, nn, 0, 0, 0],
-			[0, 0, nn, nn, nn, 0, 0],
-			[0, 0, 0, nn, nn, 0, 0],
-			[0, 0, 0, nn, nn, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0],
-		];
-
-	window.Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
-
-	window.scene = new Tilemap(20, 20, Outside);
-	for (var y = 0, ml = data.length; y < ml; y++) {
-		var line = data[y];
-		for (var x = 0, ll = line.length; x < ll; x++) {
-			var nnn = data[y][x];
-			if (nnn) {
-				scene.setAt(x, y, 'second', 0, [0, 1, 2], true);
-				scene.setAt(x, y, 'third', 0, 3, true);
-			} else {
-				scene.setAt(x, y, 'second', 0, [0, 1, 2], true);
-			}
-		}
-	}
 
 	var ttt = new Tiled('/maps/', 'test.json');
 
@@ -82,7 +29,7 @@ function run(player, host) {
 	stage.addChild(ttt);
 
 	var Game = require('./game');
-	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
+	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
 	stage.addChild(scene);
 
 	game.ttt = ttt;
@@ -283,7 +230,7 @@ r.onreadystatechange = function() {
 };
 r.send();
 
-},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./test-map":"/home/lain/gocode/src/oniproject/js/test-map.json","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","./tilemap":"/home/lain/gocode/src/oniproject/js/tilemap.js","./tileset":"/home/lain/gocode/src/oniproject/js/tileset.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
+},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
 'use strict';
 
 var Isomer = require('isomer'),
@@ -516,29 +463,12 @@ module.exports = Bat;
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
-	Isomer = require('isomer');
-
-Isomer.prototype.reorigin = function(point) {
-	var xMap = new Point(point.x * this.transformation[0][0],
-		point.x * this.transformation[0][1]),
-		yMap = new Point(point.y * this.transformation[1][0],
-		point.y * this.transformation[1][1]);
-
-	this.originX = -xMap.x - yMap.x + (this.canvas._width / 2.0);
-	this.originY = +xMap.y + yMap.y + (point.z * this.scale) + (this.canvas._height / 2.0);
-}
-
-var Point = Isomer.Point,
-	Shape = Isomer.Shape,
-	Stairs = require('./stairs'),
-	Map = require('./map'),
 	Avatar = require('./avatar'),
-	Net = require('./net');
+	Net = require('./net'),
+	Suika = require('./suika'),
+	Bat = require('./bat');
 
-var Suika = require('./suika');
-var Bat = require('./bat');
-
-function Game(renderer, stage, player, url, map) {
+function Game(renderer, stage, player, url) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
 
@@ -560,50 +490,7 @@ function Game(renderer, stage, player, url, map) {
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 
-	var iso = new Isomer(renderer.view);
-	this.iso = iso;
-	iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
-	iso.colorDifference = 0.2;
-	iso.canvas = new PIXI.Graphics();
-	stage.addChild(iso.canvas);
-	iso.canvas.path = function(points, color) {
-		var c = color.r * 256 * 256 + color.g * 256 + color.b,
-			graphics = this; // for moar speed
-		graphics.beginFill(c, color.a).moveTo(points[0].x, points[0].y);
-		for (var i = 1; i < points.length; i++) {
-			graphics.lineTo(points[i].x, points[i].y);
-		}
-		// XXX hack for pixi v1.6.0
-		if (points.length % 2) {
-			graphics.lineTo(points[0].x, points[0].y);
-		}
-		graphics.endFill();
-	}
-
 	var game = this;
-	iso.canvas.setInteractive(true);
-	iso.canvas.click = function(event) {
-		for (var id in game.avatars) {
-			if (game.avatars.hasOwnProperty(id)) {
-				var a = game.avatars[id],
-					pos = iso._translatePoint(a.position),
-					x = event.global.x - pos.x,
-					y = event.global.y - pos.y,
-					d = Math.sqrt(x * x + y * y);
-				if (d < 50) {
-					net.SetTargetMsg({
-						id: id
-					});
-					if (a.isItem) {
-						net.PickupItemMsg();
-					}
-				}
-			}
-		}
-	}
-
-	this.map = new Map(this.iso);
-	this.map.objects = map.objects;
 }
 
 Game.prototype = EventEmitter.prototype;
@@ -681,48 +568,9 @@ Game.prototype.initKeyboard = function() {
 	listener.register_many(move_combos);
 }
 
-Game.prototype.resize = function(w, h) {
-	this.iso.canvas._width = w;
-	this.iso.canvas._height = h;
+Game.prototype.resize = function(w, h) {}
 
-	this.iso.canvas.hitArea = new PIXI.Rectangle(0, 0, w, h);
-
-	if (this.avatars.hasOwnProperty(this.player)) {
-		this.iso.reorigin(this.avatars[this.player].position);
-	}
-}
-
-Game.prototype.render = function(time) {
-	var iso = this.iso;
-	iso.canvas.clear();
-
-	this.map.render(this.iso);
-
-	iso.add(Stairs(new Point(-1, 0, 0)));
-	iso.add(Stairs(new Point(0, 3, 1)).rotateZ(new Point(0.5, 3.5, 1), -Math.PI / 2));
-	iso.add(Stairs(new Point(2, 0, 2)).rotateZ(new Point(2.5, 0.5, 0), -Math.PI / 2));
-
-	var xx = [
-		[1, 1, 1, 1, 1, 1],
-		[1, 0, 0, 0, 0, 1],
-		[1, 0, 0, 0, 0, 1],
-		[1, 0, 0, 1, 0, 1],
-		[1, 0, 0, 0, 0, 1],
-		[1, 1, 1, 1, 1, 1],
-	];
-
-	for (var y = xx.length - 1; y >= 0; y--) {
-		for (var x = xx[y].length - 1; x >= 0; x--) {
-			if (xx[y][x] != 0) {
-				iso.add(Shape.Prism(new Point(x, y, 0), 1, 1, 0.1));
-			}
-		}
-	}
-
-	for (var i in this.avatars) {
-		this.avatars[i].draw(iso);
-	}
-}
+Game.prototype.render = function(time) {}
 
 Game.prototype.animate = function(time) {
 	if (this.avatars.hasOwnProperty(this.player)) {
@@ -732,9 +580,6 @@ Game.prototype.animate = function(time) {
 	}
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
-	}
-	if (this.avatars.hasOwnProperty(this.player)) {
-		this.iso.reorigin(this.avatars[this.player].position);
 	}
 }
 
@@ -840,7 +685,7 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./avatar":"/home/lain/gocode/src/oniproject/js/avatar.js","./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./map":"/home/lain/gocode/src/oniproject/js/map.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./stairs":"/home/lain/gocode/src/oniproject/js/stairs.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/knot.js":[function(require,module,exports){
+},{"./avatar":"/home/lain/gocode/src/oniproject/js/avatar.js","./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/knot.js":[function(require,module,exports){
 'use strict';
 
 var Isomer = require('isomer'),
@@ -875,98 +720,6 @@ function Knot(origin) {
 }
 
 module.exports = Knot;
-
-},{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/map.js":[function(require,module,exports){
-'use strict';
-
-var Isomer = require('isomer');
-
-function Map(iso) {
-	this.iso = iso;
-	this.objects = [];
-
-	var mod = function(add, obj) {
-		for (var i = 0, l = obj.modificators.length; i < l; i++) {
-			var mod = obj.modificators[i],
-				point = Isomer.Point.apply(null, mod.point);
-
-			switch (mod.type) {
-				case 'rotateZ':
-					add = add.rotateZ(point, mod.yaw);
-					break;
-				case 'scale':
-					add = add.scale(point, mod.x, mod.y, mod.z);
-					break;
-				case 'translate':
-					add = add.translate(mod.x, mod.y, mod.z);
-					break;
-				default:
-					console.warn('fail mod.type', mod);
-			}
-		}
-		return add;
-	};
-	this._render_one = function(obj) {
-		var add = null;
-
-		switch (obj.type) {
-			case 'prism':
-				var pos = obj.pos;
-				//add = Isomer.Shape.Prism(Isomer.Point.ORIGIN, obj.dx, obj.dy, obj.dz);
-				add = Isomer.Shape.Prism(Isomer.Point.ORIGIN, 1, 1, 1);
-				//add = add.translate(pos[0], pos[1], pos[2]);
-				//add = add.scale(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
-				break;
-			case 'pyramid':
-				var pos = obj.pos;
-				add = Isomer.Shape.Pyramid(Isomer.Point.ORIGIN, 1, 1, 1);
-				//add = add.translate(pos[0], pos[1], pos[2]);
-				//add = add.scale(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
-				break;
-			case 'cylinder':
-				var pos = obj.pos;
-				add = Isomer.Shape.Cylinder(Isomer.Point.ORIGIN, 1, obj.vertices, 1);
-				//add = add.translate(pos[0], pos[1], pos[2]);
-				break;
-			case 'path':
-				add = new Isomer.Path(obj.path.map(function(el) {
-					return Isomer.Point.apply(null, el);
-				}));
-				break;
-			case 'shape':
-				add = Isomer.Shape.extrude(new Isomer.Path(obj.path.map(function(el) {
-					return Isomer.Point.apply(null, el);
-				})), obj.height);
-				break;
-			default:
-				console.warn('fail obj.type', obj);
-		}
-		if (obj.pos !== undefined) {
-			var pos = obj.pos,
-				point = Isomer.Point.apply(null, pos);
-			add = add.translate(pos[0], pos[1], pos[2]);
-			if (obj.size !== undefined) {
-				add = add.scale(point, obj.size[0], obj.size[1], obj.size[2]);
-			}
-			if (obj.yaw !== undefined) {
-				add = add.rotateZ(point, obj.yaw * (Math.PI / 180));
-			}
-		}
-
-		return (add && mod(add, obj)) || null;
-	}
-
-	this.render = function() {
-		for (var i = 0, l = this.objects.length; i < l; i++) {
-			var obj = this.objects[i],
-				add = this._render_one(obj),
-				color = new Isomer.Color(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
-			add && this.iso.add(add, color);
-		}
-	};
-}
-
-module.exports = Map;
 
 },{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
 'use strict';
@@ -1142,64 +895,6 @@ function Octahedron(origin) {
 }
 
 module.exports = Octahedron;
-
-},{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/stairs.js":[function(require,module,exports){
-'use strict';
-
-var Isomer = require('isomer'),
-	/* Some convenient renames */
-	Path = Isomer.Path,
-	Shape = Isomer.Shape;
-
-/* Draws some stars at a given point */
-function Stairs(origin) {
-	var STEP_COUNT = 10,
-		/* Create a zig-zag */
-		zigzag = new Path(origin),
-		steps = [],
-		i,
-		/* Shape to return */
-		stairs = new Shape();
-
-	for (i = 0; i < STEP_COUNT; i++) {
-		/**
-		 *  2
-		 * __
-		 *   | 1
-		 */
-
-		var stepCorner = origin.translate(0, i / STEP_COUNT, (i + 1) / STEP_COUNT);
-		/* Draw two planes */
-		steps.push(new Path([
-			stepCorner,
-			stepCorner.translate(0, 0, -1 / STEP_COUNT),
-			stepCorner.translate(1, 0, -1 / STEP_COUNT),
-			stepCorner.translate(1, 0, 0)
-		]));
-
-		steps.push(new Path([
-			stepCorner,
-			stepCorner.translate(1, 0, 0),
-			stepCorner.translate(1, 1 / STEP_COUNT, 0),
-			stepCorner.translate(0, 1 / STEP_COUNT, 0)
-		]));
-
-		zigzag.push(stepCorner);
-		zigzag.push(stepCorner.translate(0, 1 / STEP_COUNT, 0));
-	}
-
-	zigzag.push(origin.translate(0, 1, 0));
-
-	for (i = 0; i < steps.length; i++) {
-		stairs.push(steps[i]);
-	}
-	stairs.push(zigzag);
-	stairs.push(zigzag.reverse().translate(1, 0, 0));
-
-	return stairs;
-}
-
-module.exports = Stairs;
 
 },{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/suika.js":[function(require,module,exports){
 'use strict';
@@ -1402,8 +1097,6 @@ Suika.prototype.updateTransform = function() {
 
 module.exports = Suika;
 
-},{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
 },{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
 'use strict';
 
@@ -1768,533 +1461,6 @@ function updateTransform() {
 
 		this.last += frame.duration;
 	}
-}
-
-module.exports = Tileset;
-
-},{}],"/home/lain/gocode/src/oniproject/js/tilemap.js":[function(require,module,exports){
-'use strict';
-
-var Tilemap = function(w, h, tilesets, data) {
-	PIXI.DisplayObjectContainer.call(this);
-
-	this.w = w;
-	this.h = h;
-	this.tilesets = tilesets;
-
-	this.step = 0;
-
-	if (!data) {
-		data = {
-			first: [],
-			second: [],
-			//objects: [],
-			third: [],
-		};
-	}
-
-	this.data = data;
-
-	this.first = new PIXI.SpriteBatch();
-	this.second = new PIXI.SpriteBatch();
-	this.third = new PIXI.SpriteBatch();
-	this.objects = new PIXI.DisplayObjectContainer();
-	this.addChild(this.first);
-	this.addChild(this.second);
-	this.addChild(this.objects);
-	this.addChild(this.third);
-	this.third.alpha = 0.1;
-
-	for (var y = 0; y < h; y++) {
-		data.first.push(new Array(w));
-		data.second.push(new Array(w));
-		//data.objects.push(new Array(w));
-		data.third.push(new Array(w));
-		for (var x = 0; x < w; x++) {
-			// t is a tileset
-			// v is a tile number
-			// if v is array it animated tile
-			data.first[y][x] = null;
-			data.second[y][x] = null;
-			//data.objects[y][x] = 0;
-			data.third[y][x] = null;
-			//this._setAt(x, y, 'first', 0, [0, 1, 2], true);
-			//this._setAt(x, y, 'second', 0, 3, true);
-			//this._setAt(x, y, 'first', 5, 56);
-			//this._setAt(x, y, 'second', 5, 56);
-			//this._setAt(x, y, 'third', 5, 56);
-		}
-	}
-}
-
-Tilemap.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-Tilemap.constructor = Tilemap;
-
-function cleanLastSprites(layer, tile) {
-	if (!tile) {
-		return;
-	}
-	if (tile.hasOwnProperty('s')) {
-		try {
-			if (tile.s instanceof Array) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					layer.removeChild(tile.s[i]);
-				}
-			} else {
-				layer.removeChild(tile.s);
-			}
-		} catch ( e ) {
-			console.error(e);
-		}
-		delete tile.s;
-	}
-}
-
-function _line(line, id, x) {
-	var def = true;
-	if (line === undefined) {
-		return [true, true, true];
-	}
-
-	var lines = [line[x - 1], line[x], line[x + 1]];
-	for (var i = 0, l = lines.length; i < l; i++) {
-		var n = lines[i];
-		if (n !== undefined && n !== null) {
-			if (n.v instanceof Array) {
-				n = n.v[0] === id;
-			} else {
-				n = n.v === id;
-			}
-		} else if (n === null) {
-			n = false;
-		} else {
-			n = true;
-		}
-		lines[i] = n;
-	}
-	return lines;
-}
-
-function _addAuto(layer, map, tileset, tile, x, y, frame) {
-	var w = tileset.size.width,
-		h = tileset.size.height,
-		id = (frame !== undefined) ? tile.v[frame] : tile.v,
-		zeroId = (frame !== undefined) ? tile.v[0] : tile.v,
-		neighbors = [];
-	neighbors.push(_line(map[y - 1], zeroId, x));
-	neighbors.push(_line(map[y + 0], zeroId, x));
-	neighbors.push(_line(map[y + 1], zeroId, x));
-
-	var textures = tileset.atAutoTile(id, neighbors),
-		s0 = new PIXI.Sprite(textures[0]),
-		s1 = new PIXI.Sprite(textures[1]),
-		s2 = new PIXI.Sprite(textures[2]),
-		s3 = new PIXI.Sprite(textures[3]);
-
-	s0.position.x = x * w + 0;
-	s0.position.y = y * h + 0;
-	s0.frame = frame;
-
-	s1.position.x = x * w + w / 2;
-	s1.position.y = y * h + 0;
-	s1.frame = frame;
-
-	s2.position.x = x * w + 0;
-	s2.position.y = y * h + h / 2;
-	s2.frame = frame;
-
-	s3.position.x = x * w + w / 2;
-	s3.position.y = y * h + h / 2;
-	s3.frame = frame;
-
-	layer.addChild(s0);
-	layer.addChild(s1);
-	layer.addChild(s2);
-	layer.addChild(s3);
-	return [s0, s1, s2, s3];
-}
-
-Tilemap.prototype.redrawAt = function(x, y, layer) {
-	try {
-		var tile = this.data[layer][y][x];
-		this._setAt(x, y, layer, tile.t, tile.v, tile.auto);
-	} catch ( e ) {}
-}
-
-Tilemap.prototype.setAt = function(x, y, layer, t, v, auto) {
-	this._setAt(x, y, layer, t, v, auto);
-
-	switch (layer) {
-		case 'first':
-			cleanLastSprites(this.second, this.data.second[y][x]);
-			this.data.second[y][x] = null;
-			cleanLastSprites(this.third, this.data.third[y][x]);
-			this.data.third[y][x] = null;
-			break;
-		case 'second':
-			cleanLastSprites(this.third, this.data.third[y][x]);
-			this.data.third[y][x] = null;
-			break;
-	}
-
-	this.redrawAt(x - 1, y - 1, layer);
-	this.redrawAt(x - 1, y, layer);
-	this.redrawAt(x - 1, y + 1, layer);
-
-	this.redrawAt(x, y - 1, layer);
-	this.redrawAt(x, y + 1, layer);
-
-	this.redrawAt(x + 1, y - 1, layer);
-	this.redrawAt(x + 1, y, layer);
-	this.redrawAt(x + 1, y + 1, layer);
-}
-
-Tilemap.prototype._setAt = function(x, y, layer, t, v, auto) {
-	if (x < 0 || x > this.w) {
-		throw 'Fail X';
-	}
-	if (y < 0 || y > this.h) {
-		throw 'Fail Y';
-	}
-
-	if (!this.data.hasOwnProperty(layer) || layer === 'objects') {
-		throw 'Fail Layer';
-	}
-
-	if (!this.data[layer][y][x]) {
-		this.data[layer][y][x] = {
-			t: 0,
-			v: 0
-		};
-	}
-
-	var tile = this.data[layer][y][x];
-	tile.t = t;
-	tile.v = v;
-	tile.auto = auto;
-
-	cleanLastSprites(this[layer], tile);
-
-	var tileset = this.tilesets[t];
-
-	if (typeof v === 'number') {
-		if (tile.auto) {
-			tile.s = _addAuto(this[layer], this.data[layer], tileset, tile, x, y);
-		} else {
-			var s = new PIXI.Sprite(tileset.at(v));
-			s.position.x = x * tileset.size.width;
-			s.position.y = y * tileset.size.height;
-			this[layer].addChild(s);
-			tile.s = s;
-		}
-	} else if (v instanceof Array) {
-		tile.s = [];
-		for (var i = 0, l = v.length; i < l; i++) {
-			if (tile.auto) {
-				var s = _addAuto(this[layer], this.data[layer], tileset, tile, x, y, i);
-				tile.s = tile.s.concat(s);
-			} else {
-				var s = new PIXI.Sprite(tileset.at(v[i]));
-				s.position.x = x * tileset.size.width;
-				s.position.y = y * tileset.size.height;
-				s.frame = i; // for animation
-				this[layer].addChild(s);
-				tile.s.push(s);
-			}
-		}
-	}
-}
-
-Tilemap.prototype.updateTransform = function() {
-	PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
-
-	var frame = this.step + 0.05,
-		round = (frame) | 0;
-	if (round === 3) {
-		round = 0;
-	}
-	this.step = frame % 3;
-
-	var data = this.data,
-		w = this.w,
-		h = this.h;
-
-	if (round == this.lastRount) {
-		return;
-	}
-	this.lastRount = round;
-
-	for (var y = 0; y < h; y++) {
-		for (var x = 0; x < w; x++) {
-			var tile = data.first[y][x];
-			if (tile && tile.v instanceof Array && tile.s) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					var s = tile.s[i];
-					s.visible = s.frame === round;
-				}
-			}
-			var tile = data.second[y][x];
-			if (tile && tile.v instanceof Array && tile.s) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					var s = tile.s[i];
-					s.visible = s.frame === round;
-				}
-			}
-			var tile = data.third[y][x];
-			if (tile && tile.v instanceof Array && tile.s) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					var s = tile.s[i];
-					s.visible = s.frame === round;
-				}
-			}
-		}
-	}
-}
-
-Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
-	var layer = this.data[_layer],
-		north,
-		south,
-		Q = [{
-			x: x,
-			y: y
-		}],
-		empty = (layer[y][x]) ? layer[y][x].v : null,
-		check = function(x, y) {
-			if (y < 0 || y >= layer.length) {
-				return false;
-			}
-			if (x < 0 || x >= layer[y].length) {
-				return false;
-			}
-			if (!layer[y][x] && !empty) {
-				return true;
-			}
-			if (!layer[y][x]) {
-				return false;
-			}
-
-			var v = layer[y][x].v;
-			if (typeof v === 'number' && typeof empty === 'number') {
-				return v === empty;
-			} else if (typeof v !== 'number' && typeof empty !== 'number') {
-				if (!empty) {
-					return false;
-				}
-				for (var i = 0, l = v.length; i < l; i++) {
-					if (v[i] !== empty[i]) {
-						return false;
-					}
-				}
-				return true;
-			}
-			return false;
-		};
-
-	while (Q.length) {
-		var N = Q.pop();
-		x = N.x;
-		y = N.y;
-
-		if (check(x, y)) {
-			north = south = y;
-			do {
-				north--;
-			} while (check(x, north) && north >= 0);
-			do {
-				south++;
-			} while (check(x, south) && south < layer.length);
-
-			for (var n = north + 1; n < south; n++) {
-				this.setAt(x, n, _layer, t, v, auto);
-				if (check(x - 1, n)) {
-					Q.push({
-						x: x - 1,
-						y: n,
-					});
-				}
-				if (check(x + 1, n)) {
-					Q.push({
-						x: x + 1,
-						y: n,
-					});
-				}
-			}
-		}
-	}
-}
-
-module.exports = Tilemap;
-
-},{}],"/home/lain/gocode/src/oniproject/js/tileset.js":[function(require,module,exports){
-'use strict';
-
-function Tileset(url, w, h, size, noAutoLoad) {
-	this.width = w;
-	this.height = h;
-	this.size = size;
-
-	var image = new PIXI.ImageLoader(url),
-		tiles = [];
-	for (var y = 0; y < h; y++) {
-		for (var x = 0; x < w; x++) {
-			var rect = {
-				x: x * size.width,
-				y: y * size.height,
-				width: size.width,
-				height: size.height,
-			};
-			tiles.push(new PIXI.Texture(image.texture.baseTexture, rect));
-		}
-	}
-
-	this.tiles = tiles;
-	if (!noAutoLoad) {
-		image.load();
-	}
-	this.image = image;
-}
-
-// x and y for subtile
-Tileset.prototype.at = function(i, x, y) {
-	if (x === undefined && y === undefined) {
-		return this.tiles[i];
-	} else {
-		// FIXME maybe memory leaks
-		var t = this.tiles[i],
-			rect = {
-				x: t.frame.x + x * this.size.width / 2,
-				y: t.frame.y + y * this.size.height / 2,
-				width: this.size.width / 2,
-				height: this.size.height / 2,
-			};
-		return new PIXI.Texture(t, rect);
-	}
-}
-
-/*
- * get
- *  [bool, bool, bool]
- *  [bool, xxxx, bool]
- *  [bool, bool, bool]
- * return
- *  [n, n]
- *  [n, n]
- */
-
-Tileset.prototype.atAutoTile = function(id, neighbors) {
-	/*
-	 *   |**
-	 *   |**
-	 * --|--
-	 * ↖↑|↑↗
-	 * ←4|3→
-	 * --|--
-	 * ←2|1→
-	 * ↙↓|↓↘
-	 */
-	var w = this.width >>> 1,
-		x = (id % w) * 2,
-		y = (id - id % w) / w * 3,
-		map = [
-			(y + 0) * this.width + x + 0,
-			(y + 0) * this.width + x + 1,
-			(y + 1) * this.width + x + 0,
-			(y + 1) * this.width + x + 1,
-			(y + 2) * this.width + x + 0,
-			(y + 2) * this.width + x + 1,
-		],
-		one, two, three;
-
-	// 2 3
-	// 1 x
-	one = neighbors[1][0];
-	two = neighbors[0][0];
-	three = neighbors[0][1];
-
-	// 1↘  2↖ 3↑ 4← 5*
-	var tleft = 2;
-	if (one && !two && three) {
-		tleft = 1;
-	}
-	if (one && two && three) {
-		tleft = 5;
-	}
-	if (!one && three) {
-		tleft = 4;
-	}
-	if (one && !three) {
-		tleft = 3;
-	}
-
-	// 1 2
-	// x 3
-	one = neighbors[0][1];
-	two = neighbors[0][2];
-	three = neighbors[1][2];
-
-	// 1↙ 2↑ 3↗ 4* 5→
-	var tright = 3;
-	if (one && !two && three) {
-		tright = 1;
-	}
-	if (one && two && three) {
-		tright = 4;
-	}
-	if (!one && three) {
-		tright = 2;
-	}
-	if (one && !three) {
-		tright = 5;
-	}
-
-	// 1 x
-	// 2 3
-	one = neighbors[1][0];
-	two = neighbors[2][0];
-	three = neighbors[2][1];
-
-	// 1↗ 2← 3* 4↙ 5↓
-	var dleft = 4;
-	if (one && !two && three) {
-		dleft = 1;
-	}
-	if (one && two && three) {
-		dleft = 3;
-	}
-	if (!one && three) {
-		dleft = 2;
-	}
-	if (one && !three) {
-		dleft = 5;
-	}
-
-	// x 1
-	// 3 2
-	one = neighbors[1][2];
-	two = neighbors[2][2];
-	three = neighbors[2][1];
-	// 1↖ 2* 3→ 4↓ 5↘
-	var drigth = 5;
-	if (one && !two && three) {
-		drigth = 1;
-	}
-	if (one && two && three) {
-		drigth = 2;
-	}
-	if (!one && three) {
-		drigth = 3;
-	}
-	if (one && !three) {
-		drigth = 4;
-	}
-
-	return [
-		this.at(map[tleft], 0, 0),
-		this.at(map[tright], 1, 0),
-		this.at(map[dleft], 0, 1),
-		this.at(map[drigth], 1, 1),
-	];
 }
 
 module.exports = Tileset;
