@@ -15,6 +15,12 @@ function run(player, host) {
 	document.body.appendChild(renderer.view);
 
 	var ttt = new Tiled('/maps/', 'test.json');
+	ttt.load();
+
+
+	var Game = require('./game');
+	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
+	game.container.addChild(ttt);
 
 	var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 	colorMatrixFilter.matrix = [
@@ -23,12 +29,8 @@ function run(player, host) {
 		0, 0, 0.5, 0,
 		0, 0, 0, 1,
 	];
-	ttt.filters = [colorMatrixFilter];
-	ttt.load();
-	stage.addChild(ttt);
+	game.container.filters = [colorMatrixFilter];
 
-	var Game = require('./game');
-	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
 
 	game.ttt = ttt;
 
@@ -65,8 +67,9 @@ function run(player, host) {
 		renderer.render(stage);
 		var a = game.avatars[game.player];
 		if (a) {
+
 			var d = Math.atan2(a.lastvel.x || 0, a.lastvel.y || 0);
-			var dd = d / Math.PI * 180 - 45;
+			var dd = -d / Math.PI * 180 + 180;
 			suika.direction = dd;
 		}
 	}

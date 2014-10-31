@@ -115,6 +115,8 @@ Game.prototype.animate = function(time) {
 		var player = this.avatars[this.player];
 		player.move(this.dir.join(''));
 		this.net.SetVelocityMsg(player.velocity);
+		this.container.position.x = Math.round(-player.obj.position.x + window.innerWidth / 2);
+		this.container.position.y = Math.round(-player.obj.position.y + window.innerHeight / 2);
 	}
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);

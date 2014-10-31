@@ -54,18 +54,22 @@ Avatar.prototype.update = function(time) {
 	this.position.y += this.velocity.y * time;
 
 	if (this.obj) {
-		this.obj.position.x = this.position.x * 32;
-		this.obj.position.y = this.position.y * 32;
-		if (this.velocity.x + this.velocity.y !== 0) {
-			this.obj.animation = 'walk';
-		} else {
-			this.obj.animation = 'idle';
-		}
+		var obj = this.obj;
+		obj.position.x = this.position.x * 32;
+		obj.position.y = this.position.y * 32;
 
 		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
-			this.obj.direction = -Math.atan2(this.velocity.x, this.velocity.y) / Math.PI * 180 + 180;
+			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
+			var dd = -d / Math.PI * 180 + 180;
+			obj.direction = dd;
+			obj.animation = 'walk';
 		} else if (this.lastvel !== undefined) {
-			this.obj.direction = -Math.atan2(this.lastvel.x, this.lastvel.y) / Math.PI * 180 + 180;
+			var d = Math.atan2(this.lastvel.x || 0, this.lastvel.y || 0);
+			var dd = -d / Math.PI * 180 + 180;
+			obj.direction = dd;
+			obj.animation = 'walk';
+		} else {
+			obj.animation = 'idle';
 		}
 	}
 }
