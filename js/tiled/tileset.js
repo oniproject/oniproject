@@ -72,12 +72,17 @@ Tileset.prototype.load = function(fn) {
 
 
 Tileset.prototype.CreateSprite = function(id) {
+	if (id == 0) {
+		return;
+	}
+
 	var data = this.data;
 	id -= data.firstgid;
 	var texture = this.tiles[id];
 
 
 	if (!texture) {
+		console.error('TEXTURE FAIL', data.name, id, id + data.firstgid, data.firstgid);
 		return;
 	}
 

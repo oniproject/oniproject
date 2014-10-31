@@ -20,7 +20,13 @@ var Point = Isomer.Point,
 	Avatar = require('./avatar'),
 	Net = require('./net');
 
+var Suika = require('./suika');
+var Bat = require('./bat');
+
 function Game(renderer, stage, player, url, map) {
+	this.container = new PIXI.DisplayObjectContainer();
+	stage.addChild(this.container);
+
 	this.initKeyboard();
 
 	this.renderer = renderer;
@@ -221,10 +227,23 @@ Game.prototype.state_msg = function(state) {
 	if (state.hasOwnProperty('Id')) {
 		switch (state.Type) {
 			case 2: // destroy
+				var a = this.avatars[state.Id];
+				if (a.obj) {
+					this.container.removeChild(a.obj);
+				}
 				delete this.avatars[state.Id];
 				break;
 			case 1: // create
-				this.avatars[state.Id] = new Avatar(state.Position, state.Velocity)
+				var obj;
+				if (state.Id > 0) {
+					obj = new Suika();
+					this.container.addChild(obj);
+				} else if (state.Id > -20000) {
+					obj = new Bat();
+					this.container.addChild(obj);
+				}
+				this.avatars[state.Id] = new Avatar(obj, state.Position, state.Velocity);
+
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
 					state.Type = 1;

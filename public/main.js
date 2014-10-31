@@ -9,6 +9,7 @@ var Tileset = require('./tileset'),
 var Tiled = require('./tiled');
 
 var Suika = require('./suika');
+var Bat = require('./bat');
 
 function run(player, host) {
 	var w = window.innerWidth,
@@ -68,6 +69,15 @@ function run(player, host) {
 	}
 
 	var ttt = new Tiled('/maps/', 'test.json');
+
+	var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+	colorMatrixFilter.matrix = [
+		0.2, 0, 0, 0,
+		0, 0.2, 0, 0,
+		0, 0, 0.5, 0,
+		0, 0, 0, 1,
+	];
+	ttt.filters = [colorMatrixFilter];
 	ttt.load();
 	stage.addChild(ttt);
 
@@ -83,6 +93,13 @@ function run(player, host) {
 	game.suika = suika;
 	suika.animation = 'walk';
 	stage.addChild(suika);
+
+	var bat = new Bat();
+	game.bat = bat;
+	bat.position.x = 400;
+	bat.position.y = 350;
+	bat.animation = 'walk';
+	stage.addChild(bat);
 
 	window.onresize = resize;
 	resize();
@@ -266,7 +283,7 @@ r.onreadystatechange = function() {
 };
 r.send();
 
-},{"./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./test-map":"/home/lain/gocode/src/oniproject/js/test-map.json","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","./tilemap":"/home/lain/gocode/src/oniproject/js/tilemap.js","./tileset":"/home/lain/gocode/src/oniproject/js/tileset.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
+},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./test-map":"/home/lain/gocode/src/oniproject/js/test-map.json","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","./tilemap":"/home/lain/gocode/src/oniproject/js/tilemap.js","./tileset":"/home/lain/gocode/src/oniproject/js/tileset.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
 'use strict';
 
 var Isomer = require('isomer'),
@@ -278,7 +295,7 @@ var Isomer = require('isomer'),
 	Shape = Isomer.Shape,
 	Color = Isomer.Color;
 
-function Avatar() {
+function Avatar(obj) {
 	this.position = new Point(0, 0, 0);
 	this.velocity = new Point(0, 0, 0);
 	this.speed = 1.0;
@@ -290,6 +307,7 @@ function Avatar() {
 	c.l = 0.3;
 	c.loadRGB();
 	this.color = c;
+	this.obj = obj;
 }
 
 Avatar.prototype.draw = function(iso) {
@@ -330,6 +348,16 @@ Avatar.prototype.update = function(time) {
 	this.position.x += this.velocity.x * time;
 	this.position.y += this.velocity.y * time;
 	this.position.z += this.velocity.z * time;
+
+	if (this.obj) {
+		this.obj.position.x = this.position.x * 32;
+		this.obj.position.y = this.position.y * 32;
+		if (this.velocity.x + this.velocity.y !== 0) {
+			this.obj.animation = 'walk';
+		} else {
+			this.obj.animation = 'idle';
+		}
+	}
 }
 
 Avatar.prototype.move = function(dir) {
@@ -356,7 +384,135 @@ Avatar.prototype.move = function(dir) {
 
 module.exports = Avatar;
 
-},{"./knot":"/home/lain/gocode/src/oniproject/js/knot.js","./octahedron":"/home/lain/gocode/src/oniproject/js/octahedron.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/game.js":[function(require,module,exports){
+},{"./knot":"/home/lain/gocode/src/oniproject/js/knot.js","./octahedron":"/home/lain/gocode/src/oniproject/js/octahedron.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/bat.js":[function(require,module,exports){
+'use strict';
+
+function Bat() {
+	var w = 96,
+		h = 128;
+	var image = new PIXI.ImageLoader('/bat.png');
+
+	var a = this._anim = {};
+
+	var keys = [
+		'walk ↑',
+		'walk ←',
+		'walk ↓',
+		'walk →',
+
+		/*'walk ↖',
+		'walk ↑',
+		'walk ↗',
+		'walk →',
+		'walk ↘',
+		'walk ↓',
+		'walk ↙',
+		'walk ←',
+		'death'*/
+	];
+
+	for (var y = 0, l = keys.length; y < l; y++) {
+		var k = keys[y];
+		this._anim[k] = [];
+		var aa = [0, 1, 2, 1];
+		for (var j = 0, ll = aa.length; j < ll; j++) {
+			var x = aa[j];
+			var rect = {
+				x: x * (w / 3),
+				y: y * (h / 4),
+				width: w / 3,
+				height: h / 4,
+			};
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			a[k].push(t);
+		}
+	}
+
+	//a['idle ↖'] = [a['walk ↖'][1]];
+	a['idle ↑'] = [a['walk ↑'][1]];
+	//a['idle ↗'] = [a['walk ↗'][1]];
+	a['idle →'] = [a['walk →'][1]];
+	//a['idle ↘'] = [a['walk ↘'][1]];
+	a['idle ↓'] = [a['walk ↓'][1]];
+	//a['idle ↙'] = [a['walk ↙'][1]];
+	a['idle ←'] = [a['walk ←'][1]];
+
+	this._animation = 'idle';
+	this._direction = '↓';
+
+	this.currentFrame = 0;
+	this.animationSpeed = 0.3;
+
+	PIXI.Sprite.call(this, a['idle ↓'][0]);
+
+	this.anchor.x = 0.5;
+	this.anchor.y = 1;
+
+	image.load();
+	this.image = image;
+}
+
+Bat.prototype = Object.create(PIXI.Sprite.prototype);
+Bat.prototype.constructor = Bat;
+
+Object.defineProperty(Bat.prototype, 'direction', {
+	get: function() {
+		return this._direction;
+	},
+	set: function(v) {
+		var dir = '↑↗→↘↓↙←↖';
+		if (typeof v == 'number') {
+			var x = (v / (360 / 8)) % 8;
+			if (x < 0) {
+				x = 8 + x;
+			}
+			v = dir[x | 0];
+		}
+		switch (v) {
+			case '↗': v = '↑';break;
+			case '↘': v = '→';break;
+			case '↙': v = '↓';break;
+			case '↖': v = '←';break;
+		}
+		this._direction = v;
+	},
+});
+
+Object.defineProperty(Bat.prototype, 'animation', {
+	get: function() {
+		return this._animation;
+	},
+	set: function(v) {
+		this._animation = v;
+	},
+});
+
+Bat.prototype.updateTransform = function() {
+	PIXI.Sprite.prototype.updateTransform.call(this);
+
+	var anim;
+	switch (this._animation) {
+		case 'walk':
+		case 'idle':
+			anim = this._anim[this._animation + ' ' + this._direction];
+	}
+
+	this.currentFrame += this.animationSpeed;
+
+	var round = (this.currentFrame) | 0;
+
+	this.currentFrame = this.currentFrame % anim.length;
+
+	if ( /*this.loop ||*/ round < anim.length) {
+		this.setTexture(anim[round % anim.length]);
+	} /*else if(round >= anim.length) {
+		this.gotoAndStop(this.textures.length - 1);
+	}*/
+};
+
+module.exports = Bat;
+
+},{}],"/home/lain/gocode/src/oniproject/js/game.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
@@ -379,7 +535,13 @@ var Point = Isomer.Point,
 	Avatar = require('./avatar'),
 	Net = require('./net');
 
+var Suika = require('./suika');
+var Bat = require('./bat');
+
 function Game(renderer, stage, player, url, map) {
+	this.container = new PIXI.DisplayObjectContainer();
+	stage.addChild(this.container);
+
 	this.initKeyboard();
 
 	this.renderer = renderer;
@@ -580,10 +742,23 @@ Game.prototype.state_msg = function(state) {
 	if (state.hasOwnProperty('Id')) {
 		switch (state.Type) {
 			case 2: // destroy
+				var a = this.avatars[state.Id];
+				if (a.obj) {
+					this.container.removeChild(a.obj);
+				}
 				delete this.avatars[state.Id];
 				break;
 			case 1: // create
-				this.avatars[state.Id] = new Avatar(state.Position, state.Velocity)
+				var obj;
+				if (state.Id > 0) {
+					obj = new Suika();
+					this.container.addChild(obj);
+				} else if (state.Id > -20000) {
+					obj = new Bat();
+					this.container.addChild(obj);
+				}
+				this.avatars[state.Id] = new Avatar(obj, state.Position, state.Velocity);
+
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
 					state.Type = 1;
@@ -665,7 +840,7 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./avatar":"/home/lain/gocode/src/oniproject/js/avatar.js","./map":"/home/lain/gocode/src/oniproject/js/map.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./stairs":"/home/lain/gocode/src/oniproject/js/stairs.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/knot.js":[function(require,module,exports){
+},{"./avatar":"/home/lain/gocode/src/oniproject/js/avatar.js","./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./map":"/home/lain/gocode/src/oniproject/js/map.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./stairs":"/home/lain/gocode/src/oniproject/js/stairs.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/knot.js":[function(require,module,exports){
 'use strict';
 
 var Isomer = require('isomer'),
@@ -1162,6 +1337,8 @@ function Suika() {
 
 	PIXI.Sprite.call(this, a['idle ↓'][0]);
 	this.scale.x = this.scale.y = 0.5;
+	this.anchor.x = 0.5;
+	this.anchor.y = 1;
 
 	image.load();
 	this.image = image;
@@ -1226,7 +1403,7 @@ Suika.prototype.updateTransform = function() {
 module.exports = Suika;
 
 },{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
 },{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
 'use strict';
 
@@ -1274,7 +1451,7 @@ function Tiled(path, uri) {
 Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 Tiled.constructor = Tiled;
 
-Tiled.prototype.load = function(fn) {
+Tiled.prototype.load = function(fn, fn2) {
 	var that = this;
 	this.loader.on('loaded', function() {
 		var json = that.data = that.loader.json;
@@ -1286,7 +1463,6 @@ Tiled.prototype.load = function(fn) {
 
 			t.load(function() {
 				tilesets_count--;
-				console.log(tilesets_count);
 				if (!tilesets_count) {
 					console.info('tilesets loaded');
 					if (fn) {
@@ -1312,10 +1488,13 @@ Tiled.prototype.load = function(fn) {
 					break;
 			}
 			if (obj !== undefined) {
-				console.log('addChild', layer);
+				console.log('addChild', layer, obj);
 				that.layers.push(obj);
 				that.addChild(obj);
 			}
+		}
+		if (fn2) {
+			fn2();
 		}
 
 	});
@@ -1412,35 +1591,18 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 	this.alpha = data.opacity;
 	this.visible = !!data.visible;
 
-	var x_start = 0,
-		x_end = data.width,
-		x_add = 1;
-	var y_start = 0,
-		y_end = data.height,
-		y_add = 1;
-
-	/*if(renderorder) {
-		if(renderorder.indexOf('up') != -1) {
-			y_start = data.height;
-			y_end = 0;
-			y_add = -1;
-		}
-		if(renderorder.indexOf('left') != -1) {
-			x_start = data.width;
-			x_end = 0;
-			x_add = -1;
-		}
-	}*/
-
 	this._animated = [];
 
-	for (var y = y_start; y < y_end; y += y_add) {
-		for (var x = x_start; x < x_end; x += x_add) {
+	for (var y = 0; y < data.height; y++) {
+		for (var x = 0; x < data.width; x++) {
 			var iii = y * data.width + x;
 			var id = data.data[iii];
 			found:
 			for (var i = 0, l = tilesets.length; i < l; i++) {
 				var t = tilesets[i];
+				if (id - t.data.firstgid <= 0) {
+					continue found;
+				}
 				var sprite = t.CreateSprite(id);
 
 				if (sprite) {
@@ -1462,6 +1624,8 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 			}
 		}
 	}
+
+	this.cacheAsBitmap = this._animated.length == 0;
 }
 
 TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
@@ -1553,12 +1717,17 @@ Tileset.prototype.load = function(fn) {
 
 
 Tileset.prototype.CreateSprite = function(id) {
+	if (id == 0) {
+		return;
+	}
+
 	var data = this.data;
 	id -= data.firstgid;
 	var texture = this.tiles[id];
 
 
 	if (!texture) {
+		console.error('TEXTURE FAIL', data.name, id, id + data.firstgid, data.firstgid);
 		return;
 	}
 

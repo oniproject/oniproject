@@ -9,7 +9,7 @@ var Isomer = require('isomer'),
 	Shape = Isomer.Shape,
 	Color = Isomer.Color;
 
-function Avatar() {
+function Avatar(obj) {
 	this.position = new Point(0, 0, 0);
 	this.velocity = new Point(0, 0, 0);
 	this.speed = 1.0;
@@ -21,6 +21,7 @@ function Avatar() {
 	c.l = 0.3;
 	c.loadRGB();
 	this.color = c;
+	this.obj = obj;
 }
 
 Avatar.prototype.draw = function(iso) {
@@ -61,6 +62,16 @@ Avatar.prototype.update = function(time) {
 	this.position.x += this.velocity.x * time;
 	this.position.y += this.velocity.y * time;
 	this.position.z += this.velocity.z * time;
+
+	if (this.obj) {
+		this.obj.position.x = this.position.x * 32;
+		this.obj.position.y = this.position.y * 32;
+		if (this.velocity.x + this.velocity.y !== 0) {
+			this.obj.animation = 'walk';
+		} else {
+			this.obj.animation = 'idle';
+		}
+	}
 }
 
 Avatar.prototype.move = function(dir) {

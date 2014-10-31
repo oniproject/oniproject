@@ -8,6 +8,7 @@ var Tileset = require('./tileset'),
 var Tiled = require('./tiled');
 
 var Suika = require('./suika');
+var Bat = require('./bat');
 
 function run(player, host) {
 	var w = window.innerWidth,
@@ -67,6 +68,15 @@ function run(player, host) {
 	}
 
 	var ttt = new Tiled('/maps/', 'test.json');
+
+	var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+	colorMatrixFilter.matrix = [
+		0.2, 0, 0, 0,
+		0, 0.2, 0, 0,
+		0, 0, 0.5, 0,
+		0, 0, 0, 1,
+	];
+	ttt.filters = [colorMatrixFilter];
 	ttt.load();
 	stage.addChild(ttt);
 
@@ -82,6 +92,13 @@ function run(player, host) {
 	game.suika = suika;
 	suika.animation = 'walk';
 	stage.addChild(suika);
+
+	var bat = new Bat();
+	game.bat = bat;
+	bat.position.x = 400;
+	bat.position.y = 350;
+	bat.animation = 'walk';
+	stage.addChild(bat);
 
 	window.onresize = resize;
 	resize();

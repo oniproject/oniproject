@@ -19,7 +19,7 @@ function Tiled(path, uri) {
 Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 Tiled.constructor = Tiled;
 
-Tiled.prototype.load = function(fn) {
+Tiled.prototype.load = function(fn, fn2) {
 	var that = this;
 	this.loader.on('loaded', function() {
 		var json = that.data = that.loader.json;
@@ -31,7 +31,6 @@ Tiled.prototype.load = function(fn) {
 
 			t.load(function() {
 				tilesets_count--;
-				console.log(tilesets_count);
 				if (!tilesets_count) {
 					console.info('tilesets loaded');
 					if (fn) {
@@ -57,10 +56,13 @@ Tiled.prototype.load = function(fn) {
 					break;
 			}
 			if (obj !== undefined) {
-				console.log('addChild', layer);
+				console.log('addChild', layer, obj);
 				that.layers.push(obj);
 				that.addChild(obj);
 			}
+		}
+		if (fn2) {
+			fn2();
 		}
 
 	});
