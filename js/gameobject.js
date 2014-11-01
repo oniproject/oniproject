@@ -1,9 +1,14 @@
 'use strict';
 
-function Avatar(obj) {
+function GameObject(obj, state) {
 	PIXI.DisplayObjectContainer.call(this);
 
 	this.velocity = {
+		x: 0,
+		y: 0
+	};
+
+	this.lastvel = {
 		x: 0,
 		y: 0
 	};
@@ -20,49 +25,36 @@ function Avatar(obj) {
 	};
 }
 
-Avatar.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-Avatar.constructor = Avatar;
+GameObject.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+GameObject.constructor = GameObject;
 
-Avatar.prototype.draw = function() {
-	return;
-	var pos = this.position;
-
-	if (this.hasOwnProperty('state')) {
-		// is avatar or monster
-		if (this.state.Id > -10000) {
-		}
-		// is avatar or item
-		if (this.state.Id < -10000 || this.state.Id > 0) {
-		}
-	}
-}
-
-Avatar.prototype.isAvatar = function() {
+GameObject.prototype.isGameObject = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id > 0;
 	}
 }
-Avatar.prototype.isMonster = function() {
+GameObject.prototype.isMonster = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id < 0 && this.state.Id > -10000;
 	}
 }
-Avatar.prototype.isItem = function() {
+GameObject.prototype.isItem = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id < -10000;
 	}
 }
 
-Avatar.prototype.update = function(time) {
+GameObject.prototype.update = function(time) {
 	this.angle += this.rot * Math.PI * time;
 	this.position.x += this.velocity.x * time;
 	this.position.y += this.velocity.y * time;
 
 	if (this.obj) {
 		var obj = this.obj;
-		obj.position.x = this.position.x * 32;
-		obj.position.y = this.position.y * 32;
+		obj.position.x = (this.position.x * 32) | 0;
+		obj.position.y = (this.position.y * 32) | 0;
 
+		obj.animation = 'idle';
 		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
 			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
 			var dd = -d / Math.PI * 180 + 180;
@@ -72,14 +64,11 @@ Avatar.prototype.update = function(time) {
 			var d = Math.atan2(this.lastvel.x || 0, this.lastvel.y || 0);
 			var dd = -d / Math.PI * 180 + 180;
 			obj.direction = dd;
-			obj.animation = 'walk';
-		} else {
-			obj.animation = 'idle';
 		}
 	}
 }
 
-Avatar.prototype.move = function(dir) {
+GameObject.prototype.move = function(dir) {
 	this.velocity.x = 0;
 	this.velocity.y = 0;
 	for (var i = 0, l = dir.length; i < l; i++) {
@@ -101,4 +90,4 @@ Avatar.prototype.move = function(dir) {
 	}
 }
 
-module.exports = Avatar;
+module.exports = GameObject;

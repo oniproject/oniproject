@@ -4,9 +4,6 @@ console.log('fuck');
 
 var Tiled = require('./tiled');
 
-var Suika = require('./suika');
-var Bat = require('./bat');
-
 function run(player, host) {
 	var w = window.innerWidth,
 		h = window.innerHeight,
@@ -22,7 +19,7 @@ function run(player, host) {
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
 	game.container.addChild(ttt);
 
-	var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+	/*var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 	colorMatrixFilter.matrix = [
 		0.4, 0, 0, 0,
 		0, 0.4, 0, 0,
@@ -30,23 +27,10 @@ function run(player, host) {
 		0, 0, 0, 1,
 	];
 	game.container.filters = [colorMatrixFilter];
+	*/
 
 
 	game.ttt = ttt;
-
-	var suika = new Suika();
-	suika.position.x = 40;
-	suika.position.y = 130;
-	game.suika = suika;
-	suika.animation = 'walk';
-	stage.addChild(suika);
-
-	var bat = new Bat();
-	game.bat = bat;
-	bat.position.x = 10;
-	bat.position.y = 150;
-	bat.animation = 'walk';
-	stage.addChild(bat);
 
 	window.onresize = resize;
 	resize();
@@ -59,21 +43,20 @@ function run(player, host) {
 		renderer.resize(w, h);
 	}
 
-	requestAnimFrame(render);
-
+	var updateT = 1000 / 50;
+	var lastTime = window.performance.now();
 	function render() {
 		requestAnimFrame(render);
+		var t = window.performance.now();
+		if (t - lastTime > updateT) {
+			game.update(updateT);
+			lastTime += updateT;
+		}
 		game.render();
 		renderer.render(stage);
-		var a = game.avatars[game.player];
-		if (a) {
-			var d = Math.atan2(a.lastvel.x || 0, a.lastvel.y || 0);
-			var dd = -d / Math.PI * 180 + 180;
-			suika.direction = dd;
-		}
 	}
+	requestAnimFrame(render);
 
-	setInterval(animate, 50);
 	game.net.on('open', function() {
 		game.net.RequestParametersMsg();
 		game.net.RequestInventoryMsg();

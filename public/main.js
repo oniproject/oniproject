@@ -5,9 +5,6 @@ console.log('fuck');
 
 var Tiled = require('./tiled');
 
-var Suika = require('./suika');
-var Bat = require('./bat');
-
 function run(player, host) {
 	var w = window.innerWidth,
 		h = window.innerHeight,
@@ -23,7 +20,7 @@ function run(player, host) {
 	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
 	game.container.addChild(ttt);
 
-	var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+	/*var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 	colorMatrixFilter.matrix = [
 		0.4, 0, 0, 0,
 		0, 0.4, 0, 0,
@@ -31,23 +28,10 @@ function run(player, host) {
 		0, 0, 0, 1,
 	];
 	game.container.filters = [colorMatrixFilter];
+	*/
 
 
 	game.ttt = ttt;
-
-	var suika = new Suika();
-	suika.position.x = 40;
-	suika.position.y = 130;
-	game.suika = suika;
-	suika.animation = 'walk';
-	stage.addChild(suika);
-
-	var bat = new Bat();
-	game.bat = bat;
-	bat.position.x = 10;
-	bat.position.y = 150;
-	bat.animation = 'walk';
-	stage.addChild(bat);
 
 	window.onresize = resize;
 	resize();
@@ -60,21 +44,20 @@ function run(player, host) {
 		renderer.resize(w, h);
 	}
 
-	requestAnimFrame(render);
-
+	var updateT = 1000 / 50;
+	var lastTime = window.performance.now();
 	function render() {
 		requestAnimFrame(render);
+		var t = window.performance.now();
+		if (t - lastTime > updateT) {
+			game.update(updateT);
+			lastTime += updateT;
+		}
 		game.render();
 		renderer.render(stage);
-		var a = game.avatars[game.player];
-		if (a) {
-			var d = Math.atan2(a.lastvel.x || 0, a.lastvel.y || 0);
-			var dd = -d / Math.PI * 180 + 180;
-			suika.direction = dd;
-		}
 	}
+	requestAnimFrame(render);
 
-	setInterval(animate, 50);
 	game.net.on('open', function() {
 		game.net.RequestParametersMsg();
 		game.net.RequestInventoryMsg();
@@ -231,113 +214,7 @@ r.onreadystatechange = function() {
 };
 r.send();
 
-},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
-'use strict';
-
-function Avatar(obj) {
-	PIXI.DisplayObjectContainer.call(this);
-
-	this.velocity = {
-		x: 0,
-		y: 0
-	};
-
-	this.speed = 1.0;
-	this.angle = 0;
-	this.rot = 1;
-
-	this.obj = obj;
-	obj.buttonMode = true;
-	obj.interactive = true;
-	obj.click = obj.tap = function(event) {
-		console.info("tapped");
-	};
-}
-
-Avatar.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-Avatar.constructor = Avatar;
-
-Avatar.prototype.draw = function() {
-	return;
-	var pos = this.position;
-
-	if (this.hasOwnProperty('state')) {
-		// is avatar or monster
-		if (this.state.Id > -10000) {
-		}
-		// is avatar or item
-		if (this.state.Id < -10000 || this.state.Id > 0) {
-		}
-	}
-}
-
-Avatar.prototype.isAvatar = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id > 0;
-	}
-}
-Avatar.prototype.isMonster = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id < 0 && this.state.Id > -10000;
-	}
-}
-Avatar.prototype.isItem = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id < -10000;
-	}
-}
-
-Avatar.prototype.update = function(time) {
-	this.angle += this.rot * Math.PI * time;
-	this.position.x += this.velocity.x * time;
-	this.position.y += this.velocity.y * time;
-
-	if (this.obj) {
-		var obj = this.obj;
-		obj.position.x = this.position.x * 32;
-		obj.position.y = this.position.y * 32;
-
-		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
-			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
-			var dd = -d / Math.PI * 180 + 180;
-			obj.direction = dd;
-			obj.animation = 'walk';
-		} else if (this.lastvel !== undefined) {
-			var d = Math.atan2(this.lastvel.x || 0, this.lastvel.y || 0);
-			var dd = -d / Math.PI * 180 + 180;
-			obj.direction = dd;
-			obj.animation = 'walk';
-		} else {
-			obj.animation = 'idle';
-		}
-	}
-}
-
-Avatar.prototype.move = function(dir) {
-	this.velocity.x = 0;
-	this.velocity.y = 0;
-	for (var i = 0, l = dir.length; i < l; i++) {
-		var to = dir[i];
-		switch (to) {
-			case 'N':
-				this.velocity.y -= this.speed;
-				break;
-			case 'W':
-				this.velocity.x -= this.speed;
-				break;
-			case 'S':
-				this.velocity.y += this.speed;
-				break;
-			case 'E':
-				this.velocity.x += this.speed;
-				break;
-		}
-	}
-}
-
-module.exports = Avatar;
-
-},{}],"/home/lain/gocode/src/oniproject/js/bat.js":[function(require,module,exports){
+},{"./game":"/home/lain/gocode/src/oniproject/js/game.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js"}],"/home/lain/gocode/src/oniproject/js/bat.js":[function(require,module,exports){
 'use strict';
 
 function Bat() {
@@ -469,7 +346,7 @@ module.exports = Bat;
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
-	Avatar = require('./avatar'),
+	GameObject = require('./gameobject'),
 	Net = require('./net'),
 	Suika = require('./suika'),
 	Bat = require('./bat');
@@ -576,18 +453,22 @@ Game.prototype.initKeyboard = function() {
 
 Game.prototype.resize = function(w, h) {}
 
-Game.prototype.render = function(time) {}
-
-Game.prototype.animate = function(time) {
+Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
 		player.move(this.dir.join(''));
 		this.net.SetVelocityMsg(player.velocity);
-		this.container.position.x = Math.round(-player.obj.position.x + window.innerWidth / 2);
-		this.container.position.y = Math.round(-player.obj.position.y + window.innerHeight / 2);
 	}
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
+	}
+}
+
+Game.prototype.render = function() {
+	if (this.avatars.hasOwnProperty(this.player)) {
+		var player = this.avatars[this.player];
+		this.container.position.x = Math.round(-player.obj.position.x + window.innerWidth / 2);
+		this.container.position.y = Math.round(-player.obj.position.y + window.innerHeight / 2);
 	}
 }
 
@@ -611,7 +492,7 @@ Game.prototype.state_msg = function(state) {
 				if (obj) {
 					this.container.addChild(obj);
 				}
-				this.avatars[state.Id] = new Avatar(obj, state.Position, state.Velocity);
+				this.avatars[state.Id] = new GameObject(obj);
 
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
@@ -632,7 +513,7 @@ Game.prototype.state_msg = function(state) {
 				if (state.Type == 3) {
 					avatar.rot = 3;
 					if (state.Id == this.player) {
-						this.suika.animation = 'walk';
+						//this.suika.animation = 'walk';
 					}
 					if (!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
 						avatar.lastvel = {
@@ -651,7 +532,7 @@ Game.prototype.state_msg = function(state) {
 						this.container.removeChild(a.obj);
 					}
 					delete this.avatars[state.Id];
-				}.bind(this), 800);
+				}.bind(this), 2000);
 
 				avatar.state = state;
 				avatar.position.x = state.Position.X;
@@ -698,7 +579,102 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./avatar":"/home/lain/gocode/src/oniproject/js/avatar.js","./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
+},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
+'use strict';
+
+function GameObject(obj, state) {
+	PIXI.DisplayObjectContainer.call(this);
+
+	this.velocity = {
+		x: 0,
+		y: 0
+	};
+
+	this.lastvel = {
+		x: 0,
+		y: 0
+	};
+
+	this.speed = 1.0;
+	this.angle = 0;
+	this.rot = 1;
+
+	this.obj = obj;
+	obj.buttonMode = true;
+	obj.interactive = true;
+	obj.click = obj.tap = function(event) {
+		console.info("tapped");
+	};
+}
+
+GameObject.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+GameObject.constructor = GameObject;
+
+GameObject.prototype.isGameObject = function() {
+	if (this.hasOwnProperty('state')) {
+		return this.state.Id > 0;
+	}
+}
+GameObject.prototype.isMonster = function() {
+	if (this.hasOwnProperty('state')) {
+		return this.state.Id < 0 && this.state.Id > -10000;
+	}
+}
+GameObject.prototype.isItem = function() {
+	if (this.hasOwnProperty('state')) {
+		return this.state.Id < -10000;
+	}
+}
+
+GameObject.prototype.update = function(time) {
+	this.angle += this.rot * Math.PI * time;
+	this.position.x += this.velocity.x * time;
+	this.position.y += this.velocity.y * time;
+
+	if (this.obj) {
+		var obj = this.obj;
+		obj.position.x = (this.position.x * 32) | 0;
+		obj.position.y = (this.position.y * 32) | 0;
+
+		obj.animation = 'idle';
+		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
+			var dd = -d / Math.PI * 180 + 180;
+			obj.direction = dd;
+			obj.animation = 'walk';
+		} else if (this.lastvel !== undefined) {
+			var d = Math.atan2(this.lastvel.x || 0, this.lastvel.y || 0);
+			var dd = -d / Math.PI * 180 + 180;
+			obj.direction = dd;
+		}
+	}
+}
+
+GameObject.prototype.move = function(dir) {
+	this.velocity.x = 0;
+	this.velocity.y = 0;
+	for (var i = 0, l = dir.length; i < l; i++) {
+		var to = dir[i];
+		switch (to) {
+			case 'N':
+				this.velocity.y -= this.speed;
+				break;
+			case 'W':
+				this.velocity.x -= this.speed;
+				break;
+			case 'S':
+				this.velocity.y += this.speed;
+				break;
+			case 'E':
+				this.velocity.x += this.speed;
+				break;
+		}
+	}
+}
+
+module.exports = GameObject;
+
+},{}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
@@ -837,10 +813,15 @@ module.exports = Net;
 },{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/suika.js":[function(require,module,exports){
 'use strict';
 
+var suikaImage;
+
 function Suika() {
 	var w = 880,
 		h = 720;
-	var image = new PIXI.ImageLoader('/suika.png');
+	if (!suikaImage) {
+		suikaImage = new PIXI.ImageLoader('/suika.png');
+	}
+	var image = suikaImage;
 
 
 	var a = this._anim = {};

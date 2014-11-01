@@ -1,7 +1,7 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
-	Avatar = require('./avatar'),
+	GameObject = require('./gameobject'),
 	Net = require('./net'),
 	Suika = require('./suika'),
 	Bat = require('./bat');
@@ -108,18 +108,22 @@ Game.prototype.initKeyboard = function() {
 
 Game.prototype.resize = function(w, h) {}
 
-Game.prototype.render = function(time) {}
-
-Game.prototype.animate = function(time) {
+Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
 		player.move(this.dir.join(''));
 		this.net.SetVelocityMsg(player.velocity);
-		this.container.position.x = Math.round(-player.obj.position.x + window.innerWidth / 2);
-		this.container.position.y = Math.round(-player.obj.position.y + window.innerHeight / 2);
 	}
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
+	}
+}
+
+Game.prototype.render = function() {
+	if (this.avatars.hasOwnProperty(this.player)) {
+		var player = this.avatars[this.player];
+		this.container.position.x = Math.round(-player.obj.position.x + window.innerWidth / 2);
+		this.container.position.y = Math.round(-player.obj.position.y + window.innerHeight / 2);
 	}
 }
 
@@ -143,7 +147,7 @@ Game.prototype.state_msg = function(state) {
 				if (obj) {
 					this.container.addChild(obj);
 				}
-				this.avatars[state.Id] = new Avatar(obj, state.Position, state.Velocity);
+				this.avatars[state.Id] = new GameObject(obj);
 
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
@@ -164,7 +168,7 @@ Game.prototype.state_msg = function(state) {
 				if (state.Type == 3) {
 					avatar.rot = 3;
 					if (state.Id == this.player) {
-						this.suika.animation = 'walk';
+						//this.suika.animation = 'walk';
 					}
 					if (!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
 						avatar.lastvel = {
@@ -183,7 +187,7 @@ Game.prototype.state_msg = function(state) {
 						this.container.removeChild(a.obj);
 					}
 					delete this.avatars[state.Id];
-				}.bind(this), 800);
+				}.bind(this), 2000);
 
 				avatar.state = state;
 				avatar.position.x = state.Position.X;

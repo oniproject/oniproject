@@ -1,9 +1,14 @@
 'use strict';
 
+var suikaImage;
+
 function Suika() {
 	var w = 880,
 		h = 720;
-	var image = new PIXI.ImageLoader('/suika.png');
+	if (!suikaImage) {
+		suikaImage = new PIXI.ImageLoader('/suika.png');
+	}
+	var image = suikaImage;
 
 
 	var a = this._anim = {};
