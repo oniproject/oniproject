@@ -3,218 +3,149 @@
 
 console.log('fuck');
 
-var Tiled = require('./tiled');
+var w = window.innerWidth,
+	h = window.innerHeight,
+	stage = new PIXI.Stage(0xFFFFFF, true),
+	renderer = PIXI.autoDetectRenderer(w, h);
+document.body.appendChild(renderer.view);
 
-function run(player, host) {
-	var w = window.innerWidth,
-		h = window.innerHeight,
-		stage = new PIXI.Stage(0xFFFFFF, true),
-		renderer = PIXI.autoDetectRenderer(w, h);
-	document.body.appendChild(renderer.view);
+window.onresize = function() {
+	w = window.innerWidth;
+	h = window.innerHeight;
+	renderer.resize(w, h);
+};
+window.onresize();
 
-	var ttt = new Tiled('/maps/', 'test.json');
-	ttt.load();
+var Game = require('./game');
+window.game = new Game(renderer, stage);
 
+var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+colorMatrixFilter.matrix = [
+	0.4, 0, 0, 0,
+	0, 0.4, 0, 0,
+	0, 0, 0.7, 0,
+	0, 0, 0, 1,
+];
+game.container.filters = [colorMatrixFilter];
 
-	var Game = require('./game');
-	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws');
-	game.container.addChild(ttt);
-
-	/*var colorMatrixFilter = new PIXI.ColorMatrixFilter();
-	colorMatrixFilter.matrix = [
-		0.4, 0, 0, 0,
-		0, 0.4, 0, 0,
-		0, 0, 0.7, 0,
-		0, 0, 0, 1,
-	];
-	game.container.filters = [colorMatrixFilter];
-	*/
-
-
-	game.ttt = ttt;
-
-	window.onresize = resize;
-	resize();
-
-	function resize() {
-		w = window.innerWidth;
-		h = window.innerHeight;
-		game.resize(w, h);
-
-		renderer.resize(w, h);
-	}
-
-	var updateT = 1000 / 50;
-	var lastTime = window.performance.now();
-	function render() {
-		requestAnimFrame(render);
-		var t = window.performance.now();
-		if (t - lastTime > updateT) {
-			game.update(updateT);
-			lastTime += updateT;
-		}
-		game.render();
-		renderer.render(stage);
-	}
+requestAnimFrame(render);
+var updateT = 1000 / 50;
+var lastTime = window.performance.now();
+function render() {
 	requestAnimFrame(render);
-
-	game.net.on('open', function() {
-		game.net.RequestParametersMsg();
-		game.net.RequestInventoryMsg();
-	});
-
-	game.net.on('TargetDataMsg', function(target) {
-		console.log('TargetDataMsg');
-		UI.target = target;
-	});
-	game.net.on('InventoryMsg', function(inv) {
-		UI.inventory = inv.Inventory;
-		UI.equip = inv.Equip
-	});
-	game.net.on('ParametersMsg', function(p) {
-		UI.hp = p.Parameters.HP;
-		UI.mhp = p.Parameters.MHP;
-		UI.mp = p.Parameters.MP;
-		UI.mmp = p.Parameters.MMP;
-		UI.tp = p.Parameters.TP;
-		UI.mtp = p.Parameters.MTP;
-		UI.spells = p.Skills;
-	});
-
-
-	function animate() {
-		game.animate(0.05);
+	var t = window.performance.now();
+	if (t - lastTime > updateT) {
+		game.update(updateT);
+		lastTime += updateT;
 	}
+	game.render();
+	renderer.render(stage);
 }
 
+game.net.on('open', function() {
+	game.net.RequestParametersMsg();
+	game.net.RequestInventoryMsg();
+});
+
+game.net.on('TargetDataMsg', function(target) {
+	console.log('TargetDataMsg');
+	UI.target = target;
+});
+game.net.on('InventoryMsg', function(inv) {
+	UI.inventory = inv.Inventory;
+	UI.equip = inv.Equip
+});
+game.net.on('ParametersMsg', function(p) {
+	UI.hp = p.Parameters.HP;
+	UI.mhp = p.Parameters.MHP;
+	UI.mp = p.Parameters.MP;
+	UI.mmp = p.Parameters.MMP;
+	UI.tp = p.Parameters.TP;
+	UI.mtp = p.Parameters.MTP;
+	UI.spells = p.Skills;
+});
+
 var UI = new Vue({
-		el: '#ui',
-		data: {
-			level: 88,
-			exp: 77,
-			hp: 190,
-			mhp: 300,
-			mp: 50,
-			mmp: 300,
-			tp: 50,
-			mtp: 100,
-			equip: {},
-			inventory: [
-				{
-					Name: "43"
-				},
-				{
-					Name: "1k"
-				},
-				{
-					Name: "4njki32"
-				},
-				{
-					Name: "PPPPvndfsj"
-				},
-			],
-			target: {
-				Race: 0,
-				HP: 0,
-				MHP: 0,
-				Name: "vnfdjsk"
+	el: '#ui',
+	data: {
+		level: 88,
+		exp: 77,
+		hp: 190,
+		mhp: 300,
+		mp: 50,
+		mmp: 300,
+		tp: 50,
+		mtp: 100,
+		equip: {},
+		inventory: [
+			{
+				Name: '43'
 			},
-			spells: [
-				{
-					Icon: 'all-for-one'
-				},
-				{
-					Icon: 'all-for-one'
-				},
-				{
-					Icon: 'all-for-one'
-				},
-				{
-					Icon: 'all-for-one'
-				},
-				{
-					Icon: 'all-for-one'
-				},
-
-				{
-					Icon: 'screaming'
-				},
-				{
-					Icon: 'screaming'
-				},
-				{
-					Icon: 'screaming'
-				},
-				{
-					Icon: 'screaming'
-				},
-				{
-					Icon: 'screaming'
-				},
-
-				{
-					Icon: 'spiral-thrust'
-				},
-				{
-					Icon: 'spiral-thrust'
-				},
-				{
-					Icon: 'spiral-thrust'
-				},
-				{
-					Icon: 'spiral-thrust'
-				},
-				{
-					Icon: 'spiral-thrust'
-				},
-
-				{
-					Icon: 'rune-sword'
-				},
-				{
-					Icon: 'rune-sword'
-				},
-				{
-					Icon: 'rune-sword'
-				},
-				{
-					Icon: 'rune-sword'
-				},
-				{
-					Icon: 'rune-sword'
-				},
-			],
+			{
+				Name: '1k'
+			},
+			{
+				Name: '4njki32'
+			},
+			{
+				Name: 'PPPPvndfsj'
+			},
+		],
+		target: {
+			Race: 0,
+			HP: 0,
+			MHP: 0,
+			Name: 'vnfdjsk'
 		},
-		methods: {
-			cast: function(spell) {
-				console.info('cast', spell);
-				game.net.FireMsg({
-					t: "" + spell
-				});
+		spells: [
+			{
+				Icon: 'all-for-one'
 			},
-			drop: function(index) {
-				game.net.DropItemMsg({
-					Id: index
-				});
+			{
+				Icon: 'screaming'
 			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+		],
+	},
+	methods: {
+		cast: function(spell) {
+			console.info('cast', spell);
+			game.net.FireMsg({
+				t: '' + spell
+			});
 		},
-	}),
+		drop: function(index) {
+			game.net.DropItemMsg({
+				Id: index
+			});
+		},
+	},
+});
 
-	r = new XMLHttpRequest();
-r.open('POST', '/game', true);
-r.onreadystatechange = function() {
-	if (r.readyState != 4 || r.status != 200) {
-		return;
-	}
-	var json = JSON.parse(r.responseText);
-	if (json.Id !== undefined) {
-		console.log('Success:', json);
-		run(json.Id, json.Host);
-	}
-};
-r.send();
+function getConnectionData() {
+	var r = new XMLHttpRequest();
+	r.open('POST', '/game', true);
+	r.onreadystatechange = function() {
+		if (r.readyState != 4 || r.status != 200) {
+			return;
+		}
+		var json = JSON.parse(r.responseText);
+		if (json.Id !== undefined) {
+			console.log('Success:', json);
+			game.run(json.Id, json.Host, 'test');
+		}
+	};
+	r.send();
+}
 
-},{"./game":"/home/lain/gocode/src/oniproject/js/game.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js"}],"/home/lain/gocode/src/oniproject/js/bat.js":[function(require,module,exports){
+getConnectionData();
+
+},{"./game":"/home/lain/gocode/src/oniproject/js/game.js"}],"/home/lain/gocode/src/oniproject/js/bat.js":[function(require,module,exports){
 'use strict';
 
 function Bat() {
@@ -349,7 +280,8 @@ var EventEmitter = require('events').EventEmitter,
 	GameObject = require('./gameobject'),
 	Net = require('./net'),
 	Suika = require('./suika'),
-	Bat = require('./bat');
+	Bat = require('./bat'),
+	Tiled = require('./tiled');
 
 function Game(renderer, stage, player, url) {
 	this.container = new PIXI.DisplayObjectContainer();
@@ -364,20 +296,32 @@ function Game(renderer, stage, player, url) {
 	this.target = 0;
 	this.avatars = {};
 
-	var net = new Net(url);
-	this.net = net;
+	var net = this.net = new Net();
 	net.on('message', this.onmessage.bind(this));
 	net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
-
-	var game = this;
 }
 
 Game.prototype = EventEmitter.prototype;
 Game.prototype.constructor = Game;
+
+Game.prototype.run = function(player, host, mapName) {
+	if (this.map) {
+		this.container.removeChild(this.map);
+		// TODO remove all avatars
+	}
+
+	var map = this.map = new Tiled('/maps/', mapName + '.json');
+	var that = this;
+	map.load(function() {
+		that.player = player;
+		that.net.connecTo('ws://' + host + '/ws');
+	});
+	this.container.addChild(map);
+}
 
 Game.prototype.initKeyboard = function() {
 	var listener = new window.keypress.Listener();
@@ -450,8 +394,6 @@ Game.prototype.initKeyboard = function() {
 
 	listener.register_many(move_combos);
 }
-
-Game.prototype.resize = function(w, h) {}
 
 Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
@@ -579,7 +521,7 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
+},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
 'use strict';
 
 function GameObject(obj, state) {
@@ -692,6 +634,16 @@ var M_SetVelocityMsg = 1,
 	___ = 0;
 
 function Net(url) {
+}
+
+Net.prototype = EventEmitter.prototype;
+Net.prototype.constructor = Net;
+
+Net.prototype.connecTo = function(url) {
+	if (this.ws) {
+		this.ws.close();
+	}
+
 	var websocket = new WebSocket(url);
 	this.ws = websocket;
 	var that = this;
@@ -724,8 +676,7 @@ function Net(url) {
 		}
 	};
 }
-Net.prototype = EventEmitter.prototype;
-Net.prototype.constructor = Net;
+
 Net.prototype.close = function() {
 	this.ws.close();
 }

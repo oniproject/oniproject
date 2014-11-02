@@ -15,6 +15,16 @@ var M_SetVelocityMsg = 1,
 	___ = 0;
 
 function Net(url) {
+}
+
+Net.prototype = EventEmitter.prototype;
+Net.prototype.constructor = Net;
+
+Net.prototype.connecTo = function(url) {
+	if (this.ws) {
+		this.ws.close();
+	}
+
 	var websocket = new WebSocket(url);
 	this.ws = websocket;
 	var that = this;
@@ -47,8 +57,7 @@ function Net(url) {
 		}
 	};
 }
-Net.prototype = EventEmitter.prototype;
-Net.prototype.constructor = Net;
+
 Net.prototype.close = function() {
 	this.ws.close();
 }

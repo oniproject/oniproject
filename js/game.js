@@ -4,7 +4,8 @@ var EventEmitter = require('events').EventEmitter,
 	GameObject = require('./gameobject'),
 	Net = require('./net'),
 	Suika = require('./suika'),
-	Bat = require('./bat');
+	Bat = require('./bat'),
+	Tiled = require('./tiled');
 
 function Game(renderer, stage, player, url) {
 	this.container = new PIXI.DisplayObjectContainer();
@@ -19,20 +20,32 @@ function Game(renderer, stage, player, url) {
 	this.target = 0;
 	this.avatars = {};
 
-	var net = new Net(url);
-	this.net = net;
+	var net = this.net = new Net();
 	net.on('message', this.onmessage.bind(this));
 	net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
-
-	var game = this;
 }
 
 Game.prototype = EventEmitter.prototype;
 Game.prototype.constructor = Game;
+
+Game.prototype.run = function(player, host, mapName) {
+	if (this.map) {
+		this.container.removeChild(this.map);
+		// TODO remove all avatars
+	}
+
+	var map = this.map = new Tiled('/maps/', mapName + '.json');
+	var that = this;
+	map.load(function() {
+		that.player = player;
+		that.net.connecTo('ws://' + host + '/ws');
+	});
+	this.container.addChild(map);
+}
 
 Game.prototype.initKeyboard = function() {
 	var listener = new window.keypress.Listener();
@@ -105,8 +118,6 @@ Game.prototype.initKeyboard = function() {
 
 	listener.register_many(move_combos);
 }
-
-Game.prototype.resize = function(w, h) {}
 
 Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
