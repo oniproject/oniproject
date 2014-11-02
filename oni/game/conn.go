@@ -117,7 +117,7 @@ func (c *Connection) writePump() {
 
 			buf := bytes.NewBuffer([]byte{})
 			encoder := cbor.NewEncoder(buf)
-			if err := encoder.Write(message); err != nil {
+			if err := encoder.Encode(message); err != nil {
 				log.Error("cbor encode: ", err)
 				return
 			}
