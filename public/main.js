@@ -115,14 +115,10 @@ var UI = new Vue({
 	methods: {
 		cast: function(spell) {
 			console.info('cast', spell);
-			game.net.FireMsg({
-				t: '' + spell
-			});
+			game.net.FireMsg('' + spell);
 		},
 		drop: function(index) {
-			game.net.DropItemMsg({
-				Id: index
-			});
+			game.net.DropItemMsg(index);
 		},
 	},
 });
@@ -305,12 +301,13 @@ function Game(renderer, stage, player, url) {
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 }
 
-Game.prototype = EventEmitter.prototype;
+Game.prototype = Object.create(EventEmitter.prototype);
 Game.prototype.constructor = Game;
 
 Game.prototype.run = function(player, host, mapName) {
 	if (this.map) {
 		this.container.removeChild(this.map);
+		this.container.removeChild(this.map._maskX);
 		// TODO remove all avatars
 	}
 
@@ -435,6 +432,10 @@ Game.prototype.state_msg = function(state) {
 					this.container.addChild(obj);
 				}
 				this.avatars[state.Id] = new GameObject(obj);
+				this.avatars[state.Id].on('tapped', (function(id) {
+					console.info('tapped', id);
+					this.net.SetTargetMsg(id);
+				}).bind(this));
 
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
@@ -524,8 +525,14 @@ module.exports = Game;
 },{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
 'use strict';
 
+var EventEmitter = require('events').EventEmitter;
+
 function GameObject(obj, state) {
-	PIXI.DisplayObjectContainer.call(this);
+	this.state = state;
+	this.position = {
+		x: 0,
+		y: 0
+	};
 
 	this.velocity = {
 		x: 0,
@@ -544,13 +551,13 @@ function GameObject(obj, state) {
 	this.obj = obj;
 	obj.buttonMode = true;
 	obj.interactive = true;
-	obj.click = obj.tap = function(event) {
-		console.info("tapped");
-	};
+	obj.click = obj.tap = (function(event) {
+		this.emit('tapped', this.state.Id);
+	}).bind(this);
 }
 
-GameObject.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-GameObject.constructor = GameObject;
+GameObject.prototype = Object.create(EventEmitter.prototype);
+GameObject.prototype.constructor = GameObject;
 
 GameObject.prototype.isGameObject = function() {
 	if (this.hasOwnProperty('state')) {
@@ -616,7 +623,7 @@ GameObject.prototype.move = function(dir) {
 
 module.exports = GameObject;
 
-},{}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
+},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
@@ -636,7 +643,7 @@ var M_SetVelocityMsg = 1,
 function Net(url) {
 }
 
-Net.prototype = EventEmitter.prototype;
+Net.prototype = Object.create(EventEmitter.prototype);
 Net.prototype.constructor = Net;
 
 Net.prototype.connecTo = function(url) {
@@ -722,16 +729,20 @@ Net.prototype.SetVelocityMsg = function(data) {
 		V: data
 	});
 }
-Net.prototype.SetTargetMsg = function(data) {
+Net.prototype.SetTargetMsg = function(id) {
 	this.send({
 		T: M_SetTargetMsg,
-		V: data
+		V: {
+			id: id
+		},
 	});
 }
-Net.prototype.FireMsg = function(data) {
+Net.prototype.FireMsg = function(name) {
 	this.send({
 		T: M_CastMsg,
-		V: data
+		V: {
+			t: name
+		}
 	});
 }
 Net.prototype.RequestInventoryMsg = function() {
@@ -752,10 +763,12 @@ Net.prototype.PickupItemMsg = function() {
 		V: {}
 	});
 }
-Net.prototype.DropItemMsg = function(data) {
+Net.prototype.DropItemMsg = function(index) {
 	this.send({
 		T: M_DropItem,
-		V: data
+		V: {
+			Id: index
+		}
 	});
 }
 
@@ -1241,34 +1254,6 @@ function Tileset(data, path, tilewidth, tileheight) {
 			tiles.push(t);
 		}
 	}
-
-
-	/*for (var y = 0; y < h; y++) {
-		for (var x = 0; x < w; x++) {
-			var rect = {
-				x: x * size.width,
-				y: y * size.height,
-				width: size.width,
-				height: size.height,
-			};
-			tiles.push(new PIXI.Texture(image.texture.baseTexture, rect));
-		}
-	}*/
-
-	/*this.name = "nvfjdklsvnfdjkls";
-	this.firstgid = 1;
-	this.image = "nvjfkdls";
-	this.imagewidth = 423423;
-	this.imageheight = 423423;
-
-	this.margin = 1;
-	this.spacing = 1;
-
-	this.tilewidth = 32;
-	this.tileheight = 32;
-
-	this.tiles = [];
-	*/
 }
 
 Tileset.prototype.load = function(fn) {
@@ -1280,23 +1265,16 @@ Tileset.prototype.load = function(fn) {
 
 
 Tileset.prototype.CreateSprite = function(id) {
-	if (id == 0) {
-		return;
-	}
+	if (id == 0) return;
 
 	var data = this.data;
 	id -= data.firstgid;
 	var texture = this.tiles[id];
 
-
-	if (!texture) {
-		console.error('TEXTURE FAIL', data.name, id, id + data.firstgid, data.firstgid);
-		return;
-	}
+	if (!texture) return;
 
 	var sprite = new PIXI.Sprite(texture);
 	sprite.data = data.tiles[id];
-
 
 	if (sprite.data && sprite.data.animation) {
 		sprite.last = window.performance.now();

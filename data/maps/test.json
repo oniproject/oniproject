@@ -10859,7 +10859,9 @@
       "height": 40,
       "name": "add",
       "opacity": 1,
-      "properties": {},
+      "properties": {
+        "masking": "true"
+      },
       "type": "tilelayer",
       "visible": true,
       "width": 54,
@@ -15205,7 +15207,9 @@
       "height": 40,
       "name": "walls",
       "opacity": 1,
-      "properties": {},
+      "properties": {
+        "masking": "true"
+      },
       "type": "tilelayer",
       "visible": true,
       "width": 54,
@@ -21732,281 +21736,6 @@
       "y": 0
     },
     {
-      "height": 0,
-      "name": "collision",
-      "objects": [
-        {
-          "name": "",
-          "x": 632,
-          "y": 704,
-          "width": 112,
-          "height": 112,
-          "visible": true,
-          "ellipse": true
-        },
-        {
-          "name": "",
-          "x": 920,
-          "y": 704,
-          "width": 112,
-          "height": 112,
-          "visible": true,
-          "ellipse": true
-        },
-        {
-          "name": "",
-          "x": 896,
-          "y": 880,
-          "visible": true,
-          "polygon": [
-            {
-              "x": 0,
-              "y": 0
-            },
-            {
-              "x": 96,
-              "y": 0
-            },
-            {
-              "x": 120,
-              "y": 32
-            },
-            {
-              "x": 168,
-              "y": 40
-            },
-            {
-              "x": 176,
-              "y": 128
-            },
-            {
-              "x": 216,
-              "y": 128
-            },
-            {
-              "x": 256,
-              "y": 112
-            },
-            {
-              "x": 448,
-              "y": 112
-            },
-            {
-              "x": 448,
-              "y": 48
-            },
-            {
-              "x": 512,
-              "y": 48
-            },
-            {
-              "x": 552,
-              "y": -72
-            },
-            {
-              "x": 0,
-              "y": -72
-            }
-          ]
-        },
-        {
-          "name": "",
-          "x": 1408,
-          "y": 832,
-          "width": 216,
-          "height": 360,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1416,
-          "y": 1024,
-          "visible": true,
-          "polygon": [
-            {
-              "x": 0,
-              "y": 0
-            },
-            {
-              "x": -264,
-              "y": 0
-            },
-            {
-              "x": -296,
-              "y": 16
-            },
-            {
-              "x": -256,
-              "y": 16
-            },
-            {
-              "x": -248,
-              "y": 72
-            },
-            {
-              "x": -208,
-              "y": 112
-            },
-            {
-              "x": -160,
-              "y": 120
-            },
-            {
-              "x": -128,
-              "y": 152
-            },
-            {
-              "x": -120,
-              "y": 200
-            },
-            {
-              "x": -64,
-              "y": 256
-            },
-            {
-              "x": 24,
-              "y": 256
-            }
-          ]
-        },
-        {
-          "name": "",
-          "x": 896,
-          "y": 648,
-          "width": 544,
-          "height": 120,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 224,
-          "y": 648,
-          "width": 544,
-          "height": 120,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 224,
-          "y": 144,
-          "width": 32,
-          "height": 536,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 224,
-          "y": 136,
-          "width": 1208,
-          "height": 120,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1408,
-          "y": 160,
-          "width": 32,
-          "height": 496,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 256,
-          "y": 424,
-          "width": 344,
-          "height": 224,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 296,
-          "y": 256,
-          "width": 664,
-          "height": 96,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 776,
-          "y": 328,
-          "width": 72,
-          "height": 48,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1056,
-          "y": 232,
-          "width": 136,
-          "height": 104,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1088,
-          "y": 336,
-          "width": 104,
-          "height": 72,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1176,
-          "y": 224,
-          "width": 128,
-          "height": 80,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1304,
-          "y": 240,
-          "width": 104,
-          "height": 48,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1192,
-          "y": 368,
-          "width": 80,
-          "height": 48,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 1328,
-          "y": 368,
-          "width": 80,
-          "height": 48,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 280,
-          "y": 808,
-          "width": 488,
-          "height": 72,
-          "visible": true
-        },
-        {
-          "name": "",
-          "x": 0,
-          "y": 768,
-          "width": 344,
-          "height": 88,
-          "visible": true
-        }
-      ],
-      "opacity": 1,
-      "properties": {},
-      "type": "objectgroup",
-      "visible": true,
-      "width": 0,
-      "x": 0,
-      "y": 0
-    },
-    {
       "data": [
         3073,
         3073,
@@ -24171,11 +23900,286 @@
       ],
       "height": 40,
       "name": "COLLISION",
-      "opacity": 0.75,
+      "opacity": 0.7900000214576721,
       "properties": {},
       "type": "tilelayer",
-      "visible": true,
+      "visible": false,
       "width": 54,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "height": 0,
+      "name": "collision",
+      "objects": [
+        {
+          "name": "",
+          "x": 632,
+          "y": 704,
+          "width": 112,
+          "height": 112,
+          "visible": true,
+          "ellipse": true
+        },
+        {
+          "name": "",
+          "x": 920,
+          "y": 704,
+          "width": 112,
+          "height": 112,
+          "visible": true,
+          "ellipse": true
+        },
+        {
+          "name": "",
+          "x": 896,
+          "y": 880,
+          "visible": true,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 96,
+              "y": 0
+            },
+            {
+              "x": 120,
+              "y": 32
+            },
+            {
+              "x": 168,
+              "y": 40
+            },
+            {
+              "x": 176,
+              "y": 128
+            },
+            {
+              "x": 216,
+              "y": 128
+            },
+            {
+              "x": 256,
+              "y": 112
+            },
+            {
+              "x": 448,
+              "y": 112
+            },
+            {
+              "x": 448,
+              "y": 48
+            },
+            {
+              "x": 512,
+              "y": 48
+            },
+            {
+              "x": 552,
+              "y": -72
+            },
+            {
+              "x": 0,
+              "y": -72
+            }
+          ]
+        },
+        {
+          "name": "",
+          "x": 1408,
+          "y": 832,
+          "width": 216,
+          "height": 360,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1416,
+          "y": 1024,
+          "visible": true,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": -264,
+              "y": 0
+            },
+            {
+              "x": -296,
+              "y": 16
+            },
+            {
+              "x": -256,
+              "y": 16
+            },
+            {
+              "x": -248,
+              "y": 72
+            },
+            {
+              "x": -208,
+              "y": 112
+            },
+            {
+              "x": -160,
+              "y": 120
+            },
+            {
+              "x": -128,
+              "y": 152
+            },
+            {
+              "x": -120,
+              "y": 200
+            },
+            {
+              "x": -64,
+              "y": 256
+            },
+            {
+              "x": 24,
+              "y": 256
+            }
+          ]
+        },
+        {
+          "name": "",
+          "x": 896,
+          "y": 648,
+          "width": 544,
+          "height": 120,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 224,
+          "y": 648,
+          "width": 544,
+          "height": 120,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 224,
+          "y": 144,
+          "width": 32,
+          "height": 536,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 224,
+          "y": 136,
+          "width": 1208,
+          "height": 120,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1408,
+          "y": 160,
+          "width": 32,
+          "height": 496,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 256,
+          "y": 424,
+          "width": 344,
+          "height": 224,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 296,
+          "y": 256,
+          "width": 664,
+          "height": 96,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 776,
+          "y": 328,
+          "width": 72,
+          "height": 48,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1056,
+          "y": 232,
+          "width": 136,
+          "height": 104,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1088,
+          "y": 336,
+          "width": 104,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1176,
+          "y": 224,
+          "width": 128,
+          "height": 80,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1304,
+          "y": 240,
+          "width": 104,
+          "height": 48,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1192,
+          "y": 368,
+          "width": 80,
+          "height": 48,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 1328,
+          "y": 368,
+          "width": 80,
+          "height": 48,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 280,
+          "y": 808,
+          "width": 488,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "",
+          "x": 0,
+          "y": 768,
+          "width": 344,
+          "height": 88,
+          "visible": true
+        }
+      ],
+      "opacity": 1,
+      "properties": {},
+      "type": "objectgroup",
+      "visible": false,
+      "width": 0,
       "x": 0,
       "y": 0
     }
