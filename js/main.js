@@ -114,14 +114,10 @@ var UI = new Vue({
 	methods: {
 		cast: function(spell) {
 			console.info('cast', spell);
-			game.net.FireMsg({
-				t: '' + spell
-			});
+			game.net.FireMsg('' + spell);
 		},
 		drop: function(index) {
-			game.net.DropItemMsg({
-				Id: index
-			});
+			game.net.DropItemMsg(index);
 		},
 	},
 });

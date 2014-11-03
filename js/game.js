@@ -29,12 +29,13 @@ function Game(renderer, stage, player, url) {
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 }
 
-Game.prototype = EventEmitter.prototype;
+Game.prototype = Object.create(EventEmitter.prototype);
 Game.prototype.constructor = Game;
 
 Game.prototype.run = function(player, host, mapName) {
 	if (this.map) {
 		this.container.removeChild(this.map);
+		this.container.removeChild(this.map._maskX);
 		// TODO remove all avatars
 	}
 
@@ -159,6 +160,10 @@ Game.prototype.state_msg = function(state) {
 					this.container.addChild(obj);
 				}
 				this.avatars[state.Id] = new GameObject(obj);
+				this.avatars[state.Id].on('tapped', (function(id) {
+					console.info('tapped', id);
+					this.net.SetTargetMsg(id);
+				}).bind(this));
 
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {

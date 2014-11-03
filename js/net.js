@@ -17,7 +17,7 @@ var M_SetVelocityMsg = 1,
 function Net(url) {
 }
 
-Net.prototype = EventEmitter.prototype;
+Net.prototype = Object.create(EventEmitter.prototype);
 Net.prototype.constructor = Net;
 
 Net.prototype.connecTo = function(url) {
@@ -103,16 +103,20 @@ Net.prototype.SetVelocityMsg = function(data) {
 		V: data
 	});
 }
-Net.prototype.SetTargetMsg = function(data) {
+Net.prototype.SetTargetMsg = function(id) {
 	this.send({
 		T: M_SetTargetMsg,
-		V: data
+		V: {
+			id: id
+		},
 	});
 }
-Net.prototype.FireMsg = function(data) {
+Net.prototype.FireMsg = function(name) {
 	this.send({
 		T: M_CastMsg,
-		V: data
+		V: {
+			t: name
+		}
 	});
 }
 Net.prototype.RequestInventoryMsg = function() {
@@ -133,10 +137,12 @@ Net.prototype.PickupItemMsg = function() {
 		V: {}
 	});
 }
-Net.prototype.DropItemMsg = function(data) {
+Net.prototype.DropItemMsg = function(index) {
 	this.send({
 		T: M_DropItem,
-		V: data
+		V: {
+			Id: index
+		}
 	});
 }
 

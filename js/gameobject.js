@@ -1,7 +1,13 @@
 'use strict';
 
+var EventEmitter = require('events').EventEmitter;
+
 function GameObject(obj, state) {
-	PIXI.DisplayObjectContainer.call(this);
+	this.state = state;
+	this.position = {
+		x: 0,
+		y: 0
+	};
 
 	this.velocity = {
 		x: 0,
@@ -20,13 +26,13 @@ function GameObject(obj, state) {
 	this.obj = obj;
 	obj.buttonMode = true;
 	obj.interactive = true;
-	obj.click = obj.tap = function(event) {
-		console.info("tapped");
-	};
+	obj.click = obj.tap = (function(event) {
+		this.emit('tapped', this.state.Id);
+	}).bind(this);
 }
 
-GameObject.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-GameObject.constructor = GameObject;
+GameObject.prototype = Object.create(EventEmitter.prototype);
+GameObject.prototype.constructor = GameObject;
 
 GameObject.prototype.isGameObject = function() {
 	if (this.hasOwnProperty('state')) {

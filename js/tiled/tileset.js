@@ -33,34 +33,6 @@ function Tileset(data, path, tilewidth, tileheight) {
 			tiles.push(t);
 		}
 	}
-
-
-	/*for (var y = 0; y < h; y++) {
-		for (var x = 0; x < w; x++) {
-			var rect = {
-				x: x * size.width,
-				y: y * size.height,
-				width: size.width,
-				height: size.height,
-			};
-			tiles.push(new PIXI.Texture(image.texture.baseTexture, rect));
-		}
-	}*/
-
-	/*this.name = "nvfjdklsvnfdjkls";
-	this.firstgid = 1;
-	this.image = "nvjfkdls";
-	this.imagewidth = 423423;
-	this.imageheight = 423423;
-
-	this.margin = 1;
-	this.spacing = 1;
-
-	this.tilewidth = 32;
-	this.tileheight = 32;
-
-	this.tiles = [];
-	*/
 }
 
 Tileset.prototype.load = function(fn) {
@@ -72,23 +44,16 @@ Tileset.prototype.load = function(fn) {
 
 
 Tileset.prototype.CreateSprite = function(id) {
-	if (id == 0) {
-		return;
-	}
+	if (id == 0) return;
 
 	var data = this.data;
 	id -= data.firstgid;
 	var texture = this.tiles[id];
 
-
-	if (!texture) {
-		console.error('TEXTURE FAIL', data.name, id, id + data.firstgid, data.firstgid);
-		return;
-	}
+	if (!texture) return;
 
 	var sprite = new PIXI.Sprite(texture);
 	sprite.data = data.tiles[id];
-
 
 	if (sprite.data && sprite.data.animation) {
 		sprite.last = window.performance.now();
