@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter,
 	Net = require('./net'),
 	Suika = require('./suika'),
 	Bat = require('./bat'),
+	Item = require('./item'),
 	Tiled = require('./tiled');
 
 function Game(renderer, stage, player, url) {
@@ -155,6 +156,8 @@ Game.prototype.state_msg = function(state) {
 					obj = new Suika();
 				} else if (state.Id > -20000) {
 					obj = new Bat();
+				} else {
+					obj = new Item(13);
 				}
 				if (obj) {
 					this.container.addChild(obj);
@@ -163,6 +166,13 @@ Game.prototype.state_msg = function(state) {
 				this.avatars[state.Id].on('tapped', (function(id) {
 					console.info('tapped', id);
 					this.net.SetTargetMsg(id);
+					if (this.target == id) {
+						var obj = this.avatars[id];
+						if (obj.isItem()) {
+							this.net.PickupItemMsg();
+						}
+					}
+					this.target = id;
 				}).bind(this));
 
 			case 0: // idle

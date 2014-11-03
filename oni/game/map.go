@@ -172,6 +172,7 @@ func (gm *Map) Run() {
 		close(avatar.sendMessage)
 	}
 
+	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
 	x, y := 5, 35
 
 	for i := 0; i < 4; i++ {
@@ -181,10 +182,9 @@ func (gm *Map) Run() {
 		go gm.SpawnMonster(float64(x+3), float64(y+i))
 		go gm.SpawnMonster(float64(x+4), float64(y+i))
 		go gm.SpawnMonster(float64(x+5), float64(y+i))
-	}
 
-	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
-	go gm.DropItem(3, 2, test_knife)
+		go gm.DropItem(float64(x+15), float64(y+i), test_knife)
+	}
 
 	t_replication := time.NewTicker(TickRate)
 	t_regeneration := time.NewTicker(1 * time.Second)

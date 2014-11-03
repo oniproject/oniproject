@@ -60,6 +60,8 @@ GameObject.prototype.update = function(time) {
 		obj.position.x = (this.position.x * 32) | 0;
 		obj.position.y = (this.position.y * 32) | 0;
 
+		if (!obj.animation) return;
+
 		obj.animation = 'idle';
 		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
 			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);

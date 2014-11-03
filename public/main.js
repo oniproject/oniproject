@@ -277,6 +277,7 @@ var EventEmitter = require('events').EventEmitter,
 	Net = require('./net'),
 	Suika = require('./suika'),
 	Bat = require('./bat'),
+	Item = require('./item'),
 	Tiled = require('./tiled');
 
 function Game(renderer, stage, player, url) {
@@ -427,6 +428,8 @@ Game.prototype.state_msg = function(state) {
 					obj = new Suika();
 				} else if (state.Id > -20000) {
 					obj = new Bat();
+				} else {
+					obj = new Item(13);
 				}
 				if (obj) {
 					this.container.addChild(obj);
@@ -435,6 +438,13 @@ Game.prototype.state_msg = function(state) {
 				this.avatars[state.Id].on('tapped', (function(id) {
 					console.info('tapped', id);
 					this.net.SetTargetMsg(id);
+					if (this.target == id) {
+						var obj = this.avatars[id];
+						if (obj.isItem()) {
+							this.net.PickupItemMsg();
+						}
+					}
+					this.target = id;
 				}).bind(this));
 
 			case 0: // idle
@@ -522,7 +532,7 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
+},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./item":"/home/lain/gocode/src/oniproject/js/item.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
@@ -585,6 +595,8 @@ GameObject.prototype.update = function(time) {
 		obj.position.x = (this.position.x * 32) | 0;
 		obj.position.y = (this.position.y * 32) | 0;
 
+		if (!obj.animation) return;
+
 		obj.animation = 'idle';
 		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
 			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
@@ -623,7 +635,52 @@ GameObject.prototype.move = function(dir) {
 
 module.exports = GameObject;
 
-},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
+},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/item.js":[function(require,module,exports){
+'use strict';
+
+function Item(type) {
+	var w = 32 * 3,
+		h = 32 * 10;
+	var image = new PIXI.ImageLoader('/items.png');
+	this._type = type;
+
+	var textures = this.textures = [];
+
+	for (var y = 0; y < 10; y++) {
+		for (var x = 0; x < 3; x++) {
+			var rect = {
+				x: x * 32,
+				y: y * 32,
+				width: 32,
+				height: 32,
+			};
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			textures.push(t);
+		}
+	}
+
+	PIXI.Sprite.call(this, textures[type]);
+
+	image.load();
+	this.image = image;
+}
+
+Item.prototype = Object.create(PIXI.Sprite.prototype);
+Item.prototype.constructor = Item;
+
+Object.defineProperty(Item.prototype, 'type', {
+	get: function() {
+		return this._type;
+	},
+	set: function(type) {
+		this.setTexture(this.textures[type]);
+		this._type = type;
+	}
+});
+
+module.exports = Item;
+
+},{}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
