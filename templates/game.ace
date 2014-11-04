@@ -21,19 +21,36 @@ html lang=en
       #spells {
         margin:auto;
         width:340px;
-        background:black;
+        background: url("/ui/spell-bar-bg.png");
         font-size: 0;
-        padding:3px;
+        padding: 4px 1px;
+        height: 44px;
+        width: 364px;
+        box-sizing: border-box;
+        position: relative;
+      }
+      #spell-over {
+        background: url("/ui/spell-bar-over.png");
+        height: 44px;
+        width: 364px;
+        position: absolute;
+        top:0;
+        left:0;
       }
       #spells .img {
         position: relative;
         display: inline-block;
         width:32px;
         height:32px;
-        padding: 1px;
+        margin: 2px;
       }
-      #spells .img:hover {
-        outline: 1px solid rgba(255, 255, 255, 1);
+      #spells .img:hover .img-over {
+        background: no-repeat url("/ui/spell-bar-glass.png");
+        width: 32px;
+        height: 32px;
+        position: absolute;
+        top: 1px;
+        left: 0px;
       }
       #spells img {
         margin:0;
@@ -239,9 +256,10 @@ html lang=en
       #bottom
         #spells
           .img v-repeat="spells" v-on="click: cast($key)"
-            .text
+            / .text
               span v-text="Name"
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
+            .img-over
         #exp
           div v-style="width: exp + '%'"
 

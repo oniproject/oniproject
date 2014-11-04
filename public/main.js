@@ -134,6 +134,26 @@ var UI = new Vue({
 			{
 				Icon: 'rune-sword'
 			},
+
+
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
 		],
 	},
 	methods: {
@@ -145,10 +165,11 @@ var UI = new Vue({
 			game.net.DropItemMsg(index);
 		},
 		chatMsg: function(event) {
-			console.info(this.msg);
-			game.net.ChatPostMsg(this.msg);
+			var msg = this.msg;
 			this.msg = '';
+			console.info(msg);
 			event.target.blur();
+			game.net.ChatPostMsg(msg);
 		},
 		focus: function() {
 			game.listener.stop_listening();
@@ -169,7 +190,7 @@ function getConnectionData() {
 		var json = JSON.parse(r.responseText);
 		if (json.Id !== undefined) {
 			console.log('Success:', json);
-			game.run(json.Id, json.Host, 'test');
+			//game.run(json.Id, json.Host, 'test');
 		}
 	};
 	r.send();
