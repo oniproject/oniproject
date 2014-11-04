@@ -454,7 +454,7 @@ Game.prototype.state_msg = function(state) {
 			case 2: // destroy
 				var a = this.avatars[state.Id];
 				if (a.obj) {
-					this.container.removeChild(a.obj);
+					this.map.AVATARS.removeChild(a.obj);
 				}
 				delete this.avatars[state.Id];
 				break;
@@ -516,12 +516,11 @@ Game.prototype.state_msg = function(state) {
 					clearTimeout(avatar.rm_timer);
 				}
 				avatar.rm_timer = setTimeout(function() {
-					var a = this.avatars[state.Id];
-					if (a.obj) {
-						this.container.removeChild(a.obj);
+					if (avatar.obj !== undefined) {
+						this.map.AVATARS.removeChild(avatar.obj);
 					}
 					delete this.avatars[state.Id];
-				}.bind(this), 2000);
+				}.bind(this), 1000);
 
 				avatar.state = state;
 				avatar.position.x = state.Position.X;
