@@ -64,6 +64,11 @@ game.net.on('ParametersMsg', function(p) {
 	UI.spells = p.Skills;
 });
 
+game.net.on('ChatMsg', function(msg) {
+	console.log('ChatMsg', msg);
+	UI.chat.push(msg);
+});
+
 var UI = new Vue({
 	el: '#ui',
 	data: {
@@ -75,6 +80,25 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
+
+		msg: 'msgqwer freqw',
+		chat: [{
+			Name: 'vfndjskl',
+			Text: 'vfds',
+			Type: 'party'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'local'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'guild'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'qwioerh',
+			Type: 'admin'
+		}],
 		equip: {},
 		inventory: [
 			{
@@ -119,6 +143,18 @@ var UI = new Vue({
 		drop: function(index) {
 			game.net.DropItemMsg(index);
 		},
+		chatMsg: function(event) {
+			console.info(this.msg);
+			game.net.ChatPostMsg(this.msg);
+			this.msg = '';
+			event.target.blur();
+		},
+		focus: function() {
+			game.listener.stop_listening();
+		},
+		blur: function() {
+			game.listener.listen();
+		}
 	},
 });
 

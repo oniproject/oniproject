@@ -53,6 +53,35 @@ html lang=en
         display: block;
       }
 
+      #chat {
+        position: absolute;
+        bottom: 1.5em;
+        width: 300px;
+        color: white;
+      }
+      #chat input {
+        background: rgba(120, 0, 0, 0.3);
+        border: none;
+        width: 100%;
+      }
+      #chat ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: rgba(0, 0, 255, 0.8);
+        width: 100%;
+      }
+      #chat .local {}
+      #chat .admin {
+        font-weight: bold;
+        color: #c00;
+      }
+      #chat .party {
+        font-weight: bold;
+      }
+      #chat .guild {
+        color: #0f0;
+      }
 
       #exp {
         width:100%;
@@ -155,6 +184,15 @@ html lang=en
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
         #exp
           div v-style="width: exp + '%'"
+
+      #chat
+        ul
+          li v-repeat="chat"
+            span [
+            span v-text="Name" v-class="Type"
+            span ]&nbsp
+            span v-text="Text"
+        input v-model="msg" v-on="keyup: chatMsg | key enter, focus: focus, blur: blur"
     script src="/js/pixi.js"
     script src="/js/keypress-2.0.2.min.js"
     script src="/js/cbor.js"

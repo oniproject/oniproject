@@ -12,6 +12,8 @@ var M_SetVelocityMsg = 1,
 	M_TargetData = 9,
 	M_RequestParameters = 10,
 	M_Parameters = 11,
+	M_Chat = 12,
+	M_ChatPost = 13,
 	___ = 0;
 
 function Net(url) {
@@ -92,6 +94,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_Parameters:
 			this.emit('ParametersMsg', value);
 			break;
+		case M_Chat:
+			this.emit('ChatMsg', value);
+			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -142,6 +147,15 @@ Net.prototype.DropItemMsg = function(index) {
 		T: M_DropItem,
 		V: {
 			Id: index
+		}
+	});
+}
+
+Net.prototype.ChatPostMsg = function(msg) {
+	this.send({
+		T: M_ChatPost,
+		V: {
+			m: msg
 		}
 	});
 }
