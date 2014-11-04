@@ -65,6 +65,11 @@ game.net.on('ParametersMsg', function(p) {
 	UI.spells = p.Skills;
 });
 
+game.net.on('ChatMsg', function(msg) {
+	console.log('ChatMsg', msg);
+	UI.chat.push(msg);
+});
+
 var UI = new Vue({
 	el: '#ui',
 	data: {
@@ -76,6 +81,25 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
+
+		msg: 'msgqwer freqw',
+		chat: [{
+			Name: 'vfndjskl',
+			Text: 'vfds',
+			Type: 'party'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'local'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'guild'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'qwioerh',
+			Type: 'admin'
+		}],
 		equip: {},
 		inventory: [
 			{
@@ -120,6 +144,18 @@ var UI = new Vue({
 		drop: function(index) {
 			game.net.DropItemMsg(index);
 		},
+		chatMsg: function(event) {
+			console.info(this.msg);
+			game.net.ChatPostMsg(this.msg);
+			this.msg = '';
+			event.target.blur();
+		},
+		focus: function() {
+			game.listener.stop_listening();
+		},
+		blur: function() {
+			game.listener.listen();
+		}
 	},
 });
 
@@ -432,7 +468,7 @@ Game.prototype.state_msg = function(state) {
 					obj = new Item(13);
 				}
 				if (obj) {
-					this.container.addChild(obj);
+					this.map.AVATARS.addChild(obj);
 				}
 				this.avatars[state.Id] = new GameObject(obj);
 				this.avatars[state.Id].on('tapped', (function(id) {
@@ -695,6 +731,8 @@ var M_SetVelocityMsg = 1,
 	M_TargetData = 9,
 	M_RequestParameters = 10,
 	M_Parameters = 11,
+	M_Chat = 12,
+	M_ChatPost = 13,
 	___ = 0;
 
 function Net(url) {
@@ -775,6 +813,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_Parameters:
 			this.emit('ParametersMsg', value);
 			break;
+		case M_Chat:
+			this.emit('ChatMsg', value);
+			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -825,6 +866,15 @@ Net.prototype.DropItemMsg = function(index) {
 		T: M_DropItem,
 		V: {
 			Id: index
+		}
+	});
+}
+
+Net.prototype.ChatPostMsg = function(msg) {
+	this.send({
+		T: M_ChatPost,
+		V: {
+			m: msg
 		}
 	});
 }
@@ -1079,6 +1129,8 @@ function Tiled(path, uri) {
 
 	this.tilesets = [];
 	this.layers = [];
+
+	this.AVATARS = new PIXI.DisplayObjectContainer();
 }
 
 Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
@@ -1113,7 +1165,11 @@ Tiled.prototype.load = function(fn, fn2) {
 					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
 					break;
 				case 'objectgroup':
-					obj = new ObjectGroup(layer, that.tilesets);
+					if (layer.name == 'AVATARS') {
+						obj = that.AVATARS;
+					} else {
+						obj = new ObjectGroup(layer, that.tilesets);
+					}
 					break;
 				case 'imagelayer':
 					obj = new ImageLayer(layer, that.path);

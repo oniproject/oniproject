@@ -160,7 +160,7 @@ Game.prototype.state_msg = function(state) {
 					obj = new Item(13);
 				}
 				if (obj) {
-					this.container.addChild(obj);
+					this.map.AVATARS.addChild(obj);
 				}
 				this.avatars[state.Id] = new GameObject(obj);
 				this.avatars[state.Id].on('tapped', (function(id) {

@@ -14,6 +14,8 @@ function Tiled(path, uri) {
 
 	this.tilesets = [];
 	this.layers = [];
+
+	this.AVATARS = new PIXI.DisplayObjectContainer();
 }
 
 Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
@@ -48,7 +50,11 @@ Tiled.prototype.load = function(fn, fn2) {
 					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
 					break;
 				case 'objectgroup':
-					obj = new ObjectGroup(layer, that.tilesets);
+					if (layer.name == 'AVATARS') {
+						obj = that.AVATARS;
+					} else {
+						obj = new ObjectGroup(layer, that.tilesets);
+					}
 					break;
 				case 'imagelayer':
 					obj = new ImageLayer(layer, that.path);
