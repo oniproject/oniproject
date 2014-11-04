@@ -120,6 +120,39 @@ var UI = new Vue({
 			MHP: 0,
 			Name: 'vnfdjsk'
 		},
+		invTest: [
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+		],
 		spells: [
 			{
 				Icon: 'all-for-one'
@@ -189,7 +222,7 @@ function getConnectionData() {
 		var json = JSON.parse(r.responseText);
 		if (json.Id !== undefined) {
 			console.log('Success:', json);
-			//game.run(json.Id, json.Host, 'test');
+			game.run(json.Id, json.Host, 'test');
 		}
 	};
 	r.send();

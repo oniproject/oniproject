@@ -85,7 +85,7 @@ html lang=en
         list-style: none;
         padding: 0;
         margin: 0;
-        background: rgba(0, 0, 255, 0.5);
+        background: rgba(255, 255, 255, 0.1);
         width: 100%;
       }
       #chat .local {}
@@ -102,6 +102,7 @@ html lang=en
 
       #exp {
         width:100%;
+        background: black;
       }
       #exp div {
         background: silver;
@@ -228,8 +229,219 @@ html lang=en
         height: 4px;
         background: yellow;
       }
+
+
+
+      .window {
+        width: 274px;
+        height: 424px;
+        background: url("/ui/win-bg.png");
+        position: absolute;
+        font-family: Impact;
+        text-shadow: 1px 1px 1px black;
+        color: white;
+      }
+      .window .close {
+        position: absolute;
+        top: 0px;
+        left: 241px;
+        width: 28px;
+        height: 27px;
+      }
+      .window .close:hover {
+        background: url("/ui/win-close.png");
+      }
+      .window .title {
+        text-align: center;
+        width: 100px;
+        position: absolute;
+        top: 10px;
+        left: 88px;
+      }
+      .window .scrollbar {
+        background: url("/ui/scrollbar-bg.png");
+        position: absolute;
+        top: 49px;
+        right: 5px;
+        width: 22px;
+        height: 362px;
+      }
+      .window .scrollbar .up,
+      .window .scrollbar .down,
+      .window .scrollbar .slider {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        left: 3px;
+      }
+      .window .scrollbar .up {
+        background: url("/ui/scrollbar-up.png");
+        top: 2px;
+      }
+      .window .scrollbar .up:hover {
+        background: url("/ui/scrollbar-up-hover.png");
+      }
+
+      .window .scrollbar .down {
+        background: url("/ui/scrollbar-down.png");
+        bottom: 2px;
+      }
+      .window .scrollbar .down:hover {
+        background: url("/ui/scrollbar-down-hover.png");
+      }
+
+      .window .scrollbar .slider {
+        background: url("/ui/scrollbar-slider.png");
+        bottom: 50px;
+      }
+
+      .window .btn {
+        background: url("/ui/btn.png");
+        width: 90px;
+        height: 29px;
+        font-size: 14px;
+        text-align: center;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        padding-bottom: 4px;
+
+        font-family: Impact;
+        text-shadow: 1px 1px 1px black;
+        color: white;
+      }
+      .window .btn:hover {
+        background: url("/ui/btn-hover.png");
+      }
+      .window .btn:disabled {
+        background: url("/ui/btn-disabled.png");
+      }
+      .window .btn:active {
+        background: url("/ui/btn-active.png");
+      }
+
+      .window .content {
+        color: white;
+        position: absolute;
+        top: 50px;
+        left: 7px;
+        width: 261px;
+        height: 363px;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+
+      .window .content.red {
+        background: url("/ui/win-red.png");
+        font-family: sans;
+      }
+
+      .window .content.paper {
+        background: no-repeat url("/ui/win-paper.png");
+        font-family: sans-serif;
+        padding: 45px 35px 40px 10px;
+        position: relative;
+        color: #46290e;
+        box-shadow: none;
+      }
+      .window .content.paper .sello {
+        position: absolute;
+        top: 10px;
+        left: 82px;
+        width: 87px;
+        height: 42px;
+      }
+      .window .content.paper .sello.red {
+        background: url("/ui/sello-red.png");
+      }
+      .window .content.paper .sello.blue {
+        background: url("/ui/sello-blue.png");
+      }
+
+      #inventory {
+        background: url("/ui/win-inventory.png");
+        font-size: 0;
+        padding: 14px 0 18px 18px;
+      }
+      #inventory .img {
+        position: relative;
+        display: inline-block;
+        width:32px;
+        height:32px;
+        margin: 2px 3px;
+      }
+      #inventory .img:hover .img-over {
+        background: no-repeat url("/ui/spell-bar-glass.png");
+        width: 32px;
+        height: 32px;
+        position: absolute;
+        top: 1px;
+        left: 0px;
+      }
+      #inventory img {
+        margin:0;
+        width:32px;
+        height:32px;
+      }
+
+      #inventory #gold {
+        background: no-repeat url("/ui/win-x-gold.png");
+        position: absolute;
+        width: 70px;
+        bottom: 10px;
+        right: 0px;
+        color: white;
+        padding-left: 35px;
+        line-height: 21px;
+        font-size: 12px;
+      }
+
   body
     #ui
+      .window style="top: 150px; right: 10px"
+        .title Inventory
+        .content#inventory
+          .img v-repeat="invTest" v-on="click: cast($key)"
+            img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
+            .img-over
+
+          #gold 12345678
+        .close
+      .window style="top: 150px; left: 300px"
+        .title Quest
+        .content.paper
+          .sello.red
+
+          button.btn Hello
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+        .scrollbar
+          a.up
+          a.down
+          a.slider
+        .close
+      .window style="top: 150px; left: 10px"
+        .title Spells
+        .content.red
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+        .close
       #top-left
         #hudMap v-text="level"
         #hud
