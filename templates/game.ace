@@ -335,6 +335,10 @@ html lang=en
         background: url("/ui/win-red.png");
         font-family: sans;
       }
+      .window .content.yellow {
+        background: url("/ui/win-yellow.png");
+        font-family: sans;
+      }
 
       .window .content.paper {
         background: no-repeat url("/ui/win-paper.png");
@@ -357,6 +361,7 @@ html lang=en
       .window .content.paper .sello.blue {
         background: url("/ui/sello-blue.png");
       }
+      /* icon 28x28 */
 
       #inventory {
         background: url("/ui/win-inventory.png");
@@ -396,9 +401,45 @@ html lang=en
         font-size: 12px;
       }
 
+      #sys.s5 {
+        background: no-repeat url("/ui/sys-bg-5.png");
+        background-position: 0 11px;
+        position: absolute;
+        width: 204px;
+        /*height: 24px;*/
+        height: 35px;
+        bottom: 7px;
+        right: 10px;
+        padding-left: 15px;
+      }
+      #sys .icon {
+        background: url("/ui/sys-icons.png");
+        width: 26px;
+        height: 26px;
+        display: inline-block;
+        margin-right: 11px;
+      }
+      #sys .icon.hammer {
+        background-position-x: 0;
+      }
+      #sys .icon.helment {
+        background-position-x: -26px;
+      }
+      #sys .icon.bubble {
+        background-position-x: -52px;
+      }
+      #sys .icon.cup {
+        background-position-x: -78px;
+      }
+      #sys .icon.door {
+        background-position-x: 52px;
+      }
+      #sys .icon.pounch {
+        background-position-x: 26px;
+      }
   body
     #ui
-      .window style="top: 150px; right: 10px"
+      .window v-show="showInventory" style="top: 150px; right: 10px"
         .title Inventory
         .content#inventory
           .img v-repeat="invTest" v-on="click: cast($key)"
@@ -406,12 +447,12 @@ html lang=en
             .img-over
 
           #gold 12345678
-        .close
+        .close v-on="click: showInventory = !showInventory"
+
       .window style="top: 150px; left: 300px"
         .title Quest
         .content.paper
           .sello.red
-
           button.btn Hello
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
@@ -428,7 +469,8 @@ html lang=en
           a.down
           a.slider
         .close
-      .window style="top: 150px; left: 10px"
+
+      .window v-show="showSpells" style="top: 150px; left: 10px"
         .title Spells
         .content.red
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
@@ -441,7 +483,9 @@ html lang=en
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-        .close
+        .close v-on="click: showSpells = !showSpells"
+
+
       #top-left
         #hudMap v-text="level"
         #hud
@@ -451,6 +495,7 @@ html lang=en
             div v-style="width: mp/mmp*100 + '%'"
           #hudSP.hud-bar
             div v-style="width: tp/mtp*100 + '%'"
+
       #top-center
         strong v-text="target.Name"
         .points.hp
@@ -472,10 +517,16 @@ html lang=en
               span v-text="Name"
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
             .img-over
+        #sys.s5
+          .icon.hammer
+          .icon.helment v-on="click: showEquip = !showEquip"
+          .icon.bubble v-on="click: showChat = !showChat"
+          .icon.cup v-on="click: showSpells = !showSpells"
+          .icon.pounch v-on="click: showInventory = !showInventory" style="margin-left: -2px;"
         #exp
           div v-style="width: exp + '%'"
 
-      #chat
+      #chat v-show="showChat"
         ul
           li v-repeat="chat"
             span [

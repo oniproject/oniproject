@@ -81,6 +81,11 @@ var UI = new Vue({
 		tp: 50,
 		mtp: 100,
 
+		showEquip: true,
+		showSpells: true,
+		showInventory: true,
+		showChat: true,
+
 		msg: 'msgqwer freqw',
 		chat: [{
 			Name: 'vfndjskl',
