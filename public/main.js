@@ -443,8 +443,26 @@ Game.prototype.update = function() {
 Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
-		this.container.position.x = Math.round(-player.obj.position.x + window.innerWidth / 2);
-		this.container.position.y = Math.round(-player.obj.position.y + window.innerHeight / 2);
+
+		var x = -player.obj.position.x + window.innerWidth / 2;
+		var y = -player.obj.position.y + window.innerHeight / 2;
+
+		var w = this.map.data.width * this.map.data.tilewidth;
+		var h = this.map.data.height * this.map.data.tileheight;
+
+		if (x > 0) {
+			x = 0;
+		} else if (x < -w + window.innerWidth) {
+			x = -w + window.innerWidth;
+		}
+		if (y > 0) {
+			y = 0;
+		} else if (y < -h + window.innerHeight) {
+			y = -h + window.innerHeight;
+		}
+
+		this.container.x = Math.round(x);
+		this.container.y = Math.round(y);
 	}
 }
 
