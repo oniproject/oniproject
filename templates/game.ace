@@ -68,7 +68,7 @@ html lang=en
         list-style: none;
         padding: 0;
         margin: 0;
-        background: rgba(0, 0, 255, 0.8);
+        background: rgba(0, 0, 255, 0.5);
         width: 100%;
       }
       #chat .local {}
