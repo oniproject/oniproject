@@ -51,7 +51,7 @@ game.net.on('open', function() {
 game.net.on('close', function() {
 	UI.isConnected = false;
 	console.warn('ws close');
-	getConnectionData();
+	setTimeout(getConnectionData, 1000);
 });
 
 
