@@ -82,7 +82,7 @@ game.net.on('ChatMsg', function(msg) {
 var UI = window.UI = new Vue({
 	el: '#ui',
 	data: {
-		isConnected: true,
+		isConnected: false,
 
 		level: 88,
 		exp: 77,
