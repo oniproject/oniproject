@@ -16,7 +16,7 @@ window.onresize = function() {
 window.onresize();
 
 var Game = require('./game');
-window.game = new Game(renderer, stage);
+window.game = new Game(renderer, stage, UI);
 
 var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 colorMatrixFilter.matrix = [
@@ -69,7 +69,7 @@ game.net.on('ChatMsg', function(msg) {
 	UI.chat.push(msg);
 });
 
-var UI = new Vue({
+var UI = window.UI = new Vue({
 	el: '#ui',
 	data: {
 		level: 88,
@@ -192,6 +192,82 @@ var UI = new Vue({
 				Icon: 'screaming'
 			},
 		],
+	},
+	computed: {
+		showTargetBar: function() {
+			return !!this.target.MHP;
+		},
+	},
+	components: {
+		scrollbar: {
+			scrollTopX: 5,
+			created: function() {
+				this.$on('scroll', function() {
+					this.scrollTopX = this.$parent.scrollTop;
+					console.log('scroll', this.scrollTopX, this.$parent.scrollH);
+				});
+			},
+			methods: {
+				up: function(event) {
+					this.$parent.$emit('up');
+				},
+				down: function(event) {
+					this.$parent.$emit('down');
+				},
+			}
+		},
+		scrolled: {
+			computed: {
+				scrollTop: function() {
+					var el = this.$el.querySelector('.native');
+					return el.scrollTop;
+				},
+				scrollH: function() {
+					var el = this.$el.querySelector('.scrollbar-wrap');
+					var el2 = this.$el.querySelector('.s-content');
+					var x = el2.clientHeight / el.clientHeight;
+					console.log(x, el.clientHeight, el2.clientHeight);
+					return x;
+				},
+			},
+			methods: {
+				scroll: function() {
+					this.scrollTop;
+					this.$broadcast('scroll');
+				},
+			},
+			created: function() {
+				this.$on('up', function() {
+					this.$broadcast('scroll');
+					this.$el.querySelector('.native').scrollTop -= 60;
+				});
+				this.$on('down', function() {
+					this.$broadcast('scroll');
+					this.$el.querySelector('.native').scrollTop += 60;
+				});
+			}
+		},
+		draggable: {
+			dragged: false,
+			methods: {
+				dragStart: function(event) {
+					this.dragged = true;
+				},
+				dragMove: function(event) {
+					if (this.dragged) {
+						var b = this.$el.getBoundingClientRect();
+						this.$el.style.left = b.left + event.movementX + 'px';
+						this.$el.style.top = b.top + event.movementY + 'px';
+					}
+				},
+				dragEnd: function(event) {
+					this.dragged = false;
+				},
+				dragOut: function(event) {
+					this.dragged = false;
+				},
+			}
+		}
 	},
 	methods: {
 		cast: function(spell) {

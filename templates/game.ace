@@ -8,8 +8,8 @@ html lang=en
     link rel="stylesheet" href="/game.css"
   body
     #ui
-      .window v-show="showInventory" style="top: 150px; right: 10px"
-        .title Inventory
+      .window v-component="draggable" v-show="showInventory" style="top: 150px; right: 10px"
+        .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Inventory
         .content#inventory
           .img v-repeat="invTest" v-on="click: cast($key)"
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
@@ -18,29 +18,45 @@ html lang=en
           #gold 12345678
         .close v-on="click: showInventory = !showInventory"
 
-      .window style="top: 150px; left: 300px"
-        .title Quest
-        .content.paper
-          .sello.red
-          button.btn Hello
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-        .scrollbar
-          a.up
-          a.down
-          a.slider
+      .window v-component="draggable" style="top: 150px; left: 300px"
+        div v-component="scrolled"
+          .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Quest
+          .content.paper
+            .sello.red
+
+            .scrollbar-wrap
+              .native v-on="scroll: scroll"
+                .s-content
+                  .h vnfdjskl
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+                  p XXXXXX
+
+                  button.btn Hello
+                  button.btn Hello
+
+          .scrollbar v-component="scrollbar"
+            a.up v-on="click: up"
+            a.down v-on="click: down"
+            a.slider v-style="top: scrollTopX/(scrollH-1) + 22 +'px'"
         .close
 
-      .window v-show="showSpells" style="top: 150px; left: 10px"
-        .title Spells
+      .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 10px"
+        .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Spells
         .content.red
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
@@ -54,8 +70,12 @@ html lang=en
           | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
         .close v-on="click: showSpells = !showSpells"
 
+      #target-bar v-show="showTargetBar" v-component="draggable" v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove"
+        strong v-text="target.Name"
+        .bar
+          div v-style="width: target.HP/target.MHP*100 + '%'"
 
-      #hud
+      #hud v-component="draggable" v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove"
         .hudMap v-text="level"
         .hud
           .bar.hp
@@ -64,11 +84,6 @@ html lang=en
             div v-style="width: mp/mmp*100 + '%'"
           .bar.sp
             div v-style="width: tp/mtp*100 + '%'"
-
-      #target-bar
-        strong v-text="target.Name"
-        .bar
-          div v-style="width: target.HP/target.MHP*100 + '%'"
 
       #top-right
         strong Equip
@@ -87,11 +102,15 @@ html lang=en
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
             .img-over
         #sys.s5
-          .icon.hammer
-          .icon.helment v-on="click: showEquip = !showEquip"
-          .icon.bubble v-on="click: showChat = !showChat"
-          .icon.cup v-on="click: showSpells = !showSpells"
-          .icon.pounch v-on="click: showInventory = !showInventory" style="margin-left: -2px;"
+          a.icon.hammer
+          a.icon.helment v-on="click: showEquip = !showEquip"
+            .tooltip Equip
+          a.icon.bubble v-on="click: showChat = !showChat"
+            .tooltip Chat
+          a.icon.cup v-on="click: showSpells = !showSpells"
+            .tooltip Spells
+          a.icon.pounch v-on="click: showInventory = !showInventory" style="margin-left: -2px;"
+            .tooltip Inventory
         #exp
           div v-style="width: exp + '%'"
 

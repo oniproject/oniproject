@@ -8,7 +8,7 @@ var EventEmitter = require('events').EventEmitter,
 	Item = require('./item'),
 	Tiled = require('./tiled');
 
-function Game(renderer, stage, player, url) {
+function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
 
@@ -17,7 +17,7 @@ function Game(renderer, stage, player, url) {
 	this.renderer = renderer;
 	this.stage = stage;
 	this.dir = [' ', ' '];
-	this.player = player;
+	this.player = 0;
 	this.target = 0;
 	this.avatars = {};
 
