@@ -55,19 +55,19 @@ html lang=en
         .close v-on="click: showSpells = !showSpells"
 
 
-      #top-left
-        #hudMap v-text="level"
-        #hud
-          #hudHP.hud-bar
+      #hud
+        .hudMap v-text="level"
+        .hud
+          .bar.hp
             div v-style="width: hp/mhp*100 + '%'"
-          #hudMP.hud-bar
+          .bar.mp
             div v-style="width: mp/mmp*100 + '%'"
-          #hudSP.hud-bar
+          .bar.sp
             div v-style="width: tp/mtp*100 + '%'"
 
-      #top-center
+      #target-bar
         strong v-text="target.Name"
-        .points.hp
+        .bar
           div v-style="width: target.HP/target.MHP*100 + '%'"
 
       #top-right
@@ -103,6 +103,7 @@ html lang=en
             span ]&nbsp
             span v-text="Text"
         input v-model="msg" v-on="keyup: chatMsg | key enter, focus: focus, blur: blur"
+
     script src="/js/pixi.js"
     script src="/js/keypress-2.0.2.min.js"
     script src="/js/cbor.js"
