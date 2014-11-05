@@ -45,7 +45,16 @@ function render() {
 game.net.on('open', function() {
 	game.net.RequestParametersMsg();
 	game.net.RequestInventoryMsg();
+	UI.isConnected = true;
+	console.info('ws open');
 });
+
+game.net.on('close', function() {
+	UI.isConnected = false;
+	console.warn('ws close');
+	getConnectionData();
+});
+
 
 game.net.on('TargetDataMsg', function(target) {
 	console.log('TargetDataMsg');
@@ -73,6 +82,8 @@ game.net.on('ChatMsg', function(msg) {
 var UI = window.UI = new Vue({
 	el: '#ui',
 	data: {
+		isConnected: true,
+
 		level: 88,
 		exp: 77,
 		hp: 190,
@@ -304,7 +315,7 @@ function getConnectionData() {
 		var json = JSON.parse(r.responseText);
 		if (json.Id !== undefined) {
 			console.log('Success:', json);
-			game.run(json.Id, json.Host, 'test');
+			game.run(json.Id, json.Host, json.MapId);
 		}
 	};
 	r.send();
@@ -466,7 +477,7 @@ function Game(renderer, stage) {
 
 	var net = this.net = new Net();
 	net.on('message', this.onmessage.bind(this));
-	net.on('close', alert.bind(null, 'close WS'));
+	//net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));
@@ -935,7 +946,10 @@ Net.prototype.close = function() {
 	this.ws.close();
 }
 Net.prototype.send = function(message) {
-	this.ws.send(CBOR.encode(message));
+	var ws = this.ws;
+	if (ws.readyState === WebSocket.OPEN) {
+		ws.send(CBOR.encode(message));
+	}
 }
 
 /*
@@ -1352,7 +1366,10 @@ function ObjectGroup(data, tilesets) {
 	var graphics = this.graphics = new PIXI.Graphics();
 	this.addChild(graphics);
 
-	this.data = data;
+	this.data = data || {};
+	if (!data.objects) {
+		data.objects = [];
+	}
 	this.tilesets = tilesets;
 
 	this.position.x = data.x || 0;

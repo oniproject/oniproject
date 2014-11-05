@@ -6,8 +6,22 @@ html lang=en
     meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     title {{.Title}}
     link rel="stylesheet" href="/game.css"
-  body
-    #ui
+  body#ui
+    #loading v-show="!isConnected"
+      img width="758" height="220" src="/ui/loading_bar.gif"
+
+    div v-show="isConnected"
+      .window v-component="draggable" v-show="showEquip" style="top: 150px; right: 300px"
+        .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Equip
+        .content#equip
+          div.item v-repeat="equip"
+            .slot v-text="$key"
+            .name v-text="Name"
+            .desc
+              || Your bones don't break, mine do.
+              || That's clear.
+
+        .close v-on="click: showEquip = !showEquip"
       .window v-component="draggable" v-show="showInventory" style="top: 150px; right: 10px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Inventory
         .content#inventory
@@ -27,27 +41,20 @@ html lang=en
             .scrollbar-wrap
               .native v-on="scroll: scroll"
                 .s-content
-                  .h vnfdjskl
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-                  p XXXXXX
+                  .h Is she dead, yes or no?
+                  p Your bones don't break, mine do.
+                  p That's clear.
+                  p
+                    || Your cells react to bacteria and viruses differently than mine.
+                    || You don't get sick, I do.
+                  p
+                    || That's also clear.
+                    || But for some reason, you and I react the exact same way to water.
+                  p We swallow it too fast, we choke.
+                  p We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I.
+                  p We're on the same curve, just on opposite ends.
 
-                  button.btn Hello
-                  button.btn Hello
+                  button.btn Accept
 
           .scrollbar v-component="scrollbar"
             a.up v-on="click: up"
@@ -58,16 +65,13 @@ html lang=en
       .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 10px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Spells
         .content.red
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
-          | vnfdjswk vnfdjskl vfdnsjkl vfdsuivgrhofdiw verwfnjkf lrewnjvfuioerw vnrejwio vrefnjiwo vfendwjio
+          strong Uuummmm, this is a tasty burger!
+          p
+            || Do you see any Teletubbies in here?
+            || Do you see a slender plastic tag clipped to my shirt with my name printed on it?
+            || Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical helicopter that shakes when you put quarters in it?
+          p No?
+          p Well, that's what you see at a toy store. And you must think you're in a toy store, because you're here shopping for an infant named Jeb.
         .close v-on="click: showSpells = !showSpells"
 
       #target-bar v-show="showTargetBar" v-component="draggable" v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove"

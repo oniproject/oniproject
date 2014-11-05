@@ -23,7 +23,7 @@ function Game(renderer, stage) {
 
 	var net = this.net = new Net();
 	net.on('message', this.onmessage.bind(this));
-	net.on('close', alert.bind(null, 'close WS'));
+	//net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));

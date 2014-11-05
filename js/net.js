@@ -64,7 +64,10 @@ Net.prototype.close = function() {
 	this.ws.close();
 }
 Net.prototype.send = function(message) {
-	this.ws.send(CBOR.encode(message));
+	var ws = this.ws;
+	if (ws.readyState === WebSocket.OPEN) {
+		ws.send(CBOR.encode(message));
+	}
 }
 
 /*

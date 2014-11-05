@@ -138,6 +138,26 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
+
+	// XXX XXX XXX XXX XXX
+	pos := a.Position()
+	if 11 < pos.X && pos.X < 18 && 39 < pos.Y {
+		if a.MapId == "test" {
+			a.MapId = "test2"
+			a.SetPosition(pos.X, 2)
+			s.Unregister(a)
+			return
+		}
+	}
+	if 11 < pos.X && pos.X < 18 && pos.Y < 2 {
+		if a.MapId == "test2" {
+			a.MapId = "test"
+			a.SetPosition(pos.X, 39)
+			s.Unregister(a)
+			return
+		}
+	}
+
 	a.SetVelocity(m.X, m.Y)
 }
 

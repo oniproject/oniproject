@@ -24,12 +24,12 @@ type BalancerGame struct {
 	Addr         string
 	Rpc          string
 	Minid, Maxid int64
-	Maps         map[int64]*BalancerMap
+	Maps         map[string]*BalancerMap
 	game         *game.Game
 }
 
-func (g *BalancerGame) LoadMap(id int64) {
-	g.game.LoadMap(utils.Id(id))
+func (g *BalancerGame) LoadMap(id string) {
+	g.game.LoadMap(id)
 }
 
 func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
@@ -43,7 +43,7 @@ func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	return
 }
 
-func (b *Balancer) AttachAvatar(id utils.Id) (host string, mapId int64, a *game.Avatar, err error) {
+func (b *Balancer) AttachAvatar(id utils.Id) (host string, mapId string, a *game.Avatar, err error) {
 	a, err = b.adb.AvatarById(id)
 	if err != nil {
 		a = nil
@@ -76,7 +76,7 @@ func (b *Balancer) DetachAvatar(a *game.Avatar) error {
 	return nil
 }*/
 
-func (b *Balancer) findMap(id int64) (*BalancerMap, *BalancerGame) {
+func (b *Balancer) findMap(id string) (*BalancerMap, *BalancerGame) {
 	for _, g := range b.games {
 		if m, ok := g.Maps[id]; ok {
 			if len(m.Avatars) >= m.Max {
@@ -98,7 +98,7 @@ func (b *Balancer) findMap(id int64) (*BalancerMap, *BalancerGame) {
 		go g.game.Run("")
 	}
 	if g.Maps == nil {
-		g.Maps = make(map[int64]*BalancerMap)
+		g.Maps = make(map[string]*BalancerMap)
 	}
 
 	m := &BalancerMap{

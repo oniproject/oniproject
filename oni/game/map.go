@@ -47,9 +47,9 @@ type Map struct {
 	lastLocalId          int64
 }
 
-func NewMap(game *Game) *Map {
+func NewMap(game *Game, name string) *Map {
 	// TODO remove it
-	b, err := ioutil.ReadFile("data/maps/test.wlk.txt")
+	b, err := ioutil.ReadFile("data/maps/" + name + ".wlk.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -67,7 +67,6 @@ func NewMap(game *Game) *Map {
 				s = append(s, 'X')
 			}
 		}
-		log.Println(string(s))
 	}
 	/* w, h:= 8,6
 		s := `XXXXXX

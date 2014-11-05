@@ -534,4 +534,7 @@
   <object x="280" y="808" width="488" height="72"/>
   <object x="0" y="768" width="344" height="88"/>
  </objectgroup>
+ <objectgroup color="#00ff00" name="TELEPORTS">
+  <object name="test2" x="280" y="1200" width="392" height="88"/>
+ </objectgroup>
 </map>

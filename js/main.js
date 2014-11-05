@@ -44,7 +44,16 @@ function render() {
 game.net.on('open', function() {
 	game.net.RequestParametersMsg();
 	game.net.RequestInventoryMsg();
+	UI.isConnected = true;
+	console.info('ws open');
 });
+
+game.net.on('close', function() {
+	UI.isConnected = false;
+	console.warn('ws close');
+	getConnectionData();
+});
+
 
 game.net.on('TargetDataMsg', function(target) {
 	console.log('TargetDataMsg');
@@ -72,6 +81,8 @@ game.net.on('ChatMsg', function(msg) {
 var UI = window.UI = new Vue({
 	el: '#ui',
 	data: {
+		isConnected: true,
+
 		level: 88,
 		exp: 77,
 		hp: 190,
@@ -303,7 +314,7 @@ function getConnectionData() {
 		var json = JSON.parse(r.responseText);
 		if (json.Id !== undefined) {
 			console.log('Success:', json);
-			game.run(json.Id, json.Host, 'test');
+			game.run(json.Id, json.Host, json.MapId);
 		}
 	};
 	r.send();
