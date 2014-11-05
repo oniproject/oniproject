@@ -8,7 +8,28 @@ var browserify = require('browserify'),
 	jshint = require('gulp-jshint'),
 	jsfmt = require('gulp-jsfmt'),
 	watch = require('gulp-watch'),
-	source = require('vinyl-source-stream');
+	source = require('vinyl-source-stream'),
+	stylus = require('gulp-stylus'),
+	nib = require('nib'),
+	sourcemaps = require('gulp-sourcemaps');
+
+var css = function() {
+	gulp.src('./css/**/*.styl')
+		.pipe(stylus({
+			use: [nib() /*, jeet()*/ ],
+			sourcemap: {
+				inline: true,
+				sourceRoot: '..',
+				basePath: 'css'
+			}
+		}))
+		.pipe(gulp.dest('./public'));
+}
+
+gulp.task('css', css);
+gulp.task('watch-css', ['css'], function() {
+	gulp.watch('css/**').on('change', css);
+});
 
 var dest = './public/';
 var apps = {
@@ -62,8 +83,8 @@ var fn = function(app, isWatching) {
 	}
 }
 
-var w = [];
-var b = [];
+var w = ['watch-css'];
+var b = ['css'];
 for (var k in apps) {
 	gulp.task('browserify-' + k, fn(apps[k], false));
 	gulp.task('watch-' + k, fn(apps[k], true));

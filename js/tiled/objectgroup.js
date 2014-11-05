@@ -5,7 +5,10 @@ function ObjectGroup(data, tilesets) {
 	var graphics = this.graphics = new PIXI.Graphics();
 	this.addChild(graphics);
 
-	this.data = data;
+	this.data = data || {};
+	if (!data.objects) {
+		data.objects = [];
+	}
 	this.tilesets = tilesets;
 
 	this.position.x = data.x || 0;

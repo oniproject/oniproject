@@ -14,7 +14,7 @@ type Avatar struct {
 	Nickname string
 	ClassId  int
 	RaceId   int
-	MapId    int64
+	MapId    string
 	X, Y     float64
 
 	PositionComponent `sql:"-"`

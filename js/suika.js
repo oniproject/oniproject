@@ -1,9 +1,14 @@
 'use strict';
 
+var suikaImage;
+
 function Suika() {
 	var w = 880,
 		h = 720;
-	var image = new PIXI.ImageLoader('/suika.png');
+	if (!suikaImage) {
+		suikaImage = new PIXI.ImageLoader('/suika.png');
+	}
+	var image = suikaImage;
 
 
 	var a = this._anim = {};
@@ -133,6 +138,8 @@ function Suika() {
 
 	PIXI.Sprite.call(this, a['idle ↓'][0]);
 	this.scale.x = this.scale.y = 0.5;
+	this.anchor.x = 0.5;
+	this.anchor.y = 1;
 
 	image.load();
 	this.image = image;

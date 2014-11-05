@@ -12,9 +12,21 @@ var M_SetVelocityMsg = 1,
 	M_TargetData = 9,
 	M_RequestParameters = 10,
 	M_Parameters = 11,
+	M_Chat = 12,
+	M_ChatPost = 13,
 	___ = 0;
 
 function Net(url) {
+}
+
+Net.prototype = Object.create(EventEmitter.prototype);
+Net.prototype.constructor = Net;
+
+Net.prototype.connecTo = function(url) {
+	if (this.ws) {
+		this.ws.close();
+	}
+
 	var websocket = new WebSocket(url);
 	this.ws = websocket;
 	var that = this;
@@ -47,13 +59,15 @@ function Net(url) {
 		}
 	};
 }
-Net.prototype = EventEmitter.prototype;
-Net.prototype.constructor = Net;
+
 Net.prototype.close = function() {
 	this.ws.close();
 }
 Net.prototype.send = function(message) {
-	this.ws.send(CBOR.encode(message));
+	var ws = this.ws;
+	if (ws.readyState === WebSocket.OPEN) {
+		ws.send(CBOR.encode(message));
+	}
 }
 
 /*
@@ -83,6 +97,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_Parameters:
 			this.emit('ParametersMsg', value);
 			break;
+		case M_Chat:
+			this.emit('ChatMsg', value);
+			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -94,16 +111,20 @@ Net.prototype.SetVelocityMsg = function(data) {
 		V: data
 	});
 }
-Net.prototype.SetTargetMsg = function(data) {
+Net.prototype.SetTargetMsg = function(id) {
 	this.send({
 		T: M_SetTargetMsg,
-		V: data
+		V: {
+			id: id
+		},
 	});
 }
-Net.prototype.FireMsg = function(data) {
+Net.prototype.FireMsg = function(name) {
 	this.send({
 		T: M_CastMsg,
-		V: data
+		V: {
+			t: name
+		}
 	});
 }
 Net.prototype.RequestInventoryMsg = function() {
@@ -124,10 +145,21 @@ Net.prototype.PickupItemMsg = function() {
 		V: {}
 	});
 }
-Net.prototype.DropItemMsg = function(data) {
+Net.prototype.DropItemMsg = function(index) {
 	this.send({
 		T: M_DropItem,
-		V: data
+		V: {
+			Id: index
+		}
+	});
+}
+
+Net.prototype.ChatPostMsg = function(msg) {
+	this.send({
+		T: M_ChatPost,
+		V: {
+			m: msg
+		}
 	});
 }
 

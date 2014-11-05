@@ -21,13 +21,13 @@ type GameAddr interface {
 }
 
 type Game struct {
-	Map *Map
-	adb AvatarDB
+	maps map[string]*Map
+	adb  AvatarDB
 }
 
 func NewGame(adb AvatarDB) *Game {
-	game := &Game{adb: adb}
-	game.Map = NewMap(game)
+	game := &Game{adb: adb, maps: make(map[string]*Map)}
+	//game.Map = NewMap(game)
 	return game
 }
 
@@ -36,7 +36,7 @@ func (gm *Game) Run(addr string) {
 
 	// TODO: init RPC
 
-	go gm.Map.Run()
+	//go gm.Map.Run()
 	// run http server
 
 	m := martini.Classic()
@@ -77,7 +77,7 @@ func (gm *Game) Run(addr string) {
 		}
 		log.Debug(a)
 
-		gm.Map.RunAvatar(ws, a)
+		gm.maps[a.MapId].RunAvatar(ws, a)
 
 		return 200, "game over"
 	})
@@ -92,21 +92,27 @@ func (gm *Game) Run(addr string) {
 	}
 }
 
-func (gm *Game) LoadMap(id utils.Id) {
+func (gm *Game) LoadMap(id string) {
 	log.Println("LoadMap", id)
+	gm.maps[id] = NewMap(gm, id)
+
+	go gm.maps[id].Run()
 }
-func (gm *Game) UnloadMap(id utils.Id) {
+func (gm *Game) UnloadMap(id string) {
 	log.Println("UnloadMap", id)
+	delete(gm.maps, id)
 }
 
-func (gm *Game) DetachAvatar(id utils.Id, mapId int64) error {
-	obj := gm.Map.GetObjById(id)
+func (gm *Game) DetachAvatar(id utils.Id, mapId string) error {
+	obj := gm.maps[mapId].GetObjById(id)
 	if obj == nil {
 		return errors.New("Avatar not found")
 	}
+
 	if avatar, ok := obj.(*Avatar); ok {
-		gm.Map.Unregister(avatar)
+		gm.maps[mapId].Unregister(avatar)
 		return nil
 	}
+
 	return errors.New("Avatar not found")
 }

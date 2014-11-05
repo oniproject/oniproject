@@ -6,10 +6,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"github.com/oniproject/geom"
-	"math/rand"
+	"io/ioutil"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -43,23 +44,45 @@ type Map struct {
 	sendTo               chan sender
 	Grid                 *jps.Grid
 	game                 *Game
+	lastLocalId          int64
 }
 
-func NewMap(game *Game) *Map {
+func NewMap(game *Game, name string) *Map {
 	// TODO remove it
-	s := `XXXXXX
-X....X
-X....X
-X..X.X
-X....X
-XXXXXX`
+	b, err := ioutil.ReadFile("data/maps/" + name + ".wlk.txt")
+	if err != nil {
+		panic(err)
+	}
+	s := string(b)
+	lines := strings.Split(s, "\n")
+	w, h := len(lines[0]), len(lines)
+	log.Printf("%d:%d\n%s\n", w, h, s)
+	grid := jps.FromString(s, w, h)
+	for y := 0; y < h; y++ {
+		s := []byte{}
+		for x := 0; x < w; x++ {
+			if grid.Walkable(x, y) {
+				s = append(s, ' ')
+			} else {
+				s = append(s, 'X')
+			}
+		}
+	}
+	/* w, h:= 8,6
+		s := `XXXXXX
+	X....X
+	X....X
+	X..X.X
+	X....X
+	XXXXXX`*/
 	return &Map{
-		register:   make(chan GameObject),
-		unregister: make(chan GameObject),
-		objects:    make(map[utils.Id]GameObject),
-		sendTo:     make(chan sender),
-		Grid:       jps.FromString(s, 8, 6),
-		game:       game,
+		register:    make(chan GameObject),
+		unregister:  make(chan GameObject),
+		objects:     make(map[utils.Id]GameObject),
+		sendTo:      make(chan sender),
+		Grid:        grid,
+		game:        game,
+		lastLocalId: -4,
 	}
 }
 
@@ -99,10 +122,11 @@ func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
 	c.readPump(m, c)
 }
 
-func (m *Map) SpawnMonster() {
+func (m *Map) SpawnMonster(x, y float64) {
 	monster := NewMonster()
-	monster.SetPosition(2, 3)
-	monster.id = utils.NewId(-int64(rand.Intn(10000)))
+	monster.SetPosition(x, y)
+	m.lastLocalId--
+	monster.id = utils.NewId(m.lastLocalId)
 	monster.HP, monster.MHP, monster.HRG = 20, 20, 1
 	m.register <- monster
 	monster.RunAI()
@@ -110,7 +134,9 @@ func (m *Map) SpawnMonster() {
 
 func (m *Map) DropItem(x, y float64, item *Item) {
 	ditem := NewDroppedItem(x, y, item)
-	ditem.id = utils.NewId(-int64(rand.Intn(10000) - 20000))
+
+	m.lastLocalId--
+	ditem.id = utils.NewId(m.lastLocalId - 20000)
 	m.Register(ditem)
 }
 
@@ -145,15 +171,19 @@ func (gm *Map) Run() {
 		close(avatar.sendMessage)
 	}
 
-	rand.Seed(time.Now().UnixNano())
-
-	go gm.SpawnMonster()
-	go gm.SpawnMonster()
-	go gm.SpawnMonster()
-	go gm.SpawnMonster()
-
 	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
-	go gm.DropItem(3, 2, test_knife)
+	x, y := 5, 35
+
+	for i := 0; i < 4; i++ {
+		go gm.SpawnMonster(float64(x+0), float64(y+i))
+		go gm.SpawnMonster(float64(x+1), float64(y+i))
+		go gm.SpawnMonster(float64(x+2), float64(y+i))
+		go gm.SpawnMonster(float64(x+3), float64(y+i))
+		go gm.SpawnMonster(float64(x+4), float64(y+i))
+		go gm.SpawnMonster(float64(x+5), float64(y+i))
+
+		go gm.DropItem(float64(x+15), float64(y+i), test_knife)
+	}
 
 	t_replication := time.NewTicker(TickRate)
 	t_regeneration := time.NewTicker(1 * time.Second)

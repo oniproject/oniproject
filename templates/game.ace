@@ -5,138 +5,89 @@ html lang=en
     meta http-equiv=Content-Type content="text/html;charset=UTF-8"
     meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     title {{.Title}}
-    = css
-      html, body {
-        overflow: hidden;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        height: 100%;
-      }
-      #bottom {
-        position:absolute;
-        bottom:0;
-        width:100%;
-        background: gray;
-      }
-      #spells {
-        margin:auto;
-        width:340px;
-        background:black;
-        font-size: 0;
-        padding:3px;
-      }
-      #spells .img {
-        position: relative;
-        display: inline-block;
-        width:32px;
-        height:32px;
-        padding: 1px;
-      }
-      #spells .img:hover {
-        outline: 1px solid rgba(255, 255, 255, 1);
-      }
-      #spells img {
-        margin:0;
-        width:32px;
-        height:32px;
-      }
-      #spells .img .text {
-        position: absolute;
-        display: none;
-        top: 0;
-        bottom: 0;
-        z-index: 999;
-        background: red;
-      }
-      #spells .img:hover .text {
-        display: block;
-      }
+    link rel="stylesheet" href="/game.css"
+  body#ui
+    #loading v-show="!isConnected"
+      img width="758" height="220" src="/ui/loading_bar.gif"
 
+    div v-show="isConnected"
+      .window v-component="draggable" v-show="showEquip" style="top: 150px; right: 300px"
+        .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Equip
+        .content#equip
+          div.item v-repeat="equip"
+            .slot v-text="$key"
+            .name v-text="Name"
+            .desc
+              || Your bones don't break, mine do.
+              || That's clear.
 
-      #exp {
-        width:100%;
-      }
-      #exp div {
-        background: silver;
-        height: 7px;
-      }
-      #top-left {
-        position:absolute;
-        padding: 3px;
-      }
-      #top-center {
-        position:absolute;
-        width: 30%;
-        right: 35%;
-        left: 35%;
-        text-align: center;
-        background: #ccf;
-      }
-      #top-center .points {
-        width: 100%;
-      }
-      #top-right {
-        position:absolute;
-        padding: 3px;
-        right: 0;
-        color: white;
-        background: #332;
-      }
-      .level {
-        float:left;
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-        background: blue;
-        color: white;
-        padding: 7px;
-        border-radius:20px 6px 20px 20px;
-        border: 2px solid silver;
-      }
-      .bars {
-        float:right;
-      }
-      .points {
-        width:200px;
-        border-radius:6px;
-        border: 1px solid black;
-        background: silver;
-        margin: 2px 0;
-        box-sizing: border-box;
-      }
-      .points div {
-        height: 7px;
-        border-radius:6px;
-        transition: .4s ease;
-        transition: 1.1s linear;
-      }
-      .points.hp div {
-        background: red;
-      }
-      .points.mp div {
-        height: 4px;
-        background: blue;
-      }
-      .points.tp div {
-        height: 4px;
-        background: yellow;
-      }
-  body
-    #ui
-      #top-left
-        .level v-text="level"
-        .bars
-          .points.hp
-            div v-style="width: hp/mhp*100 + '%'"
-          .points.mp
-            div v-style="width: mp/mmp*100 + '%'"
-          .points.tp
-            div v-style="width: tp/mtp*100 + '%'"
-      #top-center
+        .close v-on="click: showEquip = !showEquip"
+      .window v-component="draggable" v-show="showInventory" style="top: 150px; right: 10px"
+        .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Inventory
+        .content#inventory
+          .img v-repeat="invTest" v-on="click: cast($key)"
+            img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
+            .img-over
+
+          #gold 12345678
+        .close v-on="click: showInventory = !showInventory"
+
+      .window v-component="draggable" style="top: 150px; left: 300px"
+        div v-component="scrolled"
+          .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Quest
+          .content.paper
+            .sello.red
+
+            .scrollbar-wrap
+              .native v-on="scroll: scroll"
+                .s-content
+                  .h Is she dead, yes or no?
+                  p Your bones don't break, mine do.
+                  p That's clear.
+                  p
+                    || Your cells react to bacteria and viruses differently than mine.
+                    || You don't get sick, I do.
+                  p
+                    || That's also clear.
+                    || But for some reason, you and I react the exact same way to water.
+                  p We swallow it too fast, we choke.
+                  p We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I.
+                  p We're on the same curve, just on opposite ends.
+
+                  button.btn Accept
+
+          .scrollbar v-component="scrollbar"
+            a.up v-on="click: up"
+            a.down v-on="click: down"
+            a.slider v-style="top: scrollTopX/(scrollH-1) + 22 +'px'"
+        .close
+
+      .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 10px"
+        .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Spells
+        .content.red
+          strong Uuummmm, this is a tasty burger!
+          p
+            || Do you see any Teletubbies in here?
+            || Do you see a slender plastic tag clipped to my shirt with my name printed on it?
+            || Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical helicopter that shakes when you put quarters in it?
+          p No?
+          p Well, that's what you see at a toy store. And you must think you're in a toy store, because you're here shopping for an infant named Jeb.
+        .close v-on="click: showSpells = !showSpells"
+
+      #target-bar v-show="showTargetBar" v-component="draggable" v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove"
         strong v-text="target.Name"
-        .points.hp
+        .bar
           div v-style="width: target.HP/target.MHP*100 + '%'"
+
+      #hud v-component="draggable" v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove"
+        .hudMap v-text="level"
+        .hud
+          .bar.hp
+            div v-style="width: hp/mhp*100 + '%'"
+          .bar.mp
+            div v-style="width: mp/mmp*100 + '%'"
+          .bar.sp
+            div v-style="width: tp/mtp*100 + '%'"
 
       #top-right
         strong Equip
@@ -150,11 +101,32 @@ html lang=en
       #bottom
         #spells
           .img v-repeat="spells" v-on="click: cast($key)"
-            .text
+            / .text
               span v-text="Name"
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
+            .img-over
+        #sys.s5
+          a.icon.hammer
+          a.icon.helment v-on="click: showEquip = !showEquip"
+            .tooltip Equip
+          a.icon.bubble v-on="click: showChat = !showChat"
+            .tooltip Chat
+          a.icon.cup v-on="click: showSpells = !showSpells"
+            .tooltip Spells
+          a.icon.pounch v-on="click: showInventory = !showInventory" style="margin-left: -2px;"
+            .tooltip Inventory
         #exp
           div v-style="width: exp + '%'"
+
+      #chat v-show="showChat"
+        ul
+          li v-repeat="chat"
+            span [
+            span v-text="Name" v-class="Type"
+            span ]&nbsp
+            span v-text="Text"
+        input v-model="msg" v-on="keyup: chatMsg | key enter, focus: focus, blur: blur"
+
     script src="/js/pixi.js"
     script src="/js/keypress-2.0.2.min.js"
     script src="/js/cbor.js"

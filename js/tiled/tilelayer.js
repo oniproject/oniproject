@@ -14,35 +14,18 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 	this.alpha = data.opacity;
 	this.visible = !!data.visible;
 
-	var x_start = 0,
-		x_end = data.width,
-		x_add = 1;
-	var y_start = 0,
-		y_end = data.height,
-		y_add = 1;
-
-	/*if(renderorder) {
-		if(renderorder.indexOf('up') != -1) {
-			y_start = data.height;
-			y_end = 0;
-			y_add = -1;
-		}
-		if(renderorder.indexOf('left') != -1) {
-			x_start = data.width;
-			x_end = 0;
-			x_add = -1;
-		}
-	}*/
-
 	this._animated = [];
 
-	for (var y = y_start; y < y_end; y += y_add) {
-		for (var x = x_start; x < x_end; x += x_add) {
+	for (var y = 0; y < data.height; y++) {
+		for (var x = 0; x < data.width; x++) {
 			var iii = y * data.width + x;
 			var id = data.data[iii];
 			found:
 			for (var i = 0, l = tilesets.length; i < l; i++) {
 				var t = tilesets[i];
+				if (id - t.data.firstgid <= 0) {
+					continue found;
+				}
 				var sprite = t.CreateSprite(id);
 
 				if (sprite) {
@@ -64,6 +47,8 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 			}
 		}
 	}
+
+	this.cacheAsBitmap = this._animated.length == 0;
 }
 
 TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
