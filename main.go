@@ -11,7 +11,7 @@ import (
 	"syscall"
 )
 
-var config = flag.String("conf", "default", "config file")
+var config = flag.String("conf", "../data/config.yml", "config file")
 var master = flag.Bool("master", false, "this is a master")
 var game = flag.Bool("game", false, "this is a game mechanic")
 var database = flag.Bool("db", false, "this is a database")

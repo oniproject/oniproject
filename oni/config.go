@@ -22,7 +22,7 @@ type Config struct {
 }
 
 func NewConfig(config string) (c *Config) {
-	file, err := ioutil.ReadFile(fmt.Sprintf("config/%s.yml", config))
+	file, err := ioutil.ReadFile(config)
 	if err != nil {
 		log.Panicln("Fail load config file", err)
 	}
