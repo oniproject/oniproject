@@ -6,17 +6,21 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'events', children: [], gen: true},
+		model: {
+			type: 'events',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
 			var events = [];
-			for(var i=0; i<5; i++) {
+			for (var i = 0; i < 5; i++) {
 				events.push({
 					type: 'event',
 					name: 'vfds ' + i,
 					keyframe: 'danger',
-					visibility:true,
+					visibility: true,
 					draggable: true
 				});
 			}

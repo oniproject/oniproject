@@ -1,0 +1,11 @@
+{
+	"preset": "default",
+	"indent": {
+		"value": "\t"
+	},
+	"lineBreak": {
+		"before": {
+			"EndOfFile": 0
+		}
+	}
+}

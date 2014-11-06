@@ -1,7 +1,6 @@
 package oni
 
 import (
-	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -22,7 +21,7 @@ type Config struct {
 }
 
 func NewConfig(config string) (c *Config) {
-	file, err := ioutil.ReadFile(fmt.Sprintf("config/%s.yml", config))
+	file, err := ioutil.ReadFile(config)
 	if err != nil {
 		log.Panicln("Fail load config file", err)
 	}

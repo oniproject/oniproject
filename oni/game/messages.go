@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
 	"oniproject/oni/utils"
+	"strings"
 )
 
 type Sender interface {
@@ -45,6 +46,9 @@ const (
 
 	M_RequestParameters
 	M_Parameters
+
+	M_Chat
+	M_ChatPost
 )
 
 // to client
@@ -68,6 +72,8 @@ func WrapMessage(message Message) interface{} {
 		return &MessageWraper{M_TargetData, message}
 	case *ParametersMsg:
 		return &MessageWraper{M_Parameters, message}
+	case *ChatMsg:
+		return &MessageWraper{M_Chat, message}
 	}
 	log.Warningf("fail type %T %v", message, message)
 	return message
@@ -91,6 +97,8 @@ func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
 		message = &RequestInventoryMsg{}
 	case M_RequestParameters:
 		message = &RequestParametersMsg{}
+	case M_ChatPost:
+		message = &ChatPostMsg{}
 	default:
 		log.Error("ParseMessage fail type ", _type)
 		return nil, errors.New("fail type")
@@ -130,6 +138,24 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
+
+	// XXX XXX XXX XXX XXX
+	pos := a.Position()
+	if 11 < pos.X && pos.X < 18 {
+		if a.MapId == "test" && pos.Y > 39 {
+			a.MapId = "test2"
+			a.SetPosition(pos.X, 2)
+			s.Unregister(a)
+			return
+		}
+		if a.MapId == "test2" && pos.Y < 2 {
+			a.MapId = "test"
+			a.SetPosition(pos.X, 39)
+			s.Unregister(a)
+			return
+		}
+	}
+
 	a.SetVelocity(m.X, m.Y)
 }
 
@@ -326,4 +352,35 @@ type ParametersMsg struct {
 
 func (m *ParametersMsg) Run(s MessageToMapInterface, obj interface{}) {
 	log.Panic("ParametersMsg Run")
+}
+
+type ChatMsg struct {
+	Type string `mapstructure:"type"`
+	Text string `mapstructure:"text"`
+	Id   int64  `mapstructure:"id"`
+	Name string `mapstructure:"name"`
+}
+
+func (m *ChatMsg) Run(s MessageToMapInterface, obj interface{}) {
+	log.Panic("ChatMsg Run")
+}
+
+type ChatPostMsg struct {
+	Msg string `mapstructure:"m"`
+}
+
+func (m *ChatPostMsg) Run(s MessageToMapInterface, obj interface{}) {
+	a := obj.(*Avatar)
+	msg := m.Msg
+	t := ""
+	if msg[0] == '/' {
+		arr := strings.SplitN(m.Msg, " ", 2)
+		if len(arr) == 2 {
+			t = arr[0][1:]
+			msg = strings.TrimSpace(arr[1])
+		}
+	}
+	post := &ChatMsg{Id: int64(a.Id()), Type: t, Text: msg, Name: a.Name()}
+	log.Println(post)
+	a.sendMessage <- WrapMessage(post)
 }

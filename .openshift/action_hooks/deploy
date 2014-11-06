@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ ! -f $OPENSHIFT_DATA_DIR/config.yml ]; then
+	cp $OPENSHIFT_REPO_DIR/config.yml $OPENSHIFT_DATA_DIR/config.yml
+fi
+

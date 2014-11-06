@@ -1,5 +1,5 @@
 'use strict';
-require('less').render(require('./style.css'), function (e, css) {
+require('less').render(require('./style.css'), function(e, css) {
 	require('insert-css')(css)
 });
 
@@ -47,7 +47,7 @@ module.exports = {
 	created: function() {
 		console.log('created Skeleton tree');
 
-		this.$on('drag',  function(model) {
+		this.$on('drag', function(model) {
 			console.log('drag [%s]%s', model.type, model.name);
 		});
 		this.$on('drop', function(model, type, name, $index) {

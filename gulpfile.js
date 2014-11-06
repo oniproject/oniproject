@@ -1,18 +1,50 @@
 var browserify = require('browserify'),
 	watchify = require('watchify'),
 	partialify = require('partialify'),
-	exorcist   = require('exorcist'),
-	transform =require('vinyl-transform'),
+	exorcist = require('exorcist'),
+	transform = require('vinyl-transform'),
 	gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
+	jshint = require('gulp-jshint'),
+	jsfmt = require('gulp-jsfmt'),
 	watch = require('gulp-watch'),
-	source = require('vinyl-source-stream');
+	source = require('vinyl-source-stream'),
+	stylus = require('gulp-stylus'),
+	nib = require('nib'),
+	sourcemaps = require('gulp-sourcemaps');
+
+var css = function() {
+	gulp.src('./css/**/*.styl')
+		.pipe(stylus({
+			use: [nib() /*, jeet()*/ ],
+			sourcemap: {
+				inline: true,
+				sourceRoot: '..',
+				basePath: 'css'
+			}
+		}))
+		.pipe(gulp.dest('./public'));
+}
+
+gulp.task('css', css);
+gulp.task('watch-css', ['css'], function() {
+	gulp.watch('css/**').on('change', css);
+});
 
 var dest = './public/';
 var apps = {
-	game:     {dest: 'main.js',     source: './js/main.js'},
-	tile:     {dest: 'tile.js',     source: './redactor/tile/main.js'},
-	redactor: {dest: 'redactor.js', source: './redactor/main.js'},
+	game: {
+		dest: 'main.js',
+		source: './js/main.js'
+	},
+	tile: {
+		dest: 'tile.js',
+		source: './redactor/tile/main.js'
+	},
+	redactor: {
+		dest: 'redactor.js',
+		source: './redactor/main.js'
+	},
 }
 
 function handleErrors(err) {
@@ -24,7 +56,9 @@ function handleErrors(err) {
 var fn = function(app, isWatching) {
 	return function() {
 		var bundler = browserify({
-			cache: {}, packageCache: {}, fullPaths: true,
+			cache: {},
+			packageCache: {},
+			fullPaths: true,
 			entries: [app.source],
 			debug: true
 		});
@@ -34,11 +68,13 @@ var fn = function(app, isWatching) {
 				.transform(partialify)
 				.bundle().on('error', handleErrors)
 				.pipe(source(app.dest))
-				.pipe(transform(function () { return exorcist(dest+app.dest+'.map'); }))
+				.pipe(transform(function() {
+					return exorcist(dest + app.dest + '.map');
+				}))
 				.pipe(gulp.dest(dest));
 		};
 
-		if(isWatching) {
+		if (isWatching) {
 			bundler = watchify(bundler);
 			bundler.on('update', bundle);
 		}
@@ -47,9 +83,9 @@ var fn = function(app, isWatching) {
 	}
 }
 
-var w = [];
-var b = [];
-for(var k in apps) {
+var w = ['watch-css'];
+var b = ['css'];
+for (var k in apps) {
 	gulp.task('browserify-' + k, fn(apps[k], false));
 	gulp.task('watch-' + k, fn(apps[k], true));
 	b.push('browserify-' + k);
@@ -59,6 +95,18 @@ for(var k in apps) {
 gulp.task('watch', w);
 gulp.task('build', b);
 
+gulp.task('lint', function() {
+	return gulp.src('./js/**/*.js')
+		.pipe(jshint())
+		.pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('fmt', function() {
+	return gulp.src('./js/**/*.js')
+		.pipe(jsfmt.format())
+	//.pipe(jshint.reporter('jshint-stylish'));
+});
+
 gulp.task('server', function(next) {
 	var connect = require('connect');
 	connect()
@@ -66,7 +114,7 @@ gulp.task('server', function(next) {
 		.use(connect.static('public'))
 		.use(connect.directory('public'))
 		.use(function(req, res) {
-			if(req.method == 'POST') {
+			if (req.method == 'POST') {
 				console.log(req.body);
 			} else {
 				res.end('FUCK U\n');
@@ -79,7 +127,7 @@ gulp.task('reload', ['server'], function() {
 	var server = livereload();
 	gulp.watch('public/**').on('change', function(event) {
 		server.changed(event.path);
-		console.log('File '+event.path+' was '+event.type+', running tasks...');
+		console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 	});
 });
 

@@ -10,12 +10,15 @@ console.log('start');
 
 
 //var app = new Vue({
-module.exports =  {
+module.exports = {
 	//el: '#Redactor',
 	template: require('./app.html'),
 	data: {
 		active: -1,
-		origin: {x: 0, y: 0},
+		origin: {
+			x: 0,
+			y: 0
+		},
 		current: 0,
 		commands: [],
 	},
@@ -25,12 +28,20 @@ module.exports =  {
 	stage: null,
 	computed: {
 		originX: {
-			$get: function() { return this.origin.x; },
-			$set: function(val) { this.origin.x = val; this.resize(); }
+			$get: function() {
+				return this.origin.x;
+			},
+			$set: function(val) {
+				this.origin.x = val; this.resize();
+			}
 		},
 		originY: {
-			$get: function() { return this.origin.y; },
-			$set: function(val) { this.origin.y = val; this.resize(); }
+			$get: function() {
+				return this.origin.y;
+			},
+			$set: function(val) {
+				this.origin.y = val; this.resize();
+			}
 		},
 	},
 	components: {
@@ -129,7 +140,7 @@ module.exports =  {
 			this.setActive(this.active);
 		},
 		syncList: function() {
-			if(this.$.objList) {
+			if (this.$.objList) {
 				this.$.objList.list = this.$options.map.objects;
 			}
 		},
@@ -198,7 +209,9 @@ module.exports =  {
 			r.open('GET', url, true);
 			var that = this;
 			r.onreadystatechange = function() {
-				if (r.readyState != 4 || r.status != 200) { return; }
+				if (r.readyState != 4 || r.status != 200) {
+					return;
+				}
 				var json = JSON.parse(r.responseText);
 				console.log('load end', json);
 				that.$options.map.objects = json.objects;
@@ -215,7 +228,7 @@ module.exports =  {
 		this.$on('redo', this.redo);
 		this.$on('load', this.load);
 
-		var stage = this.$options.stage =  new PIXI.Stage(0xFFFFFF, true);
+		var stage = this.$options.stage = new PIXI.Stage(0xFFFFFF, true);
 		var renderer = this.$options.renderer = PIXI.autoDetectRenderer(1, 1, this.$el.getElementsByTagName('canvas')[0], true, true);
 
 		var iso = this.$options.iso = new Isomer(renderer.view);
@@ -291,7 +304,7 @@ module.exports =  {
 			], 0.3, [0, 0, 0], [1, 1, 1], [50, 160, 60, 0]));
 		}).bind(this))*/
 	},
-}//);
+} //);
 
 
 function _initUI(that) {
@@ -367,40 +380,40 @@ function _initUI(that) {
 	dropZone.addEventListener('drop', handleFileSelect, false);
 	*/
 
-var app = that;
+	var app = that;
 
-var originX = 0,
-	originY = 0,
-	moveSpeed = 30,
-	keyCodes = {
-	37: function(event) {
-		app.originX += moveSpeed;
-	},
-	38: function(event) {
-		app.originY += moveSpeed;
-	},
-	39: function(event) {
-		app.originX -= moveSpeed;
-	},
-	40: function(event) {
-		app.originY -= moveSpeed;
-	},
-}
-document.onkeydown = function(event) {
-	var f = keyCodes[event.keyCode];
-	if (f) {
-		event.preventDefault();
-		f(event);
+	var originX = 0,
+		originY = 0,
+		moveSpeed = 30,
+		keyCodes = {
+			37: function(event) {
+				app.originX += moveSpeed;
+			},
+			38: function(event) {
+				app.originY += moveSpeed;
+			},
+			39: function(event) {
+				app.originX -= moveSpeed;
+			},
+			40: function(event) {
+				app.originY -= moveSpeed;
+			},
+		}
+	document.onkeydown = function(event) {
+		var f = keyCodes[event.keyCode];
+		if (f) {
+			event.preventDefault();
+			f(event);
+		}
 	}
-}
-window.onresize = app.resize.bind(app);
-app.resize();
+	window.onresize = app.resize.bind(app);
+	app.resize();
 
 
-function animate() {
-	app.render();
-	app.$options.renderer.render(app.$options.stage);
+	function animate() {
+		app.render();
+		app.$options.renderer.render(app.$options.stage);
+		requestAnimFrame(animate);
+	}
 	requestAnimFrame(animate);
-}
-requestAnimFrame(animate);
 }

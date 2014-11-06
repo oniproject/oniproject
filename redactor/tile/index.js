@@ -39,7 +39,7 @@ var P = {
 						i -= 1;
 						i *= 2;
 						this.v = i + 3;
-						//this.layer = 'second';
+					//this.layer = 'second';
 					} else {
 						i *= 2;
 						this.v = [i, i + 1, i + 2];
@@ -112,9 +112,9 @@ module.exports = {
 
 		Outside_A1: [16, 12], // Animation
 		Outside_A2: [16, 12], // Ground
-		Outside_A3: [16, 8],  // Buildings
+		Outside_A3: [16, 8], // Buildings
 		Outside_A4: [16, 15], // Walls
-		Outside_A5: [8, 16],  // Normal
+		Outside_A5: [8, 16], // Normal
 		Outside_B: [16, 16],
 		Outside_C: [16, 16],
 	},
@@ -138,15 +138,15 @@ module.exports = {
 
 
 
-			for(var k in tilemaps) {
+			for (var k in tilemaps) {
 				this.count++;
 				var t = tilemaps[k];
-				var set = new Tileset('/game/'+k+'.png', t[0], t[1], WH, true);
+				var set = new Tileset('/game/' + k + '.png', t[0], t[1], WH, true);
 				tilemaps[k] = set;
-				set.image.on('loaded', (function(){
+				set.image.on('loaded', (function() {
 					this.count--;
 					console.log('loaded', this.count);
-					if(!this.count) {
+					if (!this.count) {
 						this.onLoad();
 					}
 				}).bind(this));
@@ -159,10 +159,10 @@ module.exports = {
 				tilemaps.Outside_A4,
 				tilemaps.Outside_A5,
 				tilemaps.Outside_B,
-				tilemaps.Outside_C];
+			tilemaps.Outside_C];
 			var scene = this.$options.scene = new Tilemap(20, 20, Outside);
 
-			for(var k in tilemaps) {
+			for (var k in tilemaps) {
 				tilemaps[k].image.load();
 			}
 		},

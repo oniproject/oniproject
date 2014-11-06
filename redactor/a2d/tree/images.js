@@ -8,7 +8,11 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'images', children: [], gen: true},
+		model: {
+			type: 'images',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
@@ -17,8 +21,8 @@ module.exports = {
 			var attachments = [];
 			// TODO get current skin
 			var skin = Spine.skeleton.data.defaultSkin;
-			for(var k in skin.attachments) {
-				if(skin.attachments.hasOwnProperty(k)) {
+			for (var k in skin.attachments) {
+				if (skin.attachments.hasOwnProperty(k)) {
 					var a = skin.attachments[k];
 					attachments.push({
 						type: 'image',

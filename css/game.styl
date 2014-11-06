@@ -1,0 +1,535 @@
+@import 'nib'
+
+noselect()
+    -webkit-touch-callout: none
+      -webkit-user-select: none
+       -khtml-user-select: none
+         -moz-user-select: none
+          -ms-user-select: none
+              user-select: none
+
+
+.scrollbar-wrap
+    width:100%
+    height: 100%
+    overflow: hidden
+    position: relative
+    .native
+        overflow-y: scroll
+        overflow-x: hidden
+        width:200%
+    .s-content
+        overflow: hidden
+        width: 50%
+
+scrollbar(h)
+    .native
+        height: h
+
+winHfont()
+    font-family: Impact
+    text-shadow: 1px 1px 1px black
+    color: white
+
+
+
+/*.custom_scroll_bar_handle
+    top:0
+    right:0
+    position:absolute
+    width:10px
+    height:15px
+    background:#c00
+    cursor:pointer
+    */
+
+
+//.custom_scroll_bar_handle:hover
+//    background:red
+
+
+
+
+
+
+.tooltip
+    display: none
+    top: -50px
+
+    position: absolute
+    margin-left: -50px
+    width: 100px
+    height: 20px
+    line-height: 20px
+    padding: 10px
+    font-size: 14px
+    text-align: center
+    color: white
+    background: rgba(0,0,0, 0.6)
+    &:after
+        content: ""
+        position: absolute
+        border-width: 10px
+        border-style: solid
+        border-color: rgba(0,0,0, 0.6) transparent transparent transparent
+        top: 40px
+        left: 50px
+
+runtooltip()
+    &:hover .tooltip
+        display: block
+
+
+html, body
+    overflow: hidden
+    padding: 0
+    margin: 0
+    width: 100%
+    height: 100%
+    noselect()
+
+#loading
+    position: absolute
+    top: 0
+    bottom: 0
+    width: 100%
+    height: 100%
+    z-index: 9999
+    background: radial-gradient(center, #101517, #090d0f)
+    img
+        position: absolute
+        top: 50%
+        left: 50%
+        margin-top: -110px
+        margin-left: -379px
+        opacity: 0.3
+
+#bottom
+    position:absolute
+    bottom:0
+    width:100%
+
+#spell-over
+    background: url("/ui/spell-bar-over.png")
+    height: 44px
+    width: 364px
+    position: absolute
+    top:0
+    left:0
+
+#spells
+    margin:auto
+    width:340px
+    background: url("/ui/spell-bar-bg.png")
+    font-size: 0
+    padding: 4px 1px
+    height: 44px
+    width: 364px
+    box-sizing: border-box
+    position: relative
+
+    img
+        margin:0
+        width:32px
+        height:32px
+    .img
+        position: relative
+        display: inline-block
+        width:32px
+        height:32px
+        margin: 2px
+
+        .text
+            position: absolute
+            display: none
+            top: 0
+            bottom: 0
+            z-index: 999
+            background: red
+        &:hover
+            .text
+                display: block
+            .img-over
+                background: no-repeat url("/ui/spell-bar-glass.png")
+                width: 32px
+                height: 32px
+                position: absolute
+                top: 1px
+                left: 0px
+
+
+
+#chat
+    position: absolute
+    bottom: 0.5em
+    width: 300px
+    color: white
+
+    input
+        background: rgba(120, 0, 0, 0.3)
+        border: none
+        width: 100%
+        color: white
+
+    ul
+        list-style: none
+        padding: 0
+        margin: 0
+        background: rgba(255, 255, 255, 0.1)
+        width: 100%
+
+    // .local
+    .admin
+        font-weight: bold
+        color: #c00
+    .party
+        font-weight: bold
+    .guild
+        color: #0f0
+
+
+#exp
+    width:100%
+    background: black
+    div
+        background: silver
+        height: 7px
+
+
+#hud
+    position:absolute
+    padding: 3px
+
+    .hudMap
+        background: #534741
+        // background: green
+        top: 5px
+        left: 5px
+        width: 82px
+        height: 82px
+        position: absolute
+        border-radius: 9999999px
+
+        padding: 19px
+        font-size: 40px
+        font-family: Impact
+        text-align: center
+        color: white
+        box-sizing: border-box
+
+
+    .hud
+        background: url("/ui/hud-bg.png")
+        width: 223px
+        height: 86px
+        position: relative
+
+        .bar
+            width: 119px
+            height: 9px
+            position: absolute
+            div
+                height: 9px
+                transition: .4s ease
+                transition: 1.1s linear
+
+            &.hp
+                top: 14px
+                left: 84px
+                div
+                    background: url("/ui/hp-bar.png")
+            &.mp
+                top: 28px
+                left: 84px
+                div
+                    background: url("/ui/mp-bar.png")
+            &.sp
+                top: 28px
+                left: 84px
+                div
+                    background: url("/ui/sp-bar.png")
+
+
+#target-bar
+    background: no-repeat url("/ui/target.png")
+    position:absolute
+    width: 159px
+    //height: 41px
+    height: 100px
+    top: 10px
+    left: 45%
+    line-height: 58px
+    font-size: 14px
+    //font-family: Impact
+    text-shadow: 1px 1px 1px black
+    color: white
+    text-align: center
+
+    .bar
+        width: 119px
+        height: 9px
+        position: absolute
+        top: 9px
+        left: 20px
+        div
+            height: 9px
+            transition: .4s ease
+            transition: 1.1s linear
+            background: url("/ui/hp-bar.png")
+
+    /*.points
+        //width:200px
+        width: 100%
+        border-radius:6px
+        border: 1px solid black
+        background: silver
+        margin: 2px 0
+        box-sizing: border-box
+
+        div
+            height: 7px
+            border-radius:6px
+            transition: .4s ease
+            transition: 1.1s linear
+        &.hp div
+            background: red
+        &.mp div
+            height: 4px
+            background: blue
+        &.tp div
+            height: 4px
+            background: yellow
+            */
+
+#top-right
+    position:absolute
+    padding: 3px
+    right: 0
+    color: white
+    background: #332
+
+.window
+    width: 274px
+    height: 424px
+    background: url("/ui/win-bg.png")
+    position: absolute
+
+    .close
+        position: absolute
+        top: 0px
+        left: 241px
+        width: 28px
+        height: 27px
+        &:hover
+            background: url("/ui/win-close.png")
+
+    .title
+        winHfont()
+        cursor: move
+        text-align: center
+        width: 274px
+        height: 47px
+        position: absolute
+        //top: 10px
+        //left: 88px
+        top: 0
+        left: 0
+        box-sizing: border-box
+        padding-top: 10px
+
+    .scrollbar
+        background: url("/ui/scrollbar-bg.png")
+        position: absolute
+        top: 49px
+        right: 5px
+        width: 22px
+        height: 362px
+
+        .up, .down, .slider
+            position: absolute
+            width: 16px
+            height: 16px
+            left: 3px
+
+        .up
+            background: url("/ui/scrollbar-up.png")
+            top: 2px
+            &:hover
+                background: url("/ui/scrollbar-up-hover.png")
+
+        .down
+            background: url("/ui/scrollbar-down.png")
+            bottom: 2px
+            &:hover
+                background: url("/ui/scrollbar-down-hover.png")
+
+        .slider
+            background: url("/ui/scrollbar-slider.png")
+            bottom: 50px
+
+
+    button.btn
+        background: url("/ui/btn.png")
+        width: 90px
+        height: 29px
+        font-size: 11pt
+        text-align: center
+        border: 0
+        padding: 0
+        margin: 2px
+        padding-bottom: 4px
+        text-shadow: 1px 1px 1px black
+        color: white
+
+        &:hover
+            background: url("/ui/btn-hover.png")
+        &:disabled
+            background: url("/ui/btn-disabled.png")
+        &:active
+            background: url("/ui/btn-active.png")
+
+    .content
+        color: white
+        position: absolute
+        top: 50px
+        left: 7px
+        width: 261px
+        height: 363px
+        overflow: hidden
+        box-sizing: border-box
+        font-size: 11pt
+
+        &.red
+            background: url("/ui/win-red.png")
+            font-family: sans
+            color: #fff799
+
+        &.yellow
+            background: url("/ui/win-yellow.png")
+            font-family: sans
+
+
+    .content.paper
+        background: no-repeat url("/ui/win-paper.png")
+        font-family: sans-serif
+        padding: 45px 35px 10px 10px
+        position: relative
+        color: #46290e
+        box-shadow: none
+
+        scrollbar(363px - 42px - 10px)
+        .h
+            font-size: 14pt
+            color: #356e0b
+            font-weight: bold
+        p
+            font-size: 11pt
+
+        .sello
+            position: absolute
+            top: 10px
+            left: 82px
+            width: 87px
+            height: 42px
+            &.red
+                background: url("/ui/sello-red.png")
+            &.blue
+                background: url("/ui/sello-blue.png")
+
+#equip
+    padding: 10px
+    .item
+        height: 4em
+        border-bottom: 2px solid #1f1a19
+        margin-bottom: 0.5em
+        &:nth-last-of-type(1)
+            border-bottom: 0
+        .slot
+            float: right
+            font-weight: bold
+            display: inline-block
+            width: 32px
+        .name
+            width: 32px
+            //display: inline-block
+            &:before
+                content: '['
+            &:after
+                content: ']'
+        .desc
+            display: inline-block
+
+
+/* icon 28x28 */
+#inventory
+    background: url("/ui/win-inventory.png")
+    font-size: 0
+    padding: 14px 0 18px 18px
+
+    .img
+        position: relative
+        display: inline-block
+        width:32px
+        height:32px
+        margin: 2px 3px
+        &:hover .img-over
+            background: no-repeat url("/ui/spell-bar-glass.png")
+            width: 32px
+            height: 32px
+            position: absolute
+            top: 1px
+            left: 0px
+
+    img
+        margin:0
+        width:32px
+        height:32px
+
+    #gold
+        winHfont()
+        background: no-repeat url("/ui/win-x-gold.png")
+        position: absolute
+        width: 70px
+        bottom: 10px
+        right: 0px
+        color: white
+        padding-left: 35px
+        line-height: 21px
+        font-size: 12px
+
+
+#sys
+    &.s5
+        background: no-repeat url("/ui/sys-bg-5.png")
+        background-position: 0 11px
+        position: absolute
+        width: 204px
+        // height: 24px
+        height: 35px
+        bottom: 7px
+        right: 10px
+        padding-left: 15px
+
+    .icon
+        position: relative
+        runtooltip()
+
+        background: url("/ui/sys-icons.png")
+        width: 26px
+        height: 26px
+        display: inline-block
+        margin-right: 11px
+
+        &.hammer
+            background-position: 0 0
+        &.helment
+            background-position: -26px 0
+        &.bubble
+            background-position: -52px 0
+        &.cup
+            background-position: -78px 0
+        &.door
+            background-position: 52px 0
+        &.pounch
+            background-position: 26px 0
+

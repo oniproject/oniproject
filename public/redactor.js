@@ -4,8 +4,12 @@ var Vue = require('vue');
 Vue.directive('phimg', require('vue-placeholders/src/vue-placeholders-image'))
 Vue.directive('phtxt', require('vue-placeholders/src/vue-placeholders-text'))
 
-Vue.component('Home', { template: '<br><br>HOME' })
-Vue.component('Page1', { template: '<br><br>PAGE1' })
+Vue.component('Home', {
+	template: '<br><br>HOME'
+})
+Vue.component('Page1', {
+	template: '<br><br>PAGE1'
+})
 Vue.component('Map', require('./map'))
 Vue.component('Animation', require('./a2d'))
 
@@ -18,7 +22,7 @@ new Vue({
 	methods: {
 		changeApp: function(id) {
 			this.currentApp = id;
-			if(this.currentApp == 'Map') {
+			if (this.currentApp == 'Map') {
 				Vue.nextTick((function() {
 					this.$[this.currentApp].$emit('load', '/data/map.json');
 				}).bind(this));
@@ -29778,16 +29782,16 @@ module.exports = '<div>\n	<div class="uk-button-group">\n		<button class="uk-but
 module.exports = '<div class="panel">\n	Curve type:\n	<div class="uk-button-group">\n		<button class="uk-button uk-button-small uk-button-success"\n			v-on="click: type=\'linear\'"\n			v-class="uk-active: type === \'linear\'">L</button>\n		<button class="uk-button uk-button-small uk-button-success"\n			v-on="click: type=\'bezier\'"\n			v-class="uk-active: type === \'bezier\'">B</button>\n		<button class="uk-button uk-button-small uk-button-success"\n			v-on="click: type=\'stepped\'"\n			v-class="uk-active: type === \'stepped\'">S</button>\n	</div>\n	<button class="uk-button uk-button-small uk-button-success">Match</button>\n	<div class="panel uk-height-1-1">\n		<svg v-component="svg" v-ref="svg" id="svg" xmlns="http://www.w3.org/2000/svg" width="350" height="200" viewBox="0 0 350 200" preserveAspectRatio="xMidYMid meet"\n			v-on="\n			mousedown: drag($event),\n			mousemove: move($event),\n			mouseup: isDrag = \'\'"\n		>\n			<g id="main">\n				<rect v-attr="x: left, y: top, width: w-left-right, height: h -bottom -top" fill="#777" />\n				<text x="15" y="15">\n					M{{p1.x}},{{p1.y}}\n					C{{c1.x}},{{c1.y}}\n					{{c2.x}},{{c2.y}}\n					{{p2.x}},{{p2.y}}\n					{{isDrag}}\n				</text>\n				<text x="15" y="30">\n					x1 {{x1}}\n					y1 {{y1}}\n				</text>\n				<text x="15" y="45">\n					x2 {{x2}}\n					y2 {{y2}}\n				</text>\n				<line v-attr="x1: p1.x, y1: p1.y, x2: c1.x, y2: c1.y" />\n				<line v-attr="x1: p2.x, y1: p2.y, x2: c2.x, y2: c2.y" />\n				<path\n					d="M{{p1.x}},{{p1.y}}\n					C{{c1.x}},{{c1.y}}\n					{{c2.x}},{{c2.y}}\n					{{p2.x}},{{p2.y}}" />\n\n				<circle v-attr="cx: p1.x, cy: p1.y" r="1" />\n				<circle v-attr="cx: p2.x, cy: p2.y" r="1" />\n\n				<circle id="c1" v-attr="cx: c1.x, cy: c1.y" r="4" />\n				<circle id="c2" v-attr="cx: c2.x, cy: c2.y" r="4" />\n			</g>\n		</svg>\n	</div>\n</div>\n';
 },{}],"/home/lain/gocode/src/oniproject/redactor/a2d/animations/graph.js":[function(require,module,exports){
 
-    /*this.curves = []; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
-    this.curves.length = (frameCount - 1) * 6;
+/*this.curves = []; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
+this.curves.length = (frameCount - 1) * 6;
 };
 spine.Curves.prototype = {
-    setLinear: function (frameIndex) {
-        this.curves[frameIndex * 6] = 0/ LINEAR /;
-    },
-    setStepped: function (frameIndex) {
-        this.curves[frameIndex * 6] = -1/ STEPPED /;
-    },
+setLinear: function (frameIndex) {
+    this.curves[frameIndex * 6] = 0/ LINEAR /;
+},
+setStepped: function (frameIndex) {
+    this.curves[frameIndex * 6] = -1/ STEPPED /;
+},
 */
 //0.416, 1.15, 0.494, 1.27
 
@@ -29798,9 +29802,18 @@ module.exports = {
 			data: {
 				//p1: {x: 20,  y: 200-30},
 				//p2: {x: 350-20, y: 30},
-				c1: {x: 100, y: 30},
-				c2: {x: 200, y: 70},
-				dPoint: {x: 0, y: 0},
+				c1: {
+					x: 100,
+					y: 30
+				},
+				c2: {
+					x: 200,
+					y: 70
+				},
+				dPoint: {
+					x: 0,
+					y: 0
+				},
 				isDrag: '',
 				// offsets
 				left: 20,
@@ -29818,11 +29831,15 @@ module.exports = {
 				move: function(event) {
 					event.preventDefault();
 					var id = this.isDrag;
-					if(!this.$data[id]) return;
+					if (!this.$data[id]) return;
 					this.$data[id].x += event.pageX - this.dPoint.x;
 					this.$data[id].y += event.pageY - this.dPoint.y;
-					if(this.$data[id].x<this.left) this.$data[id].x=this.left;
-					if(this.$data[id].x>this.w-this.right) this.$data[id].x=this.w-this.right;
+					if (this.$data[id].x < this.left) {
+						this.$data[id].x = this.left;
+					}
+					if (this.$data[id].x > this.w - this.right) {
+						this.$data[id].x = this.w - this.right;
+					}
 					this.dPoint.x = event.pageX;
 					this.dPoint.y = event.pageY;
 				},
@@ -29835,8 +29852,18 @@ module.exports = {
 				},
 			},
 			computed: {
-				p1: function() { return {x: this.left, y: this.h-this.bottom}; },
-				p2: function() { return {x: this.w-this.right, y: this.top}; },
+				p1: function() {
+					return {
+						x: this.left,
+						y: this.h - this.bottom
+					};
+				},
+				p2: function() {
+					return {
+						x: this.w - this.right,
+						y: this.top
+					};
+				},
 				w: function() {
 					return parseFloat(window.getComputedStyle(this.$el, null).getPropertyValue('width'));
 				},
@@ -29844,20 +29871,36 @@ module.exports = {
 					return parseFloat(window.getComputedStyle(this.$el, null).getPropertyValue('height'));
 				},
 				x1: {
-					$get: function(){ return (this.c1.x - 20)/(this.w - 20*2); },
-					$set: function(val){ this.c1.x = val*(this.w - 20*2)+20; },
+					$get: function() {
+						return (this.c1.x - 20) / (this.w - 20 * 2);
+					},
+					$set: function(val) {
+						this.c1.x = val * (this.w - 20 * 2) + 20;
+					},
 				},
 				x2: {
-					$get: function(){ return (this.c2.x - 20)/(this.w - 20*2); },
-					$set: function(val){ this.c2.x = val*(this.w - 20*2)+20; },
+					$get: function() {
+						return (this.c2.x - 20) / (this.w - 20 * 2);
+					},
+					$set: function(val) {
+						this.c2.x = val * (this.w - 20 * 2) + 20;
+					},
 				},
 				y1: {
-					$get: function(){ return -(this.c1.y -this.h + this.bottom)/(this.h -this.bottom - this.top); },
-					$set: function(val){ this.c1.y = this.h - val*(this.h -this.bottom - this.top) -this.bottom; },
+					$get: function() {
+						return -(this.c1.y - this.h + this.bottom) / (this.h - this.bottom - this.top);
+					},
+					$set: function(val) {
+						this.c1.y = this.h - val * (this.h - this.bottom - this.top) - this.bottom;
+					},
 				},
 				y2: {
-					$get: function(){ return -(this.c2.y -this.h + this.bottom)/(this.h -this.bottom - this.top); },
-					$set: function(val){ this.c2.y = this.h - val*(this.h -this.bottom - this.top) -this.bottom; },
+					$get: function() {
+						return -(this.c2.y - this.h + this.bottom) / (this.h - this.bottom - this.top);
+					},
+					$set: function(val) {
+						this.c2.y = this.h - val * (this.h - this.bottom - this.top) - this.bottom;
+					},
 				},
 			},
 		},
@@ -29869,7 +29912,7 @@ module.exports = {
 	},
 	attached: function() {
 		var that = this;
-		this.$on('updateCurve', function(curve, d){
+		this.$on('updateCurve', function(curve, d) {
 			that.type = curve.type;
 			that.cx1 = curve.cx1;
 			that.cx2 = curve.cx2;
@@ -29884,17 +29927,18 @@ module.exports = {
 	data: {
 		// linear, bezier, stepped
 		type: 'bezier',
-		cx1: 0.416, cy1: 1.15,
-		cx2: 0.494, cy2: 1.27,
+		cx1: 0.416,
+		cy1: 1.15,
+		cx2: 0.494,
+		cy2: 1.27,
 	},
 }
-
 
 },{"./graph.html":"/home/lain/gocode/src/oniproject/redactor/a2d/animations/graph.html"}],"/home/lain/gocode/src/oniproject/redactor/a2d/animations/head.html":[function(require,module,exports){
 module.exports = '<div class="uk-float-left">\n	<button class="uk-button uk-button-primary"\n		v-on="click: Dopesheet = !Dopesheet, click: Graph = false, click: resize(), click: AnimationListCheck()">\n		<i class="uk-icon-caret-{{Dopesheet? \'down\': \'up\'}}"></i>\n		Dopesheet</button>\n\n	<span class="panel second ib">\n		<button class="uk-button uk-button-small"\n			title="Automaticaly scroll timeline during playback" data-uk-tooltip>\n			Current</button>\n		<input class="uk-form-width-mini uk-form-small" type="number" v-model="Current">\n		<button class="uk-button uk-button-small"\n			title="Set loop start to current frame\n Click again to clear" data-uk-tooltip>\n			Loop Start</button>\n		<input class="uk-form-width-mini uk-form-small" type="number" v-model="LoopStart">\n		<button class="uk-button uk-button-small"\n			title="Set loop end to current frame\n Click again to clear" data-uk-tooltip>\n			Loop End</button>\n		<input class="uk-form-width-mini uk-form-small" type="number" v-model="LoopEnd">\n	</span>\n\n	<span class="panel second ib">\n		<button class="uk-button uk-button-small"\n			title="Keys will be created automaticaly whenever a bone is changed" data-uk-tooltip>\n			<i class="uk-icon-key"></i>\n			Auto Key</button>\n		<button class="uk-button uk-button-small"\n			title="Toggles the ghosting options dialog" data-uk-tooltip>\n			Ghosting</button>\n		<button class="uk-button uk-button-small"\n			title="Toggles the playback options dialog" data-uk-tooltip>\n			<i class="uk-icon-play-circle"></i>\n			Playback</button>\n	</span>\n</div>\n<div class="uk-float-right">\n	<button class="uk-button uk-button-primary"\n		v-on="click: Graph = !Graph, click: Dopesheet = true, click: resize(), click: AnimationListCheck()">\n		<i class="uk-icon-caret-{{Graph? \'right\': \'left\'}}"></i>\n		Graph</button>\n</div>\n';
 },{}],"/home/lain/gocode/src/oniproject/redactor/a2d/animations/index.js":[function(require,module,exports){
 'use strict';
-require('less').render(require('./style.css'), function (e, css) {
+require('less').render(require('./style.css'), function(e, css) {
 	require('insert-css')(css)
 });
 
@@ -29916,10 +29960,16 @@ module.exports = {
 		},
 	},
 	components: {
-		head: {template: require('./head.html')},
-		ds_head: {template: require('./ds_head.html')},
+		head: {
+			template: require('./head.html')
+		},
+		ds_head: {
+			template: require('./ds_head.html')
+		},
 		graph: require('./graph'),
-		player: {template: require('./player.html')},
+		player: {
+			template: require('./player.html')
+		},
 	},
 	computed: {
 		AnimationList: function() {
@@ -29928,39 +29978,51 @@ module.exports = {
 			var getCurve = function(curves, i) {
 				var type;
 
-				var t = curves.curves[i*6];
-				if(t !== undefined) {
-					if(t == -1) type='stepped';
-					else type = 'bezier';
-					if(t == 0) type = 'linear';
+				var t = curves.curves[i * 6];
+				if (t !== undefined) {
+					if (t == -1) {
+						type = 'stepped';
+					} else {
+						type = 'bezier';
+					}
+					if (t == 0) {
+						type = 'linear';
+					}
 				}
 
 				var c = curves._curves[i];
-				if(!c) c=[0.5, 0.5, 0.5, 0.5];
+				if (!c) {
+					c = [0.5, 0.5, 0.5, 0.5];
+				}
 				return {
 					type: type,
-					cx1: c[0], cy1: c[1],
-					cx2: c[2], cy2: c[3],
+					cx1: c[0],
+					cy1: c[1],
+					cx2: c[2],
+					cy2: c[3],
 				};
 			}
 
 			// TODO choise anim by name
 			var animList = Spine.skeleton.data.animations[0];
 			var animations = [];
-			for(var i=0, l=animList.timelines.length; i<l; i++) {
+			for (var i = 0, l = animList.timelines.length; i < l; i++) {
 				var timeline = animList.timelines[i];
-				if(timeline instanceof PIXI.Spine.spine.RotateTimeline) {
-					var t = {type:'rotate',
-						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
+				if (timeline instanceof PIXI.Spine.spine.RotateTimeline) {
+					var t = {
+						type: 'rotate',
+						bone: Spine.skeleton.bones[timeline.boneIndex].data.name,
+						frames: []
+					};
 					animations.push(t);
 
-					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+					for (var j = 0, ll = timeline.getFrameCount(); j < ll; j++) {
 						var curve = getCurve(timeline.curves, j);
 						t.frames.push({
 							curve: curve,
 							type: curve.type,
-							time: timeline.frames[j*2],
-							angle: timeline.frames[j*2+1],
+							time: timeline.frames[j * 2],
+							angle: timeline.frames[j * 2 + 1],
 						});
 					}
 
@@ -29972,17 +30034,20 @@ module.exports = {
 					*/
 					continue;
 				}
-				if(timeline instanceof PIXI.Spine.spine.TranslateTimeline) {
-					var t = {type:'translate',
-						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
+				if (timeline instanceof PIXI.Spine.spine.TranslateTimeline) {
+					var t = {
+						type: 'translate',
+						bone: Spine.skeleton.bones[timeline.boneIndex].data.name,
+						frames: []
+					};
 					animations.push(t);
 
-					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+					for (var j = 0, ll = timeline.getFrameCount(); j < ll; j++) {
 						t.frames.push({
 							curve: timeline.curves[j],
-							time: timeline.frames[j*3],
-							x: timeline.frames[j*3+1],
-							y: timeline.frames[j*3+2],
+							time: timeline.frames[j * 3],
+							x: timeline.frames[j * 3 + 1],
+							y: timeline.frames[j * 3 + 2],
 						});
 					}
 					/*
@@ -29993,17 +30058,20 @@ module.exports = {
 					*/
 					continue;
 				}
-				if(timeline instanceof PIXI.Spine.spine.ScaleTimeline) {
-					var t = {type:'scale',
-						bone: Spine.skeleton.bones[timeline.boneIndex].data.name, frames:[]};
+				if (timeline instanceof PIXI.Spine.spine.ScaleTimeline) {
+					var t = {
+						type: 'scale',
+						bone: Spine.skeleton.bones[timeline.boneIndex].data.name,
+						frames: []
+					};
 					animations.push(t);
 
-					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+					for (var j = 0, ll = timeline.getFrameCount(); j < ll; j++) {
 						t.frames.push({
 							curve: timeline.curves[j],
-							time: timeline.frames[j*3],
-							x: timeline.frames[j*3+1],
-							y: timeline.frames[j*3+2],
+							time: timeline.frames[j * 3],
+							x: timeline.frames[j * 3 + 1],
+							y: timeline.frames[j * 3 + 2],
 						});
 					}
 					/*
@@ -30014,19 +30082,22 @@ module.exports = {
 					*/
 					continue;
 				}
-				if(timeline instanceof PIXI.Spine.spine.ColorTimeline) {
-					var t = {type:'color',
-						slot: Spine.skeleton.slots[timeline.slotIndex].data.name, frames:[]};
+				if (timeline instanceof PIXI.Spine.spine.ColorTimeline) {
+					var t = {
+						type: 'color',
+						slot: Spine.skeleton.slots[timeline.slotIndex].data.name,
+						frames: []
+					};
 					animations.push(t);
 
-					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+					for (var j = 0, ll = timeline.getFrameCount(); j < ll; j++) {
 						t.frames.push({
 							curve: timeline.curves[j],
-							time: timeline.frames[j*5],
-							r: timeline.frames[j*5+1],
-							g: timeline.frames[j*5+2],
-							b: timeline.frames[j*5+3],
-							a: timeline.frames[j*5+4],
+							time: timeline.frames[j * 5],
+							r: timeline.frames[j * 5 + 1],
+							g: timeline.frames[j * 5 + 2],
+							b: timeline.frames[j * 5 + 3],
+							a: timeline.frames[j * 5 + 4],
 						});
 					}
 					/*
@@ -30037,12 +30108,15 @@ module.exports = {
 					*/
 					continue;
 				}
-				if(timeline instanceof PIXI.Spine.spine.AttachmentTimeline) {
-					var t = {type:'attachment',
-						slot: Spine.skeleton.slots[timeline.slotIndex].data.name, frames:[]};
+				if (timeline instanceof PIXI.Spine.spine.AttachmentTimeline) {
+					var t = {
+						type: 'attachment',
+						slot: Spine.skeleton.slots[timeline.slotIndex].data.name,
+						frames: []
+					};
 					animations.push(t);
 
-					for(var j=0, ll=timeline.getFrameCount(); j<ll; j++) {
+					for (var j = 0, ll = timeline.getFrameCount(); j < ll; j++) {
 						t.frames.push({
 							curve: timeline.curves[j],
 							time: timeline.frames[j],
@@ -30079,7 +30153,7 @@ module.exports = '<div id="app" class="uk-height-1-1">\n	<div class="uk-grid uk-
 },{}],"/home/lain/gocode/src/oniproject/redactor/a2d/index.js":[function(require,module,exports){
 'use strict';
 
-require('less').render(require('./app.css'), function (e, css) {
+require('less').render(require('./app.css'), function(e, css) {
 	require('insert-css')(css)
 });
 
@@ -30087,10 +30161,10 @@ function makeGrid() {
 	var backGrid = new PIXI.Graphics();
 	var n = 50;
 	var nn = 32;
-	for(var x = -n; x<n; x++) {
-		for(var y = -n; y<n; y++) {
-			backGrid.beginFill(0x000000, ((x+y)%2)?0.4:0.8);
-			backGrid.drawRect(x*nn, y*nn, nn,nn);
+	for (var x = -n; x < n; x++) {
+		for (var y = -n; y < n; y++) {
+			backGrid.beginFill(0x000000, ((x + y) % 2) ? 0.4 : 0.8);
+			backGrid.drawRect(x * nn, y * nn, nn, nn);
 			backGrid.endFill();
 		}
 	}
@@ -30103,7 +30177,7 @@ function makeBBDrawer(Spine) {
 		PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
 		bbDrawer.clear();
 
-		for(var i=0, l= Spine.skeleton.drawOrder.length; i<l; i++) {
+		for (var i = 0, l = Spine.skeleton.drawOrder.length; i < l; i++) {
 			var att = Spine.skeleton.drawOrder[i].currentSprite;
 			var bb = att.getBounds();
 			bbDrawer.lineStyle(1, 0x999999, 1);
@@ -30130,27 +30204,27 @@ function makeBoneDrawer(Spine) {
 		var ox = Spine.position.x;
 		var oy = Spine.position.y;
 
-		for(var i=0, l= Spine.skeleton.bones.length;i<l;i++) {
+		for (var i = 0, l = Spine.skeleton.bones.length; i < l; i++) {
 			var bone = Spine.skeleton.bones[i];
 
 			boneDrawer.lineStyle(0, 0x999999, 1);
 			boneDrawer.beginFill(0x9999ff, 0.8);
-			boneDrawer.drawCircle(bone.worldX +ox, bone.worldY +oy, nn/4);
+			boneDrawer.drawCircle(bone.worldX + ox, bone.worldY + oy, nn / 4);
 			boneDrawer.endFill();
 
-			if(bone.data.length) {
+			if (bone.data.length) {
 				boneDrawer.lineStyle(1, 0x9999ff, 1);
-				var rot = bone.worldRotation * Math.PI/180;
+				var rot = bone.worldRotation * Math.PI / 180;
 				var x = Math.cos(rot) * bone.data.length;
 				var y = Math.sin(rot) * bone.data.length;
-				boneDrawer.moveTo(bone.worldX +ox +x, bone.worldY +oy -y);
-				boneDrawer.lineTo(bone.worldX +ox, bone.worldY +oy);
+				boneDrawer.moveTo(bone.worldX + ox + x, bone.worldY + oy - y);
+				boneDrawer.lineTo(bone.worldX + ox, bone.worldY + oy);
 			} else {
 				boneDrawer.lineStyle(1, 0xff9999, 1);
-				boneDrawer.moveTo(bone.worldX +ox -nn, bone.worldY +oy);
-				boneDrawer.lineTo(bone.worldX +ox +nn, bone.worldY +oy);
-				boneDrawer.moveTo(bone.worldX +ox, bone.worldY -nn +oy);
-				boneDrawer.lineTo(bone.worldX +ox, bone.worldY +nn +oy);
+				boneDrawer.moveTo(bone.worldX + ox - nn, bone.worldY + oy);
+				boneDrawer.lineTo(bone.worldX + ox + nn, bone.worldY + oy);
+				boneDrawer.moveTo(bone.worldX + ox, bone.worldY - nn + oy);
+				boneDrawer.lineTo(bone.worldX + ox, bone.worldY + nn + oy);
 			}
 		}
 	}
@@ -30185,8 +30259,9 @@ module.exports = {
 	methods: {
 		load: function(data) {
 			var Spine = this.$options.Spine;
-			if(Spine.children.length)
+			if (Spine.children.length) {
 				Spine.removeChildren();
+			}
 			Spine.spineData = data;
 			var spine = PIXI.Spine.spine;
 
@@ -30231,7 +30306,7 @@ module.exports = {
 
 			this.animationSpeed = 0;
 			var Spine = this.$options.Spine;
-			Spine.state.currentTime -= Spine.state.currentTime|0;
+			Spine.state.currentTime -= Spine.state.currentTime | 0;
 			this.$.Tools.transformEnable = true;
 		},
 		play: function(speed) {
@@ -30241,32 +30316,38 @@ module.exports = {
 			console.info('play');
 			this.animationSpeed = speed;
 			var Spine = this.$options.Spine;
-			Spine.state.currentTime -= Spine.state.currentTime|0;
-			if(speed < 0) {
+			Spine.state.currentTime -= Spine.state.currentTime | 0;
+			if (speed < 0) {
 				Spine.state.currentTime += 10000;
 			}
 
 			this.$.Tools.transformEnable = false;
-			if(!this.currentAnimation) this.currentAnimation = 'flying';
+			if (!this.currentAnimation) {
+				this.currentAnimation = 'flying';
+			}
 		},
 		updateTransform: function(type, name) {
 			//if(!this.played && !this.reversed) {
-			if(this.animationSpeed === 0) {
+			if (this.animationSpeed === 0) {
 				this.$.Tools.transformEnable = type === 'bone';
 			}
-			if(!this.$.Tools.transformEnable) {
+			if (!this.$.Tools.transformEnable) {
 				this.$.Tools.toolT = 'none';
 			}
 			console.log('updateTransform[%s] %s', type, name);
 		},
 	},
 	computed: {
-		Spine: function() { return this.$options.Spine; },
+		Spine: function() {
+			return this.$options.Spine;
+		},
 		isAnimations: {
-			$get: function() { return this.$.Animations.isEnabled; },
+			$get: function() {
+				return this.$.Animations.isEnabled;
+			},
 			$set: function(val) {
 				this.$.Animations.isEnabled = val;
-				if(!val) {
+				if (!val) {
 					this.stop();
 					this.$options.Spine.state.clearAnimation();
 					this.$options.Spine.skeleton.setToSetupPose();
@@ -30276,23 +30357,31 @@ module.exports = {
 		},
 		currentAnimation: {
 			$get: function() {
-				if(!this.$options.Spine.state.current) return '';
+				if (!this.$options.Spine.state.current) return '';
 				return this.$options.Spine.state.current.name
 			},
-			$set: function(val) { this.$options.Spine.state.setAnimationByName(val, true); }
+			$set: function(val) {
+				this.$options.Spine.state.setAnimationByName(val, true);
+			}
 		},
 		animationSpeed: {
-			$get: function() { return this.$options.Spine.state.animationSpeed; },
-			$set: function(val) { this.$options.Spine.state.animationSpeed = val; Vue.nextTick((function(){this.played;}).bind(this)); }
+			$get: function() {
+				return this.$options.Spine.state.animationSpeed;
+			},
+			$set: function(val) {
+				this.$options.Spine.state.animationSpeed = val; Vue.nextTick((function() {
+					this.played;
+				}).bind(this));
+			}
 		},
 		// current time
 		Current: {
 			$get: function() {
-				return (this.Time*31) |0;
+				return (this.Time * 31) | 0;
 			},
 			$set: function(val) {
-				if (val<0) {
-					val=0;
+				if (val < 0) {
+					val = 0;
 				}
 				this.$options.Spine.state.currentTime = val / 31;
 			},
@@ -30306,7 +30395,15 @@ module.exports = {
 
 		var spineJsonParser = new PIXI.Spine.spine.SkeletonJson();
 		var skeletonData = spineJsonParser.readSkeletonData({
-			bones:[], slots:[], skins: {default: {}},  animations: {flying: {}, }});
+			bones: [],
+			slots: [],
+			skins: {
+				default: {}
+			},
+			animations: {
+				flying: {},
+			}
+		});
 		PIXI.AnimCache['defaultSpine'] = skeletonData;
 		var Spine = window.Spine = this.$options.Spine = new PIXI.Spine('defaultSpine');
 		//Spine.state.setAnimationByName('flying', true);
@@ -30330,8 +30427,8 @@ module.exports = {
 		var xxxx = Spine;
 		var scale = 1;
 		//xxxx.scale.x = xxxx.scale.y = scale;
-		xxxx.position.x = window.innerWidth/4;
-		xxxx.position.y = window.innerHeight/4 + (450 * scale);
+		xxxx.position.x = window.innerWidth / 4;
+		xxxx.position.y = window.innerHeight / 4 + (450 * scale);
 
 		var canvas = this.$el.getElementsByTagName('canvas')[0];
 		console.log('canvas', canvas);
@@ -30350,7 +30447,7 @@ module.exports = {
 			var animHeight = getH(document.getElementById('animations'));
 			var otherHeight = window.innerHeight - animHeight;
 			that.otherHeight = otherHeight;
-			Vue.nextTick(function(){
+			Vue.nextTick(function() {
 				renderer.resize(getW(canvas), getH(canvas));
 			});
 		}
@@ -30362,8 +30459,8 @@ module.exports = {
 		requestAnimFrame(animate);
 		function animate() {
 			requestAnimFrame(animate);
-			if(Spine) {
-				var time = Spine.state.currentTime - (Spine.state.currentTime|0);
+			if (Spine) {
+				var time = Spine.state.currentTime - (Spine.state.currentTime | 0);
 				that.Time = time;
 			}
 			renderer.render(stage);
@@ -30371,7 +30468,7 @@ module.exports = {
 
 		var assetsToLoader = [
 			"data/dragonBones.json",
-			"data/dragonBonesData.json"];
+		"data/dragonBonesData.json"];
 		var loader = new PIXI.AssetLoader(assetsToLoader);
 		loader.onComplete = onAssetsLoaded
 		loader.load();
@@ -30384,7 +30481,7 @@ module.exports = {
 
 },{"./animations":"/home/lain/gocode/src/oniproject/redactor/a2d/animations/index.js","./app.css":"/home/lain/gocode/src/oniproject/redactor/a2d/app.css","./app.html":"/home/lain/gocode/src/oniproject/redactor/a2d/app.html","./tools":"/home/lain/gocode/src/oniproject/redactor/a2d/tools/index.js","./tree":"/home/lain/gocode/src/oniproject/redactor/a2d/tree/index.js","insert-css":"/home/lain/gocode/src/oniproject/node_modules/insert-css/index.js","less":"/home/lain/gocode/src/oniproject/node_modules/less/lib/less/index.js"}],"/home/lain/gocode/src/oniproject/redactor/a2d/tools/index.js":[function(require,module,exports){
 'use strict';
-require('less').render(require('./style.css'), function (e, css) {
+require('less').render(require('./style.css'), function(e, css) {
 	require('insert-css')(css)
 });
 
@@ -30416,14 +30513,14 @@ module.exports = {
 		// selected
 		rotation: {
 			$get: function() {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$parent.$get('Spine');
 					return Spine.skeleton.findBone(this.$parent.selected.name).data.rotation;
 				}
 				return NaN;
 			},
 			$set: function(val) {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$parent.$get('Spine');
 					Spine.skeleton.findBone(this.$parent.selected.name).data.rotation = +val;
 					Spine.skeleton.setToSetupPose();
@@ -30433,14 +30530,14 @@ module.exports = {
 		},
 		translateX: {
 			$get: function() {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$parent.$get('Spine');
 					return Spine.skeleton.findBone(this.$parent.selected.name).data.x;
 				}
 				return NaN;
 			},
 			$set: function(val) {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$parent.$get('Spine');
 					Spine.skeleton.findBone(this.$parent.selected.name).data.x = +val;
 					Spine.skeleton.setToSetupPose();
@@ -30450,14 +30547,14 @@ module.exports = {
 		},
 		translateY: {
 			$get: function() {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$get('Spine');
 					return Spine.skeleton.findBone(this.$parent.selected.name).data.y;
 				}
 				return NaN;
 			},
 			$set: function(val) {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$get('Spine');
 					Spine.skeleton.findBone(this.$parent.selected.name).data.y = +val;
 					Spine.skeleton.setToSetupPose();
@@ -30467,14 +30564,14 @@ module.exports = {
 		},
 		scaleX: {
 			$get: function() {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$get('Spine');
 					return Spine.skeleton.findBone(this.$parent.selected.name).data.scaleX;
 				}
 				return NaN;
 			},
 			$set: function(val) {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$get('Spine');
 					Spine.skeleton.findBone(this.$parent.selected.name).data.scaleX = +val;
 					Spine.skeleton.setToSetupPose();
@@ -30484,14 +30581,14 @@ module.exports = {
 		},
 		scaleY: {
 			$get: function() {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$get('Spine');
 					return Spine.skeleton.findBone(this.$parent.selected.name).data.scaleY;
 				}
 				return NaN;
 			},
 			$set: function(val) {
-				if(this.$parent.selected.type === 'bone') {
+				if (this.$parent.selected.type === 'bone') {
 					var Spine = this.$get('Spine');
 					Spine.skeleton.findBone(this.$parent.selected.name).data.scaleY = +val;
 					Spine.skeleton.setToSetupPose();
@@ -30515,16 +30612,24 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'animations', children: [], gen: true},
+		model: {
+			type: 'animations',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
 			var Spine = this.$parent.$parent.$options.Spine;
 			var animations = [];
-			for(var i=0, l=Spine.skeleton.data.animations.length; i<l; i++) {
+			for (var i = 0, l = Spine.skeleton.data.animations.length; i < l; i++) {
 				var a = Spine.skeleton.data.animations[i];
 				// TODO parse timelines
-				animations.push({type: 'animation', name: a.name, draggable: true});
+				animations.push({
+					type: 'animation',
+					name: a.name,
+					draggable: true
+				});
 			}
 			return animations;
 		},
@@ -30540,7 +30645,12 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'bone', name: 'root', children: [], gen: true},
+		model: {
+			type: 'bone',
+			name: 'root',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
@@ -30549,68 +30659,91 @@ module.exports = {
 			this.$parent.show.slots;
 			this.$parent.show.attachments;
 
-			if(!this.$parent.show.bones) {
+			if (!this.$parent.show.bones) {
 				return [];
 			}
 
 			var bone_map = {};
 			var root = null;
-			for(var i=0, l=Spine.skeleton.bones.length; i<l;i++) {
+			for (var i = 0, l = Spine.skeleton.bones.length; i < l; i++) {
 				var bone = Spine.skeleton.bones[i];
 				var b = {
 					name: bone.data.name,
 					type: 'bone',
 					visibility: true,
 					draggable: true,
-					parent: bone.parent? bone.parent.data.name: '',
+					parent: bone.parent ? bone.parent.data.name : '',
 					length: bone.data.length,
 					data: {
 						rotation: bone.data.rotation,
-						position: {x: bone.data.x, y: bone.data.y},
-						scale: {x: bone.data.scaleX, y: bone.data.scaleY},
+						position: {
+							x: bone.data.x,
+							y: bone.data.y
+						},
+						scale: {
+							x: bone.data.scaleX,
+							y: bone.data.scaleY
+						},
 					},
 					local: {
 						rotation: bone.rotation,
-						position: {x: bone.x, y: bone.y},
-						scale: {x: bone.scaleX, y: bone.scaleY},
+						position: {
+							x: bone.x,
+							y: bone.y
+						},
+						scale: {
+							x: bone.scaleX,
+							y: bone.scaleY
+						},
 					},
 					world: {
 						rotation: bone.worldRotation,
-						position: {x: bone.worldX, y: bone.worldY},
-						scale: {x: bone.worldScaleX, y: bone.worldScaleY},
+						position: {
+							x: bone.worldX,
+							y: bone.worldY
+						},
+						scale: {
+							x: bone.worldScaleX,
+							y: bone.worldScaleY
+						},
 					}
 				};
 				bone_map[b.name] = b;
 
-				if(b.parent == '') {
+				if (b.parent == '') {
 					this.model.name = b.name;
 					root = b;
 				} else {
 					var parent = bone_map[b.parent];
-					if(!parent.children) {
+					if (!parent.children) {
 						parent.children = [];
 					}
 					parent.children.push(b);
 				}
 			}
 
-			if(this.$parent.show.slots) {
-				for(var i=0, l=Spine.skeleton.drawOrder.length; i<l;i++) {
+			if (this.$parent.show.slots) {
+				for (var i = 0, l = Spine.skeleton.drawOrder.length; i < l; i++) {
 					var slot = Spine.skeleton.drawOrder[i];
 					var s = {
 						type: 'slot',
 						visibility: true,
 						name: slot.data.name,
 						bone: slot.bone.data.name,
-						color: {r: slot.r, g: slot.g, b: slot.b, a: slot.a},
+						color: {
+							r: slot.r,
+							g: slot.g,
+							b: slot.b,
+							a: slot.a
+						},
 						//attachments: [],
 					};
 
 					// TODO find in animations ?
-					if(this.$parent.show.attachments) {
+					if (this.$parent.show.attachments) {
 						s.children = [];
-						for(var k in slot.sprites) {
-							if(slot.sprites.hasOwnProperty(k)) {
+						for (var k in slot.sprites) {
+							if (slot.sprites.hasOwnProperty(k)) {
 								s.children.push({
 									name: k,
 									type: 'region',
@@ -30621,15 +30754,15 @@ module.exports = {
 					}
 
 					var parent = bone_map[s.bone];
-					if(!parent.children) {
+					if (!parent.children) {
 						parent.children = [];
 					}
 					// insert at start
-					parent.children.splice(0,0, s);
+					parent.children.splice(0, 0, s);
 				}
 			}
 
-			return root? root.children: [];
+			return root ? root.children : [];
 		},
 	},
 }
@@ -30642,7 +30775,10 @@ module.exports = '<li title="{{model.type}}" data-uk-tooltip>\n	<a class="icon-b
 module.exports = {
 	replace: true,
 	template: require('./dir.html'),
-	data: {open: false, rename: false},
+	data: {
+		open: false,
+		rename: false
+	},
 	methods: {
 		swapStuff: function(index1, index2) {
 			//console.log('swap %s -> %s', index1, index2, this.$parent);
@@ -30698,7 +30834,6 @@ module.exports = {
 	},
 };
 
-
 },{"./dir.html":"/home/lain/gocode/src/oniproject/redactor/a2d/tree/dir.html"}],"/home/lain/gocode/src/oniproject/redactor/a2d/tree/draw_order.js":[function(require,module,exports){
 'use strict';
 
@@ -30708,7 +30843,11 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'draw_order', children: [], gen: true},
+		model: {
+			type: 'draw_order',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
@@ -30716,22 +30855,27 @@ module.exports = {
 			this.$parent.show.attachments;
 
 			var slots = [];
-			for(var i=0, l=Spine.skeleton.drawOrder.length; i<l;i++) {
+			for (var i = 0, l = Spine.skeleton.drawOrder.length; i < l; i++) {
 				var slot = Spine.skeleton.drawOrder[i];
 				var s = {
 					type: 'slot',
 					visibility: true,
 					name: slot.data.name,
 					bone: slot.bone.data.name,
-					color: {r: slot.r, g: slot.g, b: slot.b, a: slot.a},
+					color: {
+						r: slot.r,
+						g: slot.g,
+						b: slot.b,
+						a: slot.a
+					},
 					//attachments: [],
 				};
 				slots.push(s);
 				// TODO find in animations ?
-				if(this.$parent.show.attachments) {
+				if (this.$parent.show.attachments) {
 					s.children = [];
-					for(var k in slot.sprites) {
-						if(slot.sprites.hasOwnProperty(k)) {
+					for (var k in slot.sprites) {
+						if (slot.sprites.hasOwnProperty(k)) {
 							s.children.push({
 								name: k,
 								type: 'region',
@@ -30755,17 +30899,21 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'events', children: [], gen: true},
+		model: {
+			type: 'events',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
 			var events = [];
-			for(var i=0; i<5; i++) {
+			for (var i = 0; i < 5; i++) {
 				events.push({
 					type: 'event',
 					name: 'vfds ' + i,
 					keyframe: 'danger',
-					visibility:true,
+					visibility: true,
 					draggable: true
 				});
 			}
@@ -30785,7 +30933,11 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'images', children: [], gen: true},
+		model: {
+			type: 'images',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
@@ -30794,8 +30946,8 @@ module.exports = {
 			var attachments = [];
 			// TODO get current skin
 			var skin = Spine.skeleton.data.defaultSkin;
-			for(var k in skin.attachments) {
-				if(skin.attachments.hasOwnProperty(k)) {
+			for (var k in skin.attachments) {
+				if (skin.attachments.hasOwnProperty(k)) {
 					var a = skin.attachments[k];
 					attachments.push({
 						type: 'image',
@@ -30811,7 +30963,7 @@ module.exports = {
 
 },{"./dir.html":"/home/lain/gocode/src/oniproject/redactor/a2d/tree/dir.html"}],"/home/lain/gocode/src/oniproject/redactor/a2d/tree/index.js":[function(require,module,exports){
 'use strict';
-require('less').render(require('./style.css'), function (e, css) {
+require('less').render(require('./style.css'), function(e, css) {
 	require('insert-css')(css)
 });
 
@@ -30859,7 +31011,7 @@ module.exports = {
 	created: function() {
 		console.log('created Skeleton tree');
 
-		this.$on('drag',  function(model) {
+		this.$on('drag', function(model) {
 			console.log('drag [%s]%s', model.type, model.name);
 		});
 		this.$on('drop', function(model, type, name, $index) {
@@ -30879,37 +31031,46 @@ module.exports = {
 	data: {
 		open: false,
 		rename: false,
-		model: {type: 'skins', children: [], gen: true},
+		model: {
+			type: 'skins',
+			children: [],
+			gen: true
+		},
 	},
 	computed: {
 		children: function() {
 			var Spine = this.$parent.$parent.$options.Spine;
 
 			var skins = [];
-			for(var i=0, l=Spine.skeleton.data.skins.length; i<l;i++) {
+			for (var i = 0, l = Spine.skeleton.data.skins.length; i < l; i++) {
 				var skin = Spine.skeleton.data.skins[i];
 				//if(skin.name !== 'default') {
-					skins.push({
-						name: skin.name,
-						type: 'skin',
-						visibility: true,
-						//draggable: true
-					});
+				skins.push({
+					name: skin.name,
+					type: 'skin',
+					visibility: true,
+					//draggable: true
+				});
 				//}
 			}
 			return skins;
 
-		var skins = this.$parent.Skins;
-		for(var i=0, l=skins.length; i<l; i++) {
-			var skin = skins[i];
-			this.skins.push({type: 'skin', name: skin.name, visibility: true, draggable: true});
-		}
+			var skins = this.$parent.Skins;
+			for (var i = 0, l = skins.length; i < l; i++) {
+				var skin = skins[i];
+				this.skins.push({
+					type: 'skin',
+					name: skin.name,
+					visibility: true,
+					draggable: true
+				});
+			}
 
 			var attachments = [];
 			// TODO get current skin
 			var skin = Spine.skeleton.data.defaultSkin;
-			for(var k in skin.attachments) {
-				if(skin.attachments.hasOwnProperty(k)) {
+			for (var k in skin.attachments) {
+				if (skin.attachments.hasOwnProperty(k)) {
 					var a = skin.attachments[k];
 					attachments.push({
 						type: 'image',
@@ -31117,12 +31278,15 @@ console.log('start');
 
 
 //var app = new Vue({
-module.exports =  {
+module.exports = {
 	//el: '#Redactor',
 	template: require('./app.html'),
 	data: {
 		active: -1,
-		origin: {x: 0, y: 0},
+		origin: {
+			x: 0,
+			y: 0
+		},
 		current: 0,
 		commands: [],
 	},
@@ -31132,12 +31296,20 @@ module.exports =  {
 	stage: null,
 	computed: {
 		originX: {
-			$get: function() { return this.origin.x; },
-			$set: function(val) { this.origin.x = val; this.resize(); }
+			$get: function() {
+				return this.origin.x;
+			},
+			$set: function(val) {
+				this.origin.x = val; this.resize();
+			}
 		},
 		originY: {
-			$get: function() { return this.origin.y; },
-			$set: function(val) { this.origin.y = val; this.resize(); }
+			$get: function() {
+				return this.origin.y;
+			},
+			$set: function(val) {
+				this.origin.y = val; this.resize();
+			}
 		},
 	},
 	components: {
@@ -31236,7 +31408,7 @@ module.exports =  {
 			this.setActive(this.active);
 		},
 		syncList: function() {
-			if(this.$.objList) {
+			if (this.$.objList) {
 				this.$.objList.list = this.$options.map.objects;
 			}
 		},
@@ -31305,7 +31477,9 @@ module.exports =  {
 			r.open('GET', url, true);
 			var that = this;
 			r.onreadystatechange = function() {
-				if (r.readyState != 4 || r.status != 200) { return; }
+				if (r.readyState != 4 || r.status != 200) {
+					return;
+				}
 				var json = JSON.parse(r.responseText);
 				console.log('load end', json);
 				that.$options.map.objects = json.objects;
@@ -31322,7 +31496,7 @@ module.exports =  {
 		this.$on('redo', this.redo);
 		this.$on('load', this.load);
 
-		var stage = this.$options.stage =  new PIXI.Stage(0xFFFFFF, true);
+		var stage = this.$options.stage = new PIXI.Stage(0xFFFFFF, true);
 		var renderer = this.$options.renderer = PIXI.autoDetectRenderer(1, 1, this.$el.getElementsByTagName('canvas')[0], true, true);
 
 		var iso = this.$options.iso = new Isomer(renderer.view);
@@ -31398,7 +31572,7 @@ module.exports =  {
 			], 0.3, [0, 0, 0], [1, 1, 1], [50, 160, 60, 0]));
 		}).bind(this))*/
 	},
-}//);
+} //);
 
 
 function _initUI(that) {
@@ -31474,42 +31648,42 @@ function _initUI(that) {
 	dropZone.addEventListener('drop', handleFileSelect, false);
 	*/
 
-var app = that;
+	var app = that;
 
-var originX = 0,
-	originY = 0,
-	moveSpeed = 30,
-	keyCodes = {
-	37: function(event) {
-		app.originX += moveSpeed;
-	},
-	38: function(event) {
-		app.originY += moveSpeed;
-	},
-	39: function(event) {
-		app.originX -= moveSpeed;
-	},
-	40: function(event) {
-		app.originY -= moveSpeed;
-	},
-}
-document.onkeydown = function(event) {
-	var f = keyCodes[event.keyCode];
-	if (f) {
-		event.preventDefault();
-		f(event);
+	var originX = 0,
+		originY = 0,
+		moveSpeed = 30,
+		keyCodes = {
+			37: function(event) {
+				app.originX += moveSpeed;
+			},
+			38: function(event) {
+				app.originY += moveSpeed;
+			},
+			39: function(event) {
+				app.originX -= moveSpeed;
+			},
+			40: function(event) {
+				app.originY -= moveSpeed;
+			},
+		}
+	document.onkeydown = function(event) {
+		var f = keyCodes[event.keyCode];
+		if (f) {
+			event.preventDefault();
+			f(event);
+		}
 	}
-}
-window.onresize = app.resize.bind(app);
-app.resize();
+	window.onresize = app.resize.bind(app);
+	app.resize();
 
 
-function animate() {
-	app.render();
-	app.$options.renderer.render(app.$options.stage);
+	function animate() {
+		app.render();
+		app.$options.renderer.render(app.$options.stage);
+		requestAnimFrame(animate);
+	}
 	requestAnimFrame(animate);
-}
-requestAnimFrame(animate);
 }
 
 },{"../../js/map":"/home/lain/gocode/src/oniproject/js/map.js","./app.html":"/home/lain/gocode/src/oniproject/redactor/map/app.html","./commands":"/home/lain/gocode/src/oniproject/redactor/map/commands.js","./modals/cylinder":"/home/lain/gocode/src/oniproject/redactor/map/modals/cylinder.js","./modals/path":"/home/lain/gocode/src/oniproject/redactor/map/modals/path.js","./modals/prism":"/home/lain/gocode/src/oniproject/redactor/map/modals/prism.js","./modals/pyramid":"/home/lain/gocode/src/oniproject/redactor/map/modals/pyramid.js","./modals/shape":"/home/lain/gocode/src/oniproject/redactor/map/modals/shape.js","./obj-list":"/home/lain/gocode/src/oniproject/redactor/map/obj-list/index.js","./tools":"/home/lain/gocode/src/oniproject/redactor/map/tools/index.js","filesaver.js":"/home/lain/gocode/src/oniproject/node_modules/filesaver.js/FileSaver.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js","vue":"/home/lain/gocode/src/oniproject/node_modules/vue/src/main.js"}],"/home/lain/gocode/src/oniproject/redactor/map/modals/cylinder.html":[function(require,module,exports){
@@ -31532,7 +31706,7 @@ module.exports = {
 	methods: {
 		add: function(e) {
 			this.$parent.run(new commands.AddCylinder(
-				[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz], +this.vertices
+			[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz], +this.vertices
 			));
 		},
 	},
@@ -31548,7 +31722,11 @@ module.exports = {
 	template: require('./path.html'),
 	data: {
 		points: [
-			{x: 0, y: 0, z: 0}
+			{
+				x: 0,
+				y: 0,
+				z: 0
+			}
 		],
 	},
 	methods: {
@@ -31582,7 +31760,7 @@ module.exports = {
 	methods: {
 		add: function(e) {
 			this.$parent.run(new commands.AddPrism(
-				[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz]
+			[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz]
 			));
 		},
 	},
@@ -31607,7 +31785,7 @@ module.exports = {
 	methods: {
 		add: function(e) {
 			this.$parent.run(new commands.AddPyramid(
-				[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz]
+			[+this.x, +this.y, +this.z], [+this.dx, +this.dy, +this.dz]
 			));
 		},
 	},
@@ -31700,17 +31878,17 @@ module.exports = {
 		},
 		Move: function(e) {
 			this.$parent.run(new commands.Move(
-				this.$parent.active, [+this.pos.x, +this.pos.y, +this.pos.z]
+			this.$parent.active, [+this.pos.x, +this.pos.y, +this.pos.z]
 			));
 		},
 		Resize: function(e) {
 			this.$parent.run(new commands.Resize(
-				this.$parent.active, [+this.size.x, +this.size.y, +this.size.z], +this.size.v
+			this.$parent.active, [+this.size.x, +this.size.y, +this.size.z], +this.size.v
 			));
 		},
 		Rotate: function(e) {
 			this.$parent.run(new commands.Rotate(
-				this.$parent.active, +this.rotate.z
+			this.$parent.active, +this.rotate.z
 			));
 		},
 	},

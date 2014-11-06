@@ -2,137 +2,87 @@
 
 console.log('fuck');
 
-var Tileset = require('./tileset'),
-	Tilemap = require('./tilemap');
+var w = window.innerWidth,
+	h = window.innerHeight,
+	stage = new PIXI.Stage(0xFFFFFF, true),
+	renderer = PIXI.autoDetectRenderer(w, h);
+document.body.appendChild(renderer.view);
 
-var Suika = require('./suika');
+window.onresize = function() {
+	w = window.innerWidth;
+	h = window.innerHeight;
+	renderer.resize(w, h);
+};
+window.onresize();
 
-function run(player, host) {
-	var w = window.innerWidth,
-		h = window.innerHeight,
-		stage = new PIXI.Stage(0xFFFFFF, true),
-		renderer = PIXI.autoDetectRenderer(w, h);
-	document.body.appendChild(renderer.view);
+var Game = require('./game');
+window.game = new Game(renderer, stage, UI);
 
-	var WH = {
-		width: 32,
-		height: 32
-	},
-	World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
-	World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
-	World_B = new Tileset('/game/World_B.png', 16, 16, WH),
-	Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
-	Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
-	Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
-	Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
-	Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
-	Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
-	Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
-	nn = 31,
-	data = [
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, 0, nn, nn, nn, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, nn, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, nn, nn, nn, 0, nn, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, 0, nn, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-	];
+var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+colorMatrixFilter.matrix = [
+	0.4, 0, 0, 0,
+	0, 0.4, 0, 0,
+	0, 0, 0.7, 0,
+	0, 0, 0, 1,
+];
+game.container.filters = [colorMatrixFilter];
 
-	window.Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
-
-	window.scene = new Tilemap(20, 20, Outside);
-	for (var y = 0, ml = data.length; y < ml; y++) {
-		var line = data[y];
-		for (var x = 0, ll = line.length; x < ll; x++) {
-			var nnn = data[y][x];
-			if (nnn) {
-				scene.setAt(x, y, 'second', 0, [0, 1, 2], true);
-				scene.setAt(x, y, 'third', 0, 3, true);
-			} else {
-				scene.setAt(x, y, 'second', 0, [0, 1, 2], true);
-			}
-		}
-	}
-
-	var Game = require('./game');
-	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
-	stage.addChild(scene);
-
-	var suika = new Suika();
-	suika.position.x = 440;
-	suika.position.y = 300;
-	game.suika = suika;
-	suika.animation = 'walk';
-	stage.addChild(suika);
-
-	window.onresize = resize;
-	resize();
-
-	function resize() {
-		w = window.innerWidth;
-		h = window.innerHeight;
-		game.resize(w, h);
-
-		renderer.resize(w, h);
-	}
-
+requestAnimFrame(render);
+var updateT = 1000 / 50;
+var lastTime = window.performance.now();
+function render() {
 	requestAnimFrame(render);
-
-	function render() {
-		requestAnimFrame(render);
-		game.render();
-		renderer.render(stage);
-		var a = game.avatars[game.player];
-		if(a) {
-			var d = Math.atan2(a.lastvel.x||0, a.lastvel.y||0);
-			var dd = d/Math.PI * 180 - 45;
-			suika.direction = dd;
-		}
+	var t = window.performance.now();
+	if (t - lastTime > updateT) {
+		game.update(updateT);
+		lastTime += updateT;
 	}
-
-	setInterval(animate, 50);
-	game.net.on('open', function() {
-		game.net.RequestParametersMsg();
-		game.net.RequestInventoryMsg();
-	});
-
-	game.net.on('TargetDataMsg', function(target) {
-		console.log('TargetDataMsg');
-		UI.target = target;
-	});
-	game.net.on('InventoryMsg', function(inv) {
-		UI.inventory = inv.Inventory;
-		UI.equip = inv.Equip
-	});
-	game.net.on('ParametersMsg', function(p) {
-		UI.hp = p.Parameters.HP;
-		UI.mhp = p.Parameters.MHP;
-		UI.mp = p.Parameters.MP;
-		UI.mmp = p.Parameters.MMP;
-		UI.tp = p.Parameters.TP;
-		UI.mtp = p.Parameters.MTP;
-		UI.spells = p.Skills;
-	});
-
-
-	function animate() {
-		game.animate(0.05);
-	}
+	game.render();
+	renderer.render(stage);
 }
 
-var UI = new Vue({
+game.net.on('open', function() {
+	game.net.RequestParametersMsg();
+	game.net.RequestInventoryMsg();
+	UI.isConnected = true;
+	console.info('ws open');
+});
+
+game.net.on('close', function() {
+	UI.isConnected = false;
+	console.warn('ws close');
+	setTimeout(getConnectionData, 1000);
+});
+
+
+game.net.on('TargetDataMsg', function(target) {
+	console.log('TargetDataMsg');
+	UI.target = target;
+});
+game.net.on('InventoryMsg', function(inv) {
+	UI.inventory = inv.Inventory;
+	UI.equip = inv.Equip
+});
+game.net.on('ParametersMsg', function(p) {
+	UI.hp = p.Parameters.HP;
+	UI.mhp = p.Parameters.MHP;
+	UI.mp = p.Parameters.MP;
+	UI.mmp = p.Parameters.MMP;
+	UI.tp = p.Parameters.TP;
+	UI.mtp = p.Parameters.MTP;
+	UI.spells = p.Skills;
+});
+
+game.net.on('ChatMsg', function(msg) {
+	console.log('ChatMsg', msg);
+	UI.chat.push(msg);
+});
+
+var UI = window.UI = new Vue({
 	el: '#ui',
 	data: {
+		isConnected: false,
+
 		level: 88,
 		exp: 77,
 		hp: 190,
@@ -141,59 +91,233 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
-        equip: {},
+
+		showEquip: true,
+		showSpells: true,
+		showInventory: true,
+		showChat: true,
+
+		msg: 'msgqwer freqw',
+		chat: [{
+			Name: 'vfndjskl',
+			Text: 'vfds',
+			Type: 'party'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'local'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'guild'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'qwioerh',
+			Type: 'admin'
+		}],
+		equip: {},
 		inventory: [
-			{Name: "43"},
-			{Name: "1k"},
-			{Name: "4njki32"},
-			{Name: "PPPPvndfsj"},
+			{
+				Name: '43'
+			},
+			{
+				Name: '1k'
+			},
+			{
+				Name: '4njki32'
+			},
+			{
+				Name: 'PPPPvndfsj'
+			},
 		],
-        target: { Race: 0, HP: 0, MHP:0, Name: "vnfdjsk" },
+		target: {
+			Race: 0,
+			HP: 0,
+			MHP: 0,
+			Name: 'vnfdjsk'
+		},
+		invTest: [
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+		],
 		spells: [
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
 
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
 
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
 		],
+	},
+	computed: {
+		showTargetBar: function() {
+			return !!this.target.MHP;
+		},
+	},
+	components: {
+		scrollbar: {
+			scrollTopX: 5,
+			created: function() {
+				this.$on('scroll', function() {
+					this.scrollTopX = this.$parent.scrollTop;
+					console.log('scroll', this.scrollTopX, this.$parent.scrollH);
+				});
+			},
+			methods: {
+				up: function(event) {
+					this.$parent.$emit('up');
+				},
+				down: function(event) {
+					this.$parent.$emit('down');
+				},
+			}
+		},
+		scrolled: {
+			computed: {
+				scrollTop: function() {
+					var el = this.$el.querySelector('.native');
+					return el.scrollTop;
+				},
+				scrollH: function() {
+					var el = this.$el.querySelector('.scrollbar-wrap');
+					var el2 = this.$el.querySelector('.s-content');
+					var x = el2.clientHeight / el.clientHeight;
+					console.log(x, el.clientHeight, el2.clientHeight);
+					return x;
+				},
+			},
+			methods: {
+				scroll: function() {
+					this.scrollTop;
+					this.$broadcast('scroll');
+				},
+			},
+			created: function() {
+				this.$on('up', function() {
+					this.$broadcast('scroll');
+					this.$el.querySelector('.native').scrollTop -= 60;
+				});
+				this.$on('down', function() {
+					this.$broadcast('scroll');
+					this.$el.querySelector('.native').scrollTop += 60;
+				});
+			}
+		},
+		draggable: {
+			dragged: false,
+			methods: {
+				dragStart: function(event) {
+					this.dragged = true;
+				},
+				dragMove: function(event) {
+					if (this.dragged) {
+						var b = this.$el.getBoundingClientRect();
+						this.$el.style.left = b.left + event.movementX + 'px';
+						this.$el.style.top = b.top + event.movementY + 'px';
+					}
+				},
+				dragEnd: function(event) {
+					this.dragged = false;
+				},
+				dragOut: function(event) {
+					this.dragged = false;
+				},
+			}
+		}
 	},
 	methods: {
 		cast: function(spell) {
 			console.info('cast', spell);
-			game.net.FireMsg({t: ""+spell});
+			game.net.FireMsg('' + spell);
 		},
 		drop: function(index) {
-			game.net.DropItemMsg({Id:index});
+			game.net.DropItemMsg(index);
 		},
+		chatMsg: function(event) {
+			var msg = this.msg;
+			this.msg = '';
+			console.info(msg);
+			event.target.blur();
+			game.net.ChatPostMsg(msg);
+		},
+		focus: function() {
+			game.listener.stop_listening();
+		},
+		blur: function() {
+			game.listener.listen();
+		}
 	},
-}),
+});
 
-	r = new XMLHttpRequest();
-r.open('POST', '/game', true);
-r.onreadystatechange = function() {
-	if (r.readyState != 4 || r.status != 200) { return; }
-	var json = JSON.parse(r.responseText);
-	if (json.Id !== undefined) {
-		console.log('Success:', json);
-		run(json.Id, json.Host);
-	}
-};
-r.send();
+function getConnectionData() {
+	var r = new XMLHttpRequest();
+	r.open('POST', '/game', true);
+	r.onreadystatechange = function() {
+		if (r.readyState != 4 || r.status != 200) {
+			return;
+		}
+		var json = JSON.parse(r.responseText);
+		if (json.Id !== undefined) {
+			console.log('Success:', json);
+			game.run(json.Id, json.Host, json.MapId);
+		}
+	};
+	r.send();
+}
+
+getConnectionData();

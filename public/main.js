@@ -3,137 +3,87 @@
 
 console.log('fuck');
 
-var Tileset = require('./tileset'),
-	Tilemap = require('./tilemap');
+var w = window.innerWidth,
+	h = window.innerHeight,
+	stage = new PIXI.Stage(0xFFFFFF, true),
+	renderer = PIXI.autoDetectRenderer(w, h);
+document.body.appendChild(renderer.view);
 
-var Suika = require('./suika');
+window.onresize = function() {
+	w = window.innerWidth;
+	h = window.innerHeight;
+	renderer.resize(w, h);
+};
+window.onresize();
 
-function run(player, host) {
-	var w = window.innerWidth,
-		h = window.innerHeight,
-		stage = new PIXI.Stage(0xFFFFFF, true),
-		renderer = PIXI.autoDetectRenderer(w, h);
-	document.body.appendChild(renderer.view);
+var Game = require('./game');
+window.game = new Game(renderer, stage, UI);
 
-	var WH = {
-		width: 32,
-		height: 32
-	},
-	World_A1 = new Tileset('/game/World_A1.png', 16, 12, WH),
-	World_A2 = new Tileset('/game/World_A2.png', 16, 12, WH),
-	World_B = new Tileset('/game/World_B.png', 16, 16, WH),
-	Outside_A1 = new Tileset('/game/Outside_A1.png', 16, 12, WH), // Animation
-	Outside_A2 = new Tileset('/game/Outside_A2.png', 16, 12, WH), // Ground
-	Outside_A3 = new Tileset('/game/Outside_A3.png', 16, 8, WH), // Buildings
-	Outside_A4 = new Tileset('/game/Outside_A4.png', 16, 15, WH), // Walls
-	Outside_A5 = new Tileset('/game/Outside_A5.png', 8, 16, WH), // Normal
-	Outside_B = new Tileset('/game/Outside_B.png', 16, 16, WH),
-	Outside_C = new Tileset('/game/Outside_C.png', 16, 16, WH),
-	nn = 31,
-	data = [
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, 0, nn, nn, nn, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, nn, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, 0, 0, nn, 0, nn, 0],
-		[0, nn, nn, nn, 0, nn, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, nn, 0, nn, 0, 0, 0],
-		[0, nn, nn, nn, 0, 0, 0],
-		[0, 0, nn, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, nn, nn, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0],
-	];
+var colorMatrixFilter = new PIXI.ColorMatrixFilter();
+colorMatrixFilter.matrix = [
+	0.4, 0, 0, 0,
+	0, 0.4, 0, 0,
+	0, 0, 0.7, 0,
+	0, 0, 0, 1,
+];
+game.container.filters = [colorMatrixFilter];
 
-	window.Outside = [Outside_A1, Outside_A2, Outside_A3, Outside_A4, Outside_A5, Outside_B, Outside_C];
-
-	window.scene = new Tilemap(20, 20, Outside);
-	for (var y = 0, ml = data.length; y < ml; y++) {
-		var line = data[y];
-		for (var x = 0, ll = line.length; x < ll; x++) {
-			var nnn = data[y][x];
-			if (nnn) {
-				scene.setAt(x, y, 'second', 0, [0, 1, 2], true);
-				scene.setAt(x, y, 'third', 0, 3, true);
-			} else {
-				scene.setAt(x, y, 'second', 0, [0, 1, 2], true);
-			}
-		}
-	}
-
-	var Game = require('./game');
-	window.game = new Game(renderer, stage, player, 'ws://' + host + '/ws', require('./test-map'));
-	stage.addChild(scene);
-
-	var suika = new Suika();
-	suika.position.x = 440;
-	suika.position.y = 300;
-	game.suika = suika;
-	suika.animation = 'walk';
-	stage.addChild(suika);
-
-	window.onresize = resize;
-	resize();
-
-	function resize() {
-		w = window.innerWidth;
-		h = window.innerHeight;
-		game.resize(w, h);
-
-		renderer.resize(w, h);
-	}
-
+requestAnimFrame(render);
+var updateT = 1000 / 50;
+var lastTime = window.performance.now();
+function render() {
 	requestAnimFrame(render);
-
-	function render() {
-		requestAnimFrame(render);
-		game.render();
-		renderer.render(stage);
-		var a = game.avatars[game.player];
-		if(a) {
-			var d = Math.atan2(a.lastvel.x||0, a.lastvel.y||0);
-			var dd = d/Math.PI * 180 - 45;
-			suika.direction = dd;
-		}
+	var t = window.performance.now();
+	if (t - lastTime > updateT) {
+		game.update(updateT);
+		lastTime += updateT;
 	}
-
-	setInterval(animate, 50);
-	game.net.on('open', function() {
-		game.net.RequestParametersMsg();
-		game.net.RequestInventoryMsg();
-	});
-
-	game.net.on('TargetDataMsg', function(target) {
-		console.log('TargetDataMsg');
-		UI.target = target;
-	});
-	game.net.on('InventoryMsg', function(inv) {
-		UI.inventory = inv.Inventory;
-		UI.equip = inv.Equip
-	});
-	game.net.on('ParametersMsg', function(p) {
-		UI.hp = p.Parameters.HP;
-		UI.mhp = p.Parameters.MHP;
-		UI.mp = p.Parameters.MP;
-		UI.mmp = p.Parameters.MMP;
-		UI.tp = p.Parameters.TP;
-		UI.mtp = p.Parameters.MTP;
-		UI.spells = p.Skills;
-	});
-
-
-	function animate() {
-		game.animate(0.05);
-	}
+	game.render();
+	renderer.render(stage);
 }
 
-var UI = new Vue({
+game.net.on('open', function() {
+	game.net.RequestParametersMsg();
+	game.net.RequestInventoryMsg();
+	UI.isConnected = true;
+	console.info('ws open');
+});
+
+game.net.on('close', function() {
+	UI.isConnected = false;
+	console.warn('ws close');
+	setTimeout(getConnectionData, 1000);
+});
+
+
+game.net.on('TargetDataMsg', function(target) {
+	console.log('TargetDataMsg');
+	UI.target = target;
+});
+game.net.on('InventoryMsg', function(inv) {
+	UI.inventory = inv.Inventory;
+	UI.equip = inv.Equip
+});
+game.net.on('ParametersMsg', function(p) {
+	UI.hp = p.Parameters.HP;
+	UI.mhp = p.Parameters.MHP;
+	UI.mp = p.Parameters.MP;
+	UI.mmp = p.Parameters.MMP;
+	UI.tp = p.Parameters.TP;
+	UI.mtp = p.Parameters.MTP;
+	UI.spells = p.Skills;
+});
+
+game.net.on('ChatMsg', function(msg) {
+	console.log('ChatMsg', msg);
+	UI.chat.push(msg);
+});
+
+var UI = window.UI = new Vue({
 	el: '#ui',
 	data: {
+		isConnected: false,
+
 		level: 88,
 		exp: 77,
 		hp: 190,
@@ -142,243 +92,416 @@ var UI = new Vue({
 		mmp: 300,
 		tp: 50,
 		mtp: 100,
-        equip: {},
+
+		showEquip: true,
+		showSpells: true,
+		showInventory: true,
+		showChat: true,
+
+		msg: 'msgqwer freqw',
+		chat: [{
+			Name: 'vfndjskl',
+			Text: 'vfds',
+			Type: 'party'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'local'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'wqurio',
+			Type: 'guild'
+			}, {
+			Name: 'vfndjskl',
+			Text: 'qwioerh',
+			Type: 'admin'
+		}],
+		equip: {},
 		inventory: [
-			{Name: "43"},
-			{Name: "1k"},
-			{Name: "4njki32"},
-			{Name: "PPPPvndfsj"},
+			{
+				Name: '43'
+			},
+			{
+				Name: '1k'
+			},
+			{
+				Name: '4njki32'
+			},
+			{
+				Name: 'PPPPvndfsj'
+			},
 		],
-        target: { Race: 0, HP: 0, MHP:0, Name: "vnfdjsk" },
+		target: {
+			Race: 0,
+			HP: 0,
+			MHP: 0,
+			Name: 'vnfdjsk'
+		},
+		invTest: [
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+		],
 		spells: [
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
-			{Icon:'all-for-one'},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
 
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
-			{Icon:'screaming'},
 
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-			{Icon:'spiral-thrust'},
-
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
-			{Icon:'rune-sword'},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
+			{
+				Icon: 'spiral-thrust'
+			},
+			{
+				Icon: 'rune-sword'
+			},
+			{
+				Icon: 'all-for-one'
+			},
+			{
+				Icon: 'screaming'
+			},
 		],
+	},
+	computed: {
+		showTargetBar: function() {
+			return !!this.target.MHP;
+		},
+	},
+	components: {
+		scrollbar: {
+			scrollTopX: 5,
+			created: function() {
+				this.$on('scroll', function() {
+					this.scrollTopX = this.$parent.scrollTop;
+					console.log('scroll', this.scrollTopX, this.$parent.scrollH);
+				});
+			},
+			methods: {
+				up: function(event) {
+					this.$parent.$emit('up');
+				},
+				down: function(event) {
+					this.$parent.$emit('down');
+				},
+			}
+		},
+		scrolled: {
+			computed: {
+				scrollTop: function() {
+					var el = this.$el.querySelector('.native');
+					return el.scrollTop;
+				},
+				scrollH: function() {
+					var el = this.$el.querySelector('.scrollbar-wrap');
+					var el2 = this.$el.querySelector('.s-content');
+					var x = el2.clientHeight / el.clientHeight;
+					console.log(x, el.clientHeight, el2.clientHeight);
+					return x;
+				},
+			},
+			methods: {
+				scroll: function() {
+					this.scrollTop;
+					this.$broadcast('scroll');
+				},
+			},
+			created: function() {
+				this.$on('up', function() {
+					this.$broadcast('scroll');
+					this.$el.querySelector('.native').scrollTop -= 60;
+				});
+				this.$on('down', function() {
+					this.$broadcast('scroll');
+					this.$el.querySelector('.native').scrollTop += 60;
+				});
+			}
+		},
+		draggable: {
+			dragged: false,
+			methods: {
+				dragStart: function(event) {
+					this.dragged = true;
+				},
+				dragMove: function(event) {
+					if (this.dragged) {
+						var b = this.$el.getBoundingClientRect();
+						this.$el.style.left = b.left + event.movementX + 'px';
+						this.$el.style.top = b.top + event.movementY + 'px';
+					}
+				},
+				dragEnd: function(event) {
+					this.dragged = false;
+				},
+				dragOut: function(event) {
+					this.dragged = false;
+				},
+			}
+		}
 	},
 	methods: {
 		cast: function(spell) {
 			console.info('cast', spell);
-			game.net.FireMsg({t: ""+spell});
+			game.net.FireMsg('' + spell);
 		},
 		drop: function(index) {
-			game.net.DropItemMsg({Id:index});
+			game.net.DropItemMsg(index);
 		},
+		chatMsg: function(event) {
+			var msg = this.msg;
+			this.msg = '';
+			console.info(msg);
+			event.target.blur();
+			game.net.ChatPostMsg(msg);
+		},
+		focus: function() {
+			game.listener.stop_listening();
+		},
+		blur: function() {
+			game.listener.listen();
+		}
 	},
-}),
+});
 
-	r = new XMLHttpRequest();
-r.open('POST', '/game', true);
-r.onreadystatechange = function() {
-	if (r.readyState != 4 || r.status != 200) { return; }
-	var json = JSON.parse(r.responseText);
-	if (json.Id !== undefined) {
-		console.log('Success:', json);
-		run(json.Id, json.Host);
-	}
-};
-r.send();
+function getConnectionData() {
+	var r = new XMLHttpRequest();
+	r.open('POST', '/game', true);
+	r.onreadystatechange = function() {
+		if (r.readyState != 4 || r.status != 200) {
+			return;
+		}
+		var json = JSON.parse(r.responseText);
+		if (json.Id !== undefined) {
+			console.log('Success:', json);
+			game.run(json.Id, json.Host, json.MapId);
+		}
+	};
+	r.send();
+}
 
-},{"./game":"/home/lain/gocode/src/oniproject/js/game.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./test-map":"/home/lain/gocode/src/oniproject/js/test-map.json","./tilemap":"/home/lain/gocode/src/oniproject/js/tilemap.js","./tileset":"/home/lain/gocode/src/oniproject/js/tileset.js"}],"/home/lain/gocode/src/oniproject/js/avatar.js":[function(require,module,exports){
+getConnectionData();
+
+},{"./game":"/home/lain/gocode/src/oniproject/js/game.js"}],"/home/lain/gocode/src/oniproject/js/bat.js":[function(require,module,exports){
 'use strict';
 
-var Isomer = require('isomer'),
-	Octahedron = require('./octahedron'),
-	Knot = require('./knot'),
-	/* Some convenient renames */
-	Point = Isomer.Point,
-	Path = Isomer.Path,
-	Shape = Isomer.Shape,
-	Color = Isomer.Color;
+function Bat() {
+	var w = 96,
+		h = 128;
+	var image = new PIXI.ImageLoader('/bat.png');
 
-function Avatar() {
-	this.position = new Point(0, 0, 0);
-	this.velocity = new Point(0, 0, 0);
-	this.speed = 1.0;
-	this.angle = 0;
-	this.rot = 1;
-	var c = new Color();
-	c.h = Math.random();
-	c.s = 0.8;
-	c.l = 0.3;
-	c.loadRGB();
-	this.color = c;
-}
+	var a = this._anim = {};
 
-Avatar.prototype.draw = function(iso) {
-	var pos = this.position;
+	var keys = [
+		'walk ↑',
+		'walk ←',
+		'walk ↓',
+		'walk →',
 
-	if(this.hasOwnProperty('state')) {
-		// is avatar or monster
-		if(this.state.Id > -10000) {
-			iso.add(Octahedron(new Point(pos.x - 0.5, pos.y - 0.5, pos.z))
-				.rotateZ(new Point(pos.x, pos.y, pos.z + 0.5), this.angle)
-				.scale(new Point(pos.x, pos.y, pos.z), 0.7, 0.7, 0.7), this.color);
-		}
-		// is avatar or item
-		if(this.state.Id < -10000 || this.state.Id > 0) {
-			iso.add(Knot(new Point(pos.x-0.5, pos.y-0.5)).scale(new Point(pos.x, pos.y), 0.2, 0.2, 0.2), this.color);
-		}
-	}
-}
+		/*'walk ↖',
+		'walk ↑',
+		'walk ↗',
+		'walk →',
+		'walk ↘',
+		'walk ↓',
+		'walk ↙',
+		'walk ←',
+		'death'*/
+	];
 
-Avatar.prototype.isAvatar = function() {
-	if(this.hasOwnProperty('state')) {
-		return this.state.Id > 0;
-	}
-}
-Avatar.prototype.isMonster = function() {
-	if(this.hasOwnProperty('state')) {
-		return this.state.Id < 0 && this.state.Id > -10000;
-	}
-}
-Avatar.prototype.isItem = function() {
-	if(this.hasOwnProperty('state')) {
-		return this.state.Id < -10000;
-	}
-}
-
-Avatar.prototype.update = function(time) {
-	this.angle += this.rot * Math.PI * time;
-	this.position.x += this.velocity.x * time;
-	this.position.y += this.velocity.y * time;
-	this.position.z += this.velocity.z * time;
-}
-
-Avatar.prototype.move = function(dir) {
-	this.velocity.x = 0;
-	this.velocity.y = 0;
-	for (var i = 0, l = dir.length; i < l; i++) {
-		var to = dir[i];
-		switch (to) {
-			case 'N':
-				this.velocity.x += this.speed;
-				break;
-			case 'W':
-				this.velocity.y += this.speed;
-				break;
-			case 'S':
-				this.velocity.x -= this.speed;
-				break;
-			case 'E':
-				this.velocity.y -= this.speed;
-				break;
+	for (var y = 0, l = keys.length; y < l; y++) {
+		var k = keys[y];
+		this._anim[k] = [];
+		var aa = [0, 1, 2, 1];
+		for (var j = 0, ll = aa.length; j < ll; j++) {
+			var x = aa[j];
+			var rect = {
+				x: x * (w / 3),
+				y: y * (h / 4),
+				width: w / 3,
+				height: h / 4,
+			};
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			a[k].push(t);
 		}
 	}
+
+	//a['idle ↖'] = [a['walk ↖'][1]];
+	a['idle ↑'] = [a['walk ↑'][1]];
+	//a['idle ↗'] = [a['walk ↗'][1]];
+	a['idle →'] = [a['walk →'][1]];
+	//a['idle ↘'] = [a['walk ↘'][1]];
+	a['idle ↓'] = [a['walk ↓'][1]];
+	//a['idle ↙'] = [a['walk ↙'][1]];
+	a['idle ←'] = [a['walk ←'][1]];
+
+	this._animation = 'idle';
+	this._direction = '↓';
+
+	this.currentFrame = 0;
+	this.animationSpeed = 0.3;
+
+	PIXI.Sprite.call(this, a['idle ↓'][0]);
+
+	this.anchor.x = 0.5;
+	this.anchor.y = 1;
+
+	image.load();
+	this.image = image;
 }
 
-module.exports = Avatar;
+Bat.prototype = Object.create(PIXI.Sprite.prototype);
+Bat.prototype.constructor = Bat;
 
-},{"./knot":"/home/lain/gocode/src/oniproject/js/knot.js","./octahedron":"/home/lain/gocode/src/oniproject/js/octahedron.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/game.js":[function(require,module,exports){
+Object.defineProperty(Bat.prototype, 'direction', {
+	get: function() {
+		return this._direction;
+	},
+	set: function(v) {
+		var dir = '↑↗→↘↓↙←↖';
+		if (typeof v == 'number') {
+			var x = (v / (360 / 8)) % 8;
+			if (x < 0) {
+				x = 8 + x;
+			}
+			v = dir[x | 0];
+		}
+		switch (v) {
+			case '↗': v = '↑';break;
+			case '↘': v = '→';break;
+			case '↙': v = '↓';break;
+			case '↖': v = '←';break;
+		}
+		this._direction = v;
+	},
+});
+
+Object.defineProperty(Bat.prototype, 'animation', {
+	get: function() {
+		return this._animation;
+	},
+	set: function(v) {
+		this._animation = v;
+	},
+});
+
+Bat.prototype.updateTransform = function() {
+	PIXI.Sprite.prototype.updateTransform.call(this);
+
+	var anim;
+	switch (this._animation) {
+		case 'walk':
+		case 'idle':
+			anim = this._anim[this._animation + ' ' + this._direction];
+	}
+
+	this.currentFrame += this.animationSpeed;
+
+	var round = (this.currentFrame) | 0;
+
+	this.currentFrame = this.currentFrame % anim.length;
+
+	if ( /*this.loop ||*/ round < anim.length) {
+		this.setTexture(anim[round % anim.length]);
+	} /*else if(round >= anim.length) {
+		this.gotoAndStop(this.textures.length - 1);
+	}*/
+};
+
+module.exports = Bat;
+
+},{}],"/home/lain/gocode/src/oniproject/js/game.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
-	Isomer = require('isomer');
+	GameObject = require('./gameobject'),
+	Net = require('./net'),
+	Suika = require('./suika'),
+	Bat = require('./bat'),
+	Item = require('./item'),
+	Tiled = require('./tiled');
 
-Isomer.prototype.reorigin = function(point) {
-	var xMap = new Point(point.x * this.transformation[0][0],
-		point.x * this.transformation[0][1]),
-		yMap = new Point(point.y * this.transformation[1][0],
-		point.y * this.transformation[1][1]);
+function Game(renderer, stage) {
+	this.container = new PIXI.DisplayObjectContainer();
+	stage.addChild(this.container);
 
-	this.originX = -xMap.x - yMap.x + (this.canvas._width / 2.0);
-	this.originY = +xMap.y + yMap.y + (point.z * this.scale) + (this.canvas._height / 2.0);
-}
-
-var Point = Isomer.Point,
-	Shape = Isomer.Shape,
-	Stairs = require('./stairs'),
-	Map = require('./map'),
-	Avatar = require('./avatar'),
-	Net = require('./net');
-
-function Game(renderer, stage, player, url, map) {
 	this.initKeyboard();
 
 	this.renderer = renderer;
 	this.stage = stage;
 	this.dir = [' ', ' '];
-	this.player = player;
+	this.player = 0;
 	this.target = 0;
 	this.avatars = {};
 
-	var net = new Net(url);
-	this.net = net;
+	var net = this.net = new Net();
 	net.on('message', this.onmessage.bind(this));
-	net.on('close', alert.bind(null, 'close WS'));
+	//net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
-
-	var iso = new Isomer(renderer.view);
-	this.iso = iso;
-	iso.lightColor = new Isomer.Color(0xFF, 0xCC, 0xCC);
-	iso.colorDifference = 0.2;
-	iso.canvas = new PIXI.Graphics();
-	stage.addChild(iso.canvas);
-	iso.canvas.path = function(points, color) {
-		var c = color.r * 256 * 256 + color.g * 256 + color.b,
-			graphics = this; // for moar speed
-		graphics.beginFill(c, color.a).moveTo(points[0].x, points[0].y);
-		for (var i = 1; i < points.length; i++) {
-			graphics.lineTo(points[i].x, points[i].y);
-		}
-		// XXX hack for pixi v1.6.0
-		if (points.length % 2) {
-			graphics.lineTo(points[0].x, points[0].y);
-		}
-		graphics.endFill();
-	}
-
-	var game = this;
-	iso.canvas.setInteractive(true);
-	iso.canvas.click = function(event) {
-		for (var id in game.avatars) {
-			if (game.avatars.hasOwnProperty(id)) {
-				var a = game.avatars[id],
-					pos = iso._translatePoint(a.position),
-					x = event.global.x - pos.x,
-					y = event.global.y - pos.y,
-					d = Math.sqrt(x * x + y * y);
-				if (d < 50) {
-					net.SetTargetMsg({
-						id: id
-					});
-					if(a.isItem) {
-						net.PickupItemMsg();
-					}
-				}
-			}
-		}
-	}
-
-	this.map = new Map(this.iso);
-	this.map.objects = map.objects;
 }
 
-Game.prototype = EventEmitter.prototype;
+Game.prototype = Object.create(EventEmitter.prototype);
 Game.prototype.constructor = Game;
+
+Game.prototype.run = function(player, host, mapName) {
+	if (this.map) {
+		this.container.removeChild(this.map);
+		this.container.removeChild(this.map._maskX);
+		// TODO remove all avatars
+	}
+
+	var map = this.map = new Tiled('/maps/', mapName + '.json');
+	var that = this;
+	map.load(function() {
+		that.player = player;
+		that.net.connecTo('ws://' + host + '/ws');
+	});
+	this.container.addChild(map);
+}
 
 Game.prototype.initKeyboard = function() {
 	var listener = new window.keypress.Listener();
@@ -452,50 +575,7 @@ Game.prototype.initKeyboard = function() {
 	listener.register_many(move_combos);
 }
 
-Game.prototype.resize = function(w, h) {
-	this.iso.canvas._width = w;
-	this.iso.canvas._height = h;
-
-	this.iso.canvas.hitArea = new PIXI.Rectangle(0, 0, w, h);
-
-	if (this.avatars.hasOwnProperty(this.player)) {
-		this.iso.reorigin(this.avatars[this.player].position);
-	}
-}
-
-Game.prototype.render = function(time) {
-	var iso = this.iso;
-	iso.canvas.clear();
-
-	this.map.render(this.iso);
-
-	iso.add(Stairs(new Point(-1, 0, 0)));
-	iso.add(Stairs(new Point(0, 3, 1)).rotateZ(new Point(0.5, 3.5, 1), -Math.PI / 2));
-	iso.add(Stairs(new Point(2, 0, 2)).rotateZ(new Point(2.5, 0.5, 0), -Math.PI / 2));
-
-	var xx = [
-		[1, 1, 1, 1, 1, 1],
-		[1, 0, 0, 0, 0, 1],
-		[1, 0, 0, 0, 0, 1],
-		[1, 0, 0, 1, 0, 1],
-		[1, 0, 0, 0, 0, 1],
-		[1, 1, 1, 1, 1, 1],
-	];
-
-	for (var y = xx.length - 1; y >= 0; y--) {
-		for (var x = xx[y].length - 1; x >= 0; x--) {
-			if (xx[y][x] != 0) {
-				iso.add(Shape.Prism(new Point(x, y, 0), 1, 1, 0.1));
-			}
-		}
-	}
-
-	for (var i in this.avatars) {
-		this.avatars[i].draw(iso);
-	}
-}
-
-Game.prototype.animate = function(time) {
+Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
 		player.move(this.dir.join(''));
@@ -504,8 +584,31 @@ Game.prototype.animate = function(time) {
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
 	}
+}
+
+Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
-		this.iso.reorigin(this.avatars[this.player].position);
+		var player = this.avatars[this.player];
+
+		var x = -player.obj.position.x + window.innerWidth / 2;
+		var y = -player.obj.position.y + window.innerHeight / 2;
+
+		var w = this.map.data.width * this.map.data.tilewidth;
+		var h = this.map.data.height * this.map.data.tileheight;
+
+		if (x > 0) {
+			x = 0;
+		} else if (x < -w + window.innerWidth) {
+			x = -w + window.innerWidth;
+		}
+		if (y > 0) {
+			y = 0;
+		} else if (y < -h + window.innerHeight) {
+			y = -h + window.innerHeight;
+		}
+
+		this.container.x = Math.round(x);
+		this.container.y = Math.round(y);
 	}
 }
 
@@ -513,10 +616,37 @@ Game.prototype.state_msg = function(state) {
 	if (state.hasOwnProperty('Id')) {
 		switch (state.Type) {
 			case 2: // destroy
+				var a = this.avatars[state.Id];
+				if (a.obj) {
+					this.map.AVATARS.removeChild(a.obj);
+				}
 				delete this.avatars[state.Id];
 				break;
 			case 1: // create
-				this.avatars[state.Id] = new Avatar(state.Position, state.Velocity)
+				var obj;
+				if (state.Id > 0) {
+					obj = new Suika();
+				} else if (state.Id > -20000) {
+					obj = new Bat();
+				} else {
+					obj = new Item(13);
+				}
+				if (obj) {
+					this.map.AVATARS.addChild(obj);
+				}
+				this.avatars[state.Id] = new GameObject(obj);
+				this.avatars[state.Id].on('tapped', (function(id) {
+					console.info('tapped', id);
+					this.net.SetTargetMsg(id);
+					if (this.target == id) {
+						var obj = this.avatars[id];
+						if (obj.isItem()) {
+							this.net.PickupItemMsg();
+						}
+					}
+					this.target = id;
+				}).bind(this));
+
 			case 0: // idle
 				if (!this.avatars.hasOwnProperty(state.Id)) {
 					state.Type = 1;
@@ -530,31 +660,37 @@ Game.prototype.state_msg = function(state) {
 					return this.state_msg(state);
 				}
 				var avatar = this.avatars[state.Id];
-				if(state.Id == this.player) {
-					this.suika.animation = 'idle';
+				if (state.Id == this.player) {
+					//this.suika.animation = 'idle';
 				}
 				if (state.Type == 3) {
 					avatar.rot = 3;
-					if(state.Id == this.player) {
-						this.suika.animation = 'walk';
+					if (state.Id == this.player) {
+						//this.suika.animation = 'walk';
 					}
-					if(!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
-						avatar.lastvel = {x:avatar.velocity.x, y:avatar.velocity.y};
+					if (!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
+						avatar.lastvel = {
+							x: avatar.velocity.x,
+							y: avatar.velocity.y
+						};
 					}
 				}
 
-				if(avatar.rm_timer) {
+				if (avatar.rm_timer) {
 					clearTimeout(avatar.rm_timer);
 				}
 				avatar.rm_timer = setTimeout(function() {
+					if (avatar.obj !== undefined) {
+						this.map.AVATARS.removeChild(avatar.obj);
+					}
 					delete this.avatars[state.Id];
-				}.bind(this), 800);
+				}.bind(this), 1000);
 
 				avatar.state = state;
 				avatar.position.x = state.Position.X;
 				avatar.position.y = state.Position.Y;
 
-				if(state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
+				if (state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
 					avatar.velocity.x = state.Velocity.X;
 					avatar.velocity.y = state.Velocity.Y;
 				}
@@ -595,152 +731,184 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./avatar":"/home/lain/gocode/src/oniproject/js/avatar.js","./map":"/home/lain/gocode/src/oniproject/js/map.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./stairs":"/home/lain/gocode/src/oniproject/js/stairs.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js","isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/knot.js":[function(require,module,exports){
-'use strict';
-
-var Isomer = require('isomer'),
-	/* Some convenient renames */
-	Path = Isomer.Path,
-	Point = Isomer.Point,
-	Shape = Isomer.Shape;
-
-/* Draws an impossible MC Escher style knot */
-function Knot(origin) {
-	var knot = new Shape();
-
-	knot.paths = knot.paths.concat(Shape.Prism(Point.ORIGIN, 5, 1, 1).paths);
-	knot.paths = knot.paths.concat(Shape.Prism(new Point(4, 1, 0), 1, 4, 1).paths);
-	knot.paths = knot.paths.concat(Shape.Prism(new Point(4, 4, -2), 1, 1, 3).paths);
-
-	knot.push(new Path([
-		new Point(0, 0, 2),
-		new Point(0, 0, 1),
-		new Point(1, 0, 1),
-		new Point(1, 0, 2)
-	]));
-
-	knot.push(new Path([
-		new Point(0, 0, 2),
-		new Point(0, 1, 2),
-		new Point(0, 1, 1),
-		new Point(0, 0, 1)
-	]));
-
-	return knot.scale(Point.ORIGIN, 1 / 5).translate(-0.1, 0.15, 0.4).translate(origin.x, origin.y, origin.z);
-}
-
-module.exports = Knot;
-
-},{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/map.js":[function(require,module,exports){
-'use strict';
-
-var Isomer = require('isomer');
-
-function Map(iso) {
-	this.iso = iso;
-	this.objects = [];
-
-	var mod = function(add, obj) {
-		for (var i = 0, l = obj.modificators.length; i < l; i++) {
-			var mod = obj.modificators[i],
-				point = Isomer.Point.apply(null, mod.point);
-
-			switch (mod.type) {
-				case 'rotateZ':
-					add = add.rotateZ(point, mod.yaw);
-					break;
-				case 'scale':
-					add = add.scale(point, mod.x, mod.y, mod.z);
-					break;
-				case 'translate':
-					add = add.translate(mod.x, mod.y, mod.z);
-					break;
-				default:
-					console.warn('fail mod.type', mod);
-			}
-		}
-		return add;
-	};
-	this._render_one = function(obj) {
-		var add = null;
-
-		switch (obj.type) {
-			case 'prism':
-				var pos = obj.pos;
-				//add = Isomer.Shape.Prism(Isomer.Point.ORIGIN, obj.dx, obj.dy, obj.dz);
-				add = Isomer.Shape.Prism(Isomer.Point.ORIGIN, 1, 1, 1);
-				//add = add.translate(pos[0], pos[1], pos[2]);
-				//add = add.scale(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
-				break;
-			case 'pyramid':
-				var pos = obj.pos;
-				add = Isomer.Shape.Pyramid(Isomer.Point.ORIGIN, 1, 1, 1);
-				//add = add.translate(pos[0], pos[1], pos[2]);
-				//add = add.scale(Isomer.Point.apply(null, pos), obj.dx, obj.dy, obj.dz);
-				break;
-			case 'cylinder':
-				var pos = obj.pos;
-				add = Isomer.Shape.Cylinder(Isomer.Point.ORIGIN, 1, obj.vertices, 1);
-				//add = add.translate(pos[0], pos[1], pos[2]);
-				break;
-			case 'path':
-				add = new Isomer.Path(obj.path.map(function(el) {
-					return Isomer.Point.apply(null, el);
-				}));
-				break;
-			case 'shape':
-				add = Isomer.Shape.extrude(new Isomer.Path(obj.path.map(function(el) {
-					return Isomer.Point.apply(null, el);
-				})), obj.height);
-				break;
-			default:
-				console.warn('fail obj.type', obj);
-		}
-		if (obj.pos !== undefined) {
-			var pos = obj.pos,
-				point = Isomer.Point.apply(null, pos);
-			add = add.translate(pos[0], pos[1], pos[2]);
-			if (obj.size !== undefined) {
-				add = add.scale(point, obj.size[0], obj.size[1], obj.size[2]);
-			}
-			if (obj.yaw !== undefined) {
-				add = add.rotateZ(point, obj.yaw * (Math.PI / 180));
-			}
-		}
-
-		return (add && mod(add, obj)) || null;
-	}
-
-	this.render = function() {
-		for (var i = 0, l = this.objects.length; i < l; i++) {
-			var obj = this.objects[i],
-				add = this._render_one(obj),
-				color = new Isomer.Color(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
-			add && this.iso.add(add, color);
-		}
-	};
-}
-
-module.exports = Map;
-
-},{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
+},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./item":"/home/lain/gocode/src/oniproject/js/item.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
-var M_SetVelocityMsg   =1,
-    M_SetTargetMsg     =2,
-    M_CastMsg          =3,
-    M_DestroyMsg       =4,
-    M_DropItem         =5,
-    M_PickupItem       =6,
-    M_RequestInventory =7,
-    M_Inventory        =8,
-    M_TargetData       =9,
-    M_RequestParameters=10,
-    M_Parameters       =11,
-    ___ =0;
+
+function GameObject(obj, state) {
+	this.state = state;
+	this.position = {
+		x: 0,
+		y: 0
+	};
+
+	this.velocity = {
+		x: 0,
+		y: 0
+	};
+
+	this.lastvel = {
+		x: 0,
+		y: 0
+	};
+
+	this.speed = 1.0;
+	this.angle = 0;
+	this.rot = 1;
+
+	this.obj = obj;
+	obj.buttonMode = true;
+	obj.interactive = true;
+	obj.click = obj.tap = (function(event) {
+		this.emit('tapped', this.state.Id);
+	}).bind(this);
+}
+
+GameObject.prototype = Object.create(EventEmitter.prototype);
+GameObject.prototype.constructor = GameObject;
+
+GameObject.prototype.isGameObject = function() {
+	if (this.hasOwnProperty('state')) {
+		return this.state.Id > 0;
+	}
+}
+GameObject.prototype.isMonster = function() {
+	if (this.hasOwnProperty('state')) {
+		return this.state.Id < 0 && this.state.Id > -10000;
+	}
+}
+GameObject.prototype.isItem = function() {
+	if (this.hasOwnProperty('state')) {
+		return this.state.Id < -10000;
+	}
+}
+
+GameObject.prototype.update = function(time) {
+	this.angle += this.rot * Math.PI * time;
+	this.position.x += this.velocity.x * time;
+	this.position.y += this.velocity.y * time;
+
+	if (this.obj) {
+		var obj = this.obj;
+		obj.position.x = (this.position.x * 32) | 0;
+		obj.position.y = (this.position.y * 32) | 0;
+
+		if (!obj.animation) return;
+
+		obj.animation = 'idle';
+		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
+			var dd = -d / Math.PI * 180 + 180;
+			obj.direction = dd;
+			obj.animation = 'walk';
+		} else if (this.lastvel !== undefined) {
+			var d = Math.atan2(this.lastvel.x || 0, this.lastvel.y || 0);
+			var dd = -d / Math.PI * 180 + 180;
+			obj.direction = dd;
+		}
+	}
+}
+
+GameObject.prototype.move = function(dir) {
+	this.velocity.x = 0;
+	this.velocity.y = 0;
+	for (var i = 0, l = dir.length; i < l; i++) {
+		var to = dir[i];
+		switch (to) {
+			case 'N':
+				this.velocity.y -= this.speed;
+				break;
+			case 'W':
+				this.velocity.x -= this.speed;
+				break;
+			case 'S':
+				this.velocity.y += this.speed;
+				break;
+			case 'E':
+				this.velocity.x += this.speed;
+				break;
+		}
+	}
+}
+
+module.exports = GameObject;
+
+},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/item.js":[function(require,module,exports){
+'use strict';
+
+function Item(type) {
+	var w = 32 * 3,
+		h = 32 * 10;
+	var image = new PIXI.ImageLoader('/items.png');
+	this._type = type;
+
+	var textures = this.textures = [];
+
+	for (var y = 0; y < 10; y++) {
+		for (var x = 0; x < 3; x++) {
+			var rect = {
+				x: x * 32,
+				y: y * 32,
+				width: 32,
+				height: 32,
+			};
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			textures.push(t);
+		}
+	}
+
+	PIXI.Sprite.call(this, textures[type]);
+
+	image.load();
+	this.image = image;
+}
+
+Item.prototype = Object.create(PIXI.Sprite.prototype);
+Item.prototype.constructor = Item;
+
+Object.defineProperty(Item.prototype, 'type', {
+	get: function() {
+		return this._type;
+	},
+	set: function(type) {
+		this.setTexture(this.textures[type]);
+		this._type = type;
+	}
+});
+
+module.exports = Item;
+
+},{}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
+'use strict';
+
+var EventEmitter = require('events').EventEmitter;
+var M_SetVelocityMsg = 1,
+	M_SetTargetMsg = 2,
+	M_CastMsg = 3,
+	M_DestroyMsg = 4,
+	M_DropItem = 5,
+	M_PickupItem = 6,
+	M_RequestInventory = 7,
+	M_Inventory = 8,
+	M_TargetData = 9,
+	M_RequestParameters = 10,
+	M_Parameters = 11,
+	M_Chat = 12,
+	M_ChatPost = 13,
+	___ = 0;
 
 function Net(url) {
+}
+
+Net.prototype = Object.create(EventEmitter.prototype);
+Net.prototype.constructor = Net;
+
+Net.prototype.connecTo = function(url) {
+	if (this.ws) {
+		this.ws.close();
+	}
+
 	var websocket = new WebSocket(url);
 	this.ws = websocket;
 	var that = this;
@@ -767,19 +935,21 @@ function Net(url) {
 				if (message.hasOwnProperty('T')) {
 					that._ParseMessages(message.T | 0, message.V, event);
 					break;
-				}
+			}
 			default:
 				that.emit('message', message, event);
 		}
 	};
 }
-Net.prototype = EventEmitter.prototype;
-Net.prototype.constructor = Net;
+
 Net.prototype.close = function() {
 	this.ws.close();
 }
 Net.prototype.send = function(message) {
-	this.ws.send(CBOR.encode(message));
+	var ws = this.ws;
+	if (ws.readyState === WebSocket.OPEN) {
+		ws.send(CBOR.encode(message));
+	}
 }
 
 /*
@@ -809,6 +979,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_Parameters:
 			this.emit('ParametersMsg', value);
 			break;
+		case M_Chat:
+			this.emit('ChatMsg', value);
+			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -820,16 +993,20 @@ Net.prototype.SetVelocityMsg = function(data) {
 		V: data
 	});
 }
-Net.prototype.SetTargetMsg = function(data) {
+Net.prototype.SetTargetMsg = function(id) {
 	this.send({
 		T: M_SetTargetMsg,
-		V: data
+		V: {
+			id: id
+		},
 	});
 }
-Net.prototype.FireMsg = function(data) {
+Net.prototype.FireMsg = function(name) {
 	this.send({
 		T: M_CastMsg,
-		V: data
+		V: {
+			t: name
+		}
 	});
 }
 Net.prototype.RequestInventoryMsg = function() {
@@ -850,118 +1027,38 @@ Net.prototype.PickupItemMsg = function() {
 		V: {}
 	});
 }
-Net.prototype.DropItemMsg = function(data) {
+Net.prototype.DropItemMsg = function(index) {
 	this.send({
 		T: M_DropItem,
-		V: data
+		V: {
+			Id: index
+		}
+	});
+}
+
+Net.prototype.ChatPostMsg = function(msg) {
+	this.send({
+		T: M_ChatPost,
+		V: {
+			m: msg
+		}
 	});
 }
 
 module.exports = Net;
 
-},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/octahedron.js":[function(require,module,exports){
+},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/suika.js":[function(require,module,exports){
 'use strict';
 
-var Isomer = require('isomer'),
-	/* Some convenient renames */
-	Path = Isomer.Path,
-	Shape = Isomer.Shape;
-
-/**
- * Draws an octahedron contained in a 1x1 cube location at origin
- */
-function Octahedron(origin) {
-	/* Declare the center of the shape to make rotations easy */
-	var center = origin.translate(0.5, 0.5, 0.5),
-		faces = [],
-		/* Draw the upper triangle /\ and rotate it */
-		upperTriangle = new Path([
-			origin.translate(0, 0, 0.5),
-			origin.translate(0.5, 0.5, 1),
-			origin.translate(0, 1, 0.5)
-		]),
-		lowerTriangle = new Path([
-			origin.translate(0, 0, 0.5),
-			origin.translate(0, 1, 0.5),
-			origin.translate(0.5, 0.5, 0)
-		]);
-
-	for (var i = 0; i < 4; i++) {
-		faces.push(upperTriangle.rotateZ(center, i * Math.PI / 2));
-		faces.push(lowerTriangle.rotateZ(center, i * Math.PI / 2));
-	}
-
-	/* We need to scale the shape along the x & y directions to make the
-	 * sides equilateral triangles */
-	return new Shape(faces).scale(center, Math.sqrt(2) / 2, Math.sqrt(2) / 2, 1);
-}
-
-module.exports = Octahedron;
-
-},{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/stairs.js":[function(require,module,exports){
-'use strict';
-
-var Isomer = require('isomer'),
-	/* Some convenient renames */
-	Path = Isomer.Path,
-	Shape = Isomer.Shape;
-
-/* Draws some stars at a given point */
-function Stairs(origin) {
-	var STEP_COUNT = 10,
-		/* Create a zig-zag */
-		zigzag = new Path(origin),
-		steps = [],
-		i,
-		/* Shape to return */
-		stairs = new Shape();
-
-	for (i = 0; i < STEP_COUNT; i++) {
-		/**
-		 *  2
-		 * __
-		 *   | 1
-		 */
-
-		var stepCorner = origin.translate(0, i / STEP_COUNT, (i + 1) / STEP_COUNT);
-		/* Draw two planes */
-		steps.push(new Path([
-			stepCorner,
-			stepCorner.translate(0, 0, -1 / STEP_COUNT),
-			stepCorner.translate(1, 0, -1 / STEP_COUNT),
-			stepCorner.translate(1, 0, 0)
-		]));
-
-		steps.push(new Path([
-			stepCorner,
-			stepCorner.translate(1, 0, 0),
-			stepCorner.translate(1, 1 / STEP_COUNT, 0),
-			stepCorner.translate(0, 1 / STEP_COUNT, 0)
-		]));
-
-		zigzag.push(stepCorner);
-		zigzag.push(stepCorner.translate(0, 1 / STEP_COUNT, 0));
-	}
-
-	zigzag.push(origin.translate(0, 1, 0));
-
-	for (i = 0; i < steps.length; i++) {
-		stairs.push(steps[i]);
-	}
-	stairs.push(zigzag);
-	stairs.push(zigzag.reverse().translate(1, 0, 0));
-
-	return stairs;
-}
-
-module.exports = Stairs;
-
-},{"isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js"}],"/home/lain/gocode/src/oniproject/js/suika.js":[function(require,module,exports){
-'use strict';
+var suikaImage;
 
 function Suika() {
-	var w = 880, h = 720;
-	var image = new PIXI.ImageLoader('/suika.png');
+	var w = 880,
+		h = 720;
+	if (!suikaImage) {
+		suikaImage = new PIXI.ImageLoader('/suika.png');
+	}
+	var image = suikaImage;
 
 
 	var a = this._anim = {};
@@ -978,15 +1075,17 @@ function Suika() {
 		'death'
 	];
 
-	for(var x = 0, l=keys.length; x<l; x++) {
+	for (var x = 0, l = keys.length; x < l; x++) {
 		var k = keys[x];
-		this._anim[k]=[]
-		var aa=[0, 1, 2, 1];
-		for (var j = 0, ll=aa.length; j<ll; j++) {
+		this._anim[k] = []
+		var aa = [0, 1, 2, 1];
+		for (var j = 0, ll = aa.length; j < ll; j++) {
 			var y = aa[j];
 			var rect = {
-				x: x * 96, y:  y * 96,
-				width: 96, height: 96,
+				x: x * 96 + 4,
+				y: y * 96 + 4,
+				width: 96,
+				height: 96,
 			};
 			var t = new PIXI.Texture(image.texture.baseTexture, rect);
 			a[k].push(t);
@@ -1002,6 +1101,85 @@ function Suika() {
 	a['idle ↙'] = [a['walk ↙'][1]];
 	a['idle ←'] = [a['walk ←'][1]];
 
+	var keys = [
+		'boom ↙',
+		'boom ↓',
+		'boom ↘',
+
+		'boom ↖',
+		'boom ↑',
+		'boom ↗',
+
+		'boom →',
+		'boom ←',
+	];
+
+	var rect = {
+		/*x: x* 96 -3,*/
+		y: 96 * 3 + 4,
+		width: 96,
+		height: 124,
+	};
+
+	var t, k, w;
+
+	w = 96;
+	k = 'boom ↙';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = x * w - 3;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↓';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 3) * w - 3;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↘';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 6) * w - 3;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+
+	rect.y += 124;
+	rect.height = 104;
+	k = 'boom ↖';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = x * w;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↓';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 3) * w;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+	k = 'boom ↗';
+	a[k] = [];
+	for (var x = 0; x < 3; x++) {
+		rect.x = (x + 6) * w;
+		t = new PIXI.Texture(image.texture.baseTexture, rect);
+		a[k].push(t);
+	}
+
+	rect.y += 104;
+
+	/*k = 'boom →';
+	rect.x = (x +6)*w -3;
+	t = new PIXI.Texture(image.texture.baseTexture, rect);
+	a[k].push(t);
+	k = 'boom ←';*/
+
+
+
 	this._animation = 'idle';
 	this._direction = '↓';
 
@@ -1009,6 +1187,9 @@ function Suika() {
 	this.animationSpeed = 0.3;
 
 	PIXI.Sprite.call(this, a['idle ↓'][0]);
+	this.scale.x = this.scale.y = 0.5;
+	this.anchor.x = 0.5;
+	this.anchor.y = 1;
 
 	image.load();
 	this.image = image;
@@ -1017,35 +1198,44 @@ function Suika() {
 Suika.prototype = Object.create(PIXI.Sprite.prototype);
 Suika.prototype.constructor = Suika;
 
-Object.defineProperty( Suika.prototype, 'direction', {
-	get: function()  { return this._direction; },
+Object.defineProperty(Suika.prototype, 'direction', {
+	get: function() {
+		return this._direction;
+	},
 	set: function(v) {
 		var dir = '↑↗→↘↓↙←↖';
-		if(typeof v == 'number') {
-			var x = (v / (360/8)) %8;
-			if(x<0) x = 8+x;
-			v = dir[x|0];
+		if (typeof v == 'number') {
+			var x = (v / (360 / 8)) % 8;
+			if (x < 0) {
+				x = 8 + x;
+			}
+			v = dir[x | 0];
 		}
 		this._direction = v;
 	},
 });
 
-Object.defineProperty( Suika.prototype, 'animation', {
-	get: function()  { return this._animation; },
-	set: function(v) { this._animation = v; },
+Object.defineProperty(Suika.prototype, 'animation', {
+	get: function() {
+		return this._animation;
+	},
+	set: function(v) {
+		this._animation = v;
+	},
 });
 
 Suika.prototype.updateTransform = function() {
 	PIXI.Sprite.prototype.updateTransform.call(this);
 
 	var anim;
-	switch(this._animation) {
-	case 'death':
-		anim = this._anim['death'];
+	switch (this._animation) {
+		case 'death':
+			anim = this._anim['death'];
 		break
-	case 'walk':
-	case 'idle':
-		anim = this._anim[this._animation +' '+ this._direction];
+		case 'walk':
+		case 'idle':
+		case 'boom':
+			anim = this._anim[this._animation + ' ' + this._direction];
 	}
 
 	this.currentFrame += this.animationSpeed;
@@ -1054,7 +1244,7 @@ Suika.prototype.updateTransform = function() {
 
 	this.currentFrame = this.currentFrame % anim.length;
 
-	if(/*this.loop ||*/ round < anim.length) {
+	if ( /*this.loop ||*/ round < anim.length) {
 		this.setTexture(anim[round % anim.length]);
 	} /*else if(round >= anim.length) {
 		this.gotoAndStop(this.textures.length - 1);
@@ -1063,512 +1253,344 @@ Suika.prototype.updateTransform = function() {
 
 module.exports = Suika;
 
-},{}],"/home/lain/gocode/src/oniproject/js/test-map.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports={"objects":[{"type":"prism","pos":[1,0,0],"size":[4,4,2],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[1,3,1],"yaw":15,"color":[0,0,0,0],"modificators":[]},{"type":"pyramid","pos":[2,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,180,0,0],"modificators":[]},{"type":"pyramid","pos":[4,3,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[180,0,180,0],"modificators":[]},{"type":"pyramid","pos":[4,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[0,180,0,0],"modificators":[]},{"type":"pyramid","pos":[2,1,3],"size":[0.5,0.5,0.5],"yaw":0,"color":[40,180,40,0],"modificators":[]},{"type":"cylinder","pos":[0,2,0],"size":[1,1,2],"yaw":0,"vertices":30,"color":[0,0,0,0],"modificators":[]},{"type":"prism","pos":[0,0,0],"size":[3,3,1],"yaw":0,"color":[0,0,0,0],"modificators":[]},{"type":"path","path":[[1,1,1],[2,1,1],[2,2,1],[1,2,1]],"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]},{"type":"shape","path":[[1,1,1],[2,1,1],[2,3,1]],"height":0.3,"pos":[0,0,0],"size":[1,1,1],"yaw":0,"color":[50,160,60,0],"modificators":[]}]}
-},{}],"/home/lain/gocode/src/oniproject/js/tilemap.js":[function(require,module,exports){
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
 'use strict';
 
-var Tilemap = function(w, h, tilesets, data) {
+function ImageLayer(data, path) {
+	var image = this.image = new PIXI.ImageLoader(path + data.image);
+	PIXI.Sprite.call(this, image.texture);
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+}
+
+ImageLayer.prototype = Object.create(PIXI.Sprite.prototype);
+ImageLayer.constructor = ImageLayer;
+
+ImageLayer.prototype.load = function(fn) {
+	if (fn) {
+		this.image.on('loaded', fn);
+	}
+	this.image.load();
+}
+
+module.exports = ImageLayer;
+
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/index.js":[function(require,module,exports){
+'use strict';
+
+var Tileset = require('./tileset');
+var TileLayer = require('./tilelayer');
+var ObjectGroup = require('./objectgroup');
+var ImageLayer = require('./imagelayer');
+
+function Tiled(path, uri) {
 	PIXI.DisplayObjectContainer.call(this);
 
-	this.w = w;
-	this.h = h;
-	this.tilesets = tilesets;
+	this.path = path
 
-	this.step = 0;
+	var loader = this.loader = new PIXI.JsonLoader(path + uri);
 
-	if (!data) {
-		data = {
-			first: [],
-			second: [],
-			//objects: [],
-			third: [],
-		};
-	}
+	this.tilesets = [];
+	this.layers = [];
 
-	this.data = data;
-
-	this.first = new PIXI.SpriteBatch();
-	this.second = new PIXI.SpriteBatch();
-	this.third = new PIXI.SpriteBatch();
-	this.objects = new PIXI.DisplayObjectContainer();
-	this.addChild(this.first);
-	this.addChild(this.second);
-	this.addChild(this.objects);
-	this.addChild(this.third);
-	this.third.alpha = 0.1;
-
-	for (var y = 0; y < h; y++) {
-		data.first.push(new Array(w));
-		data.second.push(new Array(w));
-		//data.objects.push(new Array(w));
-		data.third.push(new Array(w));
-		for (var x = 0; x < w; x++) {
-			// t is a tileset
-			// v is a tile number
-			// if v is array it animated tile
-			data.first[y][x] = null;
-			data.second[y][x] = null;
-			//data.objects[y][x] = 0;
-			data.third[y][x] = null;
-			//this._setAt(x, y, 'first', 0, [0, 1, 2], true);
-			//this._setAt(x, y, 'second', 0, 3, true);
-			//this._setAt(x, y, 'first', 5, 56);
-			//this._setAt(x, y, 'second', 5, 56);
-			//this._setAt(x, y, 'third', 5, 56);
-		}
-	}
+	this.AVATARS = new PIXI.DisplayObjectContainer();
 }
 
-Tilemap.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-Tilemap.constructor = Tilemap;
+Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+Tiled.constructor = Tiled;
 
-function cleanLastSprites(layer, tile) {
-	if (!tile) { return; }
-	if (tile.hasOwnProperty('s')) {
-		try {
-			if (tile.s instanceof Array) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					layer.removeChild(tile.s[i]);
-				}
-			} else {
-				layer.removeChild(tile.s);
-			}
-		} catch (e) {
-			console.error(e);
-		}
-		delete tile.s;
-	}
-}
+Tiled.prototype.load = function(fn, fn2) {
+	var that = this;
+	this.loader.on('loaded', function() {
+		var json = that.data = that.loader.json;
 
-function _line(line, id, x) {
-	var def = true;
-	if (line === undefined) {
-		return [true, true, true];
-	}
+		var tilesets_count = json.tilesets.length;
+		for (var i = 0, l = json.tilesets.length; i < l; i++) {
+			var t = new Tileset(json.tilesets[i], that.path, null, null)
+			that.tilesets.push(t);
 
-	var lines = [line[x - 1], line[x], line[x + 1]];
-	for (var i = 0, l = lines.length; i < l; i++) {
-		var n = lines[i];
-		if (n !== undefined && n !== null) {
-			if (n.v instanceof Array) {
-				n = n.v[0] === id;
-			} else {
-				n = n.v === id;
-			}
-		} else if (n === null) {
-			n = false;
-		} else {
-			n = true;
-		}
-		lines[i] = n;
-	}
-	return lines;
-}
-
-function _addAuto(layer, map, tileset, tile, x, y, frame) {
-	var w = tileset.size.width,
-		h = tileset.size.height,
-		id = (frame !== undefined) ? tile.v[frame] : tile.v,
-		zeroId = (frame !== undefined) ? tile.v[0] : tile.v,
-		neighbors = [];
-	neighbors.push(_line(map[y - 1], zeroId, x));
-	neighbors.push(_line(map[y + 0], zeroId, x));
-	neighbors.push(_line(map[y + 1], zeroId, x));
-
-	var textures = tileset.atAutoTile(id, neighbors),
-		s0 = new PIXI.Sprite(textures[0]),
-		s1 = new PIXI.Sprite(textures[1]),
-		s2 = new PIXI.Sprite(textures[2]),
-		s3 = new PIXI.Sprite(textures[3]);
-
-	s0.position.x = x * w + 0;
-	s0.position.y = y * h + 0;
-	s0.frame = frame;
-
-	s1.position.x = x * w + w / 2;
-	s1.position.y = y * h + 0;
-	s1.frame = frame;
-
-	s2.position.x = x * w + 0;
-	s2.position.y = y * h + h / 2;
-	s2.frame = frame;
-
-	s3.position.x = x * w + w / 2;
-	s3.position.y = y * h + h / 2;
-	s3.frame = frame;
-
-	layer.addChild(s0);
-	layer.addChild(s1);
-	layer.addChild(s2);
-	layer.addChild(s3);
-	return [s0, s1, s2, s3];
-}
-
-Tilemap.prototype.redrawAt = function(x, y, layer) {
-	try {
-		var tile = this.data[layer][y][x];
-		this._setAt(x, y, layer, tile.t, tile.v, tile.auto);
-	}
-	catch (e) {}
-}
-
-Tilemap.prototype.setAt = function(x, y, layer, t, v, auto) {
-	this._setAt(x, y, layer, t, v, auto);
-
-	switch (layer) {
-		case 'first':
-			cleanLastSprites(this.second, this.data.second[y][x]);
-			this.data.second[y][x] = null;
-			cleanLastSprites(this.third, this.data.third[y][x]);
-			this.data.third[y][x] = null;
-			break;
-		case 'second':
-			cleanLastSprites(this.third, this.data.third[y][x]);
-			this.data.third[y][x] = null;
-			break;
-	}
-
-	this.redrawAt(x - 1, y - 1, layer);
-	this.redrawAt(x - 1, y, layer);
-	this.redrawAt(x - 1, y + 1, layer);
-
-	this.redrawAt(x, y - 1, layer);
-	this.redrawAt(x, y + 1, layer);
-
-	this.redrawAt(x + 1, y - 1, layer);
-	this.redrawAt(x + 1, y, layer);
-	this.redrawAt(x + 1, y + 1, layer);
-}
-
-Tilemap.prototype._setAt = function(x, y, layer, t, v, auto) {
-	if (x < 0 || x > this.w) {
-		throw 'Fail X';
-	}
-	if (y < 0 || y > this.h) {
-		throw 'Fail Y';
-	}
-
-	if (!this.data.hasOwnProperty(layer) || layer === 'objects') {
-		throw 'Fail Layer';
-	}
-
-	if (!this.data[layer][y][x]) {
-		this.data[layer][y][x] = {t: 0, v: 0};
-	}
-
-	var tile = this.data[layer][y][x];
-	tile.t = t;
-	tile.v = v;
-	tile.auto = auto;
-
-	cleanLastSprites(this[layer], tile);
-
-	var tileset = this.tilesets[t];
-
-	if (typeof v === 'number') {
-		if (tile.auto) {
-			tile.s = _addAuto(this[layer], this.data[layer], tileset, tile, x, y);
-		} else {
-			var s = new PIXI.Sprite(tileset.at(v));
-			s.position.x = x * tileset.size.width;
-			s.position.y = y * tileset.size.height;
-			this[layer].addChild(s);
-			tile.s = s;
-		}
-	} else if (v instanceof Array) {
-		tile.s = [];
-		for (var i = 0, l = v.length; i < l; i++) {
-			if (tile.auto) {
-				var s = _addAuto(this[layer], this.data[layer], tileset, tile, x, y, i);
-				tile.s = tile.s.concat(s);
-			} else {
-				var s = new PIXI.Sprite(tileset.at(v[i]));
-				s.position.x = x * tileset.size.width;
-				s.position.y = y * tileset.size.height;
-				s.frame = i; // for animation
-				this[layer].addChild(s);
-				tile.s.push(s);
-			}
-		}
-	}
-}
-
-Tilemap.prototype.updateTransform = function() {
-	PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
-
-	var frame = this.step + 0.05,
-		round = (frame) | 0;
-	if (round === 3) {
-		round = 0;
-	}
-	this.step = frame % 3;
-
-	var data = this.data,
-		w = this.w,
-		h = this.h;
-
-	if (round == this.lastRount) { return; }
-	this.lastRount = round;
-
-	for (var y = 0; y < h; y++) {
-		for (var x = 0; x < w; x++) {
-			var tile = data.first[y][x];
-			if (tile && tile.v instanceof Array && tile.s) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					var s = tile.s[i];
-					s.visible = s.frame === round;
-				}
-			}
-			var tile = data.second[y][x];
-			if (tile && tile.v instanceof Array && tile.s) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					var s = tile.s[i];
-					s.visible = s.frame === round;
-				}
-			}
-			var tile = data.third[y][x];
-			if (tile && tile.v instanceof Array && tile.s) {
-				for (var i = 0, l = tile.s.length; i < l; i++) {
-					var s = tile.s[i];
-					s.visible = s.frame === round;
-				}
-			}
-		}
-	}
-}
-
-Tilemap.prototype.Fill = function(x, y, _layer, t, v, auto) {
-	var layer = this.data[_layer],
-		north,
-		south,
-		Q = [{x: x, y: y}],
-		empty = (layer[y][x]) ? layer[y][x].v : null,
-		check = function(x, y) {
-			if (y < 0 || y >= layer.length) { return false; }
-			if (x < 0 || x >= layer[y].length) { return false; }
-			if (!layer[y][x] && !empty) { return true; }
-			if (!layer[y][x]) { return false; }
-
-			var v = layer[y][x].v;
-			if (typeof v === 'number' && typeof empty === 'number') {
-				return v === empty;
-			} else if (typeof v !== 'number' && typeof empty !== 'number') {
-				if (!empty) { return false; }
-				for (var i = 0, l = v.length; i < l; i++) {
-					if (v[i] !== empty[i]) {
-						return false;
+			t.load(function() {
+				tilesets_count--;
+				if (!tilesets_count) {
+					console.info('tilesets loaded');
+					if (fn) {
+						fn();
 					}
 				}
-				return true;
+			});
+		}
+
+		for (var i = 0, l = json.layers.length; i < l; i++) {
+			var layer = json.layers[i];
+			var obj = undefined;
+			switch (layer.type) {
+				case 'tilelayer':
+					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
+					break;
+				case 'objectgroup':
+					if (layer.name == 'AVATARS') {
+						obj = that.AVATARS;
+					} else {
+						obj = new ObjectGroup(layer, that.tilesets);
+					}
+					break;
+				case 'imagelayer':
+					obj = new ImageLayer(layer, that.path);
+					obj.load();
+					break;
 			}
-			return false;
-		};
-
-	while (Q.length) {
-		var N = Q.pop();
-		x = N.x;
-		y = N.y;
-
-		if (check(x, y)) {
-			north = south = y;
-			do {
-				north--;
-			} while (check(x, north) && north >= 0);
-			do {
-				south++;
-			} while (check(x, south) && south < layer.length);
-
-			for (var n = north + 1; n < south; n++) {
-				this.setAt(x, n, _layer, t, v, auto);
-				if (check(x - 1, n)) {
-					Q.push({
-						x: x - 1,
-						y: n,
-					});
-				}
-				if (check(x + 1, n)) {
-					Q.push({
-						x: x + 1,
-						y: n,
-					});
-				}
+			if (obj !== undefined) {
+				console.log('addChild', layer, obj);
+				that.layers.push(obj);
+				that.addChild(obj);
 			}
 		}
-	}
+		if (fn2) {
+			fn2();
+		}
+
+	});
+	this.loader.load();
 }
 
-module.exports = Tilemap;
+module.exports = Tiled;
 
-},{}],"/home/lain/gocode/src/oniproject/js/tileset.js":[function(require,module,exports){
+},{"./imagelayer":"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js","./objectgroup":"/home/lain/gocode/src/oniproject/js/tiled/objectgroup.js","./tilelayer":"/home/lain/gocode/src/oniproject/js/tiled/tilelayer.js","./tileset":"/home/lain/gocode/src/oniproject/js/tiled/tileset.js"}],"/home/lain/gocode/src/oniproject/js/tiled/objectgroup.js":[function(require,module,exports){
 'use strict';
 
-function Tileset(url, w, h, size, noAutoLoad) {
-	this.width = w;
-	this.height = h;
-	this.size = size;
+function ObjectGroup(data, tilesets) {
+	PIXI.DisplayObjectContainer.call(this);
+	var graphics = this.graphics = new PIXI.Graphics();
+	this.addChild(graphics);
 
-	var image = new PIXI.ImageLoader(url),
-		tiles = [];
-	for (var y = 0; y < h; y++) {
-		for (var x = 0; x < w; x++) {
-			var rect = {
-				x: x * size.width,
-				y: y * size.height,
-				width: size.width,
-				height: size.height,
-			};
-			tiles.push(new PIXI.Texture(image.texture.baseTexture, rect));
+	this.data = data || {};
+	if (!data.objects) {
+		data.objects = [];
+	}
+	this.tilesets = tilesets;
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+
+	if (data.color) {
+		var c = parseInt(data.color.slice(1), 16);
+		graphics.lineStyle(2, c, 1);
+	}
+
+	for (var i = 0, l = data.objects.length; i < l; i++) {
+		var obj = data.objects[i];
+		if (!obj.visible) {
+			continue;
+		}
+
+		var x = obj.x,
+			y = obj.y,
+			w = obj.width,
+			h = obj.height,
+			r = obj.rotation;
+		var w2 = w / 2,
+			h2 = h / 2;
+		if (obj.gid) {
+			for (var j = 0, ll = tilesets.length; j < ll; j++) {
+				var t = tilesets[j];
+				var sprite = t.CreateSprite(obj.gid);
+
+				if (sprite) {
+					sprite.position.x = x;
+					sprite.position.y = y - sprite.height; // XXX
+
+					if (t.data.tileoffset) {
+						sprite.position.x += t.data.tileoffset.x;
+						sprite.position.y += t.data.tileoffset.y;
+					}
+
+					this.addChild(sprite);
+					break;
+				}
+			}
+		} else if (obj.polyline) {
+		// TODO
+		} else if (obj.ellipse) {
+			// TODO
+			graphics.drawEllipse(x + w2, y + h2, w2, h2);
+		} else if (obj.polygon) {
+		// TODO
+		} else {
+			// TODO rect
+			graphics.drawRect(x, y, w, h);
+		}
+	}
+}
+
+ObjectGroup.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+ObjectGroup.constructor = ObjectGroup;
+
+module.exports = ObjectGroup;
+
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/tilelayer.js":[function(require,module,exports){
+'use strict';
+
+function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
+	PIXI.SpriteBatch.call(this);
+
+	this.data = data;
+	this.tilesets = tilesets;
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	if (data.opacity === undefined) {
+		data.opacity = 1;
+	}
+	this.alpha = data.opacity;
+	this.visible = !!data.visible;
+
+	this._animated = [];
+
+	for (var y = 0; y < data.height; y++) {
+		for (var x = 0; x < data.width; x++) {
+			var iii = y * data.width + x;
+			var id = data.data[iii];
+			found:
+			for (var i = 0, l = tilesets.length; i < l; i++) {
+				var t = tilesets[i];
+				if (id - t.data.firstgid <= 0) {
+					continue found;
+				}
+				var sprite = t.CreateSprite(id);
+
+				if (sprite) {
+					sprite.position.x = x * tilewidth + data.x;
+					sprite.position.y = y * tileheight + data.y;
+
+					if (t.data.tileoffset) {
+						sprite.position.x += t.data.tileoffset.x;
+						sprite.position.y += t.data.tileoffset.y;
+					}
+
+					if (sprite.textures) {
+						this._animated.push(sprite);
+					}
+
+					this.addChild(sprite);
+					break found;
+				}
+			}
 		}
 	}
 
-	this.tiles = tiles;
-	if(!noAutoLoad) {
-		image.load();
-	}
-	this.image = image;
+	this.cacheAsBitmap = this._animated.length == 0;
 }
 
-// x and y for subtile
-Tileset.prototype.at = function(i, x, y) {
-	if (x === undefined && y === undefined) {
-		return this.tiles[i];
-	} else {
-		// FIXME maybe memory leaks
-		var t = this.tiles[i],
-			rect = {
-				x: t.frame.x + x * this.size.width / 2,
-				y: t.frame.y + y * this.size.height / 2,
-				width: this.size.width / 2,
-				height: this.size.height / 2,
+TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
+TileLayer.constructor = TileLayer;
+
+TileLayer.prototype.updateTransform = function() {
+	var _animated = this._animated;
+	for (var i = 0, l = _animated.length; i < l; i++) {
+		_animated[i].updateTransform();
+	}
+	PIXI.SpriteBatch.prototype.updateTransform.call(this);
+}
+
+
+module.exports = TileLayer;
+
+},{}],"/home/lain/gocode/src/oniproject/js/tiled/tileset.js":[function(require,module,exports){
+'use strict';
+
+function Tileset(data, path, tilewidth, tileheight) {
+	this.data = data;
+
+	if (!data.tiles) {
+		data.tiles = {};
+	}
+
+	if (!tilewidth) {
+		tilewidth = data.tilewidth;
+	}
+	if (!tileheight) {
+		tileheight = data.tileheight;
+	}
+
+	var image = this.image = new PIXI.ImageLoader(path + data.image);
+
+	var tiles = this.tiles = [];
+
+	var ww = 0,
+		hh = 0;
+	for (var y = data.margin; y < data.imageheight; y += tileheight + data.spacing) {
+		hh++;
+		for (var x = data.margin; x < data.imagewidth; x += tilewidth + data.spacing) {
+			var rect = {
+				x: x,
+				y: y,
+				width: data.tilewidth,
+				height: data.tileheight,
 			};
-		return new PIXI.Texture(t, rect);
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			tiles.push(t);
+		}
 	}
 }
 
-/*
- * get
- *  [bool, bool, bool]
- *  [bool, xxxx, bool]
- *  [bool, bool, bool]
- * return
- *  [n, n]
- *  [n, n]
- */
-
-Tileset.prototype.atAutoTile = function(id, neighbors) {
-	/*
-	 *   |**
-	 *   |**
-	 * --|--
-	 * ↖↑|↑↗
-	 * ←4|3→
-	 * --|--
-	 * ←2|1→
-	 * ↙↓|↓↘
-	 */
-	var w = this.width >>> 1,
-		x = (id % w) * 2,
-		y = (id - id % w) / w * 3,
-		map = [
-			(y + 0) * this.width + x + 0,
-			(y + 0) * this.width + x + 1,
-			(y + 1) * this.width + x + 0,
-			(y + 1) * this.width + x + 1,
-			(y + 2) * this.width + x + 0,
-			(y + 2) * this.width + x + 1,
-		],
-		one, two, three;
-
-	// 2 3
-	// 1 x
-	one = neighbors[1][0];
-	two = neighbors[0][0];
-	three = neighbors[0][1];
-
-	// 1↘  2↖ 3↑ 4← 5*
-	var tleft = 2;
-	if (one && !two && three) {
-		tleft = 1;
+Tileset.prototype.load = function(fn) {
+	if (fn) {
+		this.image.on('loaded', fn);
 	}
-	if (one && two && three) {
-		tleft = 5;
-	}
-	if (!one && three) {
-		tleft = 4;
-	}
-	if (one && !three) {
-		tleft = 3;
+	this.image.load();
+}
+
+
+Tileset.prototype.CreateSprite = function(id) {
+	if (id == 0) return;
+
+	var data = this.data;
+	id -= data.firstgid;
+	var texture = this.tiles[id];
+
+	if (!texture) return;
+
+	var sprite = new PIXI.Sprite(texture);
+	sprite.data = data.tiles[id];
+
+	if (sprite.data && sprite.data.animation) {
+		sprite.last = window.performance.now();
+		sprite.currentFrame = 0;
+		sprite.updateTransform = updateTransform;
+
+		sprite.textures = [];
+		for (var i = 0, l = sprite.data.animation.length; i < l; i++) {
+			var t = sprite.data.animation[i];
+			sprite.textures.push(this.tiles[t.tileid]);
+		}
 	}
 
-	// 1 2
-	// x 3
-	one = neighbors[0][1];
-	two = neighbors[0][2];
-	three = neighbors[1][2];
+	return sprite;
+}
 
-	// 1↙ 2↑ 3↗ 4* 5→
-	var tright = 3;
-	if (one && !two && three) {
-		tright = 1;
-	}
-	if (one && two && three) {
-		tright = 4;
-	}
-	if (!one && three) {
-		tright = 2;
-	}
-	if (one && !three) {
-		tright = 5;
-	}
+function updateTransform() {
+	PIXI.Sprite.prototype.updateTransform.call(this);
 
-	// 1 x
-	// 2 3
-	one = neighbors[1][0];
-	two = neighbors[2][0];
-	three = neighbors[2][1];
+	if (!this.textures) return;
 
-	// 1↗ 2← 3* 4↙ 5↓
-	var dleft = 4;
-	if (one && !two && three) {
-		dleft = 1;
-	}
-	if (one && two && three) {
-		dleft = 3;
-	}
-	if (!one && three) {
-		dleft = 2;
-	}
-	if (one && !three) {
-		dleft = 5;
-	}
+	var time = window.performance.now();
+	var frame = this.data.animation[this.currentFrame];
 
-	// x 1
-	// 3 2
-	one = neighbors[1][2];
-	two = neighbors[2][2];
-	three = neighbors[2][1];
-	// 1↖ 2* 3→ 4↓ 5↘
-	var drigth = 5;
-	if (one && !two && three) {
-		drigth = 1;
-	}
-	if (one && two && three) {
-		drigth = 2;
-	}
-	if (!one && three) {
-		drigth = 3;
-	}
-	if (one && !three) {
-		drigth = 4;
-	}
+	if (time - this.last > frame.duration) {
+		this.currentFrame++;
+		if (this.currentFrame >= this.data.animation.length) {
+			this.currentFrame = 0;
+		}
 
-	return [
-		this.at(map[tleft], 0, 0),
-		this.at(map[tright], 1, 0),
-		this.at(map[dleft], 0, 1),
-		this.at(map[drigth], 1, 1),
-	];
+		this.setTexture(this.textures[this.currentFrame]);
+
+		this.last += frame.duration;
+	}
 }
 
 module.exports = Tileset;
@@ -1875,877 +1897,6 @@ function isObject(arg) {
 function isUndefined(arg) {
   return arg === void 0;
 }
-
-},{}],"/home/lain/gocode/src/oniproject/node_modules/isomer/index.js":[function(require,module,exports){
-/**
- * Entry point for the Isomer API
- */
-module.exports = require('./js/isomer');
-
-},{"./js/isomer":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/isomer.js"}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/canvas.js":[function(require,module,exports){
-function Canvas(elem) {
-  this.elem = elem;
-  this.ctx = this.elem.getContext('2d');
-
-  this.width = elem.width;
-  this.height = elem.height;
-}
-
-Canvas.prototype.clear = function () {
-  this.ctx.clearRect(0, 0, this.width, this.height);
-};
-
-Canvas.prototype.path = function (points, color) {
-  this.ctx.beginPath();
-  this.ctx.moveTo(points[0].x, points[0].y);
-
-  for (var i = 1; i < points.length; i++) {
-    this.ctx.lineTo(points[i].x, points[i].y);
-  }
-
-  this.ctx.closePath();
-
-  /* Set the strokeStyle and fillStyle */
-  this.ctx.save()
-
-  this.ctx.globalAlpha = color.a;
-  this.ctx.fillStyle = this.ctx.strokeStyle = color.toHex();
-  this.ctx.stroke();
-  this.ctx.fill();
-  this.ctx.restore();
-};
-
-module.exports = Canvas;
-
-},{}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/color.js":[function(require,module,exports){
-/**
- * A color instantiated with RGB between 0-255
- *
- * Also holds HSL values
- */
-function Color(r, g, b, a) {
-  this.r = parseInt(r || 0);
-  this.g = parseInt(g || 0);
-  this.b = parseInt(b || 0);
-  this.a = parseFloat((Math.round(a * 100) / 100 || 1));
-
-  this.loadHSL();
-};
-
-Color.prototype.toHex = function () {
-  // Pad with 0s
-  var hex = (this.r * 256 * 256 + this.g * 256 + this.b).toString(16);
-
-  if (hex.length < 6) {
-    hex = new Array(6 - hex.length + 1).join('0') + hex;
-  }
-
-  return '#' + hex;
-};
-
-
-/**
- * Returns a lightened color based on a given percentage and an optional
- * light color
- */
-Color.prototype.lighten = function (percentage, lightColor) {
-  lightColor = lightColor || new Color(255, 255, 255);
-
-  var newColor = new Color(
-    (lightColor.r / 255) * this.r,
-    (lightColor.g / 255) * this.g,
-    (lightColor.b / 255) * this.b,
-    this.a
-  );
-
-  newColor.l = Math.min(newColor.l + percentage, 1);
-
-  newColor.loadRGB();
-  return newColor;
-};
-
-
-/**
- * Loads HSL values using the current RGB values
- * Converted from:
- * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
- */
-Color.prototype.loadHSL = function () {
-  var r = this.r / 255;
-  var g = this.g / 255;
-  var b = this.b / 255;
-
-  var max = Math.max(r, g, b);
-  var min = Math.min(r, g, b);
-
-  var h, s, l = (max + min) / 2;
-
-  if (max === min) {
-    h = s = 0;  // achromatic
-  } else {
-    var d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-
-    h /= 6;
-  }
-
-  this.h = h;
-  this.s = s;
-  this.l = l;
-};
-
-
-/**
- * Reloads RGB using HSL values
- * Converted from:
- * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
- */
-Color.prototype.loadRGB = function () {
-  var r, g, b;
-  var h = this.h;
-  var s = this.s;
-  var l = this.l;
-
-  if (s === 0) {
-    r = g = b = l;  // achromatic
-  } else {
-    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    var p = 2 * l - q;
-    r = this._hue2rgb(p, q, h + 1/3);
-    g = this._hue2rgb(p, q, h);
-    b = this._hue2rgb(p, q, h - 1/3);
-  }
-
-  this.r = parseInt(r * 255);
-  this.g = parseInt(g * 255);
-  this.b = parseInt(b * 255);
-};
-
-
-/**
- * Helper function to convert hue to rgb
- * Taken from:
- * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
- */
-Color.prototype._hue2rgb = function (p, q, t){
-  if(t < 0) t += 1;
-  if(t > 1) t -= 1;
-  if(t < 1/6) return p + (q - p) * 6 * t;
-  if(t < 1/2) return q;
-  if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-  return p;
-};
-
-module.exports = Color;
-
-},{}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/isomer.js":[function(require,module,exports){
-var Canvas = require('./canvas');
-var Color = require('./color');
-var Path = require('./path');
-var Point = require('./point');
-var Shape = require('./shape');
-var Vector = require('./vector');
-
-
-/**
- * The Isomer class
- *
- * This file contains the Isomer base definition
- */
-function Isomer(canvasId, options) {
-  options = options || {};
-
-  this.canvas = new Canvas(canvasId);
-  this.angle = Math.PI / 6;
-
-  this.scale = options.scale || 70;
-
-  this._calculateTransformation();
-
-  this.originX = options.originX || this.canvas.width / 2;
-  this.originY = options.originY || this.canvas.height * 0.9;
-
-  /**
-   * Light source as defined as the angle from
-   * the object to the source.
-   *
-   * We'll define somewhat arbitrarily for now.
-   */
-  this.lightPosition = options.lightPosition || new Vector(2, -1, 3);
-  this.lightAngle = this.lightPosition.normalize();
-
-  /**
-   * The maximum color difference from shading
-   */
-  this.colorDifference = 0.20;
-  this.lightColor = options.lightColor || new Color(255, 255, 255);
-}
-
-/**
- * Sets the light position for drawing.
- */
-Isomer.prototype.setLightPosition = function (x, y, z) {
-  this.lightPosition = new Vector(x, y, z);
-  this.lightAngle = this.lightPosition.normalize();
-}
-
-Isomer.prototype._translatePoint = function (point) {
-  /**
-   * X rides along the angle extended from the origin
-   * Y rides perpendicular to this angle (in isometric view: PI - angle)
-   * Z affects the y coordinate of the drawn point
-   */
-  var xMap = new Point(point.x * this.transformation[0][0],
-                       point.x * this.transformation[0][1]);
-
-  var yMap = new Point(point.y * this.transformation[1][0],
-                       point.y * this.transformation[1][1]);
-
-  var x = this.originX + xMap.x + yMap.x;
-  var y = this.originY - xMap.y - yMap.y - (point.z * this.scale);
-  return new Point(x, y);
-};
-
-
-/**
- * Adds a shape or path to the scene
- *
- * This method also accepts arrays
- */
-Isomer.prototype.add = function (item, baseColor) {
-  if (Object.prototype.toString.call(item) == '[object Array]') {
-    for (var i = 0; i < item.length; i++) {
-      this.add(item[i], baseColor);
-    }
-  } else if (item instanceof Path) {
-    this._addPath(item, baseColor);
-  } else if (item instanceof Shape) {
-    /* Fetch paths ordered by distance to prevent overlaps */
-    var paths = item.orderedPaths();
-    for (var i in paths) {
-      this._addPath(paths[i], baseColor);
-    }
-  }
-};
-
-
-/**
- * Adds a path to the scene
- */
-Isomer.prototype._addPath = function (path, baseColor) {
-  /* Default baseColor */
-  baseColor = baseColor || new Color(120, 120, 120);
-
-  /* Compute color */
-  var v1 = Vector.fromTwoPoints(path.points[1], path.points[0]);
-  var v2 = Vector.fromTwoPoints(path.points[2], path.points[1]);
-
-  var normal = Vector.crossProduct(v1, v2).normalize();
-
-  /**
-   * Brightness is between -1 and 1 and is computed based
-   * on the dot product between the light source vector and normal.
-   */
-  var brightness = Vector.dotProduct(normal, this.lightAngle);
-  color = baseColor.lighten(brightness * this.colorDifference, this.lightColor);
-
-  this.canvas.path(path.points.map(this._translatePoint.bind(this)), color);
-};
-
-/**
- * Precalculates transformation values based on the current angle and scale
- * which in theory reduces costly cos and sin calls
- */
-Isomer.prototype._calculateTransformation = function () {
-  this.transformation = [
-    [
-      this.scale * Math.cos(this.angle),
-      this.scale * Math.sin(this.angle)
-    ],
-    [
-      this.scale * Math.cos(Math.PI - this.angle),
-      this.scale * Math.sin(Math.PI - this.angle)
-    ]
-  ];
-}
-
-/* Namespace our primitives */
-Isomer.Canvas = Canvas;
-Isomer.Color = Color;
-Isomer.Path = Path;
-Isomer.Point = Point;
-Isomer.Shape = Shape;
-Isomer.Vector = Vector;
-
-/* Expose Isomer API */
-module.exports = Isomer;
-
-},{"./canvas":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/canvas.js","./color":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/color.js","./path":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/path.js","./point":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/point.js","./shape":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/shape.js","./vector":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/vector.js"}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/path.js":[function(require,module,exports){
-var Point = require('./point');
-
-/**
- * Path utility class
- *
- * An Isomer.Path consists of a list of Isomer.Point's
- */
-function Path(points) {
-  if (Object.prototype.toString.call(points) === '[object Array]') {
-    this.points = points;
-  } else {
-    this.points = Array.prototype.slice.call(arguments);
-  }
-}
-
-
-/**
- * Pushes a point onto the end of the path
- */
-Path.prototype.push = function (point) {
-  this.points.push(point);
-};
-
-
-/**
- * Returns a new path with the points in reverse order
- */
-Path.prototype.reverse = function () {
-  var points = Array.prototype.slice.call(this.points);
-
-  return new Path(points.reverse());
-};
-
-
-/**
- * Translates a given path
- *
- * Simply a forward to Point#translate
- */
-Path.prototype.translate = function () {
-  var args = arguments;
-
-  return new Path(this.points.map(function (point) {
-    return point.translate.apply(point, args);
-  }));
-};
-
-/**
- * Returns a new path rotated along the X axis by a given origin
- *
- * Simply a forward to Point#rotateX
- */
-Path.prototype.rotateX = function () {
-  var args = arguments;
-
-  return new Path(this.points.map(function (point) {
-    return point.rotateX.apply(point, args);
-  }));
-};
-
-/**
- * Returns a new path rotated along the Y axis by a given origin
- *
- * Simply a forward to Point#rotateY
- */
-Path.prototype.rotateY = function () {
-  var args = arguments;
-
-  return new Path(this.points.map(function (point) {
-    return point.rotateY.apply(point, args);
-  }));
-};
-
-/**
- * Returns a new path rotated along the Z axis by a given origin
- *
- * Simply a forward to Point#rotateZ
- */
-Path.prototype.rotateZ = function () {
-  var args = arguments;
-
-  return new Path(this.points.map(function (point) {
-    return point.rotateZ.apply(point, args);
-  }));
-};
-
-
-/**
- * Scales a path about a given origin
- *
- * Simply a forward to Point#scale
- */
-Path.prototype.scale = function () {
-  var args = arguments;
-
-  return new Path(this.points.map(function (point) {
-    return point.scale.apply(point, args);
-  }));
-};
-
-
-/**
- * The estimated depth of a path as defined by the average depth
- * of its points
- */
-Path.prototype.depth = function () {
-  var i, total = 0;
-  for (i = 0; i < this.points.length; i++) {
-    total += this.points[i].depth();
-  }
-
-  return total / (this.points.length || 1);
-};
-
-
-/**
- * Some paths to play with
- */
-
-/**
- * A rectangle with the bottom-left corner in the origin
- */
-Path.Rectangle = function (origin, width, height) {
-  if (width === undefined) width = 1;
-  if (height === undefined) height = 1;
-
-  var path = new Path([
-    origin,
-    new Point(origin.x + width, origin.y, origin.z),
-    new Point(origin.x + width, origin.y + height, origin.z),
-    new Point(origin.x, origin.y + height, origin.z)
-  ]);
-
-  return path;
-};
-
-
-/**
- * A circle centered at origin with a given radius and number of vertices
- */
-Path.Circle = function (origin, radius, vertices) {
-  vertices = vertices || 20;
-  var i, path = new Path();
-
-  for (i = 0; i < vertices; i++) {
-    path.push(new Point(
-      radius * Math.cos(i * 2 * Math.PI / vertices),
-      radius * Math.sin(i * 2 * Math.PI / vertices),
-      0));
-  }
-
-  return path.translate(origin.x, origin.y, origin.z);
-};
-
-
-/**
- * A star centered at origin with a given outer radius, inner
- * radius, and number of points
- *
- * Buggy - concave polygons are difficult to draw with our method
- */
-Path.Star = function (origin, outerRadius, innerRadius, points) {
-  var i, r, path = new Path();
-
-  for (i = 0; i < points * 2; i++) {
-    r = (i % 2 === 0) ? outerRadius : innerRadius;
-
-    path.push(new Point(
-      r * Math.cos(i * Math.PI / points),
-      r * Math.sin(i * Math.PI / points),
-      0));
-  }
-
-  return path.translate(origin.x, origin.y, origin.z);
-};
-
-
-/* Expose the Path constructor */
-module.exports = Path;
-
-},{"./point":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/point.js"}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/point.js":[function(require,module,exports){
-function Point(x, y, z) {
-  if (this instanceof Point) {
-    this.x = (typeof x === 'number') ? x : 0;
-    this.y = (typeof y === 'number') ? y : 0;
-    this.z = (typeof z === 'number') ? z : 0;
-  } else {
-    return new Point(x, y, z);
-  }
-}
-
-
-Point.ORIGIN = new Point(0, 0, 0);
-
-
-/**
- * Translate a point from a given dx, dy, and dz
- */
-Point.prototype.translate = function (dx, dy, dz) {
-  return new Point(
-    this.x + dx,
-    this.y + dy,
-    this.z + dz);
-};
-
-
-/**
- * Scale a point about a given origin
- */
-Point.prototype.scale = function (origin, dx, dy, dz) {
-  var p = this.translate(-origin.x, -origin.y, -origin.z);
-
-  if (dy === undefined && dz === undefined) {
-    /* If both dy and dz are left out, scale all coordinates equally */
-    dy = dz = dx;
-    /* If just dz is missing, set it equal to 1 */
-  } else {
-    dz = (typeof dz === 'number') ? dz : 1;
-  }
-
-  p.x *= dx;
-  p.y *= dy;
-  p.z *= dz;
-
-  return p.translate(origin.x, origin.y, origin.z);
-};
-
-/**
- * Rotate about origin on the X axis
- */
-Point.prototype.rotateX = function (origin, angle) {
-  var p = this.translate(-origin.x, -origin.y, -origin.z);
-
-  var z = p.z * Math.cos(angle) - p.y * Math.sin(angle);
-  var y = p.z * Math.sin(angle) + p.y * Math.cos(angle);
-  p.z = z;
-  p.y = y;
-
-  return p.translate(origin.x, origin.y, origin.z);
-};
-
-/**
- * Rotate about origin on the Y axis
- */
-Point.prototype.rotateY = function (origin, angle) {
-  var p = this.translate(-origin.x, -origin.y, -origin.z);
-
-  var x = p.x * Math.cos(angle) - p.z * Math.sin(angle);
-  var z = p.x * Math.sin(angle) + p.z * Math.cos(angle);
-  p.x = x;
-  p.z = z;
-
-  return p.translate(origin.x, origin.y, origin.z);
-};
-
-/**
- * Rotate about origin on the Z axis
- */
-Point.prototype.rotateZ = function (origin, angle) {
-  var p = this.translate(-origin.x, -origin.y, -origin.z);
-
-  var x = p.x * Math.cos(angle) - p.y * Math.sin(angle);
-  var y = p.x * Math.sin(angle) + p.y * Math.cos(angle);
-  p.x = x;
-  p.y = y;
-
-  return p.translate(origin.x, origin.y, origin.z);
-};
-
-
-/**
- * The depth of a point in the isometric plane
- */
-Point.prototype.depth = function () {
-  /* z is weighted slightly to accomodate |_ arrangements */
-    return this.x + this.y - 2*this.z;
-};
-
-
-/**
- * Distance between two points
- */
-Point.distance = function (p1, p2) {
-  var dx = p2.x - p1.x;
-  var dy = p2.y - p1.y;
-  var dz = p2.z - p1.z;
-
-  return Math.sqrt(dx*dx + dy*dy + dz*dz);
-};
-
-
-module.exports = Point;
-
-},{}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/shape.js":[function(require,module,exports){
-var Path = require('./path');
-var Point = require('./point');
-
-/**
- * Shape utility class
- *
- * An Isomer.Shape consists of a list of Isomer.Path's
- */
-function Shape(paths) {
-  if (Object.prototype.toString.call(paths) === '[object Array]') {
-    this.paths = paths;
-  } else {
-    this.paths = Array.prototype.slice.call(arguments);
-  }
-}
-
-
-/**
- * Pushes a path onto the end of the Shape
- */
-Shape.prototype.push = function (path) {
-  this.paths.push(path);
-};
-
-
-/**
- * Translates a given shape
- *
- * Simply a forward to Path#translate
- */
-Shape.prototype.translate = function () {
-  var args = arguments;
-
-  return new Shape(this.paths.map(function (path) {
-    return path.translate.apply(path, args);
-  }));
-};
-
-/**
- * Rotates a given shape along the X axis around a given origin
- *
- * Simply a forward to Path#rotateX
- */
-Shape.prototype.rotateX = function () {
-  var args = arguments;
-
-  return new Shape(this.paths.map(function (path) {
-    return path.rotateX.apply(path, args);
-  }));
-};
-
-/**
- * Rotates a given shape along the Y axis around a given origin
- *
- * Simply a forward to Path#rotateY
- */
-Shape.prototype.rotateY = function () {
-  var args = arguments;
-
-  return new Shape(this.paths.map(function (path) {
-    return path.rotateY.apply(path, args);
-  }));
-};
-
-/**
- * Rotates a given shape along the Z axis around a given origin
- *
- * Simply a forward to Path#rotateZ
- */
-Shape.prototype.rotateZ = function () {
-  var args = arguments;
-
-  return new Shape(this.paths.map(function (path) {
-    return path.rotateZ.apply(path, args);
-  }));
-};
-
-/**
- * Scales a path about a given origin
- *
- * Simply a forward to Point#scale
- */
-Shape.prototype.scale = function () {
-  var args = arguments;
-
-  return new Shape(this.paths.map(function (path) {
-    return path.scale.apply(path, args);
-  }));
-};
-
-
-/**
- * Produces a list of the shape's paths ordered by distance to
- * prevent overlaps when drawing
- */
-Shape.prototype.orderedPaths = function () {
-  var paths = this.paths.slice();
-
-  /**
-   * Sort the list of faces by distance then map the entries, returning
-   * only the path and not the added "further point" from earlier.
-   */
-  return paths.sort(function (pathA, pathB) {
-    return pathB.depth() - pathA.depth();
-  });
-};
-
-
-/**
- * Utility function to create a 3D object by raising a 2D path
- * along the z-axis
- */
-Shape.extrude = function (path, height) {
-  height = (typeof height === 'number') ? height : 1;
-
-  var i, topPath = path.translate(0, 0, height);
-  var shape = new Shape();
-
-  /* Push the top and bottom faces, top face must be oriented correctly */
-  shape.push(path.reverse());
-  shape.push(topPath);
-
-  /* Push each side face */
-  for (i = 0; i < path.points.length; i++) {
-    shape.push(new Path([
-      topPath.points[i],
-      path.points[i],
-      path.points[(i + 1) % path.points.length],
-      topPath.points[(i + 1) % topPath.points.length]
-    ]));
-  }
-
-  return shape;
-};
-
-
-/**
- * Some shapes to play with
- */
-
-/**
- * A prism located at origin with dimensions dx, dy, dz
- */
-Shape.Prism = function (origin, dx, dy, dz) {
-  dx = (typeof dx === 'number') ? dx : 1;
-  dy = (typeof dy === 'number') ? dy : 1;
-  dz = (typeof dz === 'number') ? dz : 1;
-
-  /* The shape we will return */
-  var prism = new Shape();
-
-  /* Squares parallel to the x-axis */
-  var face1 = new Path([
-    origin,
-    new Point(origin.x + dx, origin.y, origin.z),
-    new Point(origin.x + dx, origin.y, origin.z + dz),
-    new Point(origin.x, origin.y, origin.z + dz)
-  ]);
-
-  /* Push this face and its opposite */
-  prism.push(face1);
-  prism.push(face1.reverse().translate(0, dy, 0));
-
-  /* Square parallel to the y-axis */
-  var face2 = new Path([
-    origin,
-    new Point(origin.x, origin.y, origin.z + dz),
-    new Point(origin.x, origin.y + dy, origin.z + dz),
-    new Point(origin.x, origin.y + dy, origin.z)
-  ]);
-  prism.push(face2);
-  prism.push(face2.reverse().translate(dx, 0, 0));
-
-  /* Square parallel to the xy-plane */
-  var face3 = new Path([
-    origin,
-    new Point(origin.x + dx, origin.y, origin.z),
-    new Point(origin.x + dx, origin.y + dy, origin.z),
-    new Point(origin.x, origin.y + dy, origin.z)
-  ]);
-  /* This surface is oriented backwards, so we need to reverse the points */
-  prism.push(face3.reverse());
-  prism.push(face3.translate(0, 0, dz));
-
-  return prism;
-};
-
-
-Shape.Pyramid = function (origin, dx, dy, dz) {
-  dx = (typeof dx === 'number') ? dx : 1;
-  dy = (typeof dy === 'number') ? dy : 1;
-  dz = (typeof dz === 'number') ? dz : 1;
-
-  var pyramid = new Shape();
-
-  /* Path parallel to the x-axis */
-  var face1 = new Path([
-    origin,
-    new Point(origin.x + dx, origin.y, origin.z),
-    new Point(origin.x + dx / 2, origin.y + dy / 2, origin.z + dz)
-  ]);
-  /* Push the face, and its opposite face, by rotating around the Z-axis */
-  pyramid.push(face1);
-  pyramid.push(face1.rotateZ(origin.translate(dx/2, dy/2), Math.PI));
-
-  /* Path parallel to the y-axis */
-  var face2 = new Path([
-    origin,
-    new Point(origin.x + dx / 2, origin.y + dy / 2, origin.z + dz),
-    new Point(origin.x, origin.y + dy, origin.z)
-  ]);
-  pyramid.push(face2);
-  pyramid.push(face2.rotateZ(origin.translate(dx/2, dy/2), Math.PI));
-
-  return pyramid;
-};
-
-
-Shape.Cylinder = function (origin, radius, vertices, height) {
-  radius = (typeof radius === 'number') ? radius : 1;
-
-  var circle = Path.Circle(origin, radius, vertices);
-  var cylinder = Shape.extrude(circle, height);
-
-  return cylinder;
-};
-
-
-module.exports = Shape;
-
-},{"./path":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/path.js","./point":"/home/lain/gocode/src/oniproject/node_modules/isomer/js/point.js"}],"/home/lain/gocode/src/oniproject/node_modules/isomer/js/vector.js":[function(require,module,exports){
-function Vector(i, j, k) {
-  this.i = (typeof i === 'number') ? i : 0;
-  this.j = (typeof j === 'number') ? j : 0;
-  this.k = (typeof k === 'number') ? k : 0;
-}
-
-/**
- * Alternate constructor
- */
-Vector.fromTwoPoints = function (p1, p2) {
-  return new Vector(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
-};
-
-Vector.crossProduct = function (v1, v2) {
-  var i = v1.j * v2.k - v2.j * v1.k;
-  var j = -1 * (v1.i * v2.k - v2.i * v1.k);
-  var k = v1.i * v2.j - v2.i * v1.j;
-
-  return new Vector(i, j, k);
-};
-
-Vector.dotProduct = function (v1, v2) {
-  return v1.i * v2.i + v1.j * v2.j + v1.k * v2.k;
-};
-
-Vector.prototype.magnitude = function () {
-  return Math.sqrt(this.i*this.i + this.j*this.j + this.k*this.k);
-};
-
-Vector.prototype.normalize = function () {
-  var magnitude = this.magnitude();
-  return new Vector(this.i / magnitude, this.j / magnitude, this.k / magnitude);
-};
-
-module.exports = Vector;
 
 },{}]},{},["./js/main.js"])
 

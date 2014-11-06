@@ -45,9 +45,10 @@ func (db *Database) SaveAvatar(a *game.Avatar) error {
 
 func (db *Database) CreateAvatar() (*game.Avatar, error) {
 	a := game.NewAvatar()
-	a.X, a.Y = 2, 2
+	a.X, a.Y = 10, 35
 
 	// XXX
+	a.MapId = "test"
 	a.AddSkill("screaming")
 	a.HP, a.MHP, a.HRG = 90, 100, 1
 	a.MP, a.MMP, a.MRG = 15, 50, 1
