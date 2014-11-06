@@ -1,7 +1,6 @@
 package oni
 
 import (
-	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
