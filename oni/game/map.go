@@ -6,11 +6,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"github.com/oniproject/geom"
-	"io/ioutil"
+	"github.com/oniproject/tmxconverter/tmx"
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
 	"path"
-	"strings"
 	"time"
 )
 
@@ -45,11 +44,12 @@ type Map struct {
 	Grid                 *jps.Grid
 	game                 *Game
 	lastLocalId          int64
+	tmxMap               tmx.Map
 }
 
 func NewMap(game *Game, name string) *Map {
 	// TODO remove it
-	b, err := ioutil.ReadFile("data/maps/" + name + ".wlk.txt")
+	/*b, err := ioutil.ReadFile("data/maps/" + name + ".wlk.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -67,14 +67,29 @@ func NewMap(game *Game, name string) *Map {
 				s = append(s, 'X')
 			}
 		}
+	}*/
+
+	fname := path.Join("data/maps/", name+".tmx")
+	tmxMap, err := tmx.LoadTMX(fname)
+	if err != nil {
+		log.Panic("fail load map: ", fname, err)
 	}
-	/* w, h:= 8,6
-		s := `XXXXXX
-	X....X
-	X....X
-	X..X.X
-	X....X
-	XXXXXX`*/
+	layer := tmxMap.LayerByName("COLLISION", "tilelayer")
+	if layer == nil {
+		log.Panic("layer COLLISION notfound: ", fname)
+	}
+
+	data, err := layer.Data.Data()
+	if err != nil {
+		log.Panicf("fail load data from COLLISION layer: ", fname, err)
+	}
+
+	grid := jps.NewGrid(tmxMap.Width, tmxMap.Height)
+	for k, v := range data {
+		x, y := k%tmxMap.Width, k/tmxMap.Width
+		grid.SetWalkable(x, y, v <= 0)
+	}
+
 	return &Map{
 		register:    make(chan GameObject),
 		unregister:  make(chan GameObject),
@@ -83,6 +98,7 @@ func NewMap(game *Game, name string) *Map {
 		Grid:        grid,
 		game:        game,
 		lastLocalId: -4,
+		tmxMap:      tmxMap,
 	}
 }
 
