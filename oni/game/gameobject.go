@@ -14,7 +14,7 @@ const (
 )
 
 type Walkabler interface {
-	Walkable(int, int) bool
+	Walkable(geom.Coord) bool
 }
 
 type GameObjectState struct {
@@ -68,7 +68,7 @@ func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
 		c.lastvel = c.velocity.Times(1) // just copy
 
 		// XXX {nil} for testing
-		if w == nil || w.Walkable(int(pos.X), int(pos.Y)) {
+		if w == nil || w.Walkable(pos) {
 			c.position = pos
 			return true
 		}

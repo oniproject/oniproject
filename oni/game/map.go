@@ -10,6 +10,7 @@ import (
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
 	"path"
+	"runtime/debug"
 	"time"
 )
 
@@ -48,27 +49,6 @@ type Map struct {
 }
 
 func NewMap(game *Game, name string) *Map {
-	// TODO remove it
-	/*b, err := ioutil.ReadFile("data/maps/" + name + ".wlk.txt")
-	if err != nil {
-		panic(err)
-	}
-	s := string(b)
-	lines := strings.Split(s, "\n")
-	w, h := len(lines[0]), len(lines)
-	log.Printf("%d:%d\n%s\n", w, h, s)
-	grid := jps.FromString(s, w, h)
-	for y := 0; y < h; y++ {
-		s := []byte{}
-		for x := 0; x < w; x++ {
-			if grid.Walkable(x, y) {
-				s = append(s, ' ')
-			} else {
-				s = append(s, 'X')
-			}
-		}
-	}*/
-
 	fname := path.Join("data/maps/", name+".tmx")
 	tmxMap, err := tmx.LoadTMX(fname)
 	if err != nil {
@@ -102,8 +82,8 @@ func NewMap(game *Game, name string) *Map {
 	}
 }
 
-func (m *Map) Walkable(x, y int) bool {
-	return m.Grid.Walkable(x, y)
+func (m *Map) Walkable(c geom.Coord) bool {
+	return m.Grid.Walkable(int(c.X), int(c.Y))
 }
 func (m *Map) Register(a GameObject) {
 	go func() { m.register <- a }()
@@ -119,9 +99,8 @@ func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 	return gm.objects[id]
 }
 
-func (gm *Map) ObjectsAround(x, y, r float64, exclude func(GameObject) bool) []GameObject {
+func (gm *Map) ObjectsAround(center geom.Coord, r float64, exclude func(GameObject) bool) []GameObject {
 	objects := []GameObject{}
-	center := geom.Coord{X: x, Y: y}
 	for _, obj := range gm.objects {
 		d := center.DistanceFrom(obj.Position())
 		if d <= r && !exclude(obj) {
@@ -181,7 +160,7 @@ func (gm *Map) Run() {
 	closeChan := func(avatar *Avatar) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Error(err)
+				log.Error(err, "\n", string(debug.Stack()))
 			}
 		}()
 		close(avatar.sendMessage)
@@ -239,6 +218,28 @@ func (gm *Map) Run() {
 				}
 			}
 
+			// XXX teleports
+			for _, obj := range gm.objects {
+				if a, ok := obj.(*Avatar); ok {
+					pos := a.Position()
+					layer := gm.tmxMap.LayerByName("TELEPORTS", "objectgroup")
+					objects := layer.ObjectsByPoint(pos.X*32, pos.Y*32)
+					for _, o := range objects {
+						log.Warn("!!!!!! found: ", o.Name)
+						switch o.Name {
+						case "test":
+							a.MapId = "test"
+							a.SetPosition(pos.X, 39)
+							gm.Unregister(a)
+						case "test2":
+							a.MapId = "test2"
+							a.SetPosition(pos.X, 2)
+							gm.Unregister(a)
+						}
+					}
+				}
+			}
+
 			// send states to obj
 			for id, obj := range gm.objects {
 				state := &GameObjectState{
@@ -251,7 +252,7 @@ func (gm *Map) Run() {
 				}
 
 				pos := obj.Position()
-				around := gm.ObjectsAround(pos.X, pos.Y, ReplicRange, avatarFilter)
+				around := gm.ObjectsAround(pos, ReplicRange, avatarFilter)
 
 				for _, a := range around {
 					avatar := a.(*Avatar)
