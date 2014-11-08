@@ -485,6 +485,14 @@ function Game(renderer, stage) {
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
+
+	net.on('ReplicaMsg', (function(value) {
+		var tick = value.Tick;
+		var states = value.States;
+		for (var i = 0, len = states.length; i < len; i++) {
+			this.state_msg(states[i]);
+		}
+	}).bind(this));
 }
 
 Game.prototype = Object.create(EventEmitter.prototype);
@@ -899,6 +907,7 @@ var M_SetVelocityMsg = 1,
 	M_Parameters = 11,
 	M_Chat = 12,
 	M_ChatPost = 13,
+	M_Replica = 14,
 	___ = 0;
 
 function Net(url) {
@@ -984,6 +993,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 			break;
 		case M_Chat:
 			this.emit('ChatMsg', value);
+			break;
+		case M_Replica:
+			this.emit('ReplicaMsg', value);
 			break;
 		default:
 			this.emit('event', type, value, event);

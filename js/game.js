@@ -28,6 +28,14 @@ function Game(renderer, stage) {
 	net.on('FireMsg', this.onfire.bind(this));
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
+
+	net.on('ReplicaMsg', (function(value) {
+		var tick = value.Tick;
+		var states = value.States;
+		for (var i = 0, len = states.length; i < len; i++) {
+			this.state_msg(states[i]);
+		}
+	}).bind(this));
 }
 
 Game.prototype = Object.create(EventEmitter.prototype);

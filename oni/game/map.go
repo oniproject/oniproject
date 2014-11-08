@@ -150,7 +150,7 @@ func (m *Map) PickupItem(id utils.Id) *Item {
 }
 
 func (gm *Map) Run() {
-	send := func(c *Avatar, m interface{}) {
+	send := func(c *Avatar, m Message) {
 		select {
 		case c.sendMessage <- m:
 		default:
@@ -192,10 +192,10 @@ func (gm *Map) Run() {
 			for _, obj := range gm.objects {
 				obj.Regeneration()
 				if avatar, ok := obj.(*Avatar); ok {
-					send(avatar, WrapMessage(&ParametersMsg{
+					send(avatar, &ParametersMsg{
 						Parameters: avatar.Parameters,
 						Skills:     avatar.Skills,
-					}))
+					})
 					avatars = append(avatars, avatar)
 				}
 			}
@@ -207,7 +207,6 @@ func (gm *Map) Run() {
 
 		// replication
 		case <-t_replication.C:
-			// send tick
 			gm.tick++
 
 			// update position
@@ -241,15 +240,29 @@ func (gm *Map) Run() {
 			}
 
 			// send states to obj
-			for id, obj := range gm.objects {
-				state := &GameObjectState{
-					STATE_IDLE,
-					obj.Id(), gm.tick,
-					obj.Lag(), obj.Position(), obj.Velocity()}
 
-				if updated[id] {
-					state.Type = STATE_MOVE
+			for _, a := range gm.objects {
+				if avatar, ok := a.(*Avatar); ok {
+					around := gm.ObjectsAround(
+						avatar.Position(), ReplicRange, func(GameObject) bool { return false })
+
+					msg := &ReplicaMsg{gm.tick, []*GameObjectState{}}
+					for _, obj := range around {
+						state := &GameObjectState{
+							STATE_IDLE, obj.Id(), gm.tick,
+							obj.Lag(), obj.Position(), obj.Velocity()}
+
+						if updated[obj.Id()] {
+							state.Type = STATE_MOVE
+						}
+						msg.States = append(msg.States, state)
+					}
+
+					send(avatar, msg)
 				}
+			}
+
+			/*for id, obj := range gm.objects {
 
 				pos := obj.Position()
 				around := gm.ObjectsAround(pos, ReplicRange, avatarFilter)
@@ -259,13 +272,13 @@ func (gm *Map) Run() {
 					send(avatar, gm.tick)
 					send(avatar, state)
 				}
-			}
+			}*/
 
 		// create/destroy GameObject's
 		case obj := <-gm.register:
-			if c, ok := obj.(*Avatar); ok {
+			/*if c, ok := obj.(*Avatar); ok {
 				send(c, gm.tick)
-			}
+			}*/
 			gm.objects[obj.Id()] = obj
 			log.Debug("register", obj.Id(), obj)
 		case obj := <-gm.unregister:

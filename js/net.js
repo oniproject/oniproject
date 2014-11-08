@@ -14,6 +14,7 @@ var M_SetVelocityMsg = 1,
 	M_Parameters = 11,
 	M_Chat = 12,
 	M_ChatPost = 13,
+	M_Replica = 14,
 	___ = 0;
 
 function Net(url) {
@@ -99,6 +100,9 @@ Net.prototype._ParseMessages = function(type, value, event) {
 			break;
 		case M_Chat:
 			this.emit('ChatMsg', value);
+			break;
+		case M_Replica:
+			this.emit('ReplicaMsg', value);
 			break;
 		default:
 			this.emit('event', type, value, event);
