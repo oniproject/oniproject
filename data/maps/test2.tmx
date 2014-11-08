@@ -428,6 +428,6 @@
  </layer>
  <objectgroup color="#00ff00" name="collision"/>
  <objectgroup color="#00ff00" name="TELEPORTS">
-  <object name="test" x="368" y="0" width="336" height="88"/>
+  <object name="test" x="376" y="0" width="328" height="24"/>
  </objectgroup>
 </map>
