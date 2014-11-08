@@ -268,8 +268,11 @@ var UI = window.UI = new Vue({
 				dragMove: function(event) {
 					if (this.dragged) {
 						var b = this.$el.getBoundingClientRect();
-						this.$el.style.left = b.left + event.movementX + 'px';
-						this.$el.style.top = b.top + event.movementY + 'px';
+						var x = (event.movementX !== undefined) ? event.movementX : event.mozMovementX;
+						var y = (event.movementY !== undefined) ? event.movementY : event.mozMovementY;
+						this.$el.style.left = b.left + x + 'px';
+						this.$el.style.top = b.top + y + 'px';
+						console.log('dragged', x, y, event);
 					}
 				},
 				dragEnd: function(event) {
