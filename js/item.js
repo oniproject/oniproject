@@ -22,6 +22,8 @@ function Item(type) {
 	}
 
 	PIXI.Sprite.call(this, textures[type]);
+	this.anchor.x = 0.5;
+	this.anchor.y = 1;
 
 	image.load();
 	this.image = image;

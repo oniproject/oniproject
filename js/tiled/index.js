@@ -62,7 +62,6 @@ Tiled.prototype.load = function(fn, fn2) {
 					break;
 			}
 			if (obj !== undefined) {
-				console.log('addChild', layer, obj);
 				that.layers.push(obj);
 				that.addChild(obj);
 			}

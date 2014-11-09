@@ -32,8 +32,29 @@ function Game(renderer, stage) {
 	net.on('ReplicaMsg', (function(value) {
 		var tick = value.Tick;
 		var states = value.States;
+
+		var states_hash = {};
+
 		for (var i = 0, len = states.length; i < len; i++) {
-			this.state_msg(states[i]);
+			var state = states[i];
+			states_hash[state.Id] = state;
+			if (!this.avatars.hasOwnProperty(state.Id)) {
+				this.createAvatar(state);
+			}
+			this.avatars[state.Id].addState(state);
+		}
+
+		var ids = Object.keys(this.avatars);
+		for (var k in this.avatars) {
+			var avatar = this.avatars[k];
+			avatar.container.visible = 1;
+			if (avatar.rm_timer) {
+				clearTimeout(avatar.rm_timer);
+			}
+			if (!states_hash.hasOwnProperty(k)) {
+				avatar.container.visible = 0;
+				avatar.rm_timer = setTimeout(this.destroyAvatar.bind(this, k), 3000);
+			}
 		}
 	}).bind(this));
 }
@@ -46,6 +67,9 @@ Game.prototype.run = function(player, host, mapName) {
 		this.container.removeChild(this.map);
 		this.container.removeChild(this.map._maskX);
 		// TODO remove all avatars
+		for (var k in this.avatars) {
+			this.destroyAvatar(k);
+		}
 	}
 
 	var map = this.map = new Tiled('/maps/', mapName + '.json');
@@ -55,6 +79,40 @@ Game.prototype.run = function(player, host, mapName) {
 		that.net.connecTo('ws://' + host + '/ws');
 	});
 	this.container.addChild(map);
+}
+
+Game.prototype.createAvatar = function(state) {
+	// create Avatar
+	var obj;
+	if (state.Id > 0) {
+		obj = new Suika();
+	} else if (state.Id > -20000) {
+		obj = new Bat();
+	} else {
+		obj = new Item(13);
+	}
+	var avatar = this.avatars[state.Id] = new GameObject(obj, state);
+	avatar.on('tapped', (function(id) {
+		console.info('tapped', id);
+		this.net.SetTargetMsg(id);
+		if (this.target == id) {
+			var obj = this.avatars[id];
+			if (obj.isItem()) {
+				this.net.PickupItemMsg();
+			}
+		}
+		this.target = id;
+	}).bind(this));
+
+	this.map.AVATARS.addChild(avatar.container);
+}
+
+Game.prototype.destroyAvatar = function(id) {
+	var a = this.avatars[id];
+	if (a) {
+		this.map.AVATARS.removeChild(a.container);
+		delete this.avatars[id];
+	}
 }
 
 Game.prototype.initKeyboard = function() {
@@ -144,8 +202,8 @@ Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
 
-		var x = -player.obj.position.x + window.innerWidth / 2;
-		var y = -player.obj.position.y + window.innerHeight / 2;
+		var x = -player.container.position.x + window.innerWidth / 2;
+		var y = -player.container.position.y + window.innerHeight / 2;
 
 		var w = this.map.data.width * this.map.data.tilewidth;
 		var h = this.map.data.height * this.map.data.tileheight;
@@ -166,105 +224,8 @@ Game.prototype.render = function() {
 	}
 }
 
-Game.prototype.state_msg = function(state) {
-	if (state.hasOwnProperty('Id')) {
-		switch (state.Type) {
-			case 2: // destroy
-				var a = this.avatars[state.Id];
-				if (a.obj) {
-					this.map.AVATARS.removeChild(a.obj);
-				}
-				delete this.avatars[state.Id];
-				break;
-			case 1: // create
-				var obj;
-				if (state.Id > 0) {
-					obj = new Suika();
-				} else if (state.Id > -20000) {
-					obj = new Bat();
-				} else {
-					obj = new Item(13);
-				}
-				if (obj) {
-					this.map.AVATARS.addChild(obj);
-				}
-				this.avatars[state.Id] = new GameObject(obj);
-				this.avatars[state.Id].on('tapped', (function(id) {
-					console.info('tapped', id);
-					this.net.SetTargetMsg(id);
-					if (this.target == id) {
-						var obj = this.avatars[id];
-						if (obj.isItem()) {
-							this.net.PickupItemMsg();
-						}
-					}
-					this.target = id;
-				}).bind(this));
-
-			case 0: // idle
-				if (!this.avatars.hasOwnProperty(state.Id)) {
-					state.Type = 1;
-					return this.state_msg(state);
-				}
-				var avatar = this.avatars[state.Id];
-				avatar.rot = 0;
-			case 3: // move
-				if (!this.avatars.hasOwnProperty(state.Id)) {
-					state.Type = 1;
-					return this.state_msg(state);
-				}
-				var avatar = this.avatars[state.Id];
-				if (state.Id == this.player) {
-					//this.suika.animation = 'idle';
-				}
-				if (state.Type == 3) {
-					avatar.rot = 3;
-					if (state.Id == this.player) {
-						//this.suika.animation = 'walk';
-					}
-					if (!(avatar.velocity.x == 0 && avatar.velocity.y == 0)) {
-						avatar.lastvel = {
-							x: avatar.velocity.x,
-							y: avatar.velocity.y
-						};
-					}
-				}
-
-				if (avatar.rm_timer) {
-					clearTimeout(avatar.rm_timer);
-				}
-				avatar.rm_timer = setTimeout(function() {
-					if (avatar.obj !== undefined) {
-						this.map.AVATARS.removeChild(avatar.obj);
-					}
-					delete this.avatars[state.Id];
-				}.bind(this), 1000);
-
-				avatar.state = state;
-				avatar.position.x = state.Position.X;
-				avatar.position.y = state.Position.Y;
-
-				if (state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
-					avatar.velocity.x = state.Velocity.X;
-					avatar.velocity.y = state.Velocity.Y;
-				}
-				break;
-		}
-		return true;
-	}
-	return false;
-}
-
 Game.prototype.onmessage = function(message) {
-	if (Array.isArray(message)) {
-		for (var i = 0, l = message.length; i < l; i++) {
-			this.state_msg(message[i]);
-		}
-	} else {
-		if (!this.state_msg(message)) {
-			console.log('message', message);
-		}
-	}
+	console.warn('message', message);
 }
 
 Game.prototype.onevent = function(type, message) {

@@ -76,6 +76,7 @@ game.net.on('ParametersMsg', function(p) {
 game.net.on('ChatMsg', function(msg) {
 	console.log('ChatMsg', msg);
 	UI.chat.push(msg);
+	game.avatars[msg.Id].msg = msg.Text;
 });
 
 var UI = window.UI = new Vue({
