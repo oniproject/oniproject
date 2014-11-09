@@ -11,7 +11,7 @@ html lang=en
       img width="758" height="220" src="/ui/loading_bar.gif"
 
     div v-show="isConnected"
-      .window v-component="draggable" v-show="showEquip" style="top: 150px; right: 300px"
+      .window v-component="draggable" v-show="showEquip" style="top: 150px; right: 100px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Equip
         .content#equip
           div.item v-repeat="equip"
@@ -32,7 +32,7 @@ html lang=en
           #gold 12345678
         .close v-on="click: showInventory = !showInventory"
 
-      .window v-component="draggable" style="top: 150px; left: 300px"
+      .window v-component="draggable" style="top: 150px; left: 10px"
         div v-component="scrolled"
           .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Quest
           .content.paper
@@ -62,7 +62,7 @@ html lang=en
             a.slider v-style="top: scrollTopX/(scrollH-1) + 22 +'px'"
         .close
 
-      .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 10px"
+      .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 100px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Spells
         .content.red
           strong Uuummmm, this is a tasty burger!
