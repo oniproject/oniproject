@@ -133,6 +133,7 @@ var UI = window.UI = new Vue({
 			},
 		],
 		target: {
+			Id: 0,
 			Race: 0,
 			HP: 0,
 			MHP: 0,
@@ -208,7 +209,7 @@ var UI = window.UI = new Vue({
 	},
 	computed: {
 		showTargetBar: function() {
-			return !!this.target.MHP;
+			return !!this.target.Id;
 		},
 	},
 	components: {
