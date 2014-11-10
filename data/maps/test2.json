@@ -19790,10 +19790,10 @@
       "objects": [
         {
           "name": "test",
-          "x": 368,
+          "x": 376,
           "y": 0,
-          "width": 336,
-          "height": 88,
+          "width": 328,
+          "height": 24,
           "visible": true
         }
       ],

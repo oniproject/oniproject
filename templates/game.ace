@@ -11,7 +11,7 @@ html lang=en
       img width="758" height="220" src="/ui/loading_bar.gif"
 
     div v-show="isConnected"
-      .window v-component="draggable" v-show="showEquip" style="top: 150px; right: 300px"
+      .window v-component="draggable" v-show="showEquip" style="top: 150px; right: 100px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Equip
         .content#equip
           div.item v-repeat="equip"
@@ -20,24 +20,22 @@ html lang=en
             .desc
               || Your bones don't break, mine do.
               || That's clear.
-
         .close v-on="click: showEquip = !showEquip"
+
       .window v-component="draggable" v-show="showInventory" style="top: 150px; right: 10px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Inventory
         .content#inventory
           .img v-repeat="invTest" v-on="click: cast($key)"
             img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
             .img-over
-
           #gold 12345678
         .close v-on="click: showInventory = !showInventory"
 
-      .window v-component="draggable" style="top: 150px; left: 300px"
+      / .window v-component="draggable" style="top: 150px; left: 10px"
         div v-component="scrolled"
           .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Quest
           .content.paper
             .sello.red
-
             .scrollbar-wrap
               .native v-on="scroll: scroll"
                 .s-content
@@ -53,16 +51,14 @@ html lang=en
                   p We swallow it too fast, we choke.
                   p We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I.
                   p We're on the same curve, just on opposite ends.
-
                   button.btn Accept
-
           .scrollbar v-component="scrollbar"
             a.up v-on="click: up"
             a.down v-on="click: down"
             a.slider v-style="top: scrollTopX/(scrollH-1) + 22 +'px'"
         .close
 
-      .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 10px"
+      .window v-component="draggable" v-show="showSpells" style="top: 150px; left: 100px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Spells
         .content.red
           strong Uuummmm, this is a tasty burger!
@@ -73,6 +69,9 @@ html lang=en
           p No?
           p Well, that's what you see at a toy store. And you must think you're in a toy store, because you're here shopping for an infant named Jeb.
         .close v-on="click: showSpells = !showSpells"
+
+
+
 
       #target-bar v-show="showTargetBar" v-component="draggable" v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove"
         strong v-text="target.Name"
@@ -136,9 +135,3 @@ html lang=en
           delimiters: ['`', '`'],
       });
     script src="/main.js"
-    / h1 Base Template : {{.Msg}}
-    / #container.wrapper
-      = yield main
-      = yield sub
-    / = javascript
-      alert('{{.Msg}}');

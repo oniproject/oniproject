@@ -30,7 +30,7 @@ var upgrader = websocket.Upgrader{
 
 type Connection struct {
 	ws          *websocket.Conn
-	sendMessage chan interface{}
+	sendMessage chan Message
 	ping_pong   time.Time
 	lag         time.Duration
 }
@@ -117,7 +117,7 @@ func (c *Connection) writePump() {
 
 			buf := bytes.NewBuffer([]byte{})
 			encoder := cbor.NewEncoder(buf)
-			if err := encoder.Encode(message); err != nil {
+			if err := encoder.Encode(WrapMessage(message)); err != nil {
 				log.Error("cbor encode: ", err)
 				return
 			}

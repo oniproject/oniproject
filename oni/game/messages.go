@@ -49,6 +49,8 @@ const (
 
 	M_Chat
 	M_ChatPost
+
+	M_Replica
 )
 
 // to client
@@ -74,6 +76,8 @@ func WrapMessage(message Message) interface{} {
 		return &MessageWraper{M_Parameters, message}
 	case *ChatMsg:
 		return &MessageWraper{M_Chat, message}
+	case *ReplicaMsg:
+		return &MessageWraper{M_Replica, message}
 	}
 	log.Warningf("fail type %T %v", message, message)
 	return message
@@ -138,24 +142,6 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
-
-	// XXX XXX XXX XXX XXX
-	pos := a.Position()
-	if 11 < pos.X && pos.X < 18 {
-		if a.MapId == "test" && pos.Y > 39 {
-			a.MapId = "test2"
-			a.SetPosition(pos.X, 2)
-			s.Unregister(a)
-			return
-		}
-		if a.MapId == "test2" && pos.Y < 2 {
-			a.MapId = "test"
-			a.SetPosition(pos.X, 39)
-			s.Unregister(a)
-			return
-		}
-	}
-
 	a.SetVelocity(m.X, m.Y)
 }
 
@@ -166,6 +152,14 @@ type SetTargetMsg struct {
 func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
+
+	msg := &TargetDataMsg{Id: a.Target, Race: 0, HP: 0, MHP: 0, Name: ""}
+
+	defer func() {
+		msg.Id = a.Target
+		a.sendMessage <- msg
+	}()
+
 	target := s.GetObjById(a.Target)
 	if target == nil {
 		a.Target = 0
@@ -178,8 +172,9 @@ func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
 		return
 	}
 
-	hp, mhp := target.HPbar()
-	a.sendMessage <- WrapMessage(&TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp, Name: target.Name()})
+	msg.HP, msg.MHP = target.HPbar()
+	msg.Name = target.Name()
+	msg.Race = target.Race()
 }
 
 type CastMsg struct {
@@ -236,7 +231,7 @@ func (m *CastMsg) Run(s MessageToMapInterface, obj interface{}) {
 	caster.RecoverMP(-skill.MPused)
 	caster.RecoverTP(-skill.TPused)
 
-	caster.sendMessage <- WrapMessage(&ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills})
+	caster.sendMessage <- &ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills}
 
 	if hp, _ := target.HPbar(); hp == 0 {
 		switch t := target.(type) {
@@ -250,7 +245,7 @@ func (m *CastMsg) Run(s MessageToMapInterface, obj interface{}) {
 
 	if target != caster {
 		hp, mhp := target.HPbar()
-		caster.sendMessage <- WrapMessage(&TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp, Name: target.Name()})
+		caster.sendMessage <- &TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp, Name: target.Name()}
 	}
 
 	log.Infof("cast OK: %v %d", m, caster.Target)
@@ -271,7 +266,7 @@ type DestroyMsg struct {
 
 func (m *DestroyMsg) Run(s MessageToMapInterface, obj interface{}) {
 	if a, ok := obj.(*Avatar); ok {
-		a.sendMessage <- WrapMessage(m)
+		a.sendMessage <- m
 	} else {
 		log.Warningf("fail send: not a Avatar %T %v", obj, obj)
 	}
@@ -293,7 +288,7 @@ func (m *DropItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 	pos := a.Position()
 	s.DropItem(pos.X, pos.Y, item)
 
-	a.sendMessage <- WrapMessage(&InventoryMsg{Inventory: a.Inventory, Equip: a.Equip})
+	a.sendMessage <- &InventoryMsg{Inventory: a.Inventory, Equip: a.Equip}
 }
 
 type PickupItemMsg struct{}
@@ -307,7 +302,7 @@ func (m *PickupItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 	}
 	a.AddItem(item)
 
-	a.sendMessage <- WrapMessage(&InventoryMsg{Inventory: a.Inventory, Equip: a.Equip})
+	a.sendMessage <- &InventoryMsg{Inventory: a.Inventory, Equip: a.Equip}
 }
 
 type RequestInventoryMsg struct{}
@@ -315,7 +310,7 @@ type RequestInventoryMsg struct{}
 func (m *RequestInventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	log.Debugf("RequestInventoryMsg %v %v", a.Inventory, a.Equip)
-	a.sendMessage <- WrapMessage(&InventoryMsg{Inventory: a.Inventory, Equip: a.Equip})
+	a.sendMessage <- &InventoryMsg{Inventory: a.Inventory, Equip: a.Equip}
 }
 
 type InventoryMsg struct {
@@ -328,6 +323,7 @@ func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 }
 
 type TargetDataMsg struct {
+	Id      utils.Id
 	Race    int
 	HP, MHP int
 	Name    string
@@ -342,7 +338,7 @@ type RequestParametersMsg struct{}
 func (m *RequestParametersMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	log.Debugf("RequestParametersMsg %v %v", a.Parameters, a.Skills)
-	a.sendMessage <- WrapMessage(&ParametersMsg{Parameters: a.Parameters, Skills: a.Skills})
+	a.sendMessage <- &ParametersMsg{Parameters: a.Parameters, Skills: a.Skills}
 }
 
 type ParametersMsg struct {
@@ -382,5 +378,14 @@ func (m *ChatPostMsg) Run(s MessageToMapInterface, obj interface{}) {
 	}
 	post := &ChatMsg{Id: int64(a.Id()), Type: t, Text: msg, Name: a.Name()}
 	log.Println(post)
-	a.sendMessage <- WrapMessage(post)
+	a.sendMessage <- post
+}
+
+type ReplicaMsg struct {
+	Tick   uint
+	States []*GameObjectState
+}
+
+func (m *ReplicaMsg) Run(s MessageToMapInterface, obj interface{}) {
+	log.Panic("ReplicaMsg Run")
 }

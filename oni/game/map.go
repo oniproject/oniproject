@@ -10,6 +10,7 @@ import (
 	"oniproject/oni/jps"
 	"oniproject/oni/utils"
 	"path"
+	"runtime/debug"
 	"time"
 )
 
@@ -48,27 +49,6 @@ type Map struct {
 }
 
 func NewMap(game *Game, name string) *Map {
-	// TODO remove it
-	/*b, err := ioutil.ReadFile("data/maps/" + name + ".wlk.txt")
-	if err != nil {
-		panic(err)
-	}
-	s := string(b)
-	lines := strings.Split(s, "\n")
-	w, h := len(lines[0]), len(lines)
-	log.Printf("%d:%d\n%s\n", w, h, s)
-	grid := jps.FromString(s, w, h)
-	for y := 0; y < h; y++ {
-		s := []byte{}
-		for x := 0; x < w; x++ {
-			if grid.Walkable(x, y) {
-				s = append(s, ' ')
-			} else {
-				s = append(s, 'X')
-			}
-		}
-	}*/
-
 	fname := path.Join("data/maps/", name+".tmx")
 	tmxMap, err := tmx.LoadTMX(fname)
 	if err != nil {
@@ -102,8 +82,8 @@ func NewMap(game *Game, name string) *Map {
 	}
 }
 
-func (m *Map) Walkable(x, y int) bool {
-	return m.Grid.Walkable(x, y)
+func (m *Map) Walkable(c geom.Coord) bool {
+	return m.Grid.Walkable(int(c.X), int(c.Y))
 }
 func (m *Map) Register(a GameObject) {
 	go func() { m.register <- a }()
@@ -119,9 +99,8 @@ func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 	return gm.objects[id]
 }
 
-func (gm *Map) ObjectsAround(x, y, r float64, exclude func(GameObject) bool) []GameObject {
+func (gm *Map) ObjectsAround(center geom.Coord, r float64, exclude func(GameObject) bool) []GameObject {
 	objects := []GameObject{}
-	center := geom.Coord{X: x, Y: y}
 	for _, obj := range gm.objects {
 		d := center.DistanceFrom(obj.Position())
 		if d <= r && !exclude(obj) {
@@ -171,7 +150,7 @@ func (m *Map) PickupItem(id utils.Id) *Item {
 }
 
 func (gm *Map) Run() {
-	send := func(c *Avatar, m interface{}) {
+	send := func(c *Avatar, m Message) {
 		select {
 		case c.sendMessage <- m:
 		default:
@@ -181,14 +160,14 @@ func (gm *Map) Run() {
 	closeChan := func(avatar *Avatar) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Error(err)
+				log.Error(err, "\n", string(debug.Stack()))
 			}
 		}()
 		close(avatar.sendMessage)
 	}
 
 	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
-	x, y := 5, 35
+	x, y := 20, 15
 
 	for i := 0; i < 4; i++ {
 		go gm.SpawnMonster(float64(x+0), float64(y+i))
@@ -198,7 +177,7 @@ func (gm *Map) Run() {
 		go gm.SpawnMonster(float64(x+4), float64(y+i))
 		go gm.SpawnMonster(float64(x+5), float64(y+i))
 
-		go gm.DropItem(float64(x+15), float64(y+i), test_knife)
+		go gm.DropItem(float64(x+6), float64(y+i), test_knife)
 	}
 
 	t_replication := time.NewTicker(TickRate)
@@ -213,10 +192,10 @@ func (gm *Map) Run() {
 			for _, obj := range gm.objects {
 				obj.Regeneration()
 				if avatar, ok := obj.(*Avatar); ok {
-					send(avatar, WrapMessage(&ParametersMsg{
+					send(avatar, &ParametersMsg{
 						Parameters: avatar.Parameters,
 						Skills:     avatar.Skills,
-					}))
+					})
 					avatars = append(avatars, avatar)
 				}
 			}
@@ -228,7 +207,6 @@ func (gm *Map) Run() {
 
 		// replication
 		case <-t_replication.C:
-			// send tick
 			gm.tick++
 
 			// update position
@@ -239,32 +217,68 @@ func (gm *Map) Run() {
 				}
 			}
 
-			// send states to obj
-			for id, obj := range gm.objects {
-				state := &GameObjectState{
-					STATE_IDLE,
-					obj.Id(), gm.tick,
-					obj.Lag(), obj.Position(), obj.Velocity()}
-
-				if updated[id] {
-					state.Type = STATE_MOVE
+			// XXX teleports
+			for _, obj := range gm.objects {
+				if a, ok := obj.(*Avatar); ok {
+					pos := a.Position()
+					layer := gm.tmxMap.LayerByName("TELEPORTS", "objectgroup")
+					objects := layer.ObjectsByPoint(pos.X*32, pos.Y*32)
+					for _, o := range objects {
+						log.Warn("!!!!!! found: ", o.Name)
+						switch o.Name {
+						case "test":
+							a.MapId = "test"
+							a.SetPosition(pos.X, 39)
+							gm.Unregister(a)
+						case "test2":
+							a.MapId = "test2"
+							a.SetPosition(pos.X, 2)
+							gm.Unregister(a)
+						}
+					}
 				}
+			}
+
+			// send states to obj
+
+			for _, a := range gm.objects {
+				if avatar, ok := a.(*Avatar); ok {
+					around := gm.ObjectsAround(
+						avatar.Position(), ReplicRange, func(GameObject) bool { return false })
+
+					msg := &ReplicaMsg{gm.tick, []*GameObjectState{}}
+					for _, obj := range around {
+						state := &GameObjectState{
+							STATE_IDLE, obj.Id(),
+							obj.Lag(), obj.Position(), obj.Velocity()}
+
+						if updated[obj.Id()] {
+							state.Type = STATE_MOVE
+						}
+						msg.States = append(msg.States, state)
+					}
+
+					send(avatar, msg)
+				}
+			}
+
+			/*for id, obj := range gm.objects {
 
 				pos := obj.Position()
-				around := gm.ObjectsAround(pos.X, pos.Y, ReplicRange, avatarFilter)
+				around := gm.ObjectsAround(pos, ReplicRange, avatarFilter)
 
 				for _, a := range around {
 					avatar := a.(*Avatar)
 					send(avatar, gm.tick)
 					send(avatar, state)
 				}
-			}
+			}*/
 
 		// create/destroy GameObject's
 		case obj := <-gm.register:
-			if c, ok := obj.(*Avatar); ok {
+			/*if c, ok := obj.(*Avatar); ok {
 				send(c, gm.tick)
-			}
+			}*/
 			gm.objects[obj.Id()] = obj
 			log.Debug("register", obj.Id(), obj)
 		case obj := <-gm.unregister:

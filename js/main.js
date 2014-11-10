@@ -76,6 +76,7 @@ game.net.on('ParametersMsg', function(p) {
 game.net.on('ChatMsg', function(msg) {
 	console.log('ChatMsg', msg);
 	UI.chat.push(msg);
+	game.avatars[msg.Id].msg = msg.Text;
 });
 
 var UI = window.UI = new Vue({
@@ -92,9 +93,9 @@ var UI = window.UI = new Vue({
 		tp: 50,
 		mtp: 100,
 
-		showEquip: true,
-		showSpells: true,
-		showInventory: true,
+		showEquip: false,
+		showSpells: false,
+		showInventory: false,
 		showChat: true,
 
 		msg: 'msgqwer freqw',
@@ -131,6 +132,7 @@ var UI = window.UI = new Vue({
 			},
 		],
 		target: {
+			Id: 0,
 			Race: 0,
 			HP: 0,
 			MHP: 0,
@@ -206,7 +208,7 @@ var UI = window.UI = new Vue({
 	},
 	computed: {
 		showTargetBar: function() {
-			return !!this.target.MHP;
+			return !!this.target.Id;
 		},
 	},
 	components: {
@@ -267,8 +269,11 @@ var UI = window.UI = new Vue({
 				dragMove: function(event) {
 					if (this.dragged) {
 						var b = this.$el.getBoundingClientRect();
-						this.$el.style.left = b.left + event.movementX + 'px';
-						this.$el.style.top = b.top + event.movementY + 'px';
+						var x = (event.movementX !== undefined) ? event.movementX : event.mozMovementX;
+						var y = (event.movementY !== undefined) ? event.movementY : event.mozMovementY;
+						this.$el.style.left = b.left + x + 'px';
+						this.$el.style.top = b.top + y + 'px';
+						console.log('dragged', x, y, event);
 					}
 				},
 				dragEnd: function(event) {
