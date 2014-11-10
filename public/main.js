@@ -94,9 +94,9 @@ var UI = window.UI = new Vue({
 		tp: 50,
 		mtp: 100,
 
-		showEquip: true,
-		showSpells: true,
-		showInventory: true,
+		showEquip: false,
+		showSpells: false,
+		showInventory: false,
 		showChat: true,
 
 		msg: 'msgqwer freqw',
