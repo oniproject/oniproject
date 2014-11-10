@@ -20,7 +20,6 @@ type Walkabler interface {
 type GameObjectState struct {
 	Type     uint8
 	Id       utils.Id
-	Tick     uint
 	Lag      time.Duration
 	Position geom.Coord
 	Velocity geom.Coord

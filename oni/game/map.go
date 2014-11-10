@@ -249,7 +249,7 @@ func (gm *Map) Run() {
 					msg := &ReplicaMsg{gm.tick, []*GameObjectState{}}
 					for _, obj := range around {
 						state := &GameObjectState{
-							STATE_IDLE, obj.Id(), gm.tick,
+							STATE_IDLE, obj.Id(),
 							obj.Lag(), obj.Position(), obj.Velocity()}
 
 						if updated[obj.Id()] {
