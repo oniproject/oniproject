@@ -167,7 +167,7 @@ func (gm *Map) Run() {
 	}
 
 	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
-	x, y := 5, 15
+	x, y := 20, 15
 
 	for i := 0; i < 4; i++ {
 		go gm.SpawnMonster(float64(x+0), float64(y+i))
@@ -177,7 +177,7 @@ func (gm *Map) Run() {
 		go gm.SpawnMonster(float64(x+4), float64(y+i))
 		go gm.SpawnMonster(float64(x+5), float64(y+i))
 
-		go gm.DropItem(float64(x+15), float64(y+i), test_knife)
+		go gm.DropItem(float64(x+6), float64(y+i), test_knife)
 	}
 
 	t_replication := time.NewTicker(TickRate)
