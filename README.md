@@ -7,6 +7,8 @@ MMORPG движок же!
 
 [DEMO](http://oniproject-lain.rhcloud.com/) - регистрируемся (Sign-up) под любым именем(пароль не требуется) и жмакаем по кнопке Game
 
+![screenshot](https://raw.github.com/oniproject/oniproject/develop/last_screenshot.png)
+
 ## Как запустить?
 
 Собираем сервер:
