@@ -167,7 +167,7 @@ func (gm *Map) Run() {
 	}
 
 	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
-	x, y := 5, 35
+	x, y := 5, 15
 
 	for i := 0; i < 4; i++ {
 		go gm.SpawnMonster(float64(x+0), float64(y+i))

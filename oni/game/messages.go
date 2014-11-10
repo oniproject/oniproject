@@ -152,6 +152,14 @@ type SetTargetMsg struct {
 func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	a.Target = m.Target
+
+	msg := &TargetDataMsg{Id: a.Target, Race: 0, HP: 0, MHP: 0, Name: ""}
+
+	defer func() {
+		msg.Id = a.Target
+		a.sendMessage <- msg
+	}()
+
 	target := s.GetObjById(a.Target)
 	if target == nil {
 		a.Target = 0
@@ -164,8 +172,9 @@ func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
 		return
 	}
 
-	hp, mhp := target.HPbar()
-	a.sendMessage <- &TargetDataMsg{Race: target.Race(), HP: hp, MHP: mhp, Name: target.Name()}
+	msg.HP, msg.MHP = target.HPbar()
+	msg.Name = target.Name()
+	msg.Race = target.Race()
 }
 
 type CastMsg struct {
@@ -314,6 +323,7 @@ func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 }
 
 type TargetDataMsg struct {
+	Id      utils.Id
 	Race    int
 	HP, MHP int
 	Name    string
