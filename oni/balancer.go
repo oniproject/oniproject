@@ -4,13 +4,11 @@ package oni
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/gocircuit/circuit/client"
 	"oniproject/oni/game"
 	"oniproject/oni/utils"
 )
 
 type Balancer struct {
-	c     *client.Client
 	games []*BalancerGame
 	adb   AvatarDB
 }
@@ -36,9 +34,6 @@ func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
 	b = &Balancer{
 		adb:   adb,
 		games: config.Games,
-	}
-	if config.Circuit != "" {
-		b.c = client.Dial(config.Circuit, nil)
 	}
 	return
 }
