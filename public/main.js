@@ -471,11 +471,37 @@ function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
 
+	this.container.click = this.container.tap = function(event) {
+		console.log('TAPPED', event);
+		var p1 = event.getLocalPosition(this.container);
+		var player = this.avatars[this.player];
+		if (player) {
+			var p2 = player.container.position;
+			var v = {
+				x: p1.x - p2.x,
+				y: p1.y - p2.y
+			};
+			this.inputAxesVector.x = 0;
+			this.inputAxesVector.y = 0;
+			if (v.x != 0) {
+				this.inputAxesVector.x = v.x < 0 ? -1 : 1;
+			}
+			if (v.y != 0) {
+				this.inputAxesVector.y = v.y < 0 ? -1 : 1;
+			}
+		}
+	}.bind(this);
+	this.container.hitArea = new PIXI.Rectangle(-99999, -99999, 999999, 999999);
+	this.container.interactive = true;
+
 	this.initKeyboard();
 
 	this.renderer = renderer;
 	this.stage = stage;
-	this.dir = [' ', ' '];
+	this.inputAxesVector = {
+		x: 0,
+		y: 0,
+	};
 	this.player = 0;
 	this.target = 0;
 	this.avatars = {};
@@ -581,37 +607,45 @@ Game.prototype.initKeyboard = function() {
 		{
 			keys: 'w',
 			on_keydown: function() {
-				this.dir[0] = 'N';
+				//this.dir[0] = 'N';
+				this.inputAxesVector.y = -1;
 			},
 			on_keyup: function() {
-				this.dir[0] = ' ';
+				//this.dir[0] = ' ';
+				this.inputAxesVector.y = 0;
 			},
 		},
 		{
 			keys: 'a',
 			on_keydown: function() {
-				this.dir[1] = 'W';
+				//this.dir[1] = 'W';
+				this.inputAxesVector.x = -1;
 			},
 			on_keyup: function() {
-				this.dir[1] = ' ';
+				//this.dir[1] = ' ';
+				this.inputAxesVector.x = 0;
 			},
 		},
 		{
 			keys: 's',
 			on_keydown: function() {
-				this.dir[0] = 'S';
+				//this.dir[0] = 'S';
+				this.inputAxesVector.y = 1;
 			},
 			on_keyup: function() {
-				this.dir[0] = ' ';
+				//this.dir[0] = ' ';
+				this.inputAxesVector.y = 0;
 			},
 		},
 		{
 			keys: 'd',
 			on_keydown: function() {
-				this.dir[1] = 'E';
+				this.inputAxesVector.x = 1;
+				//this.dir[1] = 'E';
 			},
 			on_keyup: function() {
-				this.dir[1] = ' ';
+				this.inputAxesVector.x = 0;
+				//this.dir[1] = ' ';
 			},
 		},
 	];
@@ -629,7 +663,7 @@ Game.prototype.initKeyboard = function() {
 Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
-		var v = {
+		/*var v = {
 			x: 0,
 			y: 0
 		};
@@ -651,8 +685,8 @@ Game.prototype.update = function() {
 					v.x += 1;
 					break;
 			}
-		}
-		this.net.SetVelocityMsg(v);
+		}*/
+		this.net.SetVelocityMsg(this.inputAxesVector);
 	}
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
