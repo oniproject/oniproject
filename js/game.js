@@ -65,7 +65,6 @@ Game.prototype.constructor = Game;
 Game.prototype.run = function(player, host, mapName) {
 	if (this.map) {
 		this.container.removeChild(this.map);
-		this.container.removeChild(this.map._maskX);
 		// TODO remove all avatars
 		for (var k in this.avatars) {
 			this.destroyAvatar(k);
@@ -156,25 +155,6 @@ Game.prototype.initKeyboard = function() {
 				this.dir[1] = ' ';
 			},
 		},
-
-		{
-			keys: 'e',
-			on_keydown: function() {
-				this.avatars[this.player].velocity.z = 1;
-			},
-			on_keyup: function() {
-				this.avatars[this.player].velocity.z = 0;
-			},
-		},
-		{
-			keys: 'q',
-			on_keydown: function() {
-				this.avatars[this.player].velocity.z = -1;
-			},
-			on_keyup: function() {
-				this.avatars[this.player].velocity.z = 0;
-			},
-		},
 	];
 	this.move_combos = move_combos;
 
@@ -190,8 +170,30 @@ Game.prototype.initKeyboard = function() {
 Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
-		player.move(this.dir.join(''));
-		this.net.SetVelocityMsg(player.velocity);
+		var v = {
+			x: 0,
+			y: 0
+		};
+		//player.move(this.dir.join(''));
+		//
+		for (var i = 0, l = this.dir.length; i < l; i++) {
+			var to = this.dir[i];
+			switch (to) {
+				case 'N':
+					v.y -= 1;
+					break;
+				case 'W':
+					v.x -= 1;
+					break;
+				case 'S':
+					v.y += 1;
+					break;
+				case 'E':
+					v.x += 1;
+					break;
+			}
+		}
+		this.net.SetVelocityMsg(v);
 	}
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);

@@ -5,24 +5,10 @@ var EventEmitter = require('events').EventEmitter;
 function GameObject(obj, state) {
 	this.state = state;
 
-	this.position = {
-		x: 0,
-		y: 0
-	};
-
-	this.velocity = {
-		x: 0,
-		y: 0
-	};
-
 	this.lastvel = {
 		x: 0,
 		y: 0
 	};
-
-	this.speed = 1.0;
-	this.angle = 0;
-	this.rot = 1;
 
 	this.container = new PIXI.DisplayObjectContainer();
 
@@ -110,36 +96,33 @@ GameObject.prototype.isItem = function() {
 }
 
 GameObject.prototype.addState = function(state) {
-	this.state = state;
 	switch (state.Type) {
 		//case 2: // destroy
 		//case 1: // create
 		case 3: // move
-			if (!(this.velocity.x == 0 && this.velocity.y == 0)) {
-				this.lastvel.x = this.velocity.x;
-				this.lastvel.y = this.velocity.y;
+			var x = this.state.Velocity.X;
+			var y = this.state.Velocity.Y;
+			if (x !== NaN && y !== NaN) {
+				if (!!x || !!y) {
+					this.lastvel.x = this.state.Velocity.X;
+					this.lastvel.y = this.state.Velocity.Y;
+				}
 		}
 
 		case 0: // idle
-			this.position.x = state.Position.X;
-			this.position.y = state.Position.Y;
-
-			if (state.Velocity && state.Velocity.X != NaN && state.Velocity.Y != NaN) {
-				this.velocity.x = state.Velocity.X;
-				this.velocity.y = state.Velocity.Y;
+			if (state.Position && state.Position.X !== NaN && state.Position.Y !== NaN) {
+				this.container.position.x = state.Position.X * 32 | 0;
+				this.container.position.y = state.Position.Y * 32 | 0;
 			}
+
 			break;
 	}
-	return true;
+
+	this.state = state;
 }
 
 GameObject.prototype.update = function(time) {
-	this.angle += this.rot * Math.PI * time;
-	this.position.x += this.velocity.x * time;
-	this.position.y += this.velocity.y * time;
-
-	this.container.x = (this.position.x * 32) | 0;
-	this.container.y = (this.position.y * 32) | 0;
+	var state = this.state;
 
 	if (this.obj) {
 		var obj = this.obj;
@@ -147,37 +130,19 @@ GameObject.prototype.update = function(time) {
 		if (!obj.animation) return;
 
 		obj.animation = 'idle';
-		if (this.velocity.x !== 0 || this.velocity.y !== 0) {
-			var d = Math.atan2(this.velocity.x || 0, this.velocity.y || 0);
+		var x = state.Velocity.X;
+		var y = state.Velocity.Y;
+		if (x !== NaN && y !== NaN) {
+			if (!!x || !!y) {
+				var d = Math.atan2(x, y);
+				var dd = -d / Math.PI * 180 + 180;
+				obj.direction = dd;
+				obj.animation = 'walk';
+			}
+		} else {
+			var d = Math.atan2(this.lastvel.x, this.lastvel.y);
 			var dd = -d / Math.PI * 180 + 180;
 			obj.direction = dd;
-			obj.animation = 'walk';
-		} else if (this.lastvel !== undefined) {
-			var d = Math.atan2(this.lastvel.x || 0, this.lastvel.y || 0);
-			var dd = -d / Math.PI * 180 + 180;
-			obj.direction = dd;
-		}
-	}
-}
-
-GameObject.prototype.move = function(dir) {
-	this.velocity.x = 0;
-	this.velocity.y = 0;
-	for (var i = 0, l = dir.length; i < l; i++) {
-		var to = dir[i];
-		switch (to) {
-			case 'N':
-				this.velocity.y -= this.speed;
-				break;
-			case 'W':
-				this.velocity.x -= this.speed;
-				break;
-			case 'S':
-				this.velocity.y += this.speed;
-				break;
-			case 'E':
-				this.velocity.x += this.speed;
-				break;
 		}
 	}
 }
