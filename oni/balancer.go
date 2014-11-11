@@ -4,6 +4,7 @@ package oni
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"net/rpc"
 	"oniproject/oni/game"
 	"oniproject/oni/utils"
 )
@@ -23,11 +24,17 @@ type BalancerGame struct {
 	Rpc          string
 	Minid, Maxid int64
 	Maps         map[string]*BalancerMap
-	game         *game.Game
+	client       *rpc.Client
 }
 
-func (g *BalancerGame) LoadMap(id string) {
-	g.game.LoadMap(id)
+func (g *BalancerGame) LoadMap(id string) error {
+	reply := struct{}{}
+	return g.client.Call("Game.LoadMap", &id, &reply)
+}
+
+func (g *BalancerGame) DetachAvatar(id utils.Id, mapId string) error {
+	reply := struct{}{}
+	return g.client.Call("Game.DetachAvatar", &game.DetachAvatarArgs{id, mapId}, &reply)
 }
 
 func NewBalancer(config *Config, adb AvatarDB) (b *Balancer) {
@@ -48,7 +55,7 @@ func (b *Balancer) AttachAvatar(id utils.Id) (host string, mapId string, a *game
 	m, game := b.findMap(a.MapId)
 
 	if _, ok := m.Avatars[a.Id()]; ok {
-		game.game.DetachAvatar(a.Id(), a.MapId)
+		game.DetachAvatar(a.Id(), a.MapId)
 	}
 
 	m.Avatars[a.Id()] = true
@@ -71,6 +78,9 @@ func (b *Balancer) DetachAvatar(a *game.Avatar) error {
 	return nil
 }*/
 
+//func (b *Balancer) AddGameClient(addr string) error {
+//}
+
 func (b *Balancer) findMap(id string) (*BalancerMap, *BalancerGame) {
 	for _, g := range b.games {
 		if m, ok := g.Maps[id]; ok {
@@ -82,24 +92,31 @@ func (b *Balancer) findMap(id string) (*BalancerMap, *BalancerGame) {
 		}
 	}
 
+	m := &BalancerMap{
+		Max:     2000,
+		Avatars: make(map[utils.Id]bool),
+	}
+
 	log.Info("create map ", id)
 
 	// FIXME find free Map
 
 	g := b.games[0]
-	if g.game == nil {
-		// XXX
-		g.game = game.NewGame(b.adb)
-		go g.game.Run("")
+	if g.client == nil {
+
+		//for _, g := range config.Games {
+		client, err := rpc.Dial("tcp", g.Rpc)
+		if err != nil {
+			log.Panic(err)
+		}
+		//}
+		g.client = client
 	}
+
 	if g.Maps == nil {
 		g.Maps = make(map[string]*BalancerMap)
 	}
 
-	m := &BalancerMap{
-		Max:     2000,
-		Avatars: make(map[utils.Id]bool),
-	}
 	g.Maps[id] = m
 	g.LoadMap(id)
 
