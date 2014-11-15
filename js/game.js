@@ -18,7 +18,12 @@ function Game(renderer, stage) {
 		pickup: new Howl({
 			urls: ['/sounds/pickup.mp3', '/sounds/pickup.ogg', '/sounds/pickup.wav'],
 		}),
+		bg: new Howl({
+			urls: ['/sounds/music/No More Magic.mp3', '/sounds/music/No More Magic.ogg'],
+			loop: true,
+		}),
 	};
+	this.sounds.bg.play();
 
 	this.container.click = this.container.tap = function(event) {
 		console.log('TAPPED', event);
