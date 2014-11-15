@@ -69,7 +69,7 @@ func main() {
 	log.Error(<-ch)
 }
 
-func spawnGame(addr string, rpcAddr string, db *oni.Database) {
+func spawnGame(addr string, rpcAddr string, db oni.AvatarDB) {
 	g := game.NewGame(db)
 	go g.Run(addr)
 
