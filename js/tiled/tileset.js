@@ -35,16 +35,17 @@ function Tileset(data, path, tilewidth, tileheight) {
 	}
 }
 
+
 Tileset.prototype.load = function(fn) {
 	if (fn) {
 		this.image.on('loaded', fn);
 	}
 	this.image.load();
-}
+};
 
 
 Tileset.prototype.CreateSprite = function(id) {
-	if (id == 0) return;
+	if (id === 0) return;
 
 	var data = this.data;
 	id -= data.firstgid;
@@ -68,9 +69,9 @@ Tileset.prototype.CreateSprite = function(id) {
 	}
 
 	return sprite;
-}
+};
 
-function updateTransform() {
+var updateTransform = function() {
 	PIXI.Sprite.prototype.updateTransform.call(this);
 
 	if (!this.textures) return;
@@ -88,6 +89,6 @@ function updateTransform() {
 
 		this.last += frame.duration;
 	}
-}
+};
 
 module.exports = Tileset;

@@ -1,6 +1,7 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
+var CBOR = window.CBOR;
 var M_SetVelocityMsg = 1,
 	M_SetTargetMsg = 2,
 	M_CastMsg = 3,
@@ -53,23 +54,23 @@ Net.prototype.connecTo = function(url) {
 			case 'object':
 				if (message.hasOwnProperty('T')) {
 					that._ParseMessages(message.T | 0, message.V, event);
-					break;
-			}
+				}
+				break;
 			default:
 				that.emit('message', message, event);
 		}
 	};
-}
+};
 
 Net.prototype.close = function() {
 	this.ws.close();
-}
+};
 Net.prototype.send = function(message) {
 	var ws = this.ws;
 	if (ws.readyState === WebSocket.OPEN) {
 		ws.send(CBOR.encode(message));
 	}
-}
+};
 
 /*
  * MESSAGES
@@ -107,14 +108,14 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		default:
 			this.emit('event', type, value, event);
 	}
-}
+};
 
 Net.prototype.SetVelocityMsg = function(data) {
 	this.send({
 		T: M_SetVelocityMsg,
 		V: data
 	});
-}
+};
 Net.prototype.SetTargetMsg = function(id) {
 	this.send({
 		T: M_SetTargetMsg,
@@ -122,7 +123,7 @@ Net.prototype.SetTargetMsg = function(id) {
 			id: id
 		},
 	});
-}
+};
 Net.prototype.FireMsg = function(name) {
 	this.send({
 		T: M_CastMsg,
@@ -130,25 +131,25 @@ Net.prototype.FireMsg = function(name) {
 			t: name
 		}
 	});
-}
+};
 Net.prototype.RequestInventoryMsg = function() {
 	this.send({
 		T: M_RequestInventory,
 		V: {}
 	});
-}
+};
 Net.prototype.RequestParametersMsg = function() {
 	this.send({
 		T: M_RequestParameters,
 		V: {}
 	});
-}
+};
 Net.prototype.PickupItemMsg = function() {
 	this.send({
 		T: M_PickupItem,
 		V: {}
 	});
-}
+};
 Net.prototype.DropItemMsg = function(index) {
 	this.send({
 		T: M_DropItem,
@@ -156,7 +157,7 @@ Net.prototype.DropItemMsg = function(index) {
 			Id: index
 		}
 	});
-}
+};
 
 Net.prototype.ChatPostMsg = function(msg) {
 	this.send({
@@ -165,6 +166,6 @@ Net.prototype.ChatPostMsg = function(msg) {
 			m: msg
 		}
 	});
-}
+};
 
 module.exports = Net;

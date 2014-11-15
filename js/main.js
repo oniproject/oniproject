@@ -2,6 +2,9 @@
 
 require('insert-css')(require('./game.styl'));
 
+var Vue = window.Vue;
+var requestAnimFrame = window.requestAnimFrame;
+
 var Stats = require('./Stats');
 var stats = new Stats();
 stats.setMode(1); // 0: fps, 1: ms
@@ -34,7 +37,7 @@ window.onresize = function() {
 window.onresize();
 
 var Game = require('./game');
-window.game = new Game(renderer, stage, UI);
+var game = window.game = new Game(renderer, stage, UI);
 
 var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 colorMatrixFilter.matrix = [
@@ -83,7 +86,7 @@ game.net.on('TargetDataMsg', function(target) {
 });
 game.net.on('InventoryMsg', function(inv) {
 	UI.inventory = inv.Inventory;
-	UI.equip = inv.Equip
+	UI.equip = inv.Equip;
 });
 game.net.on('ParametersMsg', function(p) {
 	UI.hp = p.Parameters.HP;
@@ -267,8 +270,7 @@ var UI = window.UI = new Vue({
 			},
 			methods: {
 				scroll: function() {
-					this.scrollTop;
-					this.$broadcast('scroll');
+					this.$broadcast('scroll', this.scrollTop);
 				},
 			},
 			created: function() {

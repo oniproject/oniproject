@@ -18,6 +18,6 @@ ImageLayer.prototype.load = function(fn) {
 		this.image.on('loaded', fn);
 	}
 	this.image.load();
-}
+};
 
 module.exports = ImageLayer;

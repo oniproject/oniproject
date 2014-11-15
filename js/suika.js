@@ -25,19 +25,21 @@ function Suika() {
 		'death'
 	];
 
+	var t, k, rect;
+
 	for (var x = 0, l = keys.length; x < l; x++) {
-		var k = keys[x];
-		this._anim[k] = []
+		k = keys[x];
+		this._anim[k] = [];
 		var aa = [0, 1, 2, 1];
 		for (var j = 0, ll = aa.length; j < ll; j++) {
 			var y = aa[j];
-			var rect = {
+			rect = {
 				x: x * 96 + 4,
 				y: y * 96 + 4,
 				width: 96,
 				height: 96,
 			};
-			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			t = new PIXI.Texture(image.texture.baseTexture, rect);
 			a[k].push(t);
 		}
 	}
@@ -51,7 +53,7 @@ function Suika() {
 	a['idle ↙'] = [a['walk ↙'][1]];
 	a['idle ←'] = [a['walk ←'][1]];
 
-	var keys = [
+	keys = [
 		'boom ↙',
 		'boom ↓',
 		'boom ↘',
@@ -64,33 +66,31 @@ function Suika() {
 		'boom ←',
 	];
 
-	var rect = {
+	rect = {
 		/*x: x* 96 -3,*/
 		y: 96 * 3 + 4,
 		width: 96,
 		height: 124,
 	};
 
-	var t, k, w;
-
 	w = 96;
 	k = 'boom ↙';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = x * w - 3;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↓';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 3) * w - 3;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↘';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 6) * w - 3;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
@@ -100,21 +100,21 @@ function Suika() {
 	rect.height = 104;
 	k = 'boom ↖';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = x * w;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↓';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 3) * w;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↗';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 6) * w;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
@@ -180,8 +180,8 @@ Suika.prototype.updateTransform = function() {
 	var anim;
 	switch (this._animation) {
 		case 'death':
-			anim = this._anim['death'];
-		break
+			anim = this._anim.death;
+			break;
 		case 'walk':
 		case 'idle':
 		case 'boom':

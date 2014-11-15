@@ -38,9 +38,13 @@ function GameObject(obj, state) {
 	name.anchor.x = name.anchor.y = 0.5;
 	name.y = -(obj.height + 4) | 0;
 
-	this.isAvatar() && (this.name = 'ava');
-	this.isItem() && (this.name = 'item');
-	this.isMonster() && (this.name = 'monster');
+	if (this.isAvatar()) {
+		this.name = 'ava';
+	} else if (this.isItem()) {
+		this.name = 'item';
+	} else if (this.isMonster()) {
+		this.name = 'monster';
+	}
 
 	var graphics = this._graphics = new PIXI.Graphics();
 	graphics.lineStyle(1, 0xFF0000, 0.8);
@@ -87,17 +91,17 @@ GameObject.prototype.isAvatar = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id > 0;
 	}
-}
+};
 GameObject.prototype.isMonster = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id < 0 && this.state.Id > -10000;
 	}
-}
+};
 GameObject.prototype.isItem = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id < -10000;
 	}
-}
+};
 
 GameObject.prototype.addState = function(state) {
 	switch (state.Type) {
@@ -106,7 +110,7 @@ GameObject.prototype.addState = function(state) {
 		case 3: // move
 			var x = this.state.Velocity.X;
 			var y = this.state.Velocity.Y;
-			if (x !== NaN && y !== NaN) {
+			if (!isNaN(x) && !isNaN(y)) {
 				if (!!x || !!y) {
 					this.lastvel.x = this.state.Velocity.X;
 					this.lastvel.y = this.state.Velocity.Y;
@@ -114,7 +118,7 @@ GameObject.prototype.addState = function(state) {
 		}
 
 		case 0: // idle
-			if (state.Position && state.Position.X !== NaN && state.Position.Y !== NaN) {
+			if (state.Position && !isNaN(state.Position.X) && !isNaN(state.Position.Y)) {
 				this.container.position.x = state.Position.X * 32 | 0;
 				this.container.position.y = state.Position.Y * 32 | 0;
 			}
@@ -123,7 +127,7 @@ GameObject.prototype.addState = function(state) {
 	}
 
 	this.state = state;
-}
+};
 
 GameObject.prototype.update = function(time) {
 	var state = this.state;
@@ -154,19 +158,19 @@ GameObject.prototype.update = function(time) {
 		obj.animation = 'idle';
 		var x = state.Velocity.X;
 		var y = state.Velocity.Y;
-		if (x !== NaN && y !== NaN) {
+		var dir;
+		if (!isNaN(x) && !isNaN(y)) {
 			if (!!x || !!y) {
-				var d = Math.atan2(x, y);
-				var dd = -d / Math.PI * 180 + 180;
-				obj.direction = dd;
+				dir = Math.atan2(x, y);
 				obj.animation = 'walk';
 			}
 		} else {
-			var d = Math.atan2(this.lastvel.x, this.lastvel.y);
-			var dd = -d / Math.PI * 180 + 180;
-			obj.direction = dd;
+			dir = Math.atan2(this.lastvel.x, this.lastvel.y);
+		}
+		if (dir !== undefined) {
+			obj.direction = -dir / Math.PI * 180 + 180;
 		}
 	}
-}
+};
 
 module.exports = GameObject;
