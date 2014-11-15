@@ -1,6 +1,8 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
+	Howl = require('howler').Howl,
+	Howler = require('howler').Howler,
 	GameObject = require('./gameobject'),
 	Net = require('./net'),
 	Suika = require('./suika'),
@@ -11,6 +13,12 @@ var EventEmitter = require('events').EventEmitter,
 function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
+
+	this.sounds = {
+		pickup: new Howl({
+			urls: ['/sounds/pickup.mp3', '/sounds/pickup.ogg', '/sounds/pickup.wav'],
+		}),
+	};
 
 	this.container.click = this.container.tap = function(event) {
 		console.log('TAPPED', event);
@@ -124,6 +132,7 @@ Game.prototype.createAvatar = function(state) {
 			var obj = this.avatars[id];
 			if (obj.isItem()) {
 				this.net.PickupItemMsg();
+				this.sounds.pickup.play();
 			}
 		}
 		this.target = id;
