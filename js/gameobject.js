@@ -142,7 +142,7 @@ GameObject.prototype.update = function(time) {
 
 		hp
 			.beginFill(0xCC0000, 1)
-			.drawRect(-16, 0, l, 4)
+			.drawRect(-16, 0, bar, 4)
 			.endFill();
 	}
 
