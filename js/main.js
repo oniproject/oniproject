@@ -5,7 +5,12 @@ console.log('fuck');
 var w = window.innerWidth,
 	h = window.innerHeight,
 	stage = new PIXI.Stage(0xFFFFFF, true),
-	renderer = PIXI.autoDetectRenderer(w, h);
+	renderer = PIXI.autoDetectRenderer(w, h, {
+		//view:
+		transparent: true,
+		antialias: false,
+		resolution: 1,
+	});
 document.body.appendChild(renderer.view);
 
 window.onresize = function() {
