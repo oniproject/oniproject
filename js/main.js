@@ -2,6 +2,17 @@
 
 require('insert-css')(require('./game.styl'));
 
+var Stats = require('./Stats');
+var stats = new Stats();
+stats.setMode(1); // 0: fps, 1: ms
+
+// align top-right
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.right = '100px';
+stats.domElement.style.top = '0px';
+
+document.body.appendChild(stats.domElement);
+
 console.log('fuck');
 
 var w = window.innerWidth,
@@ -39,6 +50,8 @@ var updateT = 1000 / 50;
 var lastTime = window.performance.now();
 function render() {
 	requestAnimFrame(render);
+	stats.begin();
+
 	var t = window.performance.now();
 	if (t - lastTime > updateT) {
 		game.update(updateT);
@@ -46,6 +59,8 @@ function render() {
 	}
 	game.render();
 	renderer.render(stage);
+
+	stats.end();
 }
 
 game.net.on('open', function() {
