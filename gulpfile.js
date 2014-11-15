@@ -71,7 +71,13 @@ var fn = function(app, isWatching) {
 				.transform(partialify)
 				.transform(coffeeify)
 				.transform(jadeify)
-				.transform(stylify)
+				.transform('stylify', {
+					// set    : { setting: value },
+					// include: [ path, ... ],
+					// import : [ path, ... ],
+					// define : { key: value },
+					use: [nib()],
+				})
 				.transform(vueify)
 				.bundle().on('error', handleErrors)
 				.pipe(source(app.dest))

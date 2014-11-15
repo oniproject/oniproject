@@ -1,5 +1,7 @@
 'use strict';
 
+require('insert-css')(require('./game.styl'));
+
 console.log('fuck');
 
 var w = window.innerWidth,
