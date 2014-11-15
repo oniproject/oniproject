@@ -3,6 +3,9 @@
 
 require('insert-css')(require('./game.styl'));
 
+var Vue = window.Vue;
+var requestAnimFrame = window.requestAnimFrame;
+
 var Stats = require('./Stats');
 var stats = new Stats();
 stats.setMode(1); // 0: fps, 1: ms
@@ -35,7 +38,7 @@ window.onresize = function() {
 window.onresize();
 
 var Game = require('./game');
-window.game = new Game(renderer, stage, UI);
+var game = window.game = new Game(renderer, stage, UI);
 
 var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 colorMatrixFilter.matrix = [
@@ -84,7 +87,7 @@ game.net.on('TargetDataMsg', function(target) {
 });
 game.net.on('InventoryMsg', function(inv) {
 	UI.inventory = inv.Inventory;
-	UI.equip = inv.Equip
+	UI.equip = inv.Equip;
 });
 game.net.on('ParametersMsg', function(p) {
 	UI.hp = p.Parameters.HP;
@@ -268,8 +271,7 @@ var UI = window.UI = new Vue({
 			},
 			methods: {
 				scroll: function() {
-					this.scrollTop;
-					this.$broadcast('scroll');
+					this.$broadcast('scroll', this.scrollTop);
 				},
 			},
 			created: function() {
@@ -655,10 +657,10 @@ function Game(renderer, stage) {
 			};
 			this.inputAxesVector.x = 0;
 			this.inputAxesVector.y = 0;
-			if (v.x != 0) {
+			if (v.x !== 0) {
 				this.inputAxesVector.x = v.x < 0 ? -1 : 1;
 			}
-			if (v.y != 0) {
+			if (v.y !== 0) {
 				this.inputAxesVector.y = v.y < 0 ? -1 : 1;
 			}
 		}
@@ -735,7 +737,7 @@ Game.prototype.run = function(player, host, mapName) {
 		that.net.connecTo('ws://' + host + '/ws');
 	});
 	this.container.addChild(map);
-}
+};
 
 Game.prototype.createAvatar = function(state) {
 	// create Avatar
@@ -761,7 +763,7 @@ Game.prototype.createAvatar = function(state) {
 	}).bind(this));
 
 	this.map.AVATARS.addChild(avatar.container);
-}
+};
 
 Game.prototype.destroyAvatar = function(id) {
 	var a = this.avatars[id];
@@ -769,7 +771,7 @@ Game.prototype.destroyAvatar = function(id) {
 		this.map.AVATARS.removeChild(a.container);
 		delete this.avatars[id];
 	}
-}
+};
 
 Game.prototype.initKeyboard = function() {
 	var listener = new window.keypress.Listener();
@@ -830,7 +832,7 @@ Game.prototype.initKeyboard = function() {
 	}
 
 	listener.register_many(move_combos);
-}
+};
 
 Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
@@ -863,7 +865,7 @@ Game.prototype.update = function() {
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
 	}
-}
+};
 
 Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
@@ -889,27 +891,27 @@ Game.prototype.render = function() {
 		this.container.x = Math.round(x);
 		this.container.y = Math.round(y);
 	}
-}
+};
 
 Game.prototype.onmessage = function(message) {
 	console.warn('message', message);
-}
+};
 
 Game.prototype.onevent = function(type, message) {
 	console.log('event', type, message);
-}
+};
 
 Game.prototype.ontarget = function(message) {
 	console.log('target', message);
 	this.target = message.Target;
-}
+};
 
 Game.prototype.onfire = function(message) {
 	console.log('fire', message);
-}
+};
 Game.prototype.ondestroy = function(message) {
 	delete this.avatars[message.Id];
-}
+};
 
 module.exports = Game;
 
@@ -957,9 +959,13 @@ function GameObject(obj, state) {
 	name.anchor.x = name.anchor.y = 0.5;
 	name.y = -(obj.height + 4) | 0;
 
-	this.isAvatar() && (this.name = 'ava');
-	this.isItem() && (this.name = 'item');
-	this.isMonster() && (this.name = 'monster');
+	if (this.isAvatar()) {
+		this.name = 'ava';
+	} else if (this.isItem()) {
+		this.name = 'item';
+	} else if (this.isMonster()) {
+		this.name = 'monster';
+	}
 
 	var graphics = this._graphics = new PIXI.Graphics();
 	graphics.lineStyle(1, 0xFF0000, 0.8);
@@ -1006,17 +1012,17 @@ GameObject.prototype.isAvatar = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id > 0;
 	}
-}
+};
 GameObject.prototype.isMonster = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id < 0 && this.state.Id > -10000;
 	}
-}
+};
 GameObject.prototype.isItem = function() {
 	if (this.hasOwnProperty('state')) {
 		return this.state.Id < -10000;
 	}
-}
+};
 
 GameObject.prototype.addState = function(state) {
 	switch (state.Type) {
@@ -1025,7 +1031,7 @@ GameObject.prototype.addState = function(state) {
 		case 3: // move
 			var x = this.state.Velocity.X;
 			var y = this.state.Velocity.Y;
-			if (x !== NaN && y !== NaN) {
+			if (!isNaN(x) && !isNaN(y)) {
 				if (!!x || !!y) {
 					this.lastvel.x = this.state.Velocity.X;
 					this.lastvel.y = this.state.Velocity.Y;
@@ -1033,7 +1039,7 @@ GameObject.prototype.addState = function(state) {
 		}
 
 		case 0: // idle
-			if (state.Position && state.Position.X !== NaN && state.Position.Y !== NaN) {
+			if (state.Position && !isNaN(state.Position.X) && !isNaN(state.Position.Y)) {
 				this.container.position.x = state.Position.X * 32 | 0;
 				this.container.position.y = state.Position.Y * 32 | 0;
 			}
@@ -1042,7 +1048,7 @@ GameObject.prototype.addState = function(state) {
 	}
 
 	this.state = state;
-}
+};
 
 GameObject.prototype.update = function(time) {
 	var state = this.state;
@@ -1061,7 +1067,7 @@ GameObject.prototype.update = function(time) {
 
 		hp
 			.beginFill(0xCC0000, 1)
-			.drawRect(-16, 0, l, 4)
+			.drawRect(-16, 0, bar, 4)
 			.endFill();
 	}
 
@@ -1073,20 +1079,20 @@ GameObject.prototype.update = function(time) {
 		obj.animation = 'idle';
 		var x = state.Velocity.X;
 		var y = state.Velocity.Y;
-		if (x !== NaN && y !== NaN) {
+		var dir;
+		if (!isNaN(x) && !isNaN(y)) {
 			if (!!x || !!y) {
-				var d = Math.atan2(x, y);
-				var dd = -d / Math.PI * 180 + 180;
-				obj.direction = dd;
+				dir = Math.atan2(x, y);
 				obj.animation = 'walk';
 			}
 		} else {
-			var d = Math.atan2(this.lastvel.x, this.lastvel.y);
-			var dd = -d / Math.PI * 180 + 180;
-			obj.direction = dd;
+			dir = Math.atan2(this.lastvel.x, this.lastvel.y);
+		}
+		if (dir !== undefined) {
+			obj.direction = -dir / Math.PI * 180 + 180;
 		}
 	}
-}
+};
 
 module.exports = GameObject;
 
@@ -1141,6 +1147,7 @@ module.exports = Item;
 'use strict';
 
 var EventEmitter = require('events').EventEmitter;
+var CBOR = window.CBOR;
 var M_SetVelocityMsg = 1,
 	M_SetTargetMsg = 2,
 	M_CastMsg = 3,
@@ -1193,23 +1200,23 @@ Net.prototype.connecTo = function(url) {
 			case 'object':
 				if (message.hasOwnProperty('T')) {
 					that._ParseMessages(message.T | 0, message.V, event);
-					break;
-			}
+				}
+				break;
 			default:
 				that.emit('message', message, event);
 		}
 	};
-}
+};
 
 Net.prototype.close = function() {
 	this.ws.close();
-}
+};
 Net.prototype.send = function(message) {
 	var ws = this.ws;
 	if (ws.readyState === WebSocket.OPEN) {
 		ws.send(CBOR.encode(message));
 	}
-}
+};
 
 /*
  * MESSAGES
@@ -1247,14 +1254,14 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		default:
 			this.emit('event', type, value, event);
 	}
-}
+};
 
 Net.prototype.SetVelocityMsg = function(data) {
 	this.send({
 		T: M_SetVelocityMsg,
 		V: data
 	});
-}
+};
 Net.prototype.SetTargetMsg = function(id) {
 	this.send({
 		T: M_SetTargetMsg,
@@ -1262,7 +1269,7 @@ Net.prototype.SetTargetMsg = function(id) {
 			id: id
 		},
 	});
-}
+};
 Net.prototype.FireMsg = function(name) {
 	this.send({
 		T: M_CastMsg,
@@ -1270,25 +1277,25 @@ Net.prototype.FireMsg = function(name) {
 			t: name
 		}
 	});
-}
+};
 Net.prototype.RequestInventoryMsg = function() {
 	this.send({
 		T: M_RequestInventory,
 		V: {}
 	});
-}
+};
 Net.prototype.RequestParametersMsg = function() {
 	this.send({
 		T: M_RequestParameters,
 		V: {}
 	});
-}
+};
 Net.prototype.PickupItemMsg = function() {
 	this.send({
 		T: M_PickupItem,
 		V: {}
 	});
-}
+};
 Net.prototype.DropItemMsg = function(index) {
 	this.send({
 		T: M_DropItem,
@@ -1296,7 +1303,7 @@ Net.prototype.DropItemMsg = function(index) {
 			Id: index
 		}
 	});
-}
+};
 
 Net.prototype.ChatPostMsg = function(msg) {
 	this.send({
@@ -1305,7 +1312,7 @@ Net.prototype.ChatPostMsg = function(msg) {
 			m: msg
 		}
 	});
-}
+};
 
 module.exports = Net;
 
@@ -1337,19 +1344,21 @@ function Suika() {
 		'death'
 	];
 
+	var t, k, rect;
+
 	for (var x = 0, l = keys.length; x < l; x++) {
-		var k = keys[x];
-		this._anim[k] = []
+		k = keys[x];
+		this._anim[k] = [];
 		var aa = [0, 1, 2, 1];
 		for (var j = 0, ll = aa.length; j < ll; j++) {
 			var y = aa[j];
-			var rect = {
+			rect = {
 				x: x * 96 + 4,
 				y: y * 96 + 4,
 				width: 96,
 				height: 96,
 			};
-			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			t = new PIXI.Texture(image.texture.baseTexture, rect);
 			a[k].push(t);
 		}
 	}
@@ -1363,7 +1372,7 @@ function Suika() {
 	a['idle ↙'] = [a['walk ↙'][1]];
 	a['idle ←'] = [a['walk ←'][1]];
 
-	var keys = [
+	keys = [
 		'boom ↙',
 		'boom ↓',
 		'boom ↘',
@@ -1376,33 +1385,31 @@ function Suika() {
 		'boom ←',
 	];
 
-	var rect = {
+	rect = {
 		/*x: x* 96 -3,*/
 		y: 96 * 3 + 4,
 		width: 96,
 		height: 124,
 	};
 
-	var t, k, w;
-
 	w = 96;
 	k = 'boom ↙';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = x * w - 3;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↓';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 3) * w - 3;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↘';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 6) * w - 3;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
@@ -1412,21 +1419,21 @@ function Suika() {
 	rect.height = 104;
 	k = 'boom ↖';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = x * w;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↓';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 3) * w;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
 	}
 	k = 'boom ↗';
 	a[k] = [];
-	for (var x = 0; x < 3; x++) {
+	for (x = 0; x < 3; x++) {
 		rect.x = (x + 6) * w;
 		t = new PIXI.Texture(image.texture.baseTexture, rect);
 		a[k].push(t);
@@ -1492,8 +1499,8 @@ Suika.prototype.updateTransform = function() {
 	var anim;
 	switch (this._animation) {
 		case 'death':
-			anim = this._anim['death'];
-		break
+			anim = this._anim.death;
+			break;
 		case 'walk':
 		case 'idle':
 		case 'boom':
@@ -1536,7 +1543,7 @@ ImageLayer.prototype.load = function(fn) {
 		this.image.on('loaded', fn);
 	}
 	this.image.load();
-}
+};
 
 module.exports = ImageLayer;
 
@@ -1551,7 +1558,7 @@ var ImageLayer = require('./imagelayer');
 function Tiled(path, uri) {
 	PIXI.DisplayObjectContainer.call(this);
 
-	this.path = path
+	this.path = path;
 
 	var loader = this.loader = new PIXI.JsonLoader(path + uri);
 
@@ -1570,24 +1577,25 @@ Tiled.prototype.load = function(fn, fn2) {
 		var json = that.data = that.loader.json;
 
 		var tilesets_count = json.tilesets.length;
-		for (var i = 0, l = json.tilesets.length; i < l; i++) {
-			var t = new Tileset(json.tilesets[i], that.path, null, null)
-			that.tilesets.push(t);
-
-			t.load(function() {
-				tilesets_count--;
-				if (!tilesets_count) {
-					console.info('tilesets loaded');
-					if (fn) {
-						fn();
-					}
+		var f = function() {
+			tilesets_count--;
+			if (!tilesets_count) {
+				console.info('tilesets loaded');
+				if (fn) {
+					fn();
 				}
-			});
+			}
+		};
+		var i, l;
+		for (i = 0, l = json.tilesets.length; i < l; i++) {
+			var t = new Tileset(json.tilesets[i], that.path, null, null);
+			that.tilesets.push(t);
+			t.load(f);
 		}
 
-		for (var i = 0, l = json.layers.length; i < l; i++) {
+		for (i = 0, l = json.layers.length; i < l; i++) {
 			var layer = json.layers[i];
-			var obj = undefined;
+			var obj = null;
 			switch (layer.type) {
 				case 'tilelayer':
 					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
@@ -1604,7 +1612,7 @@ Tiled.prototype.load = function(fn, fn2) {
 					obj.load();
 					break;
 			}
-			if (obj !== undefined) {
+			if (obj !== null) {
 				that.layers.push(obj);
 				that.addChild(obj);
 			}
@@ -1615,7 +1623,7 @@ Tiled.prototype.load = function(fn, fn2) {
 
 	});
 	this.loader.load();
-}
+};
 
 module.exports = Tiled;
 
@@ -1744,7 +1752,7 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 		}
 	}
 
-	this.cacheAsBitmap = this._animated.length == 0;
+	this.cacheAsBitmap = this._animated.length === 0;
 }
 
 TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
@@ -1756,8 +1764,7 @@ TileLayer.prototype.updateTransform = function() {
 		_animated[i].updateTransform();
 	}
 	PIXI.SpriteBatch.prototype.updateTransform.call(this);
-}
-
+};
 
 module.exports = TileLayer;
 
@@ -1799,16 +1806,17 @@ function Tileset(data, path, tilewidth, tileheight) {
 	}
 }
 
+
 Tileset.prototype.load = function(fn) {
 	if (fn) {
 		this.image.on('loaded', fn);
 	}
 	this.image.load();
-}
+};
 
 
 Tileset.prototype.CreateSprite = function(id) {
-	if (id == 0) return;
+	if (id === 0) return;
 
 	var data = this.data;
 	id -= data.firstgid;
@@ -1832,9 +1840,9 @@ Tileset.prototype.CreateSprite = function(id) {
 	}
 
 	return sprite;
-}
+};
 
-function updateTransform() {
+var updateTransform = function() {
 	PIXI.Sprite.prototype.updateTransform.call(this);
 
 	if (!this.textures) return;
@@ -1852,7 +1860,7 @@ function updateTransform() {
 
 		this.last += frame.duration;
 	}
-}
+};
 
 module.exports = Tileset;
 
