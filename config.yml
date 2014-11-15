@@ -7,8 +7,9 @@ db: ../data/development.bin
 level: info
 
 games:
-    #- addr: "localhost:8000"
+    #- addr: "localhost:3000"
     - addr: "oniproject-lain.rhcloud.com:8000"
+      rpc: ":1234"
       minid: 10
       maxid: 100000
       local: true

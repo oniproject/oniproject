@@ -1,11 +1,32 @@
 'use strict';
 
+require('insert-css')(require('./game.styl'));
+
+var Vue = window.Vue;
+var requestAnimFrame = window.requestAnimFrame;
+
+var Stats = require('./Stats');
+var stats = new Stats();
+stats.setMode(1); // 0: fps, 1: ms
+
+// align top-right
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.right = '100px';
+stats.domElement.style.top = '0px';
+
+document.body.appendChild(stats.domElement);
+
 console.log('fuck');
 
 var w = window.innerWidth,
 	h = window.innerHeight,
 	stage = new PIXI.Stage(0xFFFFFF, true),
-	renderer = PIXI.autoDetectRenderer(w, h);
+	renderer = PIXI.autoDetectRenderer(w, h, {
+		//view:
+		transparent: true,
+		antialias: false,
+		resolution: 1,
+	});
 document.body.appendChild(renderer.view);
 
 window.onresize = function() {
@@ -16,7 +37,7 @@ window.onresize = function() {
 window.onresize();
 
 var Game = require('./game');
-window.game = new Game(renderer, stage, UI);
+var game = window.game = new Game(renderer, stage, UI);
 
 var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 colorMatrixFilter.matrix = [
@@ -32,6 +53,8 @@ var updateT = 1000 / 50;
 var lastTime = window.performance.now();
 function render() {
 	requestAnimFrame(render);
+	stats.begin();
+
 	var t = window.performance.now();
 	if (t - lastTime > updateT) {
 		game.update(updateT);
@@ -39,6 +62,8 @@ function render() {
 	}
 	game.render();
 	renderer.render(stage);
+
+	stats.end();
 }
 
 game.net.on('open', function() {
@@ -61,7 +86,7 @@ game.net.on('TargetDataMsg', function(target) {
 });
 game.net.on('InventoryMsg', function(inv) {
 	UI.inventory = inv.Inventory;
-	UI.equip = inv.Equip
+	UI.equip = inv.Equip;
 });
 game.net.on('ParametersMsg', function(p) {
 	UI.hp = p.Parameters.HP;
@@ -245,8 +270,7 @@ var UI = window.UI = new Vue({
 			},
 			methods: {
 				scroll: function() {
-					this.scrollTop;
-					this.$broadcast('scroll');
+					this.$broadcast('scroll', this.scrollTop);
 				},
 			},
 			created: function() {

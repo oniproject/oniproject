@@ -5,6 +5,7 @@ package mock
 
 import (
 	gomock "code.google.com/p/gomock/gomock"
+	geom "github.com/oniproject/geom"
 )
 
 // Mock of EffectReceiver interface
@@ -213,12 +214,12 @@ func (_m *MockWalkabler) EXPECT() *_MockWalkablerRecorder {
 	return _m.recorder
 }
 
-func (_m *MockWalkabler) Walkable(_param0 int, _param1 int) bool {
-	ret := _m.ctrl.Call(_m, "Walkable", _param0, _param1)
+func (_m *MockWalkabler) Walkable(_param0 geom.Coord) bool {
+	ret := _m.ctrl.Call(_m, "Walkable", _param0)
 	ret0, _ := ret[0].(bool)
 	return ret0
 }
 
-func (_mr *_MockWalkablerRecorder) Walkable(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Walkable", arg0, arg1)
+func (_mr *_MockWalkablerRecorder) Walkable(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Walkable", arg0)
 }

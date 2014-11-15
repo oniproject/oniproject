@@ -48,7 +48,7 @@ function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
 		}
 	}
 
-	this.cacheAsBitmap = this._animated.length == 0;
+	this.cacheAsBitmap = this._animated.length === 0;
 }
 
 TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
@@ -60,7 +60,6 @@ TileLayer.prototype.updateTransform = function() {
 		_animated[i].updateTransform();
 	}
 	PIXI.SpriteBatch.prototype.updateTransform.call(this);
-}
-
+};
 
 module.exports = TileLayer;

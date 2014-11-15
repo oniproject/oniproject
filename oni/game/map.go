@@ -248,9 +248,11 @@ func (gm *Map) Run() {
 
 					msg := &ReplicaMsg{gm.tick, []*GameObjectState{}}
 					for _, obj := range around {
+						hp, mhp := obj.HPbar()
 						state := &GameObjectState{
-							STATE_IDLE, obj.Id(),
-							obj.Lag(), obj.Position(), obj.Velocity()}
+							STATE_IDLE, obj.Id(), obj.Lag(),
+							obj.Position(), obj.Velocity(),
+							hp, mhp}
 
 						if updated[obj.Id()] {
 							state.Type = STATE_MOVE

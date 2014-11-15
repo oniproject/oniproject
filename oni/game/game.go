@@ -92,25 +92,33 @@ func (gm *Game) Run(addr string) {
 	}
 }
 
-func (gm *Game) LoadMap(id string) {
-	log.Println("LoadMap", id)
-	gm.maps[id] = NewMap(gm, id)
+func (gm *Game) LoadMap(mapId *string, ret *struct{}) error {
+	log.Println("LoadMap", *mapId)
+	gm.maps[*mapId] = NewMap(gm, *mapId)
 
-	go gm.maps[id].Run()
-}
-func (gm *Game) UnloadMap(id string) {
-	log.Println("UnloadMap", id)
-	delete(gm.maps, id)
+	go gm.maps[*mapId].Run()
+	return nil
 }
 
-func (gm *Game) DetachAvatar(id utils.Id, mapId string) error {
-	obj := gm.maps[mapId].GetObjById(id)
+func (gm *Game) UnloadMap(mapId *string, ret *struct{}) error {
+	delete(gm.maps, *mapId)
+	log.Println("UnloadMap", *mapId)
+	return nil
+}
+
+type DetachAvatarArgs struct {
+	Id    utils.Id
+	MapId string
+}
+
+func (gm *Game) DetachAvatar(args *DetachAvatarArgs, ret *struct{}) error {
+	obj := gm.maps[args.MapId].GetObjById(args.Id)
 	if obj == nil {
 		return errors.New("Avatar not found")
 	}
 
 	if avatar, ok := obj.(*Avatar); ok {
-		gm.maps[mapId].Unregister(avatar)
+		gm.maps[args.MapId].Unregister(avatar)
 		return nil
 	}
 

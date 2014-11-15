@@ -1,6 +1,10 @@
 var browserify = require('browserify'),
-	watchify = require('watchify'),
 	partialify = require('partialify'),
+	coffeeify = require('partialify'),
+	jadeify = require('jadeify'),
+	stylify = require('stylify'),
+	vueify = require('vueify'),
+	watchify = require('watchify'),
 	exorcist = require('exorcist'),
 	transform = require('vinyl-transform'),
 	gulp = require('gulp'),
@@ -37,14 +41,14 @@ var apps = {
 		dest: 'main.js',
 		source: './js/main.js'
 	},
-	tile: {
+	/*tile: {
 		dest: 'tile.js',
 		source: './redactor/tile/main.js'
 	},
 	redactor: {
 		dest: 'redactor.js',
 		source: './redactor/main.js'
-	},
+	},*/
 }
 
 function handleErrors(err) {
@@ -62,10 +66,19 @@ var fn = function(app, isWatching) {
 			entries: [app.source],
 			debug: true
 		});
-
 		var bundle = function() {
 			return bundler
 				.transform(partialify)
+				.transform(coffeeify)
+				.transform(jadeify)
+				.transform('stylify', {
+					// set    : { setting: value },
+					// include: [ path, ... ],
+					// import : [ path, ... ],
+					// define : { key: value },
+					use: [nib()],
+				})
+				.transform(vueify)
 				.bundle().on('error', handleErrors)
 				.pipe(source(app.dest))
 				.pipe(transform(function() {

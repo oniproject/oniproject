@@ -23,6 +23,7 @@ type GameObjectState struct {
 	Lag      time.Duration
 	Position geom.Coord
 	Velocity geom.Coord
+	HP, MHP  int
 }
 
 type GameObject interface {

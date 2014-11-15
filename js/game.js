@@ -1,6 +1,8 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
+	Howl = require('howler').Howl,
+	Howler = require('howler').Howler,
 	GameObject = require('./gameobject'),
 	Net = require('./net'),
 	Suika = require('./suika'),
@@ -11,6 +13,12 @@ var EventEmitter = require('events').EventEmitter,
 function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
+
+	this.sounds = {
+		pickup: new Howl({
+			urls: ['/sounds/pickup.mp3', '/sounds/pickup.ogg', '/sounds/pickup.wav'],
+		}),
+	};
 
 	this.container.click = this.container.tap = function(event) {
 		console.log('TAPPED', event);
@@ -24,10 +32,10 @@ function Game(renderer, stage) {
 			};
 			this.inputAxesVector.x = 0;
 			this.inputAxesVector.y = 0;
-			if (v.x != 0) {
+			if (v.x !== 0) {
 				this.inputAxesVector.x = v.x < 0 ? -1 : 1;
 			}
-			if (v.y != 0) {
+			if (v.y !== 0) {
 				this.inputAxesVector.y = v.y < 0 ? -1 : 1;
 			}
 		}
@@ -104,7 +112,7 @@ Game.prototype.run = function(player, host, mapName) {
 		that.net.connecTo('ws://' + host + '/ws');
 	});
 	this.container.addChild(map);
-}
+};
 
 Game.prototype.createAvatar = function(state) {
 	// create Avatar
@@ -124,13 +132,14 @@ Game.prototype.createAvatar = function(state) {
 			var obj = this.avatars[id];
 			if (obj.isItem()) {
 				this.net.PickupItemMsg();
+				this.sounds.pickup.play();
 			}
 		}
 		this.target = id;
 	}).bind(this));
 
 	this.map.AVATARS.addChild(avatar.container);
-}
+};
 
 Game.prototype.destroyAvatar = function(id) {
 	var a = this.avatars[id];
@@ -138,7 +147,7 @@ Game.prototype.destroyAvatar = function(id) {
 		this.map.AVATARS.removeChild(a.container);
 		delete this.avatars[id];
 	}
-}
+};
 
 Game.prototype.initKeyboard = function() {
 	var listener = new window.keypress.Listener();
@@ -199,7 +208,7 @@ Game.prototype.initKeyboard = function() {
 	}
 
 	listener.register_many(move_combos);
-}
+};
 
 Game.prototype.update = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
@@ -232,7 +241,7 @@ Game.prototype.update = function() {
 	for (var i in this.avatars) {
 		this.avatars[i].update(0.05);
 	}
-}
+};
 
 Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
@@ -258,26 +267,26 @@ Game.prototype.render = function() {
 		this.container.x = Math.round(x);
 		this.container.y = Math.round(y);
 	}
-}
+};
 
 Game.prototype.onmessage = function(message) {
 	console.warn('message', message);
-}
+};
 
 Game.prototype.onevent = function(type, message) {
 	console.log('event', type, message);
-}
+};
 
 Game.prototype.ontarget = function(message) {
 	console.log('target', message);
 	this.target = message.Target;
-}
+};
 
 Game.prototype.onfire = function(message) {
 	console.log('fire', message);
-}
+};
 Game.prototype.ondestroy = function(message) {
 	delete this.avatars[message.Id];
-}
+};
 
 module.exports = Game;

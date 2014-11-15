@@ -4,7 +4,10 @@ import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
 	stdlog "log"
+	"net"
+	"net/rpc"
 	"oniproject/oni"
+	"oniproject/oni/game"
 	"os"
 	"os/signal"
 	"runtime/pprof"
@@ -12,9 +15,9 @@ import (
 )
 
 var config = flag.String("conf", "../data/config.yml", "config file")
-var master = flag.Bool("master", false, "this is a master")
-var game = flag.Bool("game", false, "this is a game mechanic")
-var database = flag.Bool("db", false, "this is a database")
+
+var masterService = flag.Bool("master", false, "this is a master")
+var gameService = flag.Bool("game", false, "this is a game mechanic")
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
@@ -45,19 +48,38 @@ func main() {
 	}
 
 	switch {
-	case *master:
-	case *game:
-	case *database:
+	case *masterService:
+		db := oni.NewDatabase(conf)
+		balancer := oni.NewBalancer(conf, db)
+		go oni.NewMaster(conf, balancer).Run()
+
+	case *gameService:
+		db := oni.NewDatabase(conf)
+		spawnGame(conf.Games[0].Addr, conf.Games[0].Rpc, db)
+
 	default:
 		db := oni.NewDatabase(conf)
 		balancer := oni.NewBalancer(conf, db)
-
-		module := oni.NewMaster(conf, balancer)
-
-		go module.Run()
+		spawnGame("", conf.Games[0].Rpc, db)
+		go oni.NewMaster(conf, balancer).Run()
 	}
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	log.Error(<-ch)
+}
+
+func spawnGame(addr string, rpcAddr string, db oni.AvatarDB) {
+	g := game.NewGame(db)
+	go g.Run(addr)
+
+	l, err := net.Listen("tcp", rpcAddr)
+	if err != nil {
+		log.Fatal("listen error:", err)
+	}
+	rpcServer := rpc.NewServer()
+	if err := rpcServer.Register(g); err != nil {
+		log.Fatal(err)
+	}
+	go rpcServer.Accept(l)
 }
