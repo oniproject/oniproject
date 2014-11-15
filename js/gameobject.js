@@ -27,7 +27,7 @@ function GameObject(obj, state) {
 		align: 'center',
 	});
 	msg.anchor.x = msg.anchor.y = 0.5;
-	msg.y = -(obj.height + 16) | 0;
+	msg.y = -(obj.height + 16 + 6) | 0;
 	var name = this._nameObj = new PIXI.Text('lol', {
 		font: '12px Helvetica',
 		fill: 'white',
@@ -49,10 +49,14 @@ function GameObject(obj, state) {
 	graphics.moveTo(0, -64);
 	graphics.lineTo(0, 16);
 
+	var hpBar = this._hpBar = new PIXI.Graphics();
+	hpBar.y = -(obj.height + 16) | 0;
+
 	this.container.addChild(graphics);
 	this.container.addChild(obj);
 	this.container.addChild(msg);
 	this.container.addChild(name);
+	this.container.addChild(hpBar);
 }
 
 GameObject.prototype = Object.create(EventEmitter.prototype);
@@ -123,6 +127,24 @@ GameObject.prototype.addState = function(state) {
 
 GameObject.prototype.update = function(time) {
 	var state = this.state;
+
+	if (state.HP) {
+		var bar = state.HP / state.MHP * 32;
+
+		var hp = this._hpBar;
+		hp.clear();
+		hp.lineStyle(1, 0x000000, 1);
+
+		hp
+			.beginFill(0x000000, 1)
+			.drawRect(-16, 0, 32, 4)
+			.endFill();
+
+		hp
+			.beginFill(0xCC0000, 1)
+			.drawRect(-16, 0, l, 4)
+			.endFill();
+	}
 
 	if (this.obj) {
 		var obj = this.obj;
