@@ -9,7 +9,7 @@ var EventEmitter = require('events').EventEmitter,
 	//Suika = require('./suika'),
 	Bat = require('./bat'),
 	Item = require('./item'),
-	Tiled = require('./tiled');
+	Tiled = require('tiled.js');
 
 function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();

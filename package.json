@@ -7,7 +7,8 @@
     "howler": "^1.1.25",
     "vue": "~0.11.0",
     "vue-placeholders": "git://github.com/lithiumjake/vue-placeholders.git",
-    "CharRedactor": "git://github.com/oniproject/CharRedactor.git#gh-pages"
+    "CharRedactor": "git://github.com/oniproject/CharRedactor.git#gh-pages",
+    "tiled.js": "git://github.com/oniproject/tiled.js"
   },
   "devDependencies": {
     "connect": "~2.18.0",
