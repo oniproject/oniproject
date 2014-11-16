@@ -68,7 +68,7 @@ function Bat() {
 Bat.prototype = Object.create(PIXI.Sprite.prototype);
 Bat.prototype.constructor = Bat;
 
-Object.defineProperty(Bat.prototype, 'direction', {
+Object.defineProperty(Bat.prototype, 'currentDirection', {
 	get: function() {
 		return this._direction;
 	},
@@ -91,7 +91,7 @@ Object.defineProperty(Bat.prototype, 'direction', {
 	},
 });
 
-Object.defineProperty(Bat.prototype, 'animation', {
+Object.defineProperty(Bat.prototype, 'currentAnimation', {
 	get: function() {
 		return this._animation;
 	},

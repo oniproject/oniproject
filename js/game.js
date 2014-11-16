@@ -1,11 +1,12 @@
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
+	Actor = require('CharRedactor'),
 	Howl = require('howler').Howl,
 	Howler = require('howler').Howler,
 	GameObject = require('./gameobject'),
 	Net = require('./net'),
-	Suika = require('./suika'),
+	//Suika = require('./suika'),
 	Bat = require('./bat'),
 	Item = require('./item'),
 	Tiled = require('./tiled');
@@ -13,6 +14,11 @@ var EventEmitter = require('events').EventEmitter,
 function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
+
+	var loader = new PIXI.AssetLoader(['/suika.json']);
+	loader.load();
+	this.suika_anim = require('../public/animations.json');
+	console.log(this.suika_anim);
 
 	this.sounds = {
 		pickup: new Howl({
@@ -123,7 +129,9 @@ Game.prototype.createAvatar = function(state) {
 	// create Avatar
 	var obj;
 	if (state.Id > 0) {
-		obj = new Suika();
+		//obj = new Suika();
+		obj = new Actor(this.suika_anim);
+		obj.scale.x = obj.scale.y = 0.5;
 	} else if (state.Id > -20000) {
 		obj = new Bat();
 	} else {

@@ -12,6 +12,7 @@ function GameObject(obj, state) {
 
 	this.container = new PIXI.DisplayObjectContainer();
 
+
 	this.obj = obj;
 	obj.buttonMode = true;
 	obj.interactive = true;
@@ -27,7 +28,6 @@ function GameObject(obj, state) {
 		align: 'center',
 	});
 	msg.anchor.x = msg.anchor.y = 0.5;
-	msg.y = -(obj.height + 16 + 6) | 0;
 	var name = this._nameObj = new PIXI.Text('lol', {
 		font: '12px Helvetica',
 		fill: 'white',
@@ -36,7 +36,6 @@ function GameObject(obj, state) {
 		align: 'center',
 	});
 	name.anchor.x = name.anchor.y = 0.5;
-	name.y = -(obj.height + 4) | 0;
 
 	if (this.isAvatar()) {
 		this.name = 'ava';
@@ -54,9 +53,13 @@ function GameObject(obj, state) {
 	graphics.lineTo(0, 16);
 
 	var hpBar = this._hpBar = new PIXI.Graphics();
-	hpBar.y = -(obj.height + 16) | 0;
 
-	this.container.addChild(graphics);
+	var h = this.isAvatar() ? 48 : obj.height;
+	hpBar.y = -(h) | 0;
+	name.y = -(h + 6) | 0;
+	msg.y = -(h + 16) | 0;
+
+	//this.container.addChild(graphics);
 	this.container.addChild(obj);
 	this.container.addChild(msg);
 	this.container.addChild(name);
@@ -153,22 +156,31 @@ GameObject.prototype.update = function(time) {
 	if (this.obj) {
 		var obj = this.obj;
 
-		if (!obj.animation) return;
+		if (!obj.currentAnimation) return;
 
-		obj.animation = 'idle';
+		obj.currentAnimation = 'idle';
 		var x = state.Velocity.X;
 		var y = state.Velocity.Y;
 		var dir;
 		if (!isNaN(x) && !isNaN(y)) {
 			if (!!x || !!y) {
 				dir = Math.atan2(x, y);
-				obj.animation = 'walk';
+				obj.currentAnimation = 'walk';
 			}
 		} else {
 			dir = Math.atan2(this.lastvel.x, this.lastvel.y);
 		}
 		if (dir !== undefined) {
-			obj.direction = -dir / Math.PI * 180 + 180;
+			var dirArr = '↑↗→↘↓↙←↖';
+			dir = -dir / Math.PI * 180 + 180;
+			if (typeof dir == 'number') {
+				var x = (dir / (360 / 8)) % 8;
+				if (x < 0) {
+					x = 8 + x;
+				}
+				dir = dirArr[x | 0];
+			}
+			obj.currentDirection = dir;
 		}
 	}
 };
