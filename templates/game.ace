@@ -5,7 +5,7 @@ html lang=en
     meta http-equiv=Content-Type content="text/html;charset=UTF-8"
     meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     title {{.Title}}
-    link rel="stylesheet" href="/game.css"
+    / link rel="stylesheet" href="/game.css"
   body#ui
     #loading v-show="!isConnected"
       img width="758" height="220" src="/ui/loading_bar.gif"
@@ -126,7 +126,7 @@ html lang=en
             span v-text="Text"
         input v-model="msg" v-on="keyup: chatMsg | key enter, focus: focus, blur: blur"
 
-    script src="/js/pixi.js"
+    script src="/js/pixi.dev.js"
     script src="/js/keypress-2.0.2.min.js"
     script src="/js/cbor.js"
     script src="/js/vue.js"
