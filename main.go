@@ -86,9 +86,9 @@ func spawnGame(addr string, rpcAddr string, db oni.AvatarDB) io.ReadWriteCloser 
 			log.Fatal("listen error:", err)
 		}
 		go rpcServer.Accept(l)
-		return l
+		return nil
 	} else {
-		p := ping{}
+		p := &ping{}
 		rpcServer.ServeConn(p)
 		return p
 	}
@@ -108,4 +108,4 @@ func (pp *ping) Write(p []byte) (n int, err error) {
 	*pp = append(*pp, p...)
 	return len(p), nil
 }
-func (pp *ping) Close(p []byte) (err error) { return }
+func (pp *ping) Close() (err error) { return }
