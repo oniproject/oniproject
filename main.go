@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	log "github.com/Sirupsen/logrus"
+	"io"
 	stdlog "log"
 	"net"
 	"net/rpc"
@@ -55,12 +56,13 @@ func main() {
 
 	case *gameService:
 		db := oni.NewDatabase(conf)
-		spawnGame(conf.Games[0].Addr, conf.Games[0].Rpc, db)
+		_ = spawnGame(conf.Games[0].Addr, conf.Games[0].Rpc, db)
 
 	default:
 		db := oni.NewDatabase(conf)
 		balancer := oni.NewBalancer(conf, db)
-		spawnGame("", conf.Games[0].Rpc, db)
+		pipe := spawnGame("", conf.Games[0].Rpc, db)
+		conf.Games[0].FakePipe = pipe
 		go oni.NewMaster(conf, balancer).Run()
 	}
 
@@ -69,17 +71,41 @@ func main() {
 	log.Error(<-ch)
 }
 
-func spawnGame(addr string, rpcAddr string, db oni.AvatarDB) {
+func spawnGame(addr string, rpcAddr string, db oni.AvatarDB) io.ReadWriteCloser {
 	g := game.NewGame(db)
 	go g.Run(addr)
 
-	l, err := net.Listen("tcp", rpcAddr)
-	if err != nil {
-		log.Fatal("listen error:", err)
-	}
 	rpcServer := rpc.NewServer()
 	if err := rpcServer.Register(g); err != nil {
 		log.Fatal(err)
 	}
-	go rpcServer.Accept(l)
+
+	if rpcAddr != "" {
+		l, err := net.Listen("tcp", rpcAddr)
+		if err != nil {
+			log.Fatal("listen error:", err)
+		}
+		go rpcServer.Accept(l)
+		return l
+	} else {
+		p := ping{}
+		rpcServer.ServeConn(p)
+		return p
+	}
 }
+
+type ping []byte
+
+func (pp *ping) Read(p []byte) (n int, err error) {
+	buf := []byte(*pp)
+	for ; n < len(buf); /*&& n < len(p)*/ n++ {
+		p = append(p, buf[n])
+	}
+	return
+}
+
+func (pp *ping) Write(p []byte) (n int, err error) {
+	*pp = append(*pp, p...)
+	return len(p), nil
+}
+func (pp *ping) Close(p []byte) (err error) { return }

@@ -4,6 +4,7 @@ package oni
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"io"
 	"net/rpc"
 	"oniproject/oni/game"
 	"oniproject/oni/utils"
@@ -25,6 +26,7 @@ type BalancerGame struct {
 	Minid, Maxid int64
 	Maps         map[string]*BalancerMap
 	client       *rpc.Client
+	FakePipe     io.ReadWriteCloser
 }
 
 func (g *BalancerGame) LoadMap(id string) error {
@@ -105,12 +107,16 @@ func (b *Balancer) findMap(id string) (*BalancerMap, *BalancerGame) {
 	if g.client == nil {
 
 		//for _, g := range config.Games {
-		client, err := rpc.Dial("tcp", g.Rpc)
-		if err != nil {
-			log.Panic(err)
+		if g.Rpc == "" {
+			g.client = rpc.NewClient(g.FakePipe)
+		} else {
+			client, err := rpc.Dial("tcp", g.Rpc)
+			if err != nil {
+				log.Panic(err)
+			}
+			g.client = client
 		}
 		//}
-		g.client = client
 	}
 
 	if g.Maps == nil {
