@@ -88,24 +88,34 @@ func spawnGame(addr string, rpcAddr string, db oni.AvatarDB) io.ReadWriteCloser 
 		go rpcServer.Accept(l)
 		return nil
 	} else {
-		p := &ping{}
-		rpcServer.ServeConn(p)
-		return p
+		log.Println("try run with fake pipe")
+		r, w := io.Pipe()
+		conn := pipe{r, w}
+
+		go rpcServer.ServeConn(conn)
+		return conn
 	}
 }
 
-type ping []byte
+type pipe struct {
+	reader *io.PipeReader
+	writer *io.PipeWriter
+}
 
-func (pp *ping) Read(p []byte) (n int, err error) {
-	buf := []byte(*pp)
-	for ; n < len(buf); /*&& n < len(p)*/ n++ {
-		p = append(p, buf[n])
-	}
+func (pp pipe) Read(p []byte) (n int, err error) {
+	n, err = pp.reader.Read(p)
 	return
 }
 
-func (pp *ping) Write(p []byte) (n int, err error) {
-	*pp = append(*pp, p...)
-	return len(p), nil
+func (pp pipe) Write(p []byte) (n int, err error) {
+	n, err = pp.writer.Write(p)
+	return
 }
-func (pp *ping) Close() (err error) { return }
+func (pp pipe) Close() error {
+	err := pp.reader.Close()
+	err1 := pp.writer.Close()
+	if err == nil {
+		err = err1
+	}
+	return err
+}

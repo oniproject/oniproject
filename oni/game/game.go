@@ -77,7 +77,11 @@ func (gm *Game) Run(addr string) {
 		}
 		log.Debug(a)
 
-		gm.maps[a.MapId].RunAvatar(ws, a)
+		m, ok := gm.maps[a.MapId]
+		if !ok {
+			log.Panicln("map notfound", a.MapId, gm.maps)
+		}
+		m.RunAvatar(ws, a)
 
 		return 200, "game over"
 	})
