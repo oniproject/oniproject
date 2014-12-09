@@ -573,7 +573,7 @@ function Bat() {
 Bat.prototype = Object.create(PIXI.Sprite.prototype);
 Bat.prototype.constructor = Bat;
 
-Object.defineProperty(Bat.prototype, 'direction', {
+Object.defineProperty(Bat.prototype, 'currentDirection', {
 	get: function() {
 		return this._direction;
 	},
@@ -596,7 +596,7 @@ Object.defineProperty(Bat.prototype, 'direction', {
 	},
 });
 
-Object.defineProperty(Bat.prototype, 'animation', {
+Object.defineProperty(Bat.prototype, 'currentAnimation', {
 	get: function() {
 		return this._animation;
 	},
@@ -634,24 +634,35 @@ module.exports = Bat;
 'use strict';
 
 var EventEmitter = require('events').EventEmitter,
+	Actor = require('CharRedactor'),
 	Howl = require('howler').Howl,
 	Howler = require('howler').Howler,
 	GameObject = require('./gameobject'),
 	Net = require('./net'),
-	Suika = require('./suika'),
+	//Suika = require('./suika'),
 	Bat = require('./bat'),
 	Item = require('./item'),
-	Tiled = require('./tiled');
+	Tiled = require('tiled.js');
 
 function Game(renderer, stage) {
 	this.container = new PIXI.DisplayObjectContainer();
 	stage.addChild(this.container);
 
+	var loader = new PIXI.AssetLoader(['/suika.json']);
+	loader.load();
+	this.suika_anim = require('../public/animations.json');
+	console.log(this.suika_anim);
+
 	this.sounds = {
 		pickup: new Howl({
 			urls: ['/sounds/pickup.mp3', '/sounds/pickup.ogg', '/sounds/pickup.wav'],
 		}),
+		bg: new Howl({
+			urls: ['/sounds/music/No More Magic.mp3', '/sounds/music/No More Magic.ogg'],
+			loop: true,
+		}),
 	};
+	this.sounds.bg.play();
 
 	this.container.click = this.container.tap = function(event) {
 		console.log('TAPPED', event);
@@ -751,7 +762,9 @@ Game.prototype.createAvatar = function(state) {
 	// create Avatar
 	var obj;
 	if (state.Id > 0) {
-		obj = new Suika();
+		//obj = new Suika();
+		obj = new Actor(this.suika_anim);
+		obj.scale.x = obj.scale.y = 0.5;
 	} else if (state.Id > -20000) {
 		obj = new Bat();
 	} else {
@@ -924,7 +937,7 @@ Game.prototype.ondestroy = function(message) {
 
 module.exports = Game;
 
-},{"./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./item":"/home/lain/gocode/src/oniproject/js/item.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","./suika":"/home/lain/gocode/src/oniproject/js/suika.js","./tiled":"/home/lain/gocode/src/oniproject/js/tiled/index.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js","howler":"/home/lain/gocode/src/oniproject/node_modules/howler/howler.js"}],"/home/lain/gocode/src/oniproject/js/game.styl":[function(require,module,exports){
+},{"../public/animations.json":"/home/lain/gocode/src/oniproject/public/animations.json","./bat":"/home/lain/gocode/src/oniproject/js/bat.js","./gameobject":"/home/lain/gocode/src/oniproject/js/gameobject.js","./item":"/home/lain/gocode/src/oniproject/js/item.js","./net":"/home/lain/gocode/src/oniproject/js/net.js","CharRedactor":"/home/lain/gocode/src/oniproject/node_modules/CharRedactor/src/actor.js","events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js","howler":"/home/lain/gocode/src/oniproject/node_modules/howler/howler.js","tiled.js":"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/index.js"}],"/home/lain/gocode/src/oniproject/js/game.styl":[function(require,module,exports){
 module.exports = ".scrollbar-wrap {\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  position: relative;\n}\n.scrollbar-wrap .native {\n  overflow-y: scroll;\n  overflow-x: hidden;\n  width: 200%;\n}\n.scrollbar-wrap .s-content {\n  overflow: hidden;\n  width: 50%;\n}\n/*.custom_scroll_bar_handle\n    top:0\n    right:0\n    position:absolute\n    width:10px\n    height:15px\n    background:#c00\n    cursor:pointer\n    */\n.tooltip {\n  display: none;\n  top: -50px;\n  position: absolute;\n  margin-left: -50px;\n  width: 100px;\n  height: 20px;\n  line-height: 20px;\n  padding: 10px;\n  font-size: 14px;\n  text-align: center;\n  color: #fff;\n  background: rgba(0,0,0,0.6);\n}\n.tooltip:after {\n  content: \"\";\n  position: absolute;\n  border-width: 10px;\n  border-style: solid;\n  border-color: rgba(0,0,0,0.6) transparent transparent transparent;\n  top: 40px;\n  left: 50px;\n}\nhtml,\nbody {\n  overflow: hidden;\n  padding: 0;\n  margin: 0;\n  width: 100%;\n  height: 100%;\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n#loading {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 9999;\n  background: -webkit-radial-gradient(center, #101517, #090d0f);\n  background: -moz-radial-gradient(center, #101517, #090d0f);\n  background: -o-radial-gradient(center, #101517, #090d0f);\n  background: -ms-radial-gradient(center, #101517, #090d0f);\n  background: radial-gradient(center, #101517, #090d0f);\n}\n#loading img {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  margin-top: -110px;\n  margin-left: -379px;\n  opacity: 0.3;\n  -ms-filter: \"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)\";\n  filter: alpha(opacity=30);\n}\n#bottom {\n  position: absolute;\n  bottom: 0;\n  width: 100%;\n}\n#spell-over {\n  background: url(\"/ui/spell-bar-over.png\");\n  height: 44px;\n  width: 364px;\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n#spells {\n  margin: auto;\n  width: 340px;\n  background: url(\"/ui/spell-bar-bg.png\");\n  font-size: 0;\n  padding: 4px 1px;\n  height: 44px;\n  width: 364px;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  position: relative;\n}\n#spells img {\n  margin: 0;\n  width: 32px;\n  height: 32px;\n}\n#spells .img {\n  position: relative;\n  display: inline-block;\n  width: 32px;\n  height: 32px;\n  margin: 2px;\n}\n#spells .img .text {\n  position: absolute;\n  display: none;\n  top: 0;\n  bottom: 0;\n  z-index: 999;\n  background: #f00;\n}\n#spells .img:hover .text {\n  display: block;\n}\n#spells .img:hover .img-over {\n  background: no-repeat url(\"/ui/spell-bar-glass.png\");\n  width: 32px;\n  height: 32px;\n  position: absolute;\n  top: 1px;\n  left: 0px;\n}\n#chat {\n  position: absolute;\n  bottom: 0.5em;\n  width: 300px;\n  color: #fff;\n}\n#chat input {\n  background: rgba(120,0,0,0.3);\n  border: none;\n  width: 100%;\n  color: #fff;\n}\n#chat ul {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  background: rgba(255,255,255,0.1);\n  width: 100%;\n}\n#chat .admin {\n  font-weight: bold;\n  color: #c00;\n}\n#chat .party {\n  font-weight: bold;\n}\n#chat .guild {\n  color: #0f0;\n}\n#exp {\n  width: 100%;\n  background: #000;\n}\n#exp div {\n  background: #c0c0c0;\n  height: 7px;\n}\n#hud {\n  position: absolute;\n  padding: 3px;\n}\n#hud .hudMap {\n  background: #534741;\n  top: 5px;\n  left: 5px;\n  width: 82px;\n  height: 82px;\n  position: absolute;\n  -webkit-border-radius: 9999999px;\n  border-radius: 9999999px;\n  padding: 19px;\n  font-size: 40px;\n  font-family: Impact;\n  text-align: center;\n  color: #fff;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n}\n#hud .hud {\n  background: url(\"/ui/hud-bg.png\");\n  width: 223px;\n  height: 86px;\n  position: relative;\n}\n#hud .hud .bar {\n  width: 119px;\n  height: 9px;\n  position: absolute;\n}\n#hud .hud .bar div {\n  height: 9px;\n  -webkit-transition: 0.4s ease;\n  -moz-transition: 0.4s ease;\n  -o-transition: 0.4s ease;\n  -ms-transition: 0.4s ease;\n  transition: 0.4s ease;\n  -webkit-transition: 1.1s linear;\n  -moz-transition: 1.1s linear;\n  -o-transition: 1.1s linear;\n  -ms-transition: 1.1s linear;\n  transition: 1.1s linear;\n}\n#hud .hud .bar.hp {\n  top: 14px;\n  left: 84px;\n}\n#hud .hud .bar.hp div {\n  background: url(\"/ui/hp-bar.png\");\n}\n#hud .hud .bar.mp {\n  top: 28px;\n  left: 84px;\n}\n#hud .hud .bar.mp div {\n  background: url(\"/ui/mp-bar.png\");\n}\n#hud .hud .bar.sp {\n  top: 28px;\n  left: 84px;\n}\n#hud .hud .bar.sp div {\n  background: url(\"/ui/sp-bar.png\");\n}\n#target-bar {\n  background: no-repeat url(\"/ui/target.png\");\n  position: absolute;\n  width: 159px;\n  height: 100px;\n  top: 10px;\n  left: 45%;\n  line-height: 58px;\n  font-size: 14px;\n  text-shadow: 1px 1px 1px #000;\n  color: #fff;\n  text-align: center;\n/*.points\n        //width:200px\n        width: 100%\n        border-radius:6px\n        border: 1px solid black\n        background: silver\n        margin: 2px 0\n        box-sizing: border-box\n\n        div\n            height: 7px\n            border-radius:6px\n            transition: .4s ease\n            transition: 1.1s linear\n        &.hp div\n            background: red\n        &.mp div\n            height: 4px\n            background: blue\n        &.tp div\n            height: 4px\n            background: yellow\n            */\n}\n#target-bar .bar {\n  width: 119px;\n  height: 9px;\n  position: absolute;\n  top: 9px;\n  left: 20px;\n}\n#target-bar .bar div {\n  height: 9px;\n  -webkit-transition: 0.4s ease;\n  -moz-transition: 0.4s ease;\n  -o-transition: 0.4s ease;\n  -ms-transition: 0.4s ease;\n  transition: 0.4s ease;\n  -webkit-transition: 1.1s linear;\n  -moz-transition: 1.1s linear;\n  -o-transition: 1.1s linear;\n  -ms-transition: 1.1s linear;\n  transition: 1.1s linear;\n  background: url(\"/ui/hp-bar.png\");\n}\n#top-right {\n  position: absolute;\n  padding: 3px;\n  right: 0;\n  color: #fff;\n  background: #332;\n}\n.window {\n  width: 274px;\n  height: 424px;\n  background: url(\"/ui/win-bg.png\");\n  position: absolute;\n}\n.window .close {\n  position: absolute;\n  top: 0px;\n  left: 241px;\n  width: 28px;\n  height: 27px;\n}\n.window .close:hover {\n  background: url(\"/ui/win-close.png\");\n}\n.window .title {\n  font-family: Impact;\n  text-shadow: 1px 1px 1px #000;\n  color: #fff;\n  cursor: move;\n  text-align: center;\n  width: 274px;\n  height: 47px;\n  position: absolute;\n  top: 0;\n  left: 0;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  padding-top: 10px;\n}\n.window .scrollbar {\n  background: url(\"/ui/scrollbar-bg.png\");\n  position: absolute;\n  top: 49px;\n  right: 5px;\n  width: 22px;\n  height: 362px;\n}\n.window .scrollbar .up,\n.window .scrollbar .down,\n.window .scrollbar .slider {\n  position: absolute;\n  width: 16px;\n  height: 16px;\n  left: 3px;\n}\n.window .scrollbar .up {\n  background: url(\"/ui/scrollbar-up.png\");\n  top: 2px;\n}\n.window .scrollbar .up:hover {\n  background: url(\"/ui/scrollbar-up-hover.png\");\n}\n.window .scrollbar .down {\n  background: url(\"/ui/scrollbar-down.png\");\n  bottom: 2px;\n}\n.window .scrollbar .down:hover {\n  background: url(\"/ui/scrollbar-down-hover.png\");\n}\n.window .scrollbar .slider {\n  background: url(\"/ui/scrollbar-slider.png\");\n  bottom: 50px;\n}\n.window button.btn {\n  background: url(\"/ui/btn.png\");\n  width: 90px;\n  height: 29px;\n  font-size: 11pt;\n  text-align: center;\n  border: 0;\n  padding: 0;\n  margin: 2px;\n  padding-bottom: 4px;\n  text-shadow: 1px 1px 1px #000;\n  color: #fff;\n}\n.window button.btn:hover {\n  background: url(\"/ui/btn-hover.png\");\n}\n.window button.btn:disabled {\n  background: url(\"/ui/btn-disabled.png\");\n}\n.window button.btn:active {\n  background: url(\"/ui/btn-active.png\");\n}\n.window .content {\n  color: #fff;\n  position: absolute;\n  top: 50px;\n  left: 7px;\n  width: 261px;\n  height: 363px;\n  overflow: hidden;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  font-size: 11pt;\n}\n.window .content.red {\n  background: url(\"/ui/win-red.png\");\n  font-family: sans;\n  color: #fff799;\n}\n.window .content.yellow {\n  background: url(\"/ui/win-yellow.png\");\n  font-family: sans;\n}\n.window .content.paper {\n  background: no-repeat url(\"/ui/win-paper.png\");\n  font-family: sans-serif;\n  padding: 45px 35px 10px 10px;\n  position: relative;\n  color: #46290e;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n}\n.window .content.paper .native {\n  height: 311px;\n}\n.window .content.paper .h {\n  font-size: 14pt;\n  color: #356e0b;\n  font-weight: bold;\n}\n.window .content.paper p {\n  font-size: 11pt;\n}\n.window .content.paper .sello {\n  position: absolute;\n  top: 10px;\n  left: 82px;\n  width: 87px;\n  height: 42px;\n}\n.window .content.paper .sello.red {\n  background: url(\"/ui/sello-red.png\");\n}\n.window .content.paper .sello.blue {\n  background: url(\"/ui/sello-blue.png\");\n}\n#equip {\n  padding: 10px;\n}\n#equip .item {\n  height: 4em;\n  border-bottom: 2px solid #1f1a19;\n  margin-bottom: 0.5em;\n}\n#equip .item:nth-last-of-type(1) {\n  border-bottom: 0;\n}\n#equip .item .slot {\n  float: right;\n  font-weight: bold;\n  display: inline-block;\n  width: 32px;\n}\n#equip .item .name {\n  width: 32px;\n}\n#equip .item .name:before {\n  content: '[';\n}\n#equip .item .name:after {\n  content: ']';\n}\n#equip .item .desc {\n  display: inline-block;\n}\n/* icon 28x28 */\n#inventory {\n  background: url(\"/ui/win-inventory.png\");\n  font-size: 0;\n  padding: 14px 0 18px 18px;\n}\n#inventory .img {\n  position: relative;\n  display: inline-block;\n  width: 32px;\n  height: 32px;\n  margin: 2px 3px;\n}\n#inventory .img:hover .img-over {\n  background: no-repeat url(\"/ui/spell-bar-glass.png\");\n  width: 32px;\n  height: 32px;\n  position: absolute;\n  top: 1px;\n  left: 0px;\n}\n#inventory img {\n  margin: 0;\n  width: 32px;\n  height: 32px;\n}\n#inventory #gold {\n  font-family: Impact;\n  text-shadow: 1px 1px 1px #000;\n  color: #fff;\n  background: no-repeat url(\"/ui/win-x-gold.png\");\n  position: absolute;\n  width: 70px;\n  bottom: 10px;\n  right: 0px;\n  color: #fff;\n  padding-left: 35px;\n  line-height: 21px;\n  font-size: 12px;\n}\n#sys.s5 {\n  background: no-repeat url(\"/ui/sys-bg-5.png\");\n  background-position: 0 11px;\n  position: absolute;\n  width: 204px;\n  height: 35px;\n  bottom: 7px;\n  right: 10px;\n  padding-left: 15px;\n}\n#sys .icon {\n  position: relative;\n  background: url(\"/ui/sys-icons.png\");\n  width: 26px;\n  height: 26px;\n  display: inline-block;\n  margin-right: 11px;\n}\n#sys .icon:hover .tooltip {\n  display: block;\n}\n#sys .icon.hammer {\n  background-position: 0 0;\n}\n#sys .icon.helment {\n  background-position: -26px 0;\n}\n#sys .icon.bubble {\n  background-position: -52px 0;\n}\n#sys .icon.cup {\n  background-position: -78px 0;\n}\n#sys .icon.door {\n  background-position: 52px 0;\n}\n#sys .icon.pounch {\n  background-position: 26px 0;\n}\n"
 
 },{}],"/home/lain/gocode/src/oniproject/js/gameobject.js":[function(require,module,exports){
@@ -942,6 +955,7 @@ function GameObject(obj, state) {
 
 	this.container = new PIXI.DisplayObjectContainer();
 
+
 	this.obj = obj;
 	obj.buttonMode = true;
 	obj.interactive = true;
@@ -957,7 +971,6 @@ function GameObject(obj, state) {
 		align: 'center',
 	});
 	msg.anchor.x = msg.anchor.y = 0.5;
-	msg.y = -(obj.height + 16 + 6) | 0;
 	var name = this._nameObj = new PIXI.Text('lol', {
 		font: '12px Helvetica',
 		fill: 'white',
@@ -966,7 +979,6 @@ function GameObject(obj, state) {
 		align: 'center',
 	});
 	name.anchor.x = name.anchor.y = 0.5;
-	name.y = -(obj.height + 4) | 0;
 
 	if (this.isAvatar()) {
 		this.name = 'ava';
@@ -984,9 +996,13 @@ function GameObject(obj, state) {
 	graphics.lineTo(0, 16);
 
 	var hpBar = this._hpBar = new PIXI.Graphics();
-	hpBar.y = -(obj.height + 16) | 0;
 
-	this.container.addChild(graphics);
+	var h = this.isAvatar() ? 48 : obj.height;
+	hpBar.y = -(h) | 0;
+	name.y = -(h + 6) | 0;
+	msg.y = -(h + 16) | 0;
+
+	//this.container.addChild(graphics);
 	this.container.addChild(obj);
 	this.container.addChild(msg);
 	this.container.addChild(name);
@@ -1083,22 +1099,31 @@ GameObject.prototype.update = function(time) {
 	if (this.obj) {
 		var obj = this.obj;
 
-		if (!obj.animation) return;
+		if (!obj.currentAnimation) return;
 
-		obj.animation = 'idle';
+		obj.currentAnimation = 'idle';
 		var x = state.Velocity.X;
 		var y = state.Velocity.Y;
 		var dir;
 		if (!isNaN(x) && !isNaN(y)) {
 			if (!!x || !!y) {
 				dir = Math.atan2(x, y);
-				obj.animation = 'walk';
+				obj.currentAnimation = 'walk';
 			}
 		} else {
 			dir = Math.atan2(this.lastvel.x, this.lastvel.y);
 		}
 		if (dir !== undefined) {
-			obj.direction = -dir / Math.PI * 180 + 180;
+			var dirArr = '↑↗→↘↓↙←↖';
+			dir = -dir / Math.PI * 180 + 180;
+			if (typeof dir == 'number') {
+				var x = (dir / (360 / 8)) % 8;
+				if (x < 0) {
+					x = 8 + x;
+				}
+				dir = dirArr[x | 0];
+			}
+			obj.currentDirection = dir;
 		}
 	}
 };
@@ -1325,553 +1350,147 @@ Net.prototype.ChatPostMsg = function(msg) {
 
 module.exports = Net;
 
-},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/js/suika.js":[function(require,module,exports){
+},{"events":"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js"}],"/home/lain/gocode/src/oniproject/node_modules/CharRedactor/src/actor.js":[function(require,module,exports){
 'use strict';
 
-var suikaImage;
-
-function Suika() {
-	var w = 880,
-		h = 720;
-	if (!suikaImage) {
-		suikaImage = new PIXI.ImageLoader('/suika.png');
-	}
-	var image = suikaImage;
-
-
-	var a = this._anim = {};
-
-	var keys = [
-		'walk ↖',
-		'walk ↑',
-		'walk ↗',
-		'walk →',
-		'walk ↘',
-		'walk ↓',
-		'walk ↙',
-		'walk ←',
-		'death'
-	];
-
-	var t, k, rect;
-
-	for (var x = 0, l = keys.length; x < l; x++) {
-		k = keys[x];
-		this._anim[k] = [];
-		var aa = [0, 1, 2, 1];
-		for (var j = 0, ll = aa.length; j < ll; j++) {
-			var y = aa[j];
-			rect = {
-				x: x * 96 + 4,
-				y: y * 96 + 4,
-				width: 96,
-				height: 96,
-			};
-			t = new PIXI.Texture(image.texture.baseTexture, rect);
-			a[k].push(t);
-		}
-	}
-
-	a['idle ↖'] = [a['walk ↖'][1]];
-	a['idle ↑'] = [a['walk ↑'][1]];
-	a['idle ↗'] = [a['walk ↗'][1]];
-	a['idle →'] = [a['walk →'][1]];
-	a['idle ↘'] = [a['walk ↘'][1]];
-	a['idle ↓'] = [a['walk ↓'][1]];
-	a['idle ↙'] = [a['walk ↙'][1]];
-	a['idle ←'] = [a['walk ←'][1]];
-
-	keys = [
-		'boom ↙',
-		'boom ↓',
-		'boom ↘',
-
-		'boom ↖',
-		'boom ↑',
-		'boom ↗',
-
-		'boom →',
-		'boom ←',
-	];
-
-	rect = {
-		/*x: x* 96 -3,*/
-		y: 96 * 3 + 4,
-		width: 96,
-		height: 124,
-	};
-
-	w = 96;
-	k = 'boom ↙';
-	a[k] = [];
-	for (x = 0; x < 3; x++) {
-		rect.x = x * w - 3;
-		t = new PIXI.Texture(image.texture.baseTexture, rect);
-		a[k].push(t);
-	}
-	k = 'boom ↓';
-	a[k] = [];
-	for (x = 0; x < 3; x++) {
-		rect.x = (x + 3) * w - 3;
-		t = new PIXI.Texture(image.texture.baseTexture, rect);
-		a[k].push(t);
-	}
-	k = 'boom ↘';
-	a[k] = [];
-	for (x = 0; x < 3; x++) {
-		rect.x = (x + 6) * w - 3;
-		t = new PIXI.Texture(image.texture.baseTexture, rect);
-		a[k].push(t);
-	}
-
-	rect.y += 124;
-	rect.height = 104;
-	k = 'boom ↖';
-	a[k] = [];
-	for (x = 0; x < 3; x++) {
-		rect.x = x * w;
-		t = new PIXI.Texture(image.texture.baseTexture, rect);
-		a[k].push(t);
-	}
-	k = 'boom ↓';
-	a[k] = [];
-	for (x = 0; x < 3; x++) {
-		rect.x = (x + 3) * w;
-		t = new PIXI.Texture(image.texture.baseTexture, rect);
-		a[k].push(t);
-	}
-	k = 'boom ↗';
-	a[k] = [];
-	for (x = 0; x < 3; x++) {
-		rect.x = (x + 6) * w;
-		t = new PIXI.Texture(image.texture.baseTexture, rect);
-		a[k].push(t);
-	}
-
-	rect.y += 104;
-
-	/*k = 'boom →';
-	rect.x = (x +6)*w -3;
-	t = new PIXI.Texture(image.texture.baseTexture, rect);
-	a[k].push(t);
-	k = 'boom ←';*/
-
-
-
-	this._animation = 'idle';
-	this._direction = '↓';
-
-	this.currentFrame = 0;
-	this.animationSpeed = 0.3;
-
-	PIXI.Sprite.call(this, a['idle ↓'][0]);
-	this.scale.x = this.scale.y = 0.5;
-	this.anchor.x = 0.5;
-	this.anchor.y = 1;
-
-	image.load();
-	this.image = image;
-}
-
-Suika.prototype = Object.create(PIXI.Sprite.prototype);
-Suika.prototype.constructor = Suika;
-
-Object.defineProperty(Suika.prototype, 'direction', {
-	get: function() {
-		return this._direction;
-	},
-	set: function(v) {
-		var dir = '↑↗→↘↓↙←↖';
-		if (typeof v == 'number') {
-			var x = (v / (360 / 8)) % 8;
-			if (x < 0) {
-				x = 8 + x;
-			}
-			v = dir[x | 0];
-		}
-		this._direction = v;
-	},
-});
-
-Object.defineProperty(Suika.prototype, 'animation', {
-	get: function() {
-		return this._animation;
-	},
-	set: function(v) {
-		this._animation = v;
-	},
-});
-
-Suika.prototype.updateTransform = function() {
-	PIXI.Sprite.prototype.updateTransform.call(this);
-
-	var anim;
-	switch (this._animation) {
-		case 'death':
-			anim = this._anim.death;
-			break;
-		case 'walk':
-		case 'idle':
-		case 'boom':
-			anim = this._anim[this._animation + ' ' + this._direction];
-	}
-
-	this.currentFrame += this.animationSpeed;
-
-	var round = (this.currentFrame) | 0;
-
-	this.currentFrame = this.currentFrame % anim.length;
-
-	if ( /*this.loop ||*/ round < anim.length) {
-		this.setTexture(anim[round % anim.length]);
-	} /*else if(round >= anim.length) {
-		this.gotoAndStop(this.textures.length - 1);
-	}*/
-};
-
-module.exports = Suika;
-
-},{}],"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js":[function(require,module,exports){
-'use strict';
-
-function ImageLayer(data, path) {
-	var image = this.image = new PIXI.ImageLoader(path + data.image);
-	PIXI.Sprite.call(this, image.texture);
-
-	this.position.x = data.x || 0;
-	this.position.y = data.y || 0;
-	this.alpha = data.opacity || 1;
-	this.visible = !!data.visible;
-}
-
-ImageLayer.prototype = Object.create(PIXI.Sprite.prototype);
-ImageLayer.constructor = ImageLayer;
-
-ImageLayer.prototype.load = function(fn) {
-	if (fn) {
-		this.image.on('loaded', fn);
-	}
-	this.image.load();
-};
-
-module.exports = ImageLayer;
-
-},{}],"/home/lain/gocode/src/oniproject/js/tiled/index.js":[function(require,module,exports){
-'use strict';
-
-var Tileset = require('./tileset');
-var TileLayer = require('./tilelayer');
-var ObjectGroup = require('./objectgroup');
-var ImageLayer = require('./imagelayer');
-
-function Tiled(path, uri) {
+var Actor = function(data) {
 	PIXI.DisplayObjectContainer.call(this);
 
-	this.path = path;
+	this.data = data;
+	//this.textures = textures;
 
-	var loader = this.loader = new PIXI.JsonLoader(path + uri);
+	this._currentAnimation = 'idle';
+	this._currentDirection = '↓';
+	this._currentFrame = 0;
 
-	this.tilesets = [];
-	this.layers = [];
+	this.lastTime = window.performance.now();
+	this.playing = true;
 
-	this.AVATARS = new PIXI.DisplayObjectContainer();
+	this._currentDelta = 100;
 }
 
-Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-Tiled.constructor = Tiled;
+Actor.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+Actor.prototype.constructor = Actor;
 
-Tiled.prototype.load = function(fn, fn2) {
-	var that = this;
-	this.loader.on('loaded', function() {
-		var json = that.data = that.loader.json;
-
-		var tilesets_count = json.tilesets.length;
-		var f = function() {
-			tilesets_count--;
-			if (!tilesets_count) {
-				console.info('tilesets loaded');
-				if (fn) {
-					fn();
-				}
-			}
-		};
-		var i, l;
-		for (i = 0, l = json.tilesets.length; i < l; i++) {
-			var t = new Tileset(json.tilesets[i], that.path, null, null);
-			that.tilesets.push(t);
-			t.load(f);
-		}
-
-		for (i = 0, l = json.layers.length; i < l; i++) {
-			var layer = json.layers[i];
-			var obj = null;
-			switch (layer.type) {
-				case 'tilelayer':
-					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
-					break;
-				case 'objectgroup':
-					if (layer.name == 'AVATARS') {
-						obj = that.AVATARS;
-					} else {
-						obj = new ObjectGroup(layer, that.tilesets);
-					}
-					break;
-				case 'imagelayer':
-					obj = new ImageLayer(layer, that.path);
-					obj.load();
-					break;
-			}
-			if (obj !== null) {
-				that.layers.push(obj);
-				that.addChild(obj);
-			}
-		}
-		if (fn2) {
-			fn2();
-		}
-
-	});
-	this.loader.load();
-};
-
-module.exports = Tiled;
-
-},{"./imagelayer":"/home/lain/gocode/src/oniproject/js/tiled/imagelayer.js","./objectgroup":"/home/lain/gocode/src/oniproject/js/tiled/objectgroup.js","./tilelayer":"/home/lain/gocode/src/oniproject/js/tiled/tilelayer.js","./tileset":"/home/lain/gocode/src/oniproject/js/tiled/tileset.js"}],"/home/lain/gocode/src/oniproject/js/tiled/objectgroup.js":[function(require,module,exports){
-'use strict';
-
-function ObjectGroup(data, tilesets) {
-	PIXI.DisplayObjectContainer.call(this);
-	var graphics = this.graphics = new PIXI.Graphics();
-	this.addChild(graphics);
-
-	this.data = data || {};
-	if (!data.objects) {
-		data.objects = [];
-	}
-	this.tilesets = tilesets;
-
-	this.position.x = data.x || 0;
-	this.position.y = data.y || 0;
-	this.alpha = data.opacity || 1;
-	this.visible = !!data.visible;
-
-	if (data.color) {
-		var c = parseInt(data.color.slice(1), 16);
-		graphics.lineStyle(2, c, 1);
-	}
-
-	for (var i = 0, l = data.objects.length; i < l; i++) {
-		var obj = data.objects[i];
-		if (!obj.visible) {
-			continue;
-		}
-
-		var x = obj.x,
-			y = obj.y,
-			w = obj.width,
-			h = obj.height,
-			r = obj.rotation;
-		var w2 = w / 2,
-			h2 = h / 2;
-		if (obj.gid) {
-			for (var j = 0, ll = tilesets.length; j < ll; j++) {
-				var t = tilesets[j];
-				var sprite = t.CreateSprite(obj.gid);
-
-				if (sprite) {
-					sprite.position.x = x;
-					sprite.position.y = y - sprite.height; // XXX
-
-					if (t.data.tileoffset) {
-						sprite.position.x += t.data.tileoffset.x;
-						sprite.position.y += t.data.tileoffset.y;
-					}
-
-					this.addChild(sprite);
-					break;
-				}
-			}
-		} else if (obj.polyline) {
-		// TODO
-		} else if (obj.ellipse) {
-			// TODO
-			graphics.drawEllipse(x + w2, y + h2, w2, h2);
-		} else if (obj.polygon) {
-		// TODO
+Object.defineProperty(Actor.prototype, 'currentFrame', {
+	get: function() {
+		return this._currentFrame;
+	},
+	set: function(val) {
+		if (this.data[this._currentAnimation].directions[this._currentDirection].length > val) {
+			this._currentFrame = val;
 		} else {
-			// TODO rect
-			graphics.drawRect(x, y, w, h);
+			console.error("Bad currentFrame", val);
 		}
-	}
+	},
+});
+
+Object.defineProperty(Actor.prototype, 'currentAnimation', {
+	get: function() {
+		return this._currentAnimation;
+	},
+	set: function(val) {
+		if (this.data.hasOwnProperty(val)) {
+			this._currentAnimation = val;
+		} else {
+			console.error("Bad action", val, this.data);
+		}
+	},
+});
+
+Object.defineProperty(Actor.prototype, 'currentDirection', {
+	get: function() {
+		return this._currentDirection;
+	},
+	set: function(val) {
+		switch (val) {
+			case '↑':
+			case '↗':
+			case '→':
+			case '↘':
+			case '↓':
+			case '↙':
+			case '←':
+			case '↖':
+				this._currentDirection = val;
+				break;
+			default:
+				console.error("Bad direction", val);
+		}
+	},
+});
+
+Actor.prototype.stop = function() {
+	this.playing = false;
+}
+Actor.prototype.play = function() {
+	this.playing = true;
+}
+Actor.prototype.gotoAndStop = function(frameNumber) {
+	this.playing = false;
+	this.currentFrame = frameNumber;
+}
+Actor.prototype.gotoAndPlay = function(frameNumber) {
+	this.currentFrame = frameNumber;
+	this.playing = true;
 }
 
-ObjectGroup.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-ObjectGroup.constructor = ObjectGroup;
-
-module.exports = ObjectGroup;
-
-},{}],"/home/lain/gocode/src/oniproject/js/tiled/tilelayer.js":[function(require,module,exports){
-'use strict';
-
-function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
-	PIXI.SpriteBatch.call(this);
-
-	this.data = data;
-	this.tilesets = tilesets;
-
-	this.position.x = data.x || 0;
-	this.position.y = data.y || 0;
-	if (data.opacity === undefined) {
-		data.opacity = 1;
-	}
-	this.alpha = data.opacity;
-	this.visible = !!data.visible;
-
-	this._animated = [];
-
-	for (var y = 0; y < data.height; y++) {
-		for (var x = 0; x < data.width; x++) {
-			var iii = y * data.width + x;
-			var id = data.data[iii];
-			found:
-			for (var i = 0, l = tilesets.length; i < l; i++) {
-				var t = tilesets[i];
-				if (id - t.data.firstgid <= 0) {
-					continue found;
-				}
-				var sprite = t.CreateSprite(id);
-
-				if (sprite) {
-					sprite.position.x = x * tilewidth + data.x;
-					sprite.position.y = y * tileheight + data.y;
-
-					if (t.data.tileoffset) {
-						sprite.position.x += t.data.tileoffset.x;
-						sprite.position.y += t.data.tileoffset.y;
-					}
-
-					if (sprite.textures) {
-						this._animated.push(sprite);
-					}
-
-					this.addChild(sprite);
-					break found;
-				}
-			}
-		}
-	}
-
-	this.cacheAsBitmap = this._animated.length === 0;
+Actor.prototype.getFrames = function() {
+	var animation = this.data[this._currentAnimation];
+	return animation.directions[this._currentDirection];
 }
 
-TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
-TileLayer.constructor = TileLayer;
-
-TileLayer.prototype.updateTransform = function() {
-	var _animated = this._animated;
-	for (var i = 0, l = _animated.length; i < l; i++) {
-		_animated[i].updateTransform();
-	}
-	PIXI.SpriteBatch.prototype.updateTransform.call(this);
-};
-
-module.exports = TileLayer;
-
-},{}],"/home/lain/gocode/src/oniproject/js/tiled/tileset.js":[function(require,module,exports){
-'use strict';
-
-function Tileset(data, path, tilewidth, tileheight) {
-	this.data = data;
-
-	if (!data.tiles) {
-		data.tiles = {};
-	}
-
-	if (!tilewidth) {
-		tilewidth = data.tilewidth;
-	}
-	if (!tileheight) {
-		tileheight = data.tileheight;
-	}
-
-	var image = this.image = new PIXI.ImageLoader(path + data.image);
-
-	var tiles = this.tiles = [];
-
-	var ww = 0,
-		hh = 0;
-	for (var y = data.margin; y < data.imageheight; y += tileheight + data.spacing) {
-		hh++;
-		for (var x = data.margin; x < data.imagewidth; x += tilewidth + data.spacing) {
-			var rect = {
-				x: x,
-				y: y,
-				width: data.tilewidth,
-				height: data.tileheight,
-			};
-			var t = new PIXI.Texture(image.texture.baseTexture, rect);
-			tiles.push(t);
-		}
-	}
-}
-
-
-Tileset.prototype.load = function(fn) {
-	if (fn) {
-		this.image.on('loaded', fn);
-	}
-	this.image.load();
-};
-
-
-Tileset.prototype.CreateSprite = function(id) {
-	if (id === 0) return;
-
-	var data = this.data;
-	id -= data.firstgid;
-	var texture = this.tiles[id];
-
-	if (!texture) return;
-
-	var sprite = new PIXI.Sprite(texture);
-	sprite.data = data.tiles[id];
-
-	if (sprite.data && sprite.data.animation) {
-		sprite.last = window.performance.now();
-		sprite.currentFrame = 0;
-		sprite.updateTransform = updateTransform;
-
-		sprite.textures = [];
-		for (var i = 0, l = sprite.data.animation.length; i < l; i++) {
-			var t = sprite.data.animation[i];
-			sprite.textures.push(this.tiles[t.tileid]);
-		}
-	}
-
-	return sprite;
-};
-
-var updateTransform = function() {
-	PIXI.Sprite.prototype.updateTransform.call(this);
-
-	if (!this.textures) return;
-
+Actor.prototype.updateTransform = function() {
 	var time = window.performance.now();
-	var frame = this.data.animation[this.currentFrame];
 
-	if (time - this.last > frame.duration) {
-		this.currentFrame++;
-		if (this.currentFrame >= this.data.animation.length) {
-			this.currentFrame = 0;
+	if (!this.playing) {
+		this.lastTime = time;
+	} else {
+		var delta = time - this.lastTime;
+
+		if (delta >= this._currentDelta) {
+			this.lastTime = time;
+
+			var frames = this.getFrames();
+			if (!frames && this._sprite) {
+				this._sprite.visible = false;
+				return
+			}
+
+			this._currentFrame++;
+
+			if (this._currentFrame >= frames.length) {
+				this._currentFrame = 0;
+			}
+			//this._upd = true;
+			var frame = frames[this._currentFrame];
+			var texture = PIXI.TextureCache[frame.name];
+			if (!texture) {
+				if (this._sprite) {
+					this._sprite.visible = false;
+				}
+				return;
+			}
+			if (!this._sprite) {
+				this._sprite = new PIXI.Sprite(texture);
+				this.addChild(this._sprite);
+			}
+			this._currentDelta = frame.t;
+			this._sprite.visible = true;
+			var sprite = this._sprite;
+			sprite.position.x = frame.x;
+			sprite.position.y = frame.y;
+			sprite.scale.x = frame.sx;
+			sprite.scale.y = frame.sy;
+			sprite.rotation = frame.rot;
+			sprite.setTexture(texture);
 		}
-
-		this.setTexture(this.textures[this.currentFrame]);
-
-		this.last += frame.duration;
 	}
-};
 
-module.exports = Tileset;
+	PIXI.DisplayObjectContainer.prototype.updateTransform.call(this);
+}
+
+module.exports = Actor;
 
 },{}],"/home/lain/gocode/src/oniproject/node_modules/browserify/node_modules/events/events.js":[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
@@ -3554,6 +3173,351 @@ module.exports = function (css, options) {
         head.appendChild(elem);
     }
 };
+
+},{}],"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/imagelayer.js":[function(require,module,exports){
+'use strict';
+
+function ImageLayer(data, path) {
+	var image = this.image = new PIXI.ImageLoader(path + data.image);
+	PIXI.Sprite.call(this, image.texture);
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+}
+
+ImageLayer.prototype = Object.create(PIXI.Sprite.prototype);
+ImageLayer.constructor = ImageLayer;
+
+ImageLayer.prototype.load = function(fn) {
+	if (fn) {
+		this.image.on('loaded', fn);
+	}
+	this.image.load();
+};
+
+module.exports = ImageLayer;
+
+},{}],"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/index.js":[function(require,module,exports){
+'use strict';
+
+var Tileset = require('./tileset');
+var TileLayer = require('./tilelayer');
+var ObjectGroup = require('./objectgroup');
+var ImageLayer = require('./imagelayer');
+
+function Tiled(path, uri) {
+	PIXI.DisplayObjectContainer.call(this);
+
+	this.path = path;
+
+	var loader = this.loader = new PIXI.JsonLoader(path + uri);
+
+	this.tilesets = [];
+	this.layers = [];
+
+	this.AVATARS = new PIXI.DisplayObjectContainer();
+}
+
+Tiled.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+Tiled.constructor = Tiled;
+
+Tiled.prototype.load = function(fn, fn2) {
+	var that = this;
+	this.loader.on('loaded', function() {
+		var json = that.data = that.loader.json;
+
+		var tilesets_count = json.tilesets.length;
+		var f = function() {
+			tilesets_count--;
+			if (!tilesets_count) {
+				console.info('tilesets loaded');
+				if (fn) {
+					fn();
+				}
+			}
+		};
+		var i, l;
+		for (i = 0, l = json.tilesets.length; i < l; i++) {
+			var t = new Tileset(json.tilesets[i], that.path, null, null);
+			that.tilesets.push(t);
+			t.load(f);
+		}
+
+		for (i = 0, l = json.layers.length; i < l; i++) {
+			var layer = json.layers[i];
+			var obj = null;
+			switch (layer.type) {
+				case 'tilelayer':
+					obj = new TileLayer(layer, that.tilesets, json.tilewidth, json.tileheight, json.renderorder);
+					break;
+				case 'objectgroup':
+					if (layer.name == 'AVATARS') {
+						obj = that.AVATARS;
+					} else {
+						obj = new ObjectGroup(layer, that.tilesets);
+					}
+					break;
+				case 'imagelayer':
+					obj = new ImageLayer(layer, that.path);
+					obj.load();
+					break;
+			}
+			if (obj !== null) {
+				that.layers.push(obj);
+				that.addChild(obj);
+			}
+		}
+		if (fn2) {
+			fn2();
+		}
+
+	});
+	this.loader.load();
+};
+
+module.exports = Tiled;
+
+},{"./imagelayer":"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/imagelayer.js","./objectgroup":"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/objectgroup.js","./tilelayer":"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/tilelayer.js","./tileset":"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/tileset.js"}],"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/objectgroup.js":[function(require,module,exports){
+'use strict';
+
+function ObjectGroup(data, tilesets) {
+	PIXI.DisplayObjectContainer.call(this);
+	var graphics = this.graphics = new PIXI.Graphics();
+	this.addChild(graphics);
+
+	this.data = data || {};
+	if (!data.objects) {
+		data.objects = [];
+	}
+	this.tilesets = tilesets;
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	this.alpha = data.opacity || 1;
+	this.visible = !!data.visible;
+
+	if (data.color) {
+		var c = parseInt(data.color.slice(1), 16);
+		graphics.lineStyle(2, c, 1);
+	}
+
+	for (var i = 0, l = data.objects.length; i < l; i++) {
+		var obj = data.objects[i];
+		if (!obj.visible) {
+			continue;
+		}
+
+		var x = obj.x,
+			y = obj.y,
+			w = obj.width,
+			h = obj.height,
+			r = obj.rotation;
+		var w2 = w / 2,
+			h2 = h / 2;
+		if (obj.gid) {
+			for (var j = 0, ll = tilesets.length; j < ll; j++) {
+				var t = tilesets[j];
+				var sprite = t.CreateSprite(obj.gid);
+
+				if (sprite) {
+					sprite.position.x = x;
+					sprite.position.y = y - sprite.height; // XXX
+
+					if (t.data.tileoffset) {
+						sprite.position.x += t.data.tileoffset.x;
+						sprite.position.y += t.data.tileoffset.y;
+					}
+
+					this.addChild(sprite);
+					break;
+				}
+			}
+		} else if (obj.polyline) {
+		// TODO
+		} else if (obj.ellipse) {
+			// TODO
+			graphics.drawEllipse(x + w2, y + h2, w2, h2);
+		} else if (obj.polygon) {
+		// TODO
+		} else {
+			// TODO rect
+			graphics.drawRect(x, y, w, h);
+		}
+	}
+}
+
+ObjectGroup.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+ObjectGroup.constructor = ObjectGroup;
+
+module.exports = ObjectGroup;
+
+},{}],"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/tilelayer.js":[function(require,module,exports){
+'use strict';
+
+function TileLayer(data, tilesets, tilewidth, tileheight, renderorder) {
+	PIXI.SpriteBatch.call(this);
+
+	this.data = data;
+	this.tilesets = tilesets;
+
+	this.position.x = data.x || 0;
+	this.position.y = data.y || 0;
+	if (data.opacity === undefined) {
+		data.opacity = 1;
+	}
+	this.alpha = data.opacity;
+	this.visible = !!data.visible;
+
+	this._animated = [];
+
+	for (var y = 0; y < data.height; y++) {
+		for (var x = 0; x < data.width; x++) {
+			var iii = y * data.width + x;
+			var id = data.data[iii];
+			found:
+			for (var i = 0, l = tilesets.length; i < l; i++) {
+				var t = tilesets[i];
+				if (id - t.data.firstgid <= 0) {
+					continue found;
+				}
+				var sprite = t.CreateSprite(id);
+
+				if (sprite) {
+					sprite.position.x = x * tilewidth + data.x;
+					sprite.position.y = y * tileheight + data.y;
+
+					if (t.data.tileoffset) {
+						sprite.position.x += t.data.tileoffset.x;
+						sprite.position.y += t.data.tileoffset.y;
+					}
+
+					if (sprite.textures) {
+						this._animated.push(sprite);
+					}
+
+					this.addChild(sprite);
+					break found;
+				}
+			}
+		}
+	}
+
+	this.cacheAsBitmap = this._animated.length === 0;
+}
+
+TileLayer.prototype = Object.create(PIXI.SpriteBatch.prototype);
+TileLayer.constructor = TileLayer;
+
+TileLayer.prototype.updateTransform = function() {
+	var _animated = this._animated;
+	for (var i = 0, l = _animated.length; i < l; i++) {
+		_animated[i].updateTransform();
+	}
+	PIXI.SpriteBatch.prototype.updateTransform.call(this);
+};
+
+module.exports = TileLayer;
+
+},{}],"/home/lain/gocode/src/oniproject/node_modules/tiled.js/src/tileset.js":[function(require,module,exports){
+'use strict';
+
+function Tileset(data, path, tilewidth, tileheight) {
+	this.data = data;
+
+	if (!data.tiles) {
+		data.tiles = {};
+	}
+
+	if (!tilewidth) {
+		tilewidth = data.tilewidth;
+	}
+	if (!tileheight) {
+		tileheight = data.tileheight;
+	}
+
+	var image = this.image = new PIXI.ImageLoader(path + data.image);
+
+	var tiles = this.tiles = [];
+
+	var ww = 0,
+		hh = 0;
+	for (var y = data.margin; y < data.imageheight; y += tileheight + data.spacing) {
+		hh++;
+		for (var x = data.margin; x < data.imagewidth; x += tilewidth + data.spacing) {
+			var rect = {
+				x: x,
+				y: y,
+				width: data.tilewidth,
+				height: data.tileheight,
+			};
+			var t = new PIXI.Texture(image.texture.baseTexture, rect);
+			tiles.push(t);
+		}
+	}
+}
+
+
+Tileset.prototype.load = function(fn) {
+	if (fn) {
+		this.image.on('loaded', fn);
+	}
+	this.image.load();
+};
+
+
+Tileset.prototype.CreateSprite = function(id) {
+	if (id === 0) return;
+
+	var data = this.data;
+	id -= data.firstgid;
+	var texture = this.tiles[id];
+
+	if (!texture) return;
+
+	var sprite = new PIXI.Sprite(texture);
+	sprite.data = data.tiles[id];
+
+	if (sprite.data && sprite.data.animation) {
+		sprite.last = window.performance.now();
+		sprite.currentFrame = 0;
+		sprite.updateTransform = updateTransform;
+
+		sprite.textures = [];
+		for (var i = 0, l = sprite.data.animation.length; i < l; i++) {
+			var t = sprite.data.animation[i];
+			sprite.textures.push(this.tiles[t.tileid]);
+		}
+	}
+
+	return sprite;
+};
+
+var updateTransform = function() {
+	PIXI.Sprite.prototype.updateTransform.call(this);
+
+	if (!this.textures) return;
+
+	var time = window.performance.now();
+	var frame = this.data.animation[this.currentFrame];
+
+	if (time - this.last > frame.duration) {
+		this.currentFrame++;
+		if (this.currentFrame >= this.data.animation.length) {
+			this.currentFrame = 0;
+		}
+
+		this.setTexture(this.textures[this.currentFrame]);
+
+		this.last += frame.duration;
+	}
+};
+
+module.exports = Tileset;
+
+},{}],"/home/lain/gocode/src/oniproject/public/animations.json":[function(require,module,exports){
+module.exports=module.exports={"idle":{"directions":{"↖":[{"name":"suika walk ↖ 1","t":0,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 1","t":0,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 1","t":0,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 1","t":0,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 1","t":0,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 1","t":0,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 1","t":0,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 1","t":0,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"walk":{"directions":{"↖":[{"name":"suika walk ↖ 0","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 2","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 0","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 2","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 0","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 2","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 0","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 2","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 0","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 2","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 0","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 2","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 0","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 2","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 0","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 2","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"boom":{"directions":{"↖":[{"name":"suika boom ↖ 0","t":300,"x":-44,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 1","t":100,"x":-52,"y":-98,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 2","t":400,"x":-50,"y":-98,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika boom ↑ 0","t":300,"x":-40,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 1","t":100,"x":-40,"y":-100,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 2","t":400,"x":-42,"y":-96,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika boom ↗ 0","t":300,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 1","t":100,"x":-36,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 2","t":400,"x":-34,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika boom ← 0","t":300,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 1","t":100,"x":-82,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 2","t":400,"x":-70,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika boom → 0","t":300,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 2","t":400,"x":-18,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika boom ↙ 0","t":300,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 1","t":100,"x":-50,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 2","t":400,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika boom ↓ 0","t":300,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 1","t":100,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 2","t":400,"x":-40,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika boom ↘ 0","t":300,"x":-44,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 2","t":400,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0}]}},"death":{"directions":{"↖":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}]}}}
 
 },{}]},{},["./js/main.js"])
 
