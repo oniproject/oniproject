@@ -1,8 +1,7 @@
 package managers
 
 import (
-//"oniproject/oni/artemis/utils"
-//. "oniproject/oni/artemis"
+	. "oniproject/oni/artemis"
 )
 
 /* Use this class together with PlayerManager.

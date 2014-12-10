@@ -1,14 +1,8 @@
 package managers
 
-/*
-import java.util.HashMap;
-import java.util.Map;
-
-import com.artemis.Entity;
-import com.artemis.Manager;
-import com.artemis.utils.Bag;
-import com.artemis.utils.ImmutableBag;
-*/
+import (
+	. "oniproject/oni/artemis"
+)
 
 /* You may sometimes want to specify to which player an entity belongs to.
 

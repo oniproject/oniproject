@@ -2,24 +2,9 @@ package managers
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
+	. "oniproject/oni/artemis"
 	"testing"
 )
-
-type Entity struct{}
-type World struct{}
-
-type EntityObserver interface {
-	Added(e *Entity)
-	Changed(e *Entity)
-	Deleted(e *Entity)
-	Enabled(e *Entity)
-	Disabled(e *Entity)
-}
-type Manager interface {
-	EntityObserver
-	SetWorld(world *World)
-	Initialize()
-}
 
 func Test_TeamManager(t *testing.T) {
 	mgr := NewTeamManager()
