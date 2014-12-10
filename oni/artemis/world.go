@@ -26,6 +26,8 @@ type System interface {
 	Initialize()
 
 	SetPassive(p bool)
+	IsPassive() bool
+	Process()
 }
 
 /* The primary instance for the framework. It contains all the managers.
@@ -207,13 +209,13 @@ func (w *World) SystemByType(t reflect.Type) System { return w.systems[t] }
 
 func (w *World) notifySystems(performer Performer, e *Entity) {
 	for _, system := range w.systemsArr {
-		performer.Perform(system, e)
+		performer(system, e)
 	}
 }
 
 func (w *World) notifyManagers(performer Performer, e *Entity) {
 	for _, manager := range w.managersArr {
-		performer.Perform(manager, e)
+		performer(manager, e)
 	}
 }
 
@@ -227,51 +229,31 @@ func (w *World) check(entities []*Entity, performer Performer) {
 }
 
 // Process all non-passive systems.
-/* TODO public void process() {
-	check(added, new Performer() {
-		@Override
-		public void perform(EntityObserver observer, Entity e) {
-			observer.added(e);
-		}
-	});
+func (w *World) Process() {
+	w.check(w.added, func(observer EntityObserver, e *Entity) {
+		observer.Added(e)
+	})
+	w.check(w.changed, func(observer EntityObserver, e *Entity) {
+		observer.Changed(e)
+	})
+	w.check(w.disable, func(observer EntityObserver, e *Entity) {
+		observer.Disabled(e)
+	})
+	w.check(w.enable, func(observer EntityObserver, e *Entity) {
+		observer.Enabled(e)
+	})
+	w.check(w.deleted, func(observer EntityObserver, e *Entity) {
+		observer.Deleted(e)
+	})
 
-	check(changed, new Performer() {
-		@Override
-		public void perform(EntityObserver observer, Entity e) {
-			observer.changed(e);
-		}
-	});
+	w.cm.Clean()
 
-	check(disable, new Performer() {
-		@Override
-		public void perform(EntityObserver observer, Entity e) {
-			observer.disabled(e);
-		}
-	});
-
-	check(enable, new Performer() {
-		@Override
-		public void perform(EntityObserver observer, Entity e) {
-			observer.enabled(e);
-		}
-	});
-
-	check(deleted, new Performer() {
-		@Override
-		public void perform(EntityObserver observer, Entity e) {
-			observer.deleted(e);
-		}
-	});
-
-	cm.clean();
-
-	for(int i = 0; systemsBag.size() > i; i++) {
-		EntitySystem system = systemsBag.get(i);
-		if(!system.isPassive()) {
-			system.process();
+	for _, sys := range w.systemsArr {
+		if !sys.IsPassive() {
+			sys.Process()
 		}
 	}
-}*/
+}
 
 /* Retrieves a ComponentMapper instance for fast retrieval of components from entities.
 
@@ -283,9 +265,7 @@ func (w *World) Mapper(t reflect.Type) *ComponentMapper {
 }
 
 // Only used internally to maintain clean code.
-type Performer interface {
-	Perform(observer EntityObserver, e *Entity)
-}
+type Performer func(observer EntityObserver, e *Entity)
 
 /* TODO
 func ComponentMapperInitHelperConfig(target interface{}, world World) {
