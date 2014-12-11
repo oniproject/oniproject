@@ -5,6 +5,7 @@ package artemis_test
 
 import (
 	bitset "github.com/willf/bitset"
+	utils "oniproject/oni/utils"
 	gomock "code.google.com/p/gomock/gomock"
 	artemis "oniproject/oni/artemis"
 )
@@ -66,7 +67,7 @@ func (_mr *_MockEntityRecorder) ComponentBits() *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "ComponentBits")
 }
 
-func (_m *MockEntity) ComponentByType(_param0 *artemis.ComponentType) artemis.Component {
+func (_m *MockEntity) ComponentByType(_param0 uint) artemis.Component {
 	ret := _m.ctrl.Call(_m, "ComponentByType", _param0)
 	ret0, _ := ret[0].(artemis.Component)
 	return ret0
@@ -161,6 +162,14 @@ func (_mr *_MockEntityRecorder) RemoveComponent(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RemoveComponent", arg0)
 }
 
+func (_m *MockEntity) SetUUID(_param0 utils.Id) {
+	_m.ctrl.Call(_m, "SetUUID", _param0)
+}
+
+func (_mr *_MockEntityRecorder) SetUUID(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "SetUUID", arg0)
+}
+
 func (_m *MockEntity) String() string {
 	ret := _m.ctrl.Call(_m, "String")
 	ret0, _ := ret[0].(string)
@@ -179,6 +188,16 @@ func (_m *MockEntity) SystemBits() *bitset.BitSet {
 
 func (_mr *_MockEntityRecorder) SystemBits() *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "SystemBits")
+}
+
+func (_m *MockEntity) UUID() utils.Id {
+	ret := _m.ctrl.Call(_m, "UUID")
+	ret0, _ := ret[0].(utils.Id)
+	return ret0
+}
+
+func (_mr *_MockEntityRecorder) UUID() *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "UUID")
 }
 
 func (_m *MockEntity) UnmarshalJSON(_param0 []byte) error {

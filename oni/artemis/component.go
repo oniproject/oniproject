@@ -1,7 +1,6 @@
 package artemis
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -10,37 +9,16 @@ type Component interface {
 	Name() string
 }
 
-var _INDEX = 0
-var componentTypes = make(map[reflect.Type]*ComponentType)
+var _INDEX = uint(0)
+var componentTypes = make(map[reflect.Type]uint)
 
-type ComponentType struct {
-	index int
-	t     reflect.Type
-}
-
-func (ct *ComponentType) Index() int { return ct.index }
-func (ct *ComponentType) String() string {
-	return fmt.Sprintf("ComponentType[%s] (%d)", ct.t.String(), ct.index)
-}
-
-func newComponentType(t reflect.Type) *ComponentType {
-	_INDEX++
-	return &ComponentType{
-		t:     t,
-		index: _INDEX,
-	}
-}
-
-func getTypeFor(c Component) *ComponentType {
+func GetIndexFor(c Component) uint {
 	t := reflect.TypeOf(c)
 	ct, ok := componentTypes[t]
 	if !ok {
-		ct = newComponentType(t)
+		_INDEX++
+		ct = _INDEX
 		componentTypes[t] = ct
 	}
 	return ct
-}
-
-func getIndexFor(c Component) int {
-	return getTypeFor(c).Index()
 }

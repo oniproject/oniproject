@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/willf/bitset"
+	"oniproject/oni/utils"
 )
 
 type Entity interface {
@@ -14,6 +15,9 @@ type Entity interface {
 	// will have the same ID, but ID's are however reused so another entity may
 	// acquire this ID if the previous entity was deleted.
 	Id() int
+
+	UUID() utils.Id
+	SetUUID(utils.Id)
 
 	// Returns a BitSet instance containing bits of the components the entity possesses.
 	ComponentBits() *bitset.BitSet
@@ -37,7 +41,7 @@ type Entity interface {
 	 *            ComponentType instance for the expected component.
 	 * @return
 	 */
-	ComponentByType(t *ComponentType) Component
+	ComponentByType(t uint) Component
 
 	/* Returns a bag of all components this entity has.
 	   You need to reset the bag yourself if you intend to fill it more than once.
@@ -89,12 +93,10 @@ type Entity interface {
 	//func (e Entity) UUID() UUID { return e.uuid }
 }
 
-//type UUID int64
-
 // The entity class. Cannot be instantiated outside the framework, you must create new entities using World.
 type entity struct {
-	//uuid UUID
-	id int
+	uuid utils.Id
+	id   int
 
 	componentBits *bitset.BitSet
 	systemBits    *bitset.BitSet
@@ -126,6 +128,9 @@ func newEntity(world *World, id int) Entity {
 	return e
 }
 
+func (e *entity) UUID() utils.Id        { return e.uuid }
+func (e *entity) SetUUID(uuid utils.Id) { e.uuid = uuid }
+
 func (e *entity) Id() int { return e.id }
 
 func (e *entity) ComponentBits() *bitset.BitSet { return e.componentBits }
@@ -140,14 +145,14 @@ func (e *entity) AddComponent(component Component) Entity {
 	return e
 }
 func (e *entity) RemoveComponent(component Component) Entity {
-	e.componentManager.RemoveComponent(e, getTypeFor(component))
+	e.componentManager.RemoveComponent(e, GetIndexFor(component))
 	return e
 }
 
 func (e *entity) IsActive() bool  { return e.entityManager.IsActive(e.id) }
 func (e *entity) IsEnabled() bool { return e.entityManager.IsEnabled(e.id) }
 
-func (e *entity) ComponentByType(t *ComponentType) Component {
+func (e *entity) ComponentByType(t uint) Component {
 	return e.componentManager.ComponentByType(e, t)
 }
 func (e *entity) Components() []Component {
@@ -159,8 +164,6 @@ func (e *entity) ChangedInWorld()  { e.world.changedEntity(e) }
 func (e *entity) DeleteFromWorld() { e.world.deleteEntity(e) }
 func (e *entity) Enable()          { e.world.enableEntity(e) }
 func (e *entity) Disable()         { e.world.disableEntity(e) }
-
-//func (e Entity) UUID() UUID { return e.uuid }
 
 func (e *entity) World() *World { return e.world }
 

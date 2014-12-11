@@ -254,7 +254,7 @@ param type of component to get mapper for.
 return mapper for specified component type.
 */
 func (w *World) Mapper(component Component) *ComponentMapper {
-	return newComponentMapper(getTypeFor(component), w)
+	return newComponentMapper(GetIndexFor(component), w)
 }
 
 /* TODO

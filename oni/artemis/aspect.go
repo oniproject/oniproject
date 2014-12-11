@@ -93,7 +93,7 @@ func NewAspectForOne(types ...Component) (aspect *Aspect) {
  */
 func (a *Aspect) All(types ...Component) *Aspect {
 	for _, t := range types {
-		a.allSet.Set(uint(getIndexFor(t)))
+		a.allSet.Set(GetIndexFor(t))
 	}
 	return a
 }
@@ -107,7 +107,7 @@ func (a *Aspect) All(types ...Component) *Aspect {
  */
 func (a *Aspect) Exclude(types ...Component) *Aspect {
 	for _, t := range types {
-		a.exclusionSet.Set(uint(getIndexFor(t)))
+		a.exclusionSet.Set(GetIndexFor(t))
 	}
 	return a
 }
@@ -119,7 +119,7 @@ func (a *Aspect) Exclude(types ...Component) *Aspect {
  */
 func (a *Aspect) One(types ...Component) *Aspect {
 	for _, t := range types {
-		a.oneSet.Set(uint(getIndexFor(t)))
+		a.oneSet.Set(GetIndexFor(t))
 	}
 	return a
 }

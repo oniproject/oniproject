@@ -6,7 +6,7 @@ import (
 )
 
 type ComponentManager struct {
-	componentsByType map[int]map[int]Component
+	componentsByType map[uint]map[int]Component
 
 	registredCompontents map[string]reflect.Type
 
@@ -20,7 +20,7 @@ type ComponentManager struct {
 func NewComponentManager() *ComponentManager {
 	return &ComponentManager{
 		registredCompontents: make(map[string]reflect.Type),
-		componentsByType:     make(map[int]map[int]Component),
+		componentsByType:     make(map[uint]map[int]Component),
 	}
 }
 
@@ -47,37 +47,37 @@ func (cm *ComponentManager) unregister(name string) {
 func (cm *ComponentManager) removeComponentsOfEntity(e Entity) {
 	componentBits := e.ComponentBits()
 	for i, ok := componentBits.NextSet(0); ok; i, ok = componentBits.NextSet(i + 1) {
-		delete(cm.componentsByType[int(i)], e.Id())
+		delete(cm.componentsByType[i], e.Id())
 	}
 	componentBits.ClearAll()
 }
 
 func (cm *ComponentManager) AddComponent(e Entity, component Component) {
-	t := getTypeFor(component)
+	t := GetIndexFor(component)
 	//FIXME cm.componentsByType.EnsureCapacity(t.Index())
 
-	components, ok := cm.componentsByType[t.Index()]
+	components, ok := cm.componentsByType[t]
 	if !ok {
 		components = make(map[int]Component)
-		cm.componentsByType[t.Index()] = components
+		cm.componentsByType[t] = components
 	}
 	components[e.Id()] = component
 
-	e.ComponentBits().Set(uint(t.Index()))
+	e.ComponentBits().Set(t)
 }
 
-func (cm *ComponentManager) RemoveComponent(e Entity, t *ComponentType) {
-	if e.ComponentBits().Test(uint(t.Index())) {
-		delete(cm.componentsByType[t.Index()], e.Id())
-		e.ComponentBits().Clear(uint(t.Index()))
+func (cm *ComponentManager) RemoveComponent(e Entity, t uint) {
+	if e.ComponentBits().Test(t) {
+		delete(cm.componentsByType[t], e.Id())
+		e.ComponentBits().Clear(uint(t))
 	}
 }
 
-func (cm *ComponentManager) TypedComponents(t *ComponentType) (ret []Component) {
-	components, ok := cm.componentsByType[t.Index()]
+func (cm *ComponentManager) TypedComponents(t uint) (ret []Component) {
+	components, ok := cm.componentsByType[t]
 	if !ok {
 		components = make(map[int]Component)
-		cm.componentsByType[t.Index()] = components
+		cm.componentsByType[t] = components
 	}
 	for _, c := range components {
 		ret = append(ret, c)
@@ -85,8 +85,8 @@ func (cm *ComponentManager) TypedComponents(t *ComponentType) (ret []Component) 
 	return
 }
 
-func (cm *ComponentManager) ComponentByType(e Entity, t *ComponentType) Component {
-	components, ok := cm.componentsByType[t.Index()]
+func (cm *ComponentManager) ComponentByType(e Entity, t uint) Component {
+	components, ok := cm.componentsByType[t]
 	if ok {
 		return components[e.Id()]
 	}
@@ -97,7 +97,7 @@ func (cm *ComponentManager) ComponentsFor(e Entity) (fill []Component) {
 	componentBits := e.ComponentBits()
 
 	for i, ok := componentBits.NextSet(0); ok; i, ok = componentBits.NextSet(i + 1) {
-		fill = append(fill, cm.componentsByType[int(i)][e.Id()])
+		fill = append(fill, cm.componentsByType[i][e.Id()])
 	}
 
 	return

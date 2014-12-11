@@ -63,8 +63,9 @@ func (m *EntityManager) Disabled(e Entity) {
  * @param entityId
  * @return true if active, false if not.
  */
-func (m *EntityManager) IsActive(entityId int) bool {
-	return m.entities[entityId] != nil
+func (m *EntityManager) IsActive(entityId int) (ok bool) {
+	_, ok = m.entities[entityId]
+	return
 }
 
 /**
