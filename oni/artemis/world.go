@@ -65,6 +65,15 @@ func NewWorld() (w *World) {
 	return
 }
 
+func (w *World) RegisterComponent(name string, t reflect.Type) {
+	w.cm.register(name, t)
+}
+
+/* Create and return a new or reused entity instance.
+   Will NOT add the entity to the world, use World.addEntity(Entity) for that.
+*/
+func (w *World) CreateEntity() Entity { return w.em.CreateEntityInstance() }
+
 // Delta time since last game loop.
 func (w *World) Delta() time.Duration { return w.delta }
 
@@ -171,6 +180,13 @@ func (w *World) Process() {
 		observer.Deleted(e)
 	})
 
+	// cleanup
+	w.added = nil
+	w.changed = nil
+	w.disable = nil
+	w.enable = nil
+	w.deleted = nil
+
 	w.cm.Clean()
 
 	for _, sys := range w.systemsArr {
@@ -232,18 +248,13 @@ func (w *World) enableEntity(e Entity) { w.enable = append(w.enable, e) }
 // Disable the entity from being processed. Won't delete it, it will continue to exist but won't get processed.
 func (w *World) disableEntity(e Entity) { w.disable = append(w.disable, e) }
 
-/* Create and return a new or reused entity instance.
-   Will NOT add the entity to the world, use World.addEntity(Entity) for that.
-*/
-func (w *World) createEntity() Entity { return w.em.CreateEntityInstance() }
-
 /* Retrieves a ComponentMapper instance for fast retrieval of components from entities.
 
 param type of component to get mapper for.
 return mapper for specified component type.
 */
-func (w *World) Mapper(t reflect.Type) *ComponentMapper {
-	return NewComponentMapper(t, w)
+func (w *World) Mapper(component Component) *ComponentMapper {
+	return newComponentMapper(getTypeFor(component), w)
 }
 
 /* TODO

@@ -59,7 +59,7 @@ func NewAspect() *Aspect {
  * @see getAspectForAll
  */
 func NewAspectFor(types ...Component) *Aspect {
-	return NewAspectForAll(types)
+	return NewAspectForAll(types...)
 }
 
 /**

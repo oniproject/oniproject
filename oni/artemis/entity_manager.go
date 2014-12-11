@@ -15,8 +15,6 @@ type EntityManager struct {
 
 	identifierPool
 
-	world *World
-
 	BaseWorldSaver
 	BaseInitializer
 }

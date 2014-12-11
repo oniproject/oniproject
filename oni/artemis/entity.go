@@ -1,11 +1,15 @@
 package artemis
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/willf/bitset"
 )
 
 type Entity interface {
+	json.Marshaler
+	json.Unmarshaler
+
 	// The internal id for this entity within the framework. No other entity
 	// will have the same ID, but ID's are however reused so another entity may
 	// acquire this ID if the previous entity was deleted.
@@ -18,9 +22,9 @@ type Entity interface {
 	String() string
 
 	// Add a component to this entity.
-	AddComponent(component Component)
+	AddComponent(component Component) Entity
 	// Removes the component from this entity.
-	RemoveComponent(component Component)
+	RemoveComponent(component Component) Entity
 
 	/**
 	 * This is the preferred method to use when retrieving a component from a
@@ -131,11 +135,13 @@ func (e *entity) String() string {
 	return fmt.Sprintf("Entity[%d]", e.id)
 }
 
-func (e *entity) AddComponent(component Component) {
+func (e *entity) AddComponent(component Component) Entity {
 	e.componentManager.AddComponent(e, component)
+	return e
 }
-func (e *entity) RemoveComponent(component Component) {
+func (e *entity) RemoveComponent(component Component) Entity {
 	e.componentManager.RemoveComponent(e, getTypeFor(component))
+	return e
 }
 
 func (e *entity) IsActive() bool  { return e.entityManager.IsActive(e.id) }
@@ -163,4 +169,33 @@ func (e *entity) reset() {
 	e.systemBits.ClearAll()
 	e.componentBits.ClearAll()
 	//e.uuid = UUID.randomUUID()
+}
+
+func (e *entity) MarshalJSON() (dst []byte, err error) {
+	src := make(map[string]interface{})
+
+	for _, c := range e.Components() {
+		src[c.Name()] = c
+	}
+
+	return json.Marshal(src)
+}
+func (e *entity) UnmarshalJSON(src []byte) (err error) {
+	dst := make(map[string]json.RawMessage)
+
+	err = json.Unmarshal(src, &dst)
+	if err != nil {
+		return
+	}
+
+	for name, data := range dst {
+		c := e.componentManager.createComponentByName(name)
+		err = json.Unmarshal(data, c)
+		if err != nil {
+			return
+		}
+		e.AddComponent(c)
+	}
+
+	return
 }

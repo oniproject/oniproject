@@ -18,11 +18,8 @@ param type the type of components this mapper uses.
 param world the world that this component mapper should use.
 return a new mapper.
 */
-func NewComponentMapper(component Component, world *World) *ComponentMapper {
-	t := getTypeFor(component)
-
+func newComponentMapper(t *ComponentType, world *World) *ComponentMapper {
 	return &ComponentMapper{
-		t:          reflect.TypeOf(component),
 		components: world.ComponentManager().TypedComponents(t),
 	}
 }

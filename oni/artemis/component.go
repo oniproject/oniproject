@@ -6,7 +6,9 @@ import (
 )
 
 // A tag class. All components in the system must extend this class.
-type Component interface{}
+type Component interface {
+	Name() string
+}
 
 var _INDEX = 0
 var componentTypes = make(map[reflect.Type]*ComponentType)
