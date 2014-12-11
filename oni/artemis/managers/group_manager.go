@@ -12,6 +12,8 @@ A entity can be assigned to more than one group.
 type GroupManager struct {
 	entitiesByGroup map[string][]*Entity
 	groupsByEntity  map[*Entity][]string
+
+	BaseEntityObserver
 }
 
 func NewGroupManager() *GroupManager {
@@ -21,11 +23,7 @@ func NewGroupManager() *GroupManager {
 	}
 }
 
-func (m *GroupManager) Added(e *Entity)       {}
-func (m *GroupManager) Changed(e *Entity)     {}
 func (m *GroupManager) Deleted(e *Entity)     { m.RemoveFromAllGroups(e) }
-func (m *GroupManager) Enabled(e *Entity)     {}
-func (m *GroupManager) Disabled(e *Entity)    {}
 func (m *GroupManager) SetWorld(world *World) {}
 func (m *GroupManager) Initialize()           {}
 

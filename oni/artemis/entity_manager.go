@@ -16,6 +16,9 @@ type EntityManager struct {
 	identifierPool
 
 	world *World
+
+	BaseWorldSaver
+	BaseInitializer
 }
 
 func NewEntityManager() *EntityManager {
@@ -54,8 +57,6 @@ func (m *EntityManager) Enabled(e *Entity) {
 func (m *EntityManager) Disabled(e *Entity) {
 	m.disabled.Set(uint(e.Id()))
 }
-func (m *EntityManager) SetWorld(world *World) {}
-func (m *EntityManager) Initialize()           {}
 
 /**
  * Check if this entity is active.

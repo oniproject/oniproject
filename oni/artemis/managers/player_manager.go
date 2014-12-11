@@ -11,6 +11,8 @@ An entity can only belong to a single player at a time.
 type PlayerManager struct {
 	playerByEntity   map[*Entity]string
 	entitiesByPlayer map[string][]*Entity
+
+	BaseEntityObserver
 }
 
 func NewPlayerManager() *PlayerManager {
@@ -20,11 +22,7 @@ func NewPlayerManager() *PlayerManager {
 	}
 }
 
-func (m *PlayerManager) Added(e *Entity)       {}
-func (m *PlayerManager) Changed(e *Entity)     {}
 func (m *PlayerManager) Deleted(e *Entity)     { m.RemoveFromPlayer(e) }
-func (m *PlayerManager) Enabled(e *Entity)     {}
-func (m *PlayerManager) Disabled(e *Entity)    {}
 func (m *PlayerManager) SetWorld(world *World) {}
 func (m *PlayerManager) Initialize()           {}
 

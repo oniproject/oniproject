@@ -1,23 +1,17 @@
 package artemis
 
 type ComponentManager struct {
-	world *World
-
 	componentsByType map[int]map[int]Component
 	deleted          []*Entity
+
+	BaseEntityObserver
+	BaseWorldSaver
+	BaseInitializer
 }
 
 func NewComponentManager() *ComponentManager {
 	return &ComponentManager{}
 }
-
-func (m *ComponentManager) Added(e *Entity)       {}
-func (m *ComponentManager) Changed(e *Entity)     {}
-func (m *ComponentManager) Deleted(e *Entity)     {}
-func (m *ComponentManager) Enabled(e *Entity)     {}
-func (m *ComponentManager) Disabled(e *Entity)    {}
-func (m *ComponentManager) SetWorld(world *World) {}
-func (m *ComponentManager) Initialize()           {}
 
 func (cm *ComponentManager) removeComponentsOfEntity(e *Entity) {
 	componentBits := e.ComponentBits()

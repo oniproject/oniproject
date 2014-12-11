@@ -14,6 +14,8 @@ A player can only belong to a single team.
 type TeamManager struct {
 	playersByTeam map[string][]string
 	teamByPlayer  map[string]string
+
+	BaseEntityObserver
 }
 
 func NewTeamManager() *TeamManager {
@@ -23,11 +25,6 @@ func NewTeamManager() *TeamManager {
 	}
 }
 
-func (m *TeamManager) Added(e *Entity)       {}
-func (m *TeamManager) Changed(e *Entity)     {}
-func (m *TeamManager) Deleted(e *Entity)     {}
-func (m *TeamManager) Enabled(e *Entity)     {}
-func (m *TeamManager) Disabled(e *Entity)    {}
 func (m *TeamManager) SetWorld(world *World) {}
 func (m *TeamManager) Initialize()           {}
 

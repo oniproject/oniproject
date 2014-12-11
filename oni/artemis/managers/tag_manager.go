@@ -10,6 +10,8 @@ import (
 type TagManager struct {
 	entitiesByTag map[string]*Entity
 	tagsByEntity  map[*Entity]string
+
+	BaseEntityObserver
 }
 
 func NewTagManager() *TagManager {
@@ -19,8 +21,6 @@ func NewTagManager() *TagManager {
 	}
 }
 
-func (m *TagManager) Added(e *Entity)   {}
-func (m *TagManager) Changed(e *Entity) {}
 func (m *TagManager) Deleted(e *Entity) {
 	removedTag, ok := m.tagsByEntity[e]
 	if ok {
@@ -28,8 +28,6 @@ func (m *TagManager) Deleted(e *Entity) {
 		delete(m.entitiesByTag, removedTag)
 	}
 }
-func (m *TagManager) Enabled(e *Entity)     {}
-func (m *TagManager) Disabled(e *Entity)    {}
 func (m *TagManager) SetWorld(world *World) {}
 func (m *TagManager) Initialize()           {}
 
