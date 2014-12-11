@@ -16,13 +16,13 @@ type EntitySystem struct {
 	passive     bool
 	dummy       bool
 
-	Aspect
+	*Aspect
 
 	System // FIXME
 }
 
 // Creates an entity system that uses the specified aspect as a matcher against entities.
-func NewEntitySystem(aspect Aspect) (es *EntitySystem) {
+func NewEntitySystem(aspect *Aspect) (es *EntitySystem) {
 	es = &EntitySystem{
 		//actives = new Bag<Entity>();
 		Aspect: aspect,
