@@ -50,6 +50,39 @@ type Entity interface {
 	   this will only return false if an entity has been explicitly disabled.
 	*/
 	IsEnabled() bool
+
+	/*
+	   Refresh all changes to components for this entity. After adding or
+	   removing components, you must call this method. It will update all
+	   relevant systems. It is typical to call this after adding components to a
+	   newly created entity.
+	*/
+	AddToWorld()
+
+	// This entity has changed, a component added or deleted.
+	ChangedInWorld()
+
+	// Delete this entity from the world.
+	DeleteFromWorld()
+
+	/* (Re)enable the entity in the world, after it having being disabled.
+	   Won't do anything unless it was already disabled.
+	*/
+	Enable()
+
+	/* Disable the entity from being processed. Won't delete it, it will
+	   continue to exist but won't get processed.
+	*/
+	Disable()
+
+	// Returns the world this entity belongs to.
+	World() *World
+
+	/* Get the UUID for this entity.
+	   This UUID is unique per entity (re-used entities get a new UUID).
+	   @return uuid instance for this entity.
+	*/
+	//func (e Entity) UUID() UUID { return e.uuid }
 }
 
 //type UUID int64
@@ -94,13 +127,6 @@ func (e *entity) Id() int { return e.id }
 func (e *entity) ComponentBits() *bitset.BitSet { return e.componentBits }
 func (e *entity) SystemBits() *bitset.BitSet    { return e.systemBits }
 
-// Make entity ready for re-use. Will generate a new uuid for the entity.
-func (e *entity) reset() {
-	e.systemBits.ClearAll()
-	e.componentBits.ClearAll()
-	//e.uuid = UUID.randomUUID()
-}
-
 func (e *entity) String() string {
 	return fmt.Sprintf("Entity[%d]", e.id)
 }
@@ -122,35 +148,19 @@ func (e *entity) Components() []Component {
 	return e.componentManager.ComponentsFor(e)
 }
 
-/*
-  Refresh all changes to components for this entity. After adding or
-  removing components, you must call this method. It will update all
-  relevant systems. It is typical to call this after adding components to a
-  newly created entity.
-*/
-func (e *entity) AddToWorld() { e.world.AddEntity(e) }
+func (e *entity) AddToWorld()      { e.world.addEntity(e) }
+func (e *entity) ChangedInWorld()  { e.world.changedEntity(e) }
+func (e *entity) DeleteFromWorld() { e.world.deleteEntity(e) }
+func (e *entity) Enable()          { e.world.enableEntity(e) }
+func (e *entity) Disable()         { e.world.disableEntity(e) }
 
-// This entity has changed, a component added or deleted.
-func (e *entity) ChangedInWorld() { e.world.ChangedEntity(e) }
-
-// Delete this entity from the world.
-func (e *entity) DeleteFromWorld() { e.world.DeleteEntity(e) }
-
-/* (Re)enable the entity in the world, after it having being disabled.
-Won't do anything unless it was already disabled.
-*/
-func (e *entity) Enable() { e.world.EnableEntity(e) }
-
-/* Disable the entity from being processed. Won't delete it, it will
-continue to exist but won't get processed.
-*/
-func (e *entity) Disable() { e.world.DisableEntity(e) }
-
-/* Get the UUID for this entity.
-This UUID is unique per entity (re-used entities get a new UUID).
-@return uuid instance for this entity.
-*/
 //func (e Entity) UUID() UUID { return e.uuid }
 
-// Returns the world this entity belongs to.
 func (e *entity) World() *World { return e.world }
+
+// Make entity ready for re-use. Will generate a new uuid for the entity.
+func (e *entity) reset() {
+	e.systemBits.ClearAll()
+	e.componentBits.ClearAll()
+	//e.uuid = UUID.randomUUID()
+}
