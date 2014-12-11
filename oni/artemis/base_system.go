@@ -9,21 +9,22 @@ import (
  * entity system handling by extending this. It is recommended that you use the other provided
  * entity system implementations.
  */
-type EntitySystem struct {
+type BaseSystem struct {
 	systemIndex uint
-	world       *World
 	actives     []*Entity
 	passive     bool
 	dummy       bool
 
 	*Aspect
 
-	System // FIXME
+	BaseEntityObserver
+	BaseWorldSaver
+	BaseInitializer
 }
 
 // Creates an entity system that uses the specified aspect as a matcher against entities.
-func NewEntitySystem(aspect *Aspect) (es *EntitySystem) {
-	es = &EntitySystem{
+func NewBaseSystem(aspect *Aspect) (es *BaseSystem) {
+	es = &BaseSystem{
 		//actives = new Bag<Entity>();
 		Aspect: aspect,
 	}
@@ -34,7 +35,7 @@ func NewEntitySystem(aspect *Aspect) (es *EntitySystem) {
 	return
 }
 
-func (es *EntitySystem) process() {
+func (es *BaseSystem) Process() {
 	if es.checkProcessing() {
 		es.begin()
 		es.processEntities(es.actives)
@@ -43,10 +44,10 @@ func (es *EntitySystem) process() {
 }
 
 // Called before processing of entities begins.
-func (es *EntitySystem) begin() {}
+func (es *BaseSystem) begin() {}
 
 // Called after the processing of entities ends.
-func (es *EntitySystem) end() {}
+func (es *BaseSystem) end() {}
 
 /**
  * Any implementing entity system must implement this method and the logic
@@ -55,11 +56,11 @@ func (es *EntitySystem) end() {}
  * @param entities the entities this system contains.
  */
 //protected abstract void processEntities(ImmutableBag<Entity> entities);
-func (es *EntitySystem) processEntities(entities []*Entity) bool { return false }
+func (es *BaseSystem) processEntities(entities []*Entity) bool { return false }
 
 // return true if the system should be processed, false if not.
 //protected abstract boolean checkProcessing();
-func (es *EntitySystem) checkProcessing() bool { return false }
+func (es *BaseSystem) checkProcessing() bool { return false }
 
 // Override to implement code that gets executed when systems are initialized.
 //protected void initialize() {};
@@ -68,16 +69,16 @@ func (es *EntitySystem) checkProcessing() bool { return false }
  * Called if the system has received a entity it is interested in, e.g. created or a component was added to it.
  * @param e the entity that was added to this system.
  */
-func (es *EntitySystem) Inserted(e *Entity) {}
+func (es *BaseSystem) Inserted(e *Entity) {}
 
 /**
  * Called if a entity was removed from this system, e.g. deleted or had one of it's components removed.
  * @param e the entity that was removed from this system.
  */
-func (es *EntitySystem) Removed(e *Entity) {}
+func (es *BaseSystem) Removed(e *Entity) {}
 
 // Will check if the entity is of interest to this system.
-func (es *EntitySystem) check(e *Entity) {
+func (es *BaseSystem) check(e *Entity) {
 	if es.dummy {
 		return
 	}
@@ -114,7 +115,7 @@ func (es *EntitySystem) check(e *Entity) {
 	}
 }
 
-func (es *EntitySystem) removeFromSystem(e *Entity) {
+func (es *BaseSystem) removeFromSystem(e *Entity) {
 	for i, other := range es.actives {
 		if other == e {
 			es.actives = append(es.actives[:i], es.actives[i+1:]...)
@@ -125,34 +126,34 @@ func (es *EntitySystem) removeFromSystem(e *Entity) {
 	es.Removed(e)
 }
 
-func (es *EntitySystem) insertToSystem(e *Entity) {
+func (es *BaseSystem) insertToSystem(e *Entity) {
 	es.actives = append(es.actives, e)
 	e.SystemBits().Set(es.systemIndex)
 	es.Inserted(e)
 }
 
-func (es *EntitySystem) Added(e *Entity)   { es.check(e) }
-func (es *EntitySystem) Changed(e *Entity) { es.check(e) }
+func (es *BaseSystem) Added(e *Entity)   { es.check(e) }
+func (es *BaseSystem) Changed(e *Entity) { es.check(e) }
 
-func (es *EntitySystem) Deleted(e *Entity) {
+func (es *BaseSystem) Deleted(e *Entity) {
 	if e.SystemBits().Test(es.systemIndex) {
 		es.removeFromSystem(e)
 	}
 }
 
-func (es *EntitySystem) Disabled(e *Entity) {
+func (es *BaseSystem) Disabled(e *Entity) {
 	if e.SystemBits().Test(es.systemIndex) {
 		es.removeFromSystem(e)
 	}
 }
 
-func (es *EntitySystem) Enabled(e *Entity)       { es.check(e) }
-func (es *EntitySystem) SetWorld(world *World)   { es.world = world }
-func (es *EntitySystem) IsPassive() bool         { return es.passive }
-func (es *EntitySystem) SetPassive(passive bool) { es.passive = passive }
-func (es *EntitySystem) Actives() []*Entity      { return es.actives }
+func (es *BaseSystem) Enabled(e *Entity)       { es.check(e) }
+func (es *BaseSystem) SetWorld(world *World)   { es.world = world }
+func (es *BaseSystem) IsPassive() bool         { return es.passive }
+func (es *BaseSystem) SetPassive(passive bool) { es.passive = passive }
+func (es *BaseSystem) Actives() []*Entity      { return es.actives }
 
-// Used to generate a unique bit for each system. Only used internally in EntitySystem.
+// Used to generate a unique bit for each system. Only used internally in BaseSystem.
 var _SystemIndexManager = SystemIndexManager{
 	INDEX:   0,
 	indices: make(map[reflect.Type]uint),

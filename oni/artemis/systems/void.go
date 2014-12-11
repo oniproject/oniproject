@@ -10,12 +10,12 @@ import (
   yourself about aspects or entities.
 */
 type VoidEntitySystem struct {
-	*EntitySystem
+	*BaseSystem
 }
 
 func NewVoidEntitySystem() *VoidEntitySystem {
 	return &VoidEntitySystem{
-		EntitySystem: NewEntitySystem(NewAspect()),
+		BaseSystem: NewBaseSystem(NewAspect()),
 	}
 }
 

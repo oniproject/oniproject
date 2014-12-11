@@ -11,21 +11,20 @@ import (
 */
 
 type IntervalEntitySystem struct {
-	*EntitySystem
+	*BaseSystem
 	acc, interval time.Duration
-	world         *World
 }
 
 func NewIntervalEntitySystem(aspect *Aspect, interval time.Duration) *IntervalEntitySystem {
 	return &IntervalEntitySystem{
-		EntitySystem: NewEntitySystem(aspect),
-		interval:     interval,
+		BaseSystem: NewBaseSystem(aspect),
+		interval:   interval,
 	}
 }
 
 // Process a entity this system is interested in.
 func (sys *IntervalEntitySystem) CheckProcessing() bool {
-	sys.acc += sys.world.Delta()
+	sys.acc += sys.World().Delta()
 	if sys.acc >= sys.interval {
 		sys.acc -= sys.interval
 		return true

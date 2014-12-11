@@ -30,15 +30,14 @@ import (
 
 */
 type DelayedEntityProcessingSystem struct {
-	*EntitySystem
+	*BaseSystem
 	acc, delay time.Duration
 	running    bool
-	world      *World
 }
 
 func NewDelayedEntityProcessingSystem(aspect *Aspect) *DelayedEntityProcessingSystem {
 	return &DelayedEntityProcessingSystem{
-		EntitySystem: NewEntitySystem(aspect),
+		BaseSystem: NewBaseSystem(aspect),
 	}
 }
 
@@ -72,7 +71,7 @@ func (sys *DelayedEntityProcessingSystem) RemainingDelay(e *Entity) time.Duratio
 
 func (sys *DelayedEntityProcessingSystem) CheckProcessing() bool {
 	if sys.running {
-		sys.acc += sys.world.Delta()
+		sys.acc += sys.World().Delta()
 
 		if sys.acc >= sys.delay {
 			return true

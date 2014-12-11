@@ -6,12 +6,12 @@ import (
 
 // A typical entity system. Use this when you need to process entities possessing the provided component types.
 type EntityProcessingSystem struct {
-	*EntitySystem
+	*BaseSystem
 }
 
 func NewEntityProcessingSystem(aspect *Aspect) *EntityProcessingSystem {
 	return &EntityProcessingSystem{
-		EntitySystem: NewEntitySystem(aspect),
+		BaseSystem: NewBaseSystem(aspect),
 	}
 }
 
