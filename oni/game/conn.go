@@ -6,8 +6,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"net/http"
+	. "oniproject/oni/artemis"
 	"time"
 )
+
+var CONNECTION = GetIndexFor((*Connection)(nil))
 
 type ConnToMapInterface interface {
 	Sender
@@ -33,6 +36,12 @@ type Connection struct {
 	sendMessage chan Message
 	ping_pong   time.Time
 	lag         time.Duration
+}
+
+func (c *Connection) Name() string { return "conn" }
+
+func (c *Connection) Send(msg Message) {
+	go func() { c.sendMessage <- msg }()
 }
 
 func (c *Connection) Lag() time.Duration { return c.lag }
@@ -73,7 +82,7 @@ Loop:
 				continue Loop
 			}
 			if m, err := ParseMessage(val.T, val.V); err == nil {
-				game.Send(avatar.Id(), m)
+				game.Send(avatar.UUID(), m)
 			} else {
 				log.Error(err)
 			}

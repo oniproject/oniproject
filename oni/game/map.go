@@ -7,8 +7,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/oniproject/geom"
 	"github.com/oniproject/tmxconverter/tmx"
+	. "oniproject/oni/artemis"
 	"oniproject/oni/jps"
-	"oniproject/oni/utils"
+	. "oniproject/oni/utils"
 	"path"
 	"runtime/debug"
 	"time"
@@ -22,7 +23,7 @@ const (
 
 // for message system
 type sender struct {
-	id utils.Id
+	id Id
 	m  Message
 }
 
@@ -39,13 +40,15 @@ func avatarFilter(obj GameObject) bool {
 
 type Map struct {
 	tick                 uint
-	objects              map[utils.Id]GameObject
+	objects              map[Id]GameObject
 	register, unregister chan GameObject
 	sendTo               chan sender
 	Grid                 *jps.Grid
 	game                 *Game
 	lastLocalId          int64
 	tmxMap               tmx.Map
+
+	*World
 }
 
 func NewMap(game *Game, name string) *Map {
@@ -70,16 +73,20 @@ func NewMap(game *Game, name string) *Map {
 		grid.SetWalkable(x, y, v <= 0)
 	}
 
-	return &Map{
+	m := &Map{
 		register:    make(chan GameObject),
 		unregister:  make(chan GameObject),
-		objects:     make(map[utils.Id]GameObject),
+		objects:     make(map[Id]GameObject),
 		sendTo:      make(chan sender),
 		Grid:        grid,
 		game:        game,
 		lastLocalId: -4,
 		tmxMap:      tmxMap,
 	}
+	m.World = NewWorld()
+	pos := NewPositionSystem(m)
+	m.World.SetManager(pos)
+	return m
 }
 
 func (m *Map) Walkable(c geom.Coord) bool {
@@ -91,11 +98,11 @@ func (m *Map) Register(a GameObject) {
 func (m *Map) Unregister(a GameObject) {
 	go func() { m.unregister <- a }()
 }
-func (gm *Map) Send(id utils.Id, m Message) {
+func (gm *Map) Send(id Id, m Message) {
 	go func() { gm.sendTo <- sender{id, m} }()
 }
 
-func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
+func (gm *Map) GetObjById(id Id) (obj GameObject) {
 	return gm.objects[id]
 }
 
@@ -119,9 +126,9 @@ func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
 
 func (m *Map) SpawnMonster(x, y float64) {
 	monster := NewMonster()
-	monster.SetPosition(x, y)
+	monster.SetPosition(geom.Coord{x, y})
 	m.lastLocalId--
-	monster.id = utils.NewId(m.lastLocalId)
+	monster.id = NewId(m.lastLocalId)
 	monster.HP, monster.MHP, monster.HRG = 20, 20, 1
 	m.register <- monster
 	monster.RunAI()
@@ -131,11 +138,11 @@ func (m *Map) DropItem(x, y float64, item *Item) {
 	ditem := NewDroppedItem(x, y, item)
 
 	m.lastLocalId--
-	ditem.id = utils.NewId(m.lastLocalId - 20000)
+	ditem.id = NewId(m.lastLocalId - 20000)
 	m.Register(ditem)
 }
 
-func (m *Map) PickupItem(id utils.Id) *Item {
+func (m *Map) PickupItem(id Id) *Item {
 	obj, ok := m.objects[id]
 	if !ok {
 		return nil
@@ -202,7 +209,7 @@ func (gm *Map) Run() {
 
 			// target data
 			for _, avatar := range avatars {
-				gm.Send(avatar.Id(), &SetTargetMsg{avatar.Target})
+				gm.Send(avatar.UUID(), &SetTargetMsg{avatar.Target})
 			}
 
 		// replication
@@ -210,7 +217,7 @@ func (gm *Map) Run() {
 			gm.tick++
 
 			// update position
-			updated := map[utils.Id]bool{}
+			updated := map[Id]bool{}
 			for id, obj := range gm.objects {
 				if ok := obj.Update(gm, gm.tick, TickRate); ok {
 					updated[id] = true
@@ -228,11 +235,11 @@ func (gm *Map) Run() {
 						switch o.Name {
 						case "test":
 							a.MapId = "test"
-							a.SetPosition(pos.X, 39)
+							a.SetPosition(geom.Coord{pos.X, 39})
 							gm.Unregister(a)
 						case "test2":
 							a.MapId = "test2"
-							a.SetPosition(pos.X, 2)
+							a.SetPosition(geom.Coord{pos.X, 2})
 							gm.Unregister(a)
 						}
 					}
@@ -250,11 +257,11 @@ func (gm *Map) Run() {
 					for _, obj := range around {
 						hp, mhp := obj.HPbar()
 						state := &GameObjectState{
-							STATE_IDLE, obj.Id(), obj.Lag(),
+							STATE_IDLE, obj.UUID(), obj.Lag(),
 							obj.Position(), obj.Velocity(),
 							hp, mhp}
 
-						if updated[obj.Id()] {
+						if updated[obj.UUID()] {
 							state.Type = STATE_MOVE
 						}
 						msg.States = append(msg.States, state)
@@ -264,27 +271,15 @@ func (gm *Map) Run() {
 				}
 			}
 
-			/*for id, obj := range gm.objects {
-
-				pos := obj.Position()
-				around := gm.ObjectsAround(pos, ReplicRange, avatarFilter)
-
-				for _, a := range around {
-					avatar := a.(*Avatar)
-					send(avatar, gm.tick)
-					send(avatar, state)
-				}
-			}*/
-
 		// create/destroy GameObject's
 		case obj := <-gm.register:
 			/*if c, ok := obj.(*Avatar); ok {
 				send(c, gm.tick)
 			}*/
-			gm.objects[obj.Id()] = obj
+			gm.objects[obj.UUID()] = obj
 			log.Debug("register", obj.Id(), obj)
 		case obj := <-gm.unregister:
-			delete(gm.objects, obj.Id())
+			delete(gm.objects, obj.UUID())
 			if avatar, ok := obj.(*Avatar); ok {
 				closeChan(avatar)
 				gm.game.adb.SaveAvatar(avatar)

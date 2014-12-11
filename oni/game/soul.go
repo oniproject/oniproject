@@ -18,3 +18,5 @@ type Soul struct {
 	}
 	Abilities map[string]Ability
 }
+
+func (s *Soul) Name() string { return "soul" }

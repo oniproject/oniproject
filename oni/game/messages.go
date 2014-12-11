@@ -4,17 +4,18 @@ import (
 	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
-	"oniproject/oni/utils"
+	"github.com/oniproject/geom"
+	. "oniproject/oni/utils"
 	"strings"
 )
 
 type Sender interface {
-	Send(utils.Id, Message)
+	Send(Id, Message)
 }
 
 type MessageToMapInterface interface {
 	// XXX
-	GetObjById(utils.Id) GameObject
+	GetObjById(Id) GameObject
 	Unregister(GameObject)
 
 	Sender
@@ -142,11 +143,12 @@ type SetVelocityMsg struct {
 
 func (m *SetVelocityMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
-	a.SetVelocity(m.X, m.Y)
+	vel := geom.Coord{X: m.X, Y: m.Y}
+	a.SetVelocity(vel.Unit())
 }
 
 type SetTargetMsg struct {
-	Target utils.Id `mapstructure:"id"`
+	Target Id `mapstructure:"id"`
 }
 
 func (m *SetTargetMsg) Run(s MessageToMapInterface, obj interface{}) {
@@ -260,7 +262,7 @@ func (m *CloseMsg) Run(s MessageToMapInterface, obj interface{}) {
 }
 
 type DestroyMsg struct {
-	Id utils.Id
+	Id Id
 	T  uint // tick
 }
 
@@ -323,7 +325,7 @@ func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 }
 
 type TargetDataMsg struct {
-	Id      utils.Id
+	Id      Id
 	Race    int
 	HP, MHP int
 	Name    string

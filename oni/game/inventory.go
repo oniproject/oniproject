@@ -3,9 +3,14 @@ package game
 // TODO sync
 // TODO check item parameters (maybe in message?)
 
-import "errors"
+import (
+	"errors"
+	. "oniproject/oni/artemis"
+)
 
 var (
+	INVENTORY = GetIndexFor((*InventoryComponent)(nil))
+
 	ItemNotfound  = errors.New("Item not found")
 	ItemDontEquip = errors.New("Item cant be put on")
 	ItemFailSlot1 = errors.New("Item fail slot 1")
@@ -24,6 +29,8 @@ func NewInventoryComponent() InventoryComponent {
 		Equip:     make(map[string]*Item),
 	}
 }
+
+func (inv *InventoryComponent) Name() string { return "inv" }
 
 func (inv *InventoryComponent) AddItem(item *Item) { inv.Inventory = append(inv.Inventory, item) }
 func (inv *InventoryComponent) RemoveItem(index int) {
@@ -101,3 +108,21 @@ func (inv *InventoryComponent) UnequipItem(slot string) error {
 	inv.AddItem(item)
 	return nil
 }
+
+type InventorySystem struct {
+	*BaseSystem
+}
+
+func NewInventorySystem() (sys *InventorySystem) {
+	sys = &InventorySystem{}
+	sys.BaseSystem = NewBaseSystem(NewAspectFor((*InventoryComponent)(nil)), sys)
+	return
+}
+
+func (sys *InventorySystem) ProcessEntities(entities []Entity) {}
+func (sys *InventorySystem) CheckProcessing() bool             { return false }
+func (sys *InventorySystem) Inserted(e Entity)                 {}
+func (sys *InventorySystem) Removed(e Entity)                  {}
+
+func (sys *InventorySystem) EquipItem(inv *InventoryComponent, item Item)         {}
+func (sys *InventorySystem) TransferItem(from, to *InventoryComponent, item Item) {}

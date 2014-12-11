@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"oniproject/oni/utils"
+	. "oniproject/oni/artemis"
+	. "oniproject/oni/utils"
 	"time"
 )
 
@@ -32,7 +33,9 @@ type Avatar struct {
 
 	Connection `sql:"-"`
 
-	Target utils.Id `sql:"-"`
+	Target Id `sql:"-"`
+
+	Entity
 }
 
 func NewAvatar() *Avatar {
@@ -44,8 +47,12 @@ func NewAvatar() *Avatar {
 	return a
 }
 
+func (a Avatar) GetPositionComponent() *PositionComponent {
+	return &a.PositionComponent
+}
+
 func (a Avatar) Name() string { return a.Nickname }
-func (a Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
+func (a Avatar) UUID() Id     { return Id(a.AvatarId) }
 func (a Avatar) Race() int    { return 5 }
 
 // for debug print

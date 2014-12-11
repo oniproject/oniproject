@@ -4,8 +4,8 @@
 package mock
 
 import (
-	gomock "code.google.com/p/gomock/gomock"
 	geom "github.com/oniproject/geom"
+	gomock "code.google.com/p/gomock/gomock"
 )
 
 // Mock of EffectReceiver interface

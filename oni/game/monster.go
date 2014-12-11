@@ -1,7 +1,9 @@
 package game
 
 import (
+	"github.com/oniproject/geom"
 	"math/rand"
+	. "oniproject/oni/artemis"
 	"oniproject/oni/utils"
 	"time"
 )
@@ -12,6 +14,8 @@ type Monster struct {
 	Parameters
 
 	id utils.Id
+
+	Entity
 }
 
 func NewMonster() *Monster {
@@ -20,9 +24,13 @@ func NewMonster() *Monster {
 	}
 }
 
+func (a Monster) GetPositionComponent() *PositionComponent {
+	return &a.PositionComponent
+}
+
 func (a Monster) Name() string       { return "Monster" }
 func (a Monster) Lag() time.Duration { return 0 }
-func (a Monster) Id() utils.Id       { return a.id }
+func (a Monster) UUID() utils.Id     { return a.id }
 func (a Monster) Race() int          { return 0 }
 
 func (m *Monster) Update(w Walkabler, tick uint, t time.Duration) bool {
@@ -36,7 +44,7 @@ func (m *Monster) RunAI() {
 		case <-t.C:
 			x := (rand.Float64() - 0.5) * 5
 			y := (rand.Float64() - 0.5) * 5
-			m.SetVelocity(x, y)
+			m.SetVelocity(geom.Coord{x, y})
 		}
 	}
 }

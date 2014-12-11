@@ -7,12 +7,12 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/martini-contrib/sessions"
 	"net/http"
-	"oniproject/oni/utils"
+	. "oniproject/oni/utils"
 	"time"
 )
 
 type AvatarDB interface {
-	AvatarById(utils.Id) (*Avatar, error)
+	AvatarById(Id) (*Avatar, error)
 	SaveAvatar(*Avatar) error
 }
 
@@ -26,7 +26,10 @@ type Game struct {
 }
 
 func NewGame(adb AvatarDB) *Game {
-	game := &Game{adb: adb, maps: make(map[string]*Map)}
+	game := &Game{
+		adb:  adb,
+		maps: make(map[string]*Map),
+	}
 	//game.Map = NewMap(game)
 	return game
 }
@@ -40,7 +43,7 @@ func (gm *Game) Run(addr string) {
 	// run http server
 
 	m := martini.Classic()
-	m.Map(utils.CreateMartiniLogger())
+	m.Map(CreateMartiniLogger())
 
 	store := sessions.NewCookieStore([]byte("secret123"))
 	store.Options(sessions.Options{Path: "/", MaxAge: 86400 * 30, HttpOnly: true})
@@ -64,7 +67,7 @@ func (gm *Game) Run(addr string) {
 			return 418, http.StatusText(418)
 		}
 
-		a, err := gm.adb.AvatarById(utils.Id(id))
+		a, err := gm.adb.AvatarById(Id(id))
 		if err != nil {
 			log.Error("get avatar", err)
 			return 500, http.StatusText(418)
@@ -111,7 +114,7 @@ func (gm *Game) UnloadMap(mapId *string, ret *struct{}) error {
 }
 
 type DetachAvatarArgs struct {
-	Id    utils.Id
+	Id    Id
 	MapId string
 }
 

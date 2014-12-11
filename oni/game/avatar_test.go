@@ -3,6 +3,7 @@ package game
 import (
 	"./mock"
 	gomock "code.google.com/p/gomock/gomock"
+	"github.com/oniproject/geom"
 	"testing"
 	"time"
 )
@@ -12,7 +13,7 @@ func TestAvatarUpdateIDLE(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	w := mock.NewMockWalkabler(mockCtrl)
-	w.EXPECT().Walkable(1, 1).AnyTimes()
+	w.EXPECT().Walkable(geom.Coord{1, 1}).AnyTimes()
 
 	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 0)}
 	state := avatar.Update(w, 1, 0)
@@ -30,7 +31,7 @@ func TestAvatarUpdateSimple(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	w := mock.NewMockWalkabler(mockCtrl)
-	w.EXPECT().Walkable(1, 1).Return(true).AnyTimes()
+	w.EXPECT().Walkable(geom.Coord{1, 1}).Return(true).AnyTimes()
 
 	avatar := &Avatar{PositionComponent: NewPositionComponent(1, 2)}
 	state := avatar.Update(w, 1, 1*time.Second)
@@ -49,7 +50,7 @@ func TestAvatarUpdateOnlyX(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	w := mock.NewMockWalkabler(mockCtrl)
-	w.EXPECT().Walkable(1, 1).AnyTimes()
+	w.EXPECT().Walkable(geom.Coord{1, 1}).AnyTimes()
 
 	avatar := &Avatar{PositionComponent: NewPositionComponent(2, 0)}
 	state := avatar.Update(w, 1, 1*time.Second)
@@ -68,7 +69,7 @@ func TestAvatarUpdateOnlyY(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	w := mock.NewMockWalkabler(mockCtrl)
-	w.EXPECT().Walkable(1, 1).AnyTimes()
+	w.EXPECT().Walkable(geom.Coord{1, 1}).AnyTimes()
 
 	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 2)}
 	state := avatar.Update(w, 1, 1*time.Second)
@@ -87,7 +88,7 @@ func TestAvatarUpdateZero(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	w := mock.NewMockWalkabler(mockCtrl)
-	w.EXPECT().Walkable(1, 1).AnyTimes()
+	w.EXPECT().Walkable(geom.Coord{1, 1}).AnyTimes()
 
 	avatar := &Avatar{PositionComponent: NewPositionComponent(0, 2)}
 	avatar.PositionComponent.position.Y = 1
