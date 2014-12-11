@@ -5,7 +5,7 @@ import (
 )
 
 type EntityManager struct {
-	entities map[int]*Entity
+	entities map[int]Entity
 	disabled *bitset.BitSet
 
 	active  int
@@ -24,23 +24,23 @@ type EntityManager struct {
 func NewEntityManager() *EntityManager {
 	return &EntityManager{
 		disabled: bitset.New(0),
-		entities: make(map[int]*Entity),
+		entities: make(map[int]Entity),
 	}
 }
 
-func (m *EntityManager) CreateEntityInstance() (e *Entity) {
-	e = NewEntity(m.world, m.checkOut())
+func (m *EntityManager) CreateEntityInstance() (e Entity) {
+	e = newEntity(m.world, m.checkOut())
 	m.created++
 	return
 }
 
-func (m *EntityManager) Added(e *Entity) {
+func (m *EntityManager) Added(e Entity) {
 	m.active++
 	m.added++
 	m.entities[e.Id()] = e
 }
-func (m *EntityManager) Changed(e *Entity) {}
-func (m *EntityManager) Deleted(e *Entity) {
+func (m *EntityManager) Changed(e Entity) {}
+func (m *EntityManager) Deleted(e Entity) {
 	delete(m.entities, e.Id())
 
 	m.disabled.Clear(uint(e.Id()))
@@ -51,10 +51,10 @@ func (m *EntityManager) Deleted(e *Entity) {
 	m.deleted++
 
 }
-func (m *EntityManager) Enabled(e *Entity) {
+func (m *EntityManager) Enabled(e Entity) {
 	m.disabled.Clear(uint(e.Id()))
 }
-func (m *EntityManager) Disabled(e *Entity) {
+func (m *EntityManager) Disabled(e Entity) {
 	m.disabled.Set(uint(e.Id()))
 }
 
@@ -80,7 +80,7 @@ func (m *EntityManager) IsEnabled(entityId int) bool {
 }
 
 // Get a entity with this id.
-func (m *EntityManager) EntityById(entityId int) *Entity {
+func (m *EntityManager) EntityById(entityId int) Entity {
 	return m.entities[entityId]
 }
 

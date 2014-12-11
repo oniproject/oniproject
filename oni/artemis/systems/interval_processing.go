@@ -21,8 +21,8 @@ func NewIntervalEntityProcessingSystem(aspect *Aspect, interval time.Duration) *
 }
 
 // Process a entity this system is interested in.
-func (sys *IntervalEntityProcessingSystem) Process(e *Entity) {}
-func (sys *IntervalEntityProcessingSystem) ProcessEntities(entities []*Entity) {
+func (sys *IntervalEntityProcessingSystem) Process(e Entity) {}
+func (sys *IntervalEntityProcessingSystem) ProcessEntities(entities []Entity) {
 	for _, e := range entities {
 		sys.Process(e)
 	}

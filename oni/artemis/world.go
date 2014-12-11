@@ -6,11 +6,11 @@ import (
 )
 
 type EntityObserver interface {
-	Added(e *Entity)
-	Changed(e *Entity)
-	Deleted(e *Entity)
-	Enabled(e *Entity)
-	Disabled(e *Entity)
+	Added(e Entity)
+	Changed(e Entity)
+	Deleted(e Entity)
+	Enabled(e Entity)
+	Disabled(e Entity)
 }
 
 type Manager interface {
@@ -41,7 +41,7 @@ type World struct {
 	cm ComponentManager
 
 	delta                                    time.Duration // TODO maybe time.Duration ?
-	added, changed, deleted, enable, disable []*Entity
+	added, changed, deleted, enable, disable []Entity
 
 	managers    map[reflect.Type]Manager
 	managersArr []Manager
@@ -138,16 +138,16 @@ func (w *World) Delta() time.Duration { return w.delta }
 func (w *World) SetDelta(delta time.Duration) { w.delta = delta }
 
 // Adds a entity to this world.
-func (w *World) AddEntity(e *Entity) { w.added = append(w.added, e) }
+func (w *World) AddEntity(e Entity) { w.added = append(w.added, e) }
 
 /* Ensure all systems are notified of changes to this entity.
 If you're adding a component to an entity after it's been
 added to the world, then you need to invoke this method.
 */
-func (w *World) ChangedEntity(e *Entity) { w.changed = append(w.changed, e) }
+func (w *World) ChangedEntity(e Entity) { w.changed = append(w.changed, e) }
 
 // Delete the entity from the world.
-func (w *World) DeleteEntity(e *Entity) {
+func (w *World) DeleteEntity(e Entity) {
 	for _, other := range w.deleted {
 		if e == other {
 			return
@@ -160,18 +160,18 @@ func (w *World) DeleteEntity(e *Entity) {
 /* (Re)enable the entity in the world, after it having being disabled.
    Won't do anything unless it was already disabled.
 */
-func (w *World) EnableEntity(e *Entity) { w.enable = append(w.enable, e) }
+func (w *World) EnableEntity(e Entity) { w.enable = append(w.enable, e) }
 
 // Disable the entity from being processed. Won't delete it, it will continue to exist but won't get processed.
-func (w *World) DisableEntity(e *Entity) { w.disable = append(w.disable, e) }
+func (w *World) DisableEntity(e Entity) { w.disable = append(w.disable, e) }
 
 /* Create and return a new or reused entity instance.
    Will NOT add the entity to the world, use World.addEntity(Entity) for that.
 */
-func (w *World) CreateEntity() *Entity { return w.em.CreateEntityInstance() }
+func (w *World) CreateEntity() Entity { return w.em.CreateEntityInstance() }
 
 // Get a entity having the specified id.
-func (w *World) EntityById(entityId int) *Entity { return w.em.EntityById(entityId) }
+func (w *World) EntityById(entityId int) Entity { return w.em.EntityById(entityId) }
 
 // Gives you all the systems in this world for possible iteration.
 func (w *World) Systems() []System { return w.systemsArr }
@@ -207,20 +207,20 @@ func (w *World) DeleteSystem(system System) {
 // Retrieve a system for specified system type.
 func (w *World) SystemByType(t reflect.Type) System { return w.systems[t] }
 
-func (w *World) notifySystems(performer Performer, e *Entity) {
+func (w *World) notifySystems(performer Performer, e Entity) {
 	for _, system := range w.systemsArr {
 		performer(system, e)
 	}
 }
 
-func (w *World) notifyManagers(performer Performer, e *Entity) {
+func (w *World) notifyManagers(performer Performer, e Entity) {
 	for _, manager := range w.managersArr {
 		performer(manager, e)
 	}
 }
 
 // Performs an action on each entity.
-func (w *World) check(entities []*Entity, performer Performer) {
+func (w *World) check(entities []Entity, performer Performer) {
 	for _, e := range entities {
 		w.notifyManagers(performer, e)
 		w.notifySystems(performer, e)
@@ -230,19 +230,19 @@ func (w *World) check(entities []*Entity, performer Performer) {
 
 // Process all non-passive systems.
 func (w *World) Process() {
-	w.check(w.added, func(observer EntityObserver, e *Entity) {
+	w.check(w.added, func(observer EntityObserver, e Entity) {
 		observer.Added(e)
 	})
-	w.check(w.changed, func(observer EntityObserver, e *Entity) {
+	w.check(w.changed, func(observer EntityObserver, e Entity) {
 		observer.Changed(e)
 	})
-	w.check(w.disable, func(observer EntityObserver, e *Entity) {
+	w.check(w.disable, func(observer EntityObserver, e Entity) {
 		observer.Disabled(e)
 	})
-	w.check(w.enable, func(observer EntityObserver, e *Entity) {
+	w.check(w.enable, func(observer EntityObserver, e Entity) {
 		observer.Enabled(e)
 	})
-	w.check(w.deleted, func(observer EntityObserver, e *Entity) {
+	w.check(w.deleted, func(observer EntityObserver, e Entity) {
 		observer.Deleted(e)
 	})
 
@@ -265,7 +265,7 @@ func (w *World) Mapper(t reflect.Type) *ComponentMapper {
 }
 
 // Only used internally to maintain clean code.
-type Performer func(observer EntityObserver, e *Entity)
+type Performer func(observer EntityObserver, e Entity)
 
 /* TODO
 func ComponentMapperInitHelperConfig(target interface{}, world World) {

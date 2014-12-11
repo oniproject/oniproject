@@ -4,6 +4,17 @@ import (
 	"reflect"
 )
 
+type ChildSystem interface {
+	// Called if the system has received a entity it is interested in, e.g. created or a component was added to it.
+	Inserted(e Entity)
+	// Called if a entity was removed from this system, e.g. deleted or had one of it's components removed.
+	Removed(e Entity)
+	// Any implementing entity system must implement this method and the logic to process the given entities of the system.
+	ProcessEntities(entities []Entity)
+	// return true if the system should be processed, false if not.
+	CheckProcessing() bool
+}
+
 /**
  * The most raw entity system. It should not typically be used, but you can create your own
  * entity system handling by extending this. It is recommended that you use the other provided
@@ -11,86 +22,51 @@ import (
  */
 type BaseSystem struct {
 	systemIndex uint
-	actives     []*Entity
+	actives     []Entity
 	passive     bool
 	dummy       bool
 
 	*Aspect
 
-	BaseEntityObserver
+	child ChildSystem
+
 	BaseWorldSaver
 	BaseInitializer
 }
 
 // Creates an entity system that uses the specified aspect as a matcher against entities.
-func NewBaseSystem(aspect *Aspect) (es *BaseSystem) {
-	es = &BaseSystem{
-		//actives = new Bag<Entity>();
+func NewBaseSystem(aspect *Aspect, child ChildSystem) (sys *BaseSystem) {
+	sys = &BaseSystem{
 		Aspect: aspect,
+		child:  child,
 	}
 
-	es.systemIndex = _SystemIndexManager.getIndexFor(es)
+	sys.systemIndex = _SystemIndexManager.getIndexFor(sys)
 	// This system can't possibly be interested in any entity, so it must be "dummy"
-	es.dummy = es.allSet.Len() == 0 && es.oneSet.Len() == 0
+	sys.dummy = sys.allSet.Len() == 0 && sys.oneSet.Len() == 0
 	return
 }
 
-func (es *BaseSystem) Process() {
-	if es.checkProcessing() {
-		es.begin()
-		es.processEntities(es.actives)
-		es.end()
+func (sys *BaseSystem) Process() {
+	if sys.child.CheckProcessing() {
+		sys.child.ProcessEntities(sys.actives)
 	}
 }
 
-// Called before processing of entities begins.
-func (es *BaseSystem) begin() {}
-
-// Called after the processing of entities ends.
-func (es *BaseSystem) end() {}
-
-/**
- * Any implementing entity system must implement this method and the logic
- * to process the given entities of the system.
- *
- * @param entities the entities this system contains.
- */
-//protected abstract void processEntities(ImmutableBag<Entity> entities);
-func (es *BaseSystem) processEntities(entities []*Entity) bool { return false }
-
-// return true if the system should be processed, false if not.
-//protected abstract boolean checkProcessing();
-func (es *BaseSystem) checkProcessing() bool { return false }
-
-// Override to implement code that gets executed when systems are initialized.
-//protected void initialize() {};
-
-/**
- * Called if the system has received a entity it is interested in, e.g. created or a component was added to it.
- * @param e the entity that was added to this system.
- */
-func (es *BaseSystem) Inserted(e *Entity) {}
-
-/**
- * Called if a entity was removed from this system, e.g. deleted or had one of it's components removed.
- * @param e the entity that was removed from this system.
- */
-func (es *BaseSystem) Removed(e *Entity) {}
-
 // Will check if the entity is of interest to this system.
-func (es *BaseSystem) check(e *Entity) {
-	if es.dummy {
+func (sys *BaseSystem) check(e Entity) {
+	if sys.dummy {
 		return
 	}
 
-	contains := e.SystemBits().Test(es.systemIndex)
+	contains := e.SystemBits().Test(sys.systemIndex)
 	interested := true // possibly interested, let's try to prove it wrong.
 
 	componentBits := e.ComponentBits()
 
 	// Check if the entity possesses ALL of the components defined in the aspect.
-	if es.allSet.Len() > 0 {
-		for i, ok := es.allSet.NextSet(0); ok; i, ok = es.allSet.NextSet(i + 1) {
+	if sys.allSet.Len() > 0 {
+		for i, ok := sys.allSet.NextSet(0); ok; i, ok = sys.allSet.NextSet(i + 1) {
 			if !componentBits.Test(i) {
 				interested = false
 				break
@@ -99,59 +75,58 @@ func (es *BaseSystem) check(e *Entity) {
 	}
 
 	// Check if the entity possesses ANY of the exclusion components, if it does then the system is not interested.
-	if es.exclusionSet.Len() > 0 && interested {
-		interested = !es.exclusionSet.Intersection(componentBits).Any()
+	if sys.exclusionSet.Len() > 0 && interested {
+		interested = !sys.exclusionSet.Intersection(componentBits).Any()
 	}
 
 	// Check if the entity possesses ANY of the components in the oneSet. If so, the system is interested.
-	if es.oneSet.Len() > 0 {
-		interested = es.oneSet.Intersection(componentBits).Any()
+	if sys.oneSet.Len() > 0 {
+		interested = sys.oneSet.Intersection(componentBits).Any()
 	}
 
 	if interested && !contains {
-		es.insertToSystem(e)
+		sys.insertToSystem(e)
 	} else if !interested && contains {
-		es.removeFromSystem(e)
+		sys.removeFromSystem(e)
 	}
 }
 
-func (es *BaseSystem) removeFromSystem(e *Entity) {
-	for i, other := range es.actives {
+func (sys *BaseSystem) removeFromSystem(e Entity) {
+	for i, other := range sys.actives {
 		if other == e {
-			es.actives = append(es.actives[:i], es.actives[i+1:]...)
+			sys.actives = append(sys.actives[:i], sys.actives[i+1:]...)
 			break
 		}
 	}
-	e.SystemBits().Clear(es.systemIndex)
-	es.Removed(e)
+	e.SystemBits().Clear(sys.systemIndex)
+	sys.child.Removed(e)
 }
 
-func (es *BaseSystem) insertToSystem(e *Entity) {
-	es.actives = append(es.actives, e)
-	e.SystemBits().Set(es.systemIndex)
-	es.Inserted(e)
+func (sys *BaseSystem) insertToSystem(e Entity) {
+	sys.actives = append(sys.actives, e)
+	e.SystemBits().Set(sys.systemIndex)
+	sys.child.Inserted(e)
 }
 
-func (es *BaseSystem) Added(e *Entity)   { es.check(e) }
-func (es *BaseSystem) Changed(e *Entity) { es.check(e) }
+func (sys *BaseSystem) Added(e Entity)   { sys.check(e) }
+func (sys *BaseSystem) Changed(e Entity) { sys.check(e) }
 
-func (es *BaseSystem) Deleted(e *Entity) {
-	if e.SystemBits().Test(es.systemIndex) {
-		es.removeFromSystem(e)
+func (sys *BaseSystem) Deleted(e Entity) {
+	if e.SystemBits().Test(sys.systemIndex) {
+		sys.removeFromSystem(e)
 	}
 }
 
-func (es *BaseSystem) Disabled(e *Entity) {
-	if e.SystemBits().Test(es.systemIndex) {
-		es.removeFromSystem(e)
+func (sys *BaseSystem) Disabled(e Entity) {
+	if e.SystemBits().Test(sys.systemIndex) {
+		sys.removeFromSystem(e)
 	}
 }
 
-func (es *BaseSystem) Enabled(e *Entity)       { es.check(e) }
-func (es *BaseSystem) SetWorld(world *World)   { es.world = world }
-func (es *BaseSystem) IsPassive() bool         { return es.passive }
-func (es *BaseSystem) SetPassive(passive bool) { es.passive = passive }
-func (es *BaseSystem) Actives() []*Entity      { return es.actives }
+func (sys *BaseSystem) Enabled(e Entity)        { sys.check(e) }
+func (sys *BaseSystem) IsPassive() bool         { return sys.passive }
+func (sys *BaseSystem) SetPassive(passive bool) { sys.passive = passive }
+func (sys *BaseSystem) Actives() []Entity       { return sys.actives }
 
 // Used to generate a unique bit for each system. Only used internally in BaseSystem.
 var _SystemIndexManager = SystemIndexManager{

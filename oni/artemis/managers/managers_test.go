@@ -35,7 +35,7 @@ func Test_TeamManager(t *testing.T) {
 
 func Test_TagManager(t *testing.T) {
 	mgr := NewTagManager()
-	e := &Entity{}
+	e := NewEntityVoid()
 	tag := "PITBOSS"
 
 	Convey("should implement Manager", t, func() {
@@ -63,7 +63,7 @@ func Test_TagManager(t *testing.T) {
 
 func Test_PlayerManager(t *testing.T) {
 	mgr := NewPlayerManager()
-	e := &Entity{}
+	e := NewEntityVoid()
 	player := "lol"
 
 	Convey("should implement Manager", t, func() {
@@ -89,7 +89,7 @@ func Test_PlayerManager(t *testing.T) {
 
 func Test_GroupManager(t *testing.T) {
 	mgr := NewGroupManager()
-	e := &Entity{}
+	e := NewEntityVoid()
 	group := "awesome"
 
 	Convey("should implement Manager", t, func() {

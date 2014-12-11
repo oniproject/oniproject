@@ -2,7 +2,7 @@ package artemis
 
 type ComponentManager struct {
 	componentsByType map[int]map[int]Component
-	deleted          []*Entity
+	deleted          []Entity
 
 	BaseEntityObserver
 	BaseWorldSaver
@@ -13,7 +13,7 @@ func NewComponentManager() *ComponentManager {
 	return &ComponentManager{}
 }
 
-func (cm *ComponentManager) removeComponentsOfEntity(e *Entity) {
+func (cm *ComponentManager) removeComponentsOfEntity(e Entity) {
 	componentBits := e.ComponentBits()
 	for i, ok := componentBits.NextSet(0); ok; i, ok = componentBits.NextSet(i + 1) {
 		delete(cm.componentsByType[int(i)], e.Id())
@@ -21,7 +21,7 @@ func (cm *ComponentManager) removeComponentsOfEntity(e *Entity) {
 	componentBits.ClearAll()
 }
 
-func (cm *ComponentManager) AddComponent(e *Entity, component Component) {
+func (cm *ComponentManager) AddComponent(e Entity, component Component) {
 	t := getTypeFor(component)
 	//FIXME cm.componentsByType.EnsureCapacity(t.Index())
 
@@ -35,7 +35,7 @@ func (cm *ComponentManager) AddComponent(e *Entity, component Component) {
 	e.ComponentBits().Set(uint(t.Index()))
 }
 
-func (cm *ComponentManager) RemoveComponent(e *Entity, t *ComponentType) {
+func (cm *ComponentManager) RemoveComponent(e Entity, t *ComponentType) {
 	if e.ComponentBits().Test(uint(t.Index())) {
 		delete(cm.componentsByType[t.Index()], e.Id())
 		e.ComponentBits().Clear(uint(t.Index()))
@@ -54,7 +54,7 @@ func (cm *ComponentManager) TypedComponents(t *ComponentType) (ret []Component) 
 	return
 }
 
-func (cm *ComponentManager) ComponentByType(e *Entity, t *ComponentType) Component {
+func (cm *ComponentManager) ComponentByType(e Entity, t *ComponentType) Component {
 	components, ok := cm.componentsByType[t.Index()]
 	if ok {
 		return components[e.Id()]
@@ -62,7 +62,7 @@ func (cm *ComponentManager) ComponentByType(e *Entity, t *ComponentType) Compone
 	return nil
 }
 
-func (cm *ComponentManager) ComponentsFor(e *Entity) (fill []Component) {
+func (cm *ComponentManager) ComponentsFor(e Entity) (fill []Component) {
 	componentBits := e.ComponentBits()
 
 	for i, ok := componentBits.NextSet(0); ok; i, ok = componentBits.NextSet(i + 1) {
@@ -71,12 +71,12 @@ func (cm *ComponentManager) ComponentsFor(e *Entity) (fill []Component) {
 
 	return
 }
-func (cm *ComponentManager) Delete(e *Entity) {
+func (cm *ComponentManager) Delete(e Entity) {
 	cm.deleted = append(cm.deleted, e)
 }
 func (cm *ComponentManager) Clean() {
 	for _, e := range cm.deleted {
 		cm.removeComponentsOfEntity(e)
 	}
-	cm.deleted = []*Entity{}
+	cm.deleted = []Entity{}
 }

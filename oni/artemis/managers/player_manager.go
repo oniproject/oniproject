@@ -9,36 +9,36 @@ import (
 An entity can only belong to a single player at a time.
 */
 type PlayerManager struct {
-	playerByEntity   map[*Entity]string
-	entitiesByPlayer map[string][]*Entity
+	playerByEntity   map[Entity]string
+	entitiesByPlayer map[string][]Entity
 
 	BaseEntityObserver
 }
 
 func NewPlayerManager() *PlayerManager {
 	return &PlayerManager{
-		playerByEntity:   make(map[*Entity]string),
-		entitiesByPlayer: make(map[string][]*Entity),
+		playerByEntity:   make(map[Entity]string),
+		entitiesByPlayer: make(map[string][]Entity),
 	}
 }
 
-func (m *PlayerManager) Deleted(e *Entity)     { m.RemoveFromPlayer(e) }
+func (m *PlayerManager) Deleted(e Entity)      { m.RemoveFromPlayer(e) }
 func (m *PlayerManager) SetWorld(world *World) {}
 func (m *PlayerManager) Initialize()           {}
 
-func (m *PlayerManager) SetPlayer(e *Entity, player string) {
+func (m *PlayerManager) SetPlayer(e Entity, player string) {
 	m.playerByEntity[e] = player
 	if entities, ok := m.entitiesByPlayer[player]; !ok {
-		m.entitiesByPlayer[player] = []*Entity{e}
+		m.entitiesByPlayer[player] = []Entity{e}
 	} else {
 		m.entitiesByPlayer[player] = append(entities, e)
 	}
 }
 
-func (m *PlayerManager) EntitiesOfPlayer(player string) []*Entity { return m.entitiesByPlayer[player] }
-func (m *PlayerManager) PlayerByEntity(e *Entity) string          { return m.playerByEntity[e] }
+func (m *PlayerManager) EntitiesOfPlayer(player string) []Entity { return m.entitiesByPlayer[player] }
+func (m *PlayerManager) PlayerByEntity(e Entity) string          { return m.playerByEntity[e] }
 
-func (m *PlayerManager) RemoveFromPlayer(e *Entity) {
+func (m *PlayerManager) RemoveFromPlayer(e Entity) {
 	if player, ok := m.playerByEntity[e]; ok {
 		if entities, ok := m.entitiesByPlayer[player]; ok {
 			for i, other := range entities {

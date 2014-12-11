@@ -9,19 +9,22 @@ type EntityProcessingSystem struct {
 	*BaseSystem
 }
 
-func NewEntityProcessingSystem(aspect *Aspect) *EntityProcessingSystem {
-	return &EntityProcessingSystem{
-		BaseSystem: NewBaseSystem(aspect),
-	}
+func NewEntityProcessingSystem(aspect *Aspect) (sys *EntityProcessingSystem) {
+	sys = &EntityProcessingSystem{}
+	sys.BaseSystem = NewBaseSystem(aspect, sys)
+	return
 }
 
 // Process a entity this system is interested in.
-func (sys *EntityProcessingSystem) Process(e *Entity) {}
+func (sys *EntityProcessingSystem) Process(e Entity) {}
 
-func (sys *EntityProcessingSystem) ProcessEntities(entities []*Entity) {
+func (sys *EntityProcessingSystem) ProcessEntities(entities []Entity) {
 	for _, e := range entities {
 		sys.Process(e)
 	}
 }
 
 func (sys *EntityProcessingSystem) CheckProcessing() bool { return true }
+
+func (sys *EntityProcessingSystem) Inserted(e Entity) {}
+func (sys *EntityProcessingSystem) Removed(e Entity)  {}

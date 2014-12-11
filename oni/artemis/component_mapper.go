@@ -35,7 +35,7 @@ func NewComponentMapper(component Component, world *World) *ComponentMapper {
  * @param e the entity that should possess the component
  * @return the instance of the component
  */
-func (mapper *ComponentMapper) Get(e *Entity) (c Component) {
+func (mapper *ComponentMapper) Get(e Entity) (c Component) {
 	defer func() {
 		if err := recover(); err != nil {
 			c = nil
@@ -49,7 +49,7 @@ func (mapper *ComponentMapper) Get(e *Entity) (c Component) {
  * @param e the entity to check
  * @return true if the entity has this component type, false if it doesn't.
  */
-/*func (mapper *ComponentMapper) GetSafe(e *Entity) Component {
+/*func (mapper *ComponentMapper) GetSafe(e Entity) Component {
 	if components.isIndexWithinBounds(e.Id()) {
 		return mapper.components.Get(e.Id())
 	}
@@ -61,6 +61,6 @@ func (mapper *ComponentMapper) Get(e *Entity) (c Component) {
  * @param e the entity to check
  * @return true if the entity has this component type, false if it doesn't.
  */
-func (mapper *ComponentMapper) Has(e *Entity) (has bool) {
+func (mapper *ComponentMapper) Has(e Entity) (has bool) {
 	return mapper.Get(e) != nil
 }

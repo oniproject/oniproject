@@ -35,13 +35,13 @@ type DelayedEntityProcessingSystem struct {
 	running    bool
 }
 
-func NewDelayedEntityProcessingSystem(aspect *Aspect) *DelayedEntityProcessingSystem {
-	return &DelayedEntityProcessingSystem{
-		BaseSystem: NewBaseSystem(aspect),
-	}
+func NewDelayedEntityProcessingSystem(aspect *Aspect) (sys *DelayedEntityProcessingSystem) {
+	sys = &DelayedEntityProcessingSystem{}
+	sys.BaseSystem = NewBaseSystem(aspect, sys)
+	return
 }
 
-func (sys *DelayedEntityProcessingSystem) ProcessEntities(entities []*Entity) {
+func (sys *DelayedEntityProcessingSystem) ProcessEntities(entities []Entity) {
 	for _, entity := range entities {
 		sys.ProcessDelta(entity, sys.acc)
 		remaining := sys.RemainingDelay(entity)
@@ -54,20 +54,16 @@ func (sys *DelayedEntityProcessingSystem) ProcessEntities(entities []*Entity) {
 	sys.Stop()
 }
 
-func (sys *DelayedEntityProcessingSystem) Inserted(e *Entity) {
+func (sys *DelayedEntityProcessingSystem) Inserted(e Entity) {
 	delay := sys.RemainingDelay(e)
 	if delay > 0 {
 		sys.OfferDelay(delay)
 	}
 }
+func (sys *DelayedEntityProcessingSystem) Removed(e Entity) {}
 
-/**
- * Return the delay until this entity should be processed.
- *
- * @param e entity
- * @return delay
- */
-func (sys *DelayedEntityProcessingSystem) RemainingDelay(e *Entity) time.Duration { return 0 }
+// Return the delay until this entity should be processed.
+func (sys *DelayedEntityProcessingSystem) RemainingDelay(e Entity) time.Duration { return 0 }
 
 func (sys *DelayedEntityProcessingSystem) CheckProcessing() bool {
 	if sys.running {
@@ -87,17 +83,13 @@ func (sys *DelayedEntityProcessingSystem) CheckProcessing() bool {
  * @param e the entity to process.
  * @param accumulatedDelta the delta time since this system was last executed.
  */
-func (sys *DelayedEntityProcessingSystem) ProcessDelta(e *Entity, accumulatedDelta time.Duration) {}
+func (sys *DelayedEntityProcessingSystem) ProcessDelta(e Entity, accumulatedDelta time.Duration) {}
 
-func (sys *DelayedEntityProcessingSystem) ProcessExpired(e *Entity) {}
+func (sys *DelayedEntityProcessingSystem) ProcessExpired(e Entity) {}
 
-/**
- * Start processing of entities after a certain amount of delta time.
- *
- * Cancels current delayed run and starts a new one.
- *
- * @param delta time delay until processing starts.
- */
+// Start processing of entities after a certain amount of delta time.
+// Cancels current delayed run and starts a new one.
+// @param delta time delay until processing starts.
 func (sys *DelayedEntityProcessingSystem) Restart(delay time.Duration) {
 	sys.delay = delay
 	sys.acc = 0
@@ -124,11 +116,7 @@ func (sys *DelayedEntityProcessingSystem) OfferDelay(delay time.Duration) {
 	}
 }
 
-/**
- * Get the initial delay that the system was ordered to process entities after.
- *
- * @return the originally set delay.
- */
+// Get the initial delay that the system was ordered to process entities after.
 func (sys *DelayedEntityProcessingSystem) InitialTimeDelay() time.Duration { return sys.delay }
 
 /**
@@ -145,17 +133,10 @@ func (sys *DelayedEntityProcessingSystem) RemainingTimeUntilProcessing() time.Du
 	return 0
 }
 
-/**
- * Check if the system is counting down towards processing.
- *
- * @return true if it's counting down, false if it's not running.
- */
+// Check if the system is counting down towards processing. true if it's counting down, false if it's not running.
 func (sys *DelayedEntityProcessingSystem) IsRunning() bool { return sys.running }
 
-/**
- * Stops the system from running, aborts current countdown.
- * Call offerDelay or restart to run it again.
- */
+// Stops the system from running, aborts current countdown. Call offerDelay or restart to run it again.
 func (sys *DelayedEntityProcessingSystem) Stop() {
 	sys.running = false
 	sys.acc = 0

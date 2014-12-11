@@ -15,11 +15,12 @@ type IntervalEntitySystem struct {
 	acc, interval time.Duration
 }
 
-func NewIntervalEntitySystem(aspect *Aspect, interval time.Duration) *IntervalEntitySystem {
-	return &IntervalEntitySystem{
-		BaseSystem: NewBaseSystem(aspect),
-		interval:   interval,
+func NewIntervalEntitySystem(aspect *Aspect, interval time.Duration) (sys *IntervalEntitySystem) {
+	sys = &IntervalEntitySystem{
+		interval: interval,
 	}
+	sys.BaseSystem = NewBaseSystem(aspect, sys)
+	return
 }
 
 // Process a entity this system is interested in.
@@ -31,3 +32,7 @@ func (sys *IntervalEntitySystem) CheckProcessing() bool {
 	}
 	return false
 }
+
+func (sys *IntervalEntitySystem) ProcessEntities(entities []Entity) {}
+func (sys *IntervalEntitySystem) Inserted(e Entity)                 {}
+func (sys *IntervalEntitySystem) Removed(e Entity)                  {}

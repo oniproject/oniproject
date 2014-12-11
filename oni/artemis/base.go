@@ -2,11 +2,11 @@ package artemis
 
 type BaseEntityObserver struct{}
 
-func (b *BaseEntityObserver) Added(e *Entity)    {}
-func (b *BaseEntityObserver) Changed(e *Entity)  {}
-func (b *BaseEntityObserver) Deleted(e *Entity)  {}
-func (b *BaseEntityObserver) Enabled(e *Entity)  {}
-func (b *BaseEntityObserver) Disabled(e *Entity) {}
+func (b *BaseEntityObserver) Added(e Entity)    {}
+func (b *BaseEntityObserver) Changed(e Entity)  {}
+func (b *BaseEntityObserver) Deleted(e Entity)  {}
+func (b *BaseEntityObserver) Enabled(e Entity)  {}
+func (b *BaseEntityObserver) Disabled(e Entity) {}
 
 type BaseWorldSaver struct{ world *World }
 
