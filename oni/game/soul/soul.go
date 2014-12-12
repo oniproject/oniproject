@@ -19,8 +19,6 @@ type SoulComponent struct {
 	Abilities map[string]Ability
 }
 
-func (s *SoulComponent) Name() string { return "soul" }
-
 func NewSoulComponent() *SoulComponent {
 	return &SoulComponent{}
 }

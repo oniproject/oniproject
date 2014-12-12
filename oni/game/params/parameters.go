@@ -16,8 +16,6 @@ type Parameters struct {
 	DEF int // DEFense power
 }
 
-func (p *Parameters) Name() string { return "params" }
-
 func (p *Parameters) HPbar() (int, int) { return p.HP, p.MHP }
 func (p *Parameters) MPbar() (int, int) { return p.MP, p.MMP }
 func (p *Parameters) TPbar() (int, int) { return p.TP, p.MTP }

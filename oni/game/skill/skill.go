@@ -64,8 +64,6 @@ type SkillComponent struct {
 	Skills map[string]time.Time
 }
 
-func (c *SkillComponent) Name() string { return "skills" }
-
 func NewSkillComponent() *SkillComponent {
 	return &SkillComponent{
 		Skills: make(map[string]time.Time),

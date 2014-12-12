@@ -47,8 +47,6 @@ func NewInventoryComponent(width, height int, slots []string) *InventoryComponen
 	return &InventoryComponent{inv, equip, equipLock}
 }
 
-func (inv *InventoryComponent) Name() string { return "inv" }
-
 func (inv *InventoryComponent) Height() int { return len(inv.Inventory) }
 func (inv *InventoryComponent) Width() int  { return len(inv.Inventory[0]) }
 

@@ -1,11 +1,13 @@
 package items
 
 import (
-//"encoding/json"
-//log "github.com/Sirupsen/logrus"
+	. "oniproject/oni/artemis"
 )
 
-var ITEM_PATH = "data/items"
+var (
+	ITEM_PATH = "data/items"
+	ITEM      = GetIndexFor((*Item)(nil))
+)
 
 const (
 	ITEM_ATTR_DONTDROP          = 1 << iota // cant drop to ground
