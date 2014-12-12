@@ -1,31 +1,19 @@
 package state_test
 
 import (
-	//"../mock"
-	//gomock "code.google.com/p/gomock/gomock"
 	. "github.com/smartystreets/goconvey/convey"
 	. "oniproject/oni/artemis"
 	. "oniproject/oni/game/state"
-	//"path"
 	"testing"
 	"time"
 )
 
 func Test_StateSystem(t *testing.T) {
 	STATE_PATH = "../" + STATE_PATH
-	/*add_def, err := LoadStateYaml(path.Join("../"+STATE_PATH, "add_def.yml"))
-
-	Convey("LoadStateYaml", t, func() {
-		So(err, ShouldBeNil)
-		Println(add_def)
-	})*/
 
 	world := NewWorld()
 	sys := NewStateSystem()
 	world.SetSystem(sys, false)
-
-	//mockCtrl := gomock.NewController(t)
-	//defer mockCtrl.Finish()
 
 	e := world.CreateEntity()
 	e.AddComponent(NewStateComponent())

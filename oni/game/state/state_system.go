@@ -53,22 +53,15 @@ func (sys *StateSystem) Removed(e Entity)      {}
 	}
 }*/
 
-func (sys *StateSystem) AddStateTo(e Entity, name string) (State, error) {
+func (sys *StateSystem) AddStateTo(e Entity, name string) (state State, err error) {
 	s := e.ComponentByType(STATE).(*StateComponent)
-	s.States[name] = time.Now()
-
-	state, ok := sys.cacheOfStateData[name]
-	if ok {
-		return state, nil
-	}
-
-	state, err := LoadStateYaml(path.Join(STATE_PATH, name+".yml"))
+	state, err = sys.loadState(name)
 	if err == nil {
-		sys.cacheOfStateData[name] = state
+		s.States[name] = time.Now()
 	}
-
-	return state, err
+	return
 }
+
 func (sys *StateSystem) RemoveStateFrom(e Entity, name string) {
 	s := e.ComponentByType(STATE).(*StateComponent)
 	delete(s.States, name)
@@ -83,7 +76,14 @@ func (sys *StateSystem) States(e Entity) (states map[string]State) {
 	return
 }
 
-func LoadStateYaml(fname string) (state State, err error) {
+func (sys *StateSystem) loadState(name string) (state State, err error) {
+	state, ok := sys.cacheOfStateData[name]
+	if ok {
+		return
+	}
+
+	fname := path.Join(STATE_PATH, name+".yml")
+
 	file, err := ioutil.ReadFile(fname)
 	if err != nil {
 		return
@@ -96,6 +96,8 @@ func LoadStateYaml(fname string) (state State, err error) {
 
 	//state.features = ParseFeatureList(state.Features)
 	state.AutoRemovalTiming *= time.Millisecond
+
+	sys.cacheOfStateData[name] = state
 
 	return
 }
