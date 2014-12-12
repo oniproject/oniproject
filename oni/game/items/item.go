@@ -1,15 +1,13 @@
-package game
+package items
 
 import (
-	//"encoding/json"
-	//log "github.com/Sirupsen/logrus"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
+//"encoding/json"
+//log "github.com/Sirupsen/logrus"
 )
 
-const (
-	ITEM_PATH = "data/items"
+var ITEM_PATH = "data/items"
 
+const (
 	ITEM_ATTR_DONTDROP          = 1 << iota // cant drop to ground
 	ITEM_ATTR_DONTUSE                       // cant be used like a potion
 	ITEM_ATTR_DONTEQUIP                     // isnt clothing or weapon
@@ -32,11 +30,10 @@ type Item struct {
 	PriceBuy   int
 	PriceSell  int
 
-	EquipTypeId  int
-	Slot1, Slot2 string
-	Dual         bool
+	EquipTypeId int
+	Slot, Lock  string
 
-	Features FeatureList
+	// TODO Features FeatureList
 	//Xfeatures FeatureList `json:"-"`
 
 	//EquipScript   string
@@ -57,24 +54,7 @@ type Item struct {
 	unmarshaled bool `json:"-"`
 }
 
-func LoadItemYaml(fname string) (*Item, error) {
-	file, err := ioutil.ReadFile(fname)
-	if err != nil {
-		return nil, err
-	}
-
-	item := &Item{}
-	err = yaml.Unmarshal(file, item)
-	if err != nil {
-		return nil, err
-	}
-
-	//item.Xfeatures = ParseFeatureList(item.Features)
-
-	return item, err
-}
-
-func (item *Item) ApplyFeatures(r FeatureReceiver) { item.Features.Run(r) }
+// TODO func (item *Item) ApplyFeatures(r FeatureReceiver) { item.Features.Run(r) }
 
 /*func (item Item) UnmarshalJSON(b []byte) (err error) {
 	if item.unmarshaled {

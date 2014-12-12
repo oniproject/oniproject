@@ -1,8 +1,7 @@
 name: Knife
 type: weapon
 class: assasin
-slot1: right
-slot2: left
+slot: left
 #use:
 #    - skill _attack
 #features:
