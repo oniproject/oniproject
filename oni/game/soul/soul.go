@@ -1,11 +1,11 @@
-package game
+package soul
 
 type Ability struct {
 	Level int
 	EXP   int
 }
 
-type Soul struct {
+type SoulComponent struct {
 	ClassId int
 	RaceId  int
 
@@ -19,4 +19,8 @@ type Soul struct {
 	Abilities map[string]Ability
 }
 
-func (s *Soul) Name() string { return "soul" }
+func (s *SoulComponent) Name() string { return "soul" }
+
+func NewSoulComponent() *SoulComponent {
+	return &SoulComponent{}
+}
