@@ -77,7 +77,7 @@ func (w *World) Delta() time.Duration { return w.delta }
 func (w *World) SetDelta(delta time.Duration) { w.delta = delta }
 
 // Get a entity having the specified id.
-func (w *World) EntityById(entityId int) Entity { return w.em.EntityById(entityId) }
+func (w *World) EntityById(entityId uint) Entity { return w.em.EntityById(entityId) }
 
 // Makes sure all managers systems are initialized in the order they were added.
 func (w *World) Initialize() {

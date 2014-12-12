@@ -10,7 +10,7 @@ type Entity interface {
 	// The internal id for this entity within the framework. No other entity
 	// will have the same ID, but ID's are however reused so another entity may
 	// acquire this ID if the previous entity was deleted.
-	Id() int
+	Id() uint
 
 	UUID() utils.Id
 	SetUUID(utils.Id)
@@ -92,7 +92,7 @@ type Entity interface {
 // The entity class. Cannot be instantiated outside the framework, you must create new entities using World.
 type entity struct {
 	uuid utils.Id
-	id   int
+	id   uint
 
 	componentBits *bitset.BitSet
 	systemBits    *bitset.BitSet
@@ -111,7 +111,7 @@ func NewEntityVoid() Entity {
 	}
 }
 
-func newEntity(world *World, id int) Entity {
+func newEntity(world *World, id uint) Entity {
 	e := &entity{
 		world:            world,
 		id:               id,
@@ -127,7 +127,7 @@ func newEntity(world *World, id int) Entity {
 func (e *entity) UUID() utils.Id        { return e.uuid }
 func (e *entity) SetUUID(uuid utils.Id) { e.uuid = uuid }
 
-func (e *entity) Id() int { return e.id }
+func (e *entity) Id() uint { return e.id }
 
 func (e *entity) ComponentBits() *bitset.BitSet { return e.componentBits }
 func (e *entity) SystemBits() *bitset.BitSet    { return e.systemBits }

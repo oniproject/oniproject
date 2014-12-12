@@ -1,7 +1,7 @@
 package artemis
 
 type ComponentManager struct {
-	componentsByType map[uint]map[int]Component
+	componentsByType map[uint]map[uint]Component
 
 	deleted []Entity
 
@@ -12,7 +12,7 @@ type ComponentManager struct {
 
 func NewComponentManager() *ComponentManager {
 	return &ComponentManager{
-		componentsByType: make(map[uint]map[int]Component),
+		componentsByType: make(map[uint]map[uint]Component),
 	}
 }
 
@@ -30,7 +30,7 @@ func (cm *ComponentManager) AddComponent(e Entity, component Component) {
 
 	components, ok := cm.componentsByType[t]
 	if !ok {
-		components = make(map[int]Component)
+		components = make(map[uint]Component)
 		cm.componentsByType[t] = components
 	}
 	components[e.Id()] = component
@@ -41,14 +41,14 @@ func (cm *ComponentManager) AddComponent(e Entity, component Component) {
 func (cm *ComponentManager) RemoveComponent(e Entity, t uint) {
 	if e.ComponentBits().Test(t) {
 		delete(cm.componentsByType[t], e.Id())
-		e.ComponentBits().Clear(uint(t))
+		e.ComponentBits().Clear(t)
 	}
 }
 
 func (cm *ComponentManager) TypedComponents(t uint) (ret []Component) {
 	components, ok := cm.componentsByType[t]
 	if !ok {
-		components = make(map[int]Component)
+		components = make(map[uint]Component)
 		cm.componentsByType[t] = components
 	}
 	for _, c := range components {

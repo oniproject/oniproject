@@ -5,7 +5,7 @@ import (
 )
 
 type EntityManager struct {
-	entities map[int]Entity
+	entities map[uint]Entity
 	disabled *bitset.BitSet
 
 	active  int
@@ -22,7 +22,7 @@ type EntityManager struct {
 func NewEntityManager() *EntityManager {
 	return &EntityManager{
 		disabled: bitset.New(0),
-		entities: make(map[int]Entity),
+		entities: make(map[uint]Entity),
 	}
 }
 
@@ -41,7 +41,7 @@ func (m *EntityManager) Changed(e Entity) {}
 func (m *EntityManager) Deleted(e Entity) {
 	delete(m.entities, e.Id())
 
-	m.disabled.Clear(uint(e.Id()))
+	m.disabled.Clear(e.Id())
 
 	m.checkIn(e.Id())
 
@@ -50,10 +50,10 @@ func (m *EntityManager) Deleted(e Entity) {
 
 }
 func (m *EntityManager) Enabled(e Entity) {
-	m.disabled.Clear(uint(e.Id()))
+	m.disabled.Clear(e.Id())
 }
 func (m *EntityManager) Disabled(e Entity) {
-	m.disabled.Set(uint(e.Id()))
+	m.disabled.Set(e.Id())
 }
 
 /**
@@ -63,7 +63,7 @@ func (m *EntityManager) Disabled(e Entity) {
  * @param entityId
  * @return true if active, false if not.
  */
-func (m *EntityManager) IsActive(entityId int) (ok bool) {
+func (m *EntityManager) IsActive(entityId uint) (ok bool) {
 	_, ok = m.entities[entityId]
 	return
 }
@@ -74,12 +74,12 @@ func (m *EntityManager) IsActive(entityId int) (ok bool) {
  * @param entityId
  * @return true if the entity is enabled, false if it is disabled.
  */
-func (m *EntityManager) IsEnabled(entityId int) bool {
-	return !m.disabled.Test(uint(entityId))
+func (m *EntityManager) IsEnabled(entityId uint) bool {
+	return !m.disabled.Test(entityId)
 }
 
 // Get a entity with this id.
-func (m *EntityManager) EntityById(entityId int) Entity {
+func (m *EntityManager) EntityById(entityId uint) Entity {
 	return m.entities[entityId]
 }
 
@@ -101,14 +101,14 @@ func (m *EntityManager) TotalDeleted() int64 { return m.deleted }
 
 // Used only internally to generate distinct ids for entities and reuse them.
 type identifierPool struct {
-	ids             []int
-	nextAvailableId int
+	ids             []uint
+	nextAvailableId uint
 }
 
-func (pool *identifierPool) checkIn(id int) {
+func (pool *identifierPool) checkIn(id uint) {
 	pool.ids = append(pool.ids, id)
 }
-func (pool *identifierPool) checkOut() (id int) {
+func (pool *identifierPool) checkOut() (id uint) {
 	if len(pool.ids) > 0 {
 		id = pool.ids[len(pool.ids)-1]
 		pool.ids = pool.ids[:len(pool.ids)-1]
