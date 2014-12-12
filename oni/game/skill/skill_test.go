@@ -1,5 +1,26 @@
-package game
+package skill_test
 
+import (
+	. "github.com/smartystreets/goconvey/convey"
+	. "oniproject/oni/artemis"
+	. "oniproject/oni/game/skill"
+	"testing"
+)
+
+func Test_SkillSystem(t *testing.T) {
+	world := NewWorld()
+	sys := NewSkillSystem()
+	world.SetSystem(sys, false)
+
+	e := world.CreateEntity()
+	e.AddComponent(NewSkillComponent())
+	e.AddToWorld()
+
+	SkipConvey("ok", t, func() {
+	})
+}
+
+/*
 import (
 	"./mock"
 	gomock "code.google.com/p/gomock/gomock"
@@ -36,4 +57,4 @@ func TestHealingCooldown(t *testing.T) {
 		t.Fail()
 	}
 	t.Log(err)
-}
+}*/
