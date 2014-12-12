@@ -5,8 +5,12 @@ import (
 	"encoding/json"
 	. "github.com/smartystreets/goconvey/convey"
 	. "oniproject/oni/artemis"
-	"reflect"
 	"testing"
+)
+
+var (
+	NAME     = GetIndexFor((*NameComponent)(nil))
+	POSITION = GetIndexFor((*PositionComponent)(nil))
 )
 
 type NameComponent string
@@ -49,20 +53,23 @@ func Test_World(t *testing.T) {
 	test_pos := &PositionComponent{1, 2, 3}
 	_test_name := NameComponent("qwerty")
 	test_name := &_test_name
-	test_json := []byte(`{"position": [1,2,3], "name": "qwerty"}`)
-
-	world.RegisterComponent(test_name.Name(), reflect.TypeOf(test_name))
-	world.RegisterComponent(test_pos.Name(), reflect.TypeOf(test_pos))
 
 	avatar := world.CreateEntity()
+	avatar.AddComponent(test_name)
+	avatar.AddComponent(test_pos)
 
 	Convey("Avatar unmarshal", t, func() {
-		err := avatar.UnmarshalJSON(test_json)
-		So(err, ShouldBeNil)
 		cs := avatar.Components()
 		So(cs, ShouldNotBeEmpty)
-		So(cs[0].(*PositionComponent), ShouldResemble, test_pos)
-		So(cs[1].(*NameComponent), ShouldResemble, test_name)
+		So(len(cs), ShouldEqual, 2)
+		for _, c := range cs {
+			switch c := c.(type) {
+			case *PositionComponent:
+				So(c, ShouldResemble, test_pos)
+			case *NameComponent:
+				So(c, ShouldResemble, test_name)
+			}
+		}
 
 		Println()
 		Println("systems", world.Systems())

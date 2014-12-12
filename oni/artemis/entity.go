@@ -1,16 +1,12 @@
 package artemis
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/willf/bitset"
 	"oniproject/oni/utils"
 )
 
 type Entity interface {
-	json.Marshaler
-	json.Unmarshaler
-
 	// The internal id for this entity within the framework. No other entity
 	// will have the same ID, but ID's are however reused so another entity may
 	// acquire this ID if the previous entity was deleted.
@@ -172,33 +168,4 @@ func (e *entity) reset() {
 	e.systemBits.ClearAll()
 	e.componentBits.ClearAll()
 	//e.uuid = UUID.randomUUID()
-}
-
-func (e *entity) MarshalJSON() (dst []byte, err error) {
-	src := make(map[string]interface{})
-
-	for _, c := range e.Components() {
-		src[c.Name()] = c
-	}
-
-	return json.Marshal(src)
-}
-func (e *entity) UnmarshalJSON(src []byte) (err error) {
-	dst := make(map[string]json.RawMessage)
-
-	err = json.Unmarshal(src, &dst)
-	if err != nil {
-		return
-	}
-
-	for name, data := range dst {
-		c := e.componentManager.createComponentByName(name)
-		err = json.Unmarshal(data, c)
-		if err != nil {
-			return
-		}
-		e.AddComponent(c)
-	}
-
-	return
 }

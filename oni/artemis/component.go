@@ -5,9 +5,7 @@ import (
 )
 
 // A tag class. All components in the system must extend this class.
-type Component interface {
-	Name() string
-}
+type Component interface{}
 
 var _INDEX = uint(0)
 var componentTypes = make(map[reflect.Type]uint)

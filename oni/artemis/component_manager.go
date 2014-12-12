@@ -1,14 +1,7 @@
 package artemis
 
-import (
-	log "github.com/Sirupsen/logrus"
-	"reflect"
-)
-
 type ComponentManager struct {
 	componentsByType map[uint]map[int]Component
-
-	registredCompontents map[string]reflect.Type
 
 	deleted []Entity
 
@@ -19,29 +12,8 @@ type ComponentManager struct {
 
 func NewComponentManager() *ComponentManager {
 	return &ComponentManager{
-		registredCompontents: make(map[string]reflect.Type),
-		componentsByType:     make(map[uint]map[int]Component),
+		componentsByType: make(map[uint]map[int]Component),
 	}
-}
-
-func (cm *ComponentManager) createComponentByName(name string) Component {
-	t, ok := cm.registredCompontents[name]
-	if !ok {
-		return nil
-	}
-	return reflect.New(t.Elem()).Interface().(Component)
-}
-
-func (cm *ComponentManager) register(name string, t reflect.Type) {
-	ct := reflect.TypeOf((*Component)(nil)).Elem()
-	if !t.Implements(ct) {
-		log.Panic("Registred Component is NOT Component", name, t)
-	}
-	cm.registredCompontents[name] = t
-}
-
-func (cm *ComponentManager) unregister(name string) {
-	delete(cm.registredCompontents, name)
 }
 
 func (cm *ComponentManager) removeComponentsOfEntity(e Entity) {

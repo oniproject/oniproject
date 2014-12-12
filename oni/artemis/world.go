@@ -65,10 +65,6 @@ func NewWorld() (w *World) {
 	return
 }
 
-func (w *World) RegisterComponent(name string, t reflect.Type) {
-	w.cm.register(name, t)
-}
-
 /* Create and return a new or reused entity instance.
    Will NOT add the entity to the world, use World.addEntity(Entity) for that.
 */
