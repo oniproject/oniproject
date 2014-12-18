@@ -1,6 +1,6 @@
 name: Small shield
 type: shield
 class: warrior
-slot1: left
+slot: left
 #features:
 #    - def 8

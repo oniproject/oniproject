@@ -16,17 +16,15 @@ html lang=en
         .content#equip
           div.item v-repeat="equip"
             .slot v-text="$key"
-            .name v-text="Name"
-            .desc
-              || Your bones don't break, mine do.
-              || That's clear.
+            .name v-text="Item.Name" v-if="Item"
+            .desc v-text="Item.Description" v-if="Item"
         .close v-on="click: showEquip = !showEquip"
 
       .window v-component="draggable" v-show="showInventory" style="top: 150px; right: 10px"
         .title v-on="mousedown: dragStart, mouseout: dragOut, mouseup: dragEnd, mousemove: dragMove" Inventory
         .content#inventory
-          .img v-repeat="invTest" v-on="click: cast($key)"
-            img v-attr="src:'/icons/lorc/originals/svg/'+ Icon +'.svg'"
+          .img v-repeat="inventory" v-style="left: 20+X*38+'px', top: 17+ Y*36+'px'" v-on="click: drop($index)"
+            img v-if="Item" v-attr="src:'/icons/lorc/originals/svg/'+ Item.Icon +'.svg'"
             .img-over
           #gold 12345678
         .close v-on="click: showInventory = !showInventory"
@@ -87,15 +85,6 @@ html lang=en
             div v-style="width: mp/mmp*100 + '%'"
           .bar.sp
             div v-style="width: tp/mtp*100 + '%'"
-
-      #top-right
-        strong Equip
-        div v-repeat="equip"
-          span v-text="$key +': '"
-          span v-text="Name"
-        strong Inventory
-        div v-repeat="inventory"
-          a v-text="Name" v-on="click: drop($index)"
 
       #bottom
         #spells

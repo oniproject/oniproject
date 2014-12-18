@@ -4,6 +4,7 @@ import (
 	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
+	. "oniproject/oni/game/inv"
 	"oniproject/oni/utils"
 	"strings"
 )
@@ -19,7 +20,6 @@ type MessageToMapInterface interface {
 
 	Sender
 	Dropper
-	Pickuper
 }
 
 // command
@@ -283,26 +283,42 @@ func (m *DropItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 		}
 	}()
 	a := obj.(*Avatar)
-	item := a.Inventory[m.Id]
-	a.RemoveItem(m.Id)
-	pos := a.Position()
-	s.DropItem(pos.X, pos.Y, item)
 
-	a.sendMessage <- &InventoryMsg{Inventory: a.Inventory, Equip: a.Equip}
+	x := m.Id % a.InventoryComponent.Width()
+	y := m.Id / a.InventoryComponent.Width()
+
+	name, err := a.GetItem(x, y)
+	if err != nil {
+		return
+	}
+
+	a.RemoveItem(x, y)
+
+	pos := a.Position()
+	s.DropItem(pos.X, pos.Y, name)
+
+	a.sendMessage <- &InventoryMsg{Inventory: a.GetInventory(), Equip: a.GetEquip()}
 }
 
-type PickupItemMsg struct{}
+type PickupItemMsg struct {
+	Target utils.Id `mapstructure:"t"`
+}
 
 func (m *PickupItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
-	item := s.PickupItem(a.Target)
-	if item == nil {
-		log.Error("fail PickupItem: item notfound")
-		return
+	if obj := s.GetObjById(a.Target); obj != nil {
+		if item, ok := obj.(*DroppedItem); ok {
+			err := a.AddItem(item.Item, 0, 0)
+			if err == nil {
+				s.Unregister(obj)
+				a.sendMessage <- &InventoryMsg{Inventory: a.GetInventory(), Equip: a.GetEquip()}
+				return
+			}
+		}
 	}
-	a.AddItem(item)
 
-	a.sendMessage <- &InventoryMsg{Inventory: a.Inventory, Equip: a.Equip}
+	log.Error("FAIL PickupItem")
+	return
 }
 
 type RequestInventoryMsg struct{}
@@ -310,12 +326,12 @@ type RequestInventoryMsg struct{}
 func (m *RequestInventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	log.Debugf("RequestInventoryMsg %v %v", a.Inventory, a.Equip)
-	a.sendMessage <- &InventoryMsg{Inventory: a.Inventory, Equip: a.Equip}
+	a.sendMessage <- &InventoryMsg{Inventory: a.GetInventory(), Equip: a.GetEquip()}
 }
 
 type InventoryMsg struct {
-	Inventory []*Item          `mapstructure:"inv"`
-	Equip     map[string]*Item `mapstructure:"equip"`
+	Inventory []DataInvPos        `mapstructure:"inv"`
+	Equip     map[string]DataSlot `mapstructure:"equip"`
 }
 
 func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {

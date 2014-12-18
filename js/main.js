@@ -11,8 +11,8 @@ stats.setMode(1); // 0: fps, 1: ms
 
 // align top-right
 stats.domElement.style.position = 'absolute';
-stats.domElement.style.right = '100px';
-stats.domElement.style.top = '0px';
+stats.domElement.style.right = '0';
+stats.domElement.style.top = '0';
 
 document.body.appendChild(stats.domElement);
 
@@ -142,20 +142,7 @@ var UI = window.UI = new Vue({
 			Type: 'admin'
 		}],
 		equip: {},
-		inventory: [
-			{
-				Name: '43'
-			},
-			{
-				Name: '1k'
-			},
-			{
-				Name: '4njki32'
-			},
-			{
-				Name: 'PPPPvndfsj'
-			},
-		],
+		inventory: [],
 		target: {
 			Id: 0,
 			Race: 0,

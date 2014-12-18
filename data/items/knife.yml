@@ -1,8 +1,9 @@
 name: Knife
+icon: rune-sword
 type: weapon
 class: assasin
-slot1: right
-slot2: left
+slot: right
+#slot: left
 #use:
 #    - skill _attack
 #features:

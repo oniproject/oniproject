@@ -1,6 +1,6 @@
 name: Hauberk
 type: armor
 class: warrior
-slot1: body
+slot: body
 features:
     - def 10

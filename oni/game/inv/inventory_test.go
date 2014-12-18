@@ -1,5 +1,6 @@
-package game
+package inv
 
+/*
 import "testing"
 import "path"
 
@@ -72,4 +73,4 @@ func printIventory(t *testing.T, s string, inv *InventoryComponent) {
 	for k, v := range inv.Inventory {
 		t.Log(k, v.Name)
 	}
-}
+}*/

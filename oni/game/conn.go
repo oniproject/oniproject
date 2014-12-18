@@ -37,9 +37,9 @@ type Connection struct {
 
 func (c *Connection) Lag() time.Duration { return c.lag }
 
-func (c *Avatar) readPump(game ConnToMapInterface, avatar GameObject) {
+func (c *Connection) readPump(game ConnToMapInterface, avatar GameObject) {
 	defer func() {
-		game.Unregister(c)
+		game.Unregister(avatar)
 		c.ws.Close()
 	}()
 

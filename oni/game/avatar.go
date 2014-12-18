@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	. "oniproject/oni/game/inv"
 	"oniproject/oni/utils"
 	"time"
 )
@@ -37,7 +38,7 @@ type Avatar struct {
 
 func NewAvatar() *Avatar {
 	a := &Avatar{
-		InventoryComponent: NewInventoryComponent(),
+		InventoryComponent: NewInventoryComponent(6, 8, []string{"body", "left", "right"}),
 		SkillComponent:     NewSkillComponent(),
 		StateComponent:     NewStateComponent(),
 	}

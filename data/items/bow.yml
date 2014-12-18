@@ -1,9 +1,9 @@
 name: Bow
 type: weapon
 class: range
-slot1: right
-slot2: left
-dual: true
+slot: right
+lock: left
+#dual: true
 #use:
 #    - skill _attack
 #features:

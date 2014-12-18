@@ -127,26 +127,12 @@ func (m *Map) SpawnMonster(x, y float64) {
 	monster.RunAI()
 }
 
-func (m *Map) DropItem(x, y float64, item *Item) {
+func (m *Map) DropItem(x, y float64, item string) {
 	ditem := NewDroppedItem(x, y, item)
 
 	m.lastLocalId--
 	ditem.id = utils.NewId(m.lastLocalId - 20000)
 	m.Register(ditem)
-}
-
-func (m *Map) PickupItem(id utils.Id) *Item {
-	obj, ok := m.objects[id]
-	if !ok {
-		return nil
-	}
-	if item, ok := obj.(*DroppedItem); ok {
-		m.Unregister(obj)
-		return item.Item
-	} else {
-		log.Error("try PickupItem: item is NOT item")
-		return nil
-	}
 }
 
 func (gm *Map) Run() {
@@ -166,9 +152,7 @@ func (gm *Map) Run() {
 		close(avatar.sendMessage)
 	}
 
-	test_knife, _ := LoadItemYaml(path.Join(ITEM_PATH, "knife.yml"))
 	x, y := 20, 15
-
 	for i := 0; i < 4; i++ {
 		go gm.SpawnMonster(float64(x+0), float64(y+i))
 		go gm.SpawnMonster(float64(x+1), float64(y+i))
@@ -177,7 +161,7 @@ func (gm *Map) Run() {
 		go gm.SpawnMonster(float64(x+4), float64(y+i))
 		go gm.SpawnMonster(float64(x+5), float64(y+i))
 
-		go gm.DropItem(float64(x+6), float64(y+i), test_knife)
+		go gm.DropItem(float64(x+6), float64(y+i), "knife")
 	}
 
 	t_replication := time.NewTicker(TickRate)
