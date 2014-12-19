@@ -3,15 +3,21 @@ package game
 import (
 	"errors"
 	log "github.com/Sirupsen/logrus"
+	"github.com/robertkrimen/otto"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
+	"sync"
 	"time"
 )
 
-const (
-	SKILL_PATH = "data/skills"
+var (
+	SKILL_VM    = otto.New()
+	SKILL_PATH  = "data/skills"
+	skill_mutex = sync.Mutex{}
+)
 
+const (
 	_ = iota
 	TARGET_ANOTHER_RACE
 	TARGET_SAME_RACE
@@ -38,6 +44,7 @@ func NewSkillComponent() SkillComponent {
 }
 
 func (s *SkillComponent) AddSkill(name string) {
+	log.Println("addSkill", name)
 	skill, err := LoadSkillYaml(path.Join(SKILL_PATH, name+".yml"))
 	if err != nil {
 		log.Error("AddSkill ", err)
@@ -87,26 +94,24 @@ type Skill struct {
 
 	Animation int
 
-	OnTarget EffectList `yaml:"effects"`
+	OnTarget       string       `yaml:"effect"`
+	onTargetScript *otto.Script `json:"-"`
 
 	HPused int `yaml:"hp"`
 	MPused int `yaml:"mp"`
 	TPused int `yaml:"tp"`
 
 	UsableWith []string `yaml:"with"`
-
-	// stackoverflow? nowai
-	unmarshaled bool `json:"-"`
 }
 
-func LoadSkillYaml(fname string) (*Skill, error) {
+func LoadSkillYaml(fname string) (skill *Skill, err error) {
 	file, err := ioutil.ReadFile(fname)
 	if err != nil {
 		log.Error("LoadSkillYaml ", err)
 		return nil, err
 	}
 
-	skill := &Skill{}
+	skill = &Skill{}
 	err = yaml.Unmarshal(file, skill)
 	if err != nil {
 		log.Error("LoadSkillYaml ", err)
@@ -118,18 +123,32 @@ func LoadSkillYaml(fname string) (*Skill, error) {
 	return skill, err
 }
 
-func (s *Skill) Cast(target SkillTarget, lastCast time.Time) error {
-	if s.Target == 0 {
-		return SkillFailTarget
-	}
-
+func (s *Skill) Cast(target interface{}, lastCast time.Time) (err error) {
 	if time.Now().Sub(lastCast) < s.CastDealy {
 		return SkillFailCooldown
 	}
 
 	log.Println("Cast Skill", s)
 
-	s.OnTarget.ApplyTo(target)
+	skill_mutex.Lock()
+	defer skill_mutex.Unlock()
+	if s.onTargetScript == nil {
+		s.onTargetScript, err = SKILL_VM.Compile("", s.OnTarget)
+		if err != nil {
+			return
+		}
+	}
 
-	return nil
+	err = SKILL_VM.Set("target", target)
+	if err != nil {
+		return
+	}
+
+	//_, err = SKILL_VM.Run(s.OnTarget)
+	_, err = SKILL_VM.Run(s.onTargetScript)
+
+	// FIXME cbor not ignore unexporting tags
+	s.onTargetScript = nil
+
+	return
 }

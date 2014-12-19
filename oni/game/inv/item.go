@@ -3,6 +3,8 @@ package inv
 import (
 //"encoding/json"
 //log "github.com/Sirupsen/logrus"
+//"github.com/robertkrimen/otto"
+
 )
 
 const (
@@ -47,9 +49,6 @@ type Item struct {
 
 	Level  int
 	PLevel int
-
-	// stackoverflow? nowai
-	unmarshaled bool `json:"-"`
 }
 
 //func (item *Item) ApplyFeatures(r FeatureReceiver) { item.Features.Run(r) }

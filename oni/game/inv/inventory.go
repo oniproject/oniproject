@@ -20,14 +20,6 @@ type Slot struct {
 	Item   string
 	Locked bool
 }
-type DataInvPos struct {
-	X, Y int
-	Item *Item
-}
-type DataSlot struct {
-	Item   *Item
-	Locked bool
-}
 
 type InventoryComponent struct {
 	Inventory [][]string
@@ -51,33 +43,6 @@ func NewInventoryComponent(width, height int, slots []string) InventoryComponent
 
 func (inv *InventoryComponent) Height() int { return len(inv.Inventory) }
 func (inv *InventoryComponent) Width() int  { return len(inv.Inventory[0]) }
-
-func (inv *InventoryComponent) GetInventory() (items []DataInvPos) {
-	for y, line := range inv.Inventory {
-		for x, item := range line {
-			s := DataInvPos{x, y, nil}
-			i, err := ItemByName(item)
-			if err == nil {
-				s.Item = i
-			}
-			items = append(items, s)
-		}
-	}
-	return
-}
-
-func (inv *InventoryComponent) GetEquip() (equip map[string]DataSlot) {
-	equip = make(map[string]DataSlot)
-	for k, v := range inv.Equip {
-		s := DataSlot{Locked: v.Locked}
-		i, err := ItemByName(v.Item)
-		if err == nil {
-			s.Item = i
-		}
-		equip[k] = s
-	}
-	return
-}
 
 func (inv *InventoryComponent) GetItem(x, y int) (string, error) {
 	if x < 0 || x >= inv.Width() || y < 0 || y >= inv.Height() {
@@ -215,124 +180,3 @@ func (inv *InventoryComponent) UnequipItem(name string) (err error) {
 
 	return
 }
-
-/*
-func (sys *InventorySystem) getItem(e Entity, x, y int) (inv *InventoryComponent, name string, item Item, err error) {
-	inv = e.ComponentByType(INVENTORY).(*InventoryComponent)
-
-	if x >= inv.Width() || y >= inv.Height() {
-		err = InventoryBadPlace
-		return
-	}
-
-	name = inv.Inventory[y][x]
-	if name == "" {
-		err = ItemNotfound
-		return
-	}
-	item, err = sys.loadItem(name)
-
-	return
-}
-
-func (sys *InventorySystem) loadItem(name string) (item Item, err error) {
-	item, ok := sys.cacheOfItemsData[name]
-	if ok {
-		return
-	}
-
-	fname := path.Join(ITEM_PATH, name+".yml")
-
-	file, err := ioutil.ReadFile(fname)
-	if err != nil {
-		return
-	}
-
-	err = yaml.Unmarshal(file, &item)
-	if err != nil {
-		return
-	}
-
-	sys.cacheOfItemsData[name] = item
-
-	return
-}
-
-/*
-
-func (inv *InventoryComponent) AddItem(item *Item) { inv.Inventory = append(inv.Inventory, item) }
-func (inv *InventoryComponent) RemoveItem(index int) {
-	inv.Inventory = append(inv.Inventory[:index], inv.Inventory[index+1:]...)
-}
-
-func (inv *InventoryComponent) EquipItem(index int) error {
-	if index >= len(inv.Inventory) {
-		return ItemNotfound
-	}
-
-	item := inv.Inventory[index]
-
-	if item == nil {
-		return ItemIsNil
-	}
-
-	if item.Slot1 == "" && item.Slot2 == "" {
-		return ItemDontEquip
-	}
-
-	if item.Dual {
-		if slot, ok := inv.Equip[item.Slot1]; ok {
-			inv.AddItem(slot)
-		}
-		if slot, ok := inv.Equip[item.Slot2]; ok {
-			inv.AddItem(slot)
-		}
-		inv.Equip[item.Slot1] = item
-		inv.Equip[item.Slot2] = item
-	} else {
-		slot1, ok1 := inv.Equip[item.Slot1]
-		slot2, ok2 := inv.Equip[item.Slot2]
-		switch {
-		case ok1 && ok2:
-			inv.AddItem(slot1)
-			if slot1 != slot2 {
-				inv.AddItem(slot2)
-			}
-			inv.Equip[item.Slot1] = item
-			delete(inv.Equip, item.Slot2)
-		case ok1:
-			if item.Slot1 == "" {
-				return ItemFailSlot1
-			}
-			inv.AddItem(slot1)
-			inv.Equip[item.Slot1] = item
-		case ok2:
-			if item.Slot2 == "" {
-				return ItemFailSlot2
-			}
-			inv.AddItem(slot2)
-			inv.Equip[item.Slot2] = item
-		default:
-			inv.Equip[item.Slot1] = item
-		}
-	}
-
-	inv.RemoveItem(index)
-
-	return nil
-}
-
-func (inv *InventoryComponent) UnequipItem(slot string) error {
-	item, ok := inv.Equip[slot]
-	if !ok {
-		return ItemNotfound
-	}
-	if item.Dual {
-		delete(inv.Equip, item.Slot1)
-		delete(inv.Equip, item.Slot2)
-	} else {
-		delete(inv.Equip, slot)
-	}
-	inv.AddItem(item)
-	return nil
-}*/

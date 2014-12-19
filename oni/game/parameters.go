@@ -10,20 +10,20 @@ type Parameters struct {
 	DEF int // DEFense power
 }
 
-func (p *Parameters) HPbar() (int, int) { return p.HP, p.MHP }
-func (p *Parameters) MPbar() (int, int) { return p.MP, p.MMP }
-func (p *Parameters) TPbar() (int, int) { return p.TP, p.MTP }
+func (p *Parameters) HPbar() (int, int) { return int(p.HP), int(p.MHP) }
+func (p *Parameters) MPbar() (int, int) { return int(p.MP), int(p.MMP) }
+func (p *Parameters) TPbar() (int, int) { return int(p.TP), int(p.MTP) }
 
 // run it every second
 func (p *Parameters) Regeneration() {
-	p.RecoverHP(p.HRG)
-	p.RecoverMP(p.MRG)
-	p.RecoverTP(p.TRG)
+	p.RecoverHP(float64(p.HRG))
+	p.RecoverMP(float64(p.MRG))
+	p.RecoverTP(float64(p.TRG))
 }
 
 // for effects
-func (p *Parameters) RecoverHP(v int) {
-	p.HP += v
+func (p *Parameters) RecoverHP(v float64) {
+	p.HP += int(v)
 	if p.HP > p.MHP {
 		p.HP = p.MHP
 	}
@@ -31,8 +31,8 @@ func (p *Parameters) RecoverHP(v int) {
 		p.HP = 0
 	}
 }
-func (p *Parameters) RecoverMP(v int) {
-	p.MP += v
+func (p *Parameters) RecoverMP(v float64) {
+	p.MP += int(v)
 	if p.MP > p.MMP {
 		p.MP = p.MMP
 	}
@@ -40,8 +40,8 @@ func (p *Parameters) RecoverMP(v int) {
 		p.MP = 0
 	}
 }
-func (p *Parameters) RecoverTP(v int) {
-	p.TP += v
+func (p *Parameters) RecoverTP(v float64) {
+	p.TP += int(v)
 	if p.TP > p.MTP {
 		p.TP = p.MTP
 	}
@@ -51,5 +51,5 @@ func (p *Parameters) RecoverTP(v int) {
 }
 
 // for features
-func (p *Parameters) AddATK(v int) { p.ATK += v }
-func (p *Parameters) AddDEF(v int) { p.DEF += v }
+func (p *Parameters) AddATK(v float64) { p.ATK += int(v) }
+func (p *Parameters) AddDEF(v float64) { p.DEF += int(v) }

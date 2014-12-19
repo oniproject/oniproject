@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
 	. "oniproject/oni/game/inv"
@@ -27,31 +26,40 @@ type Message interface {
 	Run(MessageToMapInterface, interface{})
 }
 
-const (
-	_ = iota
-	// Client <-> Server only
-	M_SetVelocityMsg
-	M_SetTargetMsg
+var messages = utils.NewTypeIndexer()
 
-	M_CastMsg
-	M_DestroyMsg
+func init() {
+	m := []interface{}{
+		0, // pass
+		&SetVelocityMsg{},
+		&SetTargetMsg{},
 
-	M_DropItem
-	M_PickupItem
+		&CastMsg{},
+		&DestroyMsg{},
 
-	M_RequestInventory
-	M_Inventory
+		&DropItemMsg{},
+		&PickupItemMsg{},
 
-	M_TargetData
+		&RequestInventoryMsg{},
+		&InventoryMsg{},
 
-	M_RequestParameters
-	M_Parameters
+		&TargetDataMsg{},
 
-	M_Chat
-	M_ChatPost
+		&RequestParametersMsg{},
+		&ParametersMsg{},
 
-	M_Replica
-)
+		&ChatMsg{},
+		&ChatPostMsg{},
+
+		&ReplicaMsg{},
+	}
+	for id, obj := range m {
+		if id == 0 {
+			continue
+		}
+		messages.Register(uint(id), obj)
+	}
+}
 
 // to client
 func WrapMessage(message Message) interface{} {
@@ -59,54 +67,13 @@ func WrapMessage(message Message) interface{} {
 		T uint8
 		V interface{}
 	}
-	switch message.(type) {
-	case *SetVelocityMsg:
-		return &MessageWraper{M_SetVelocityMsg, message}
-	case *SetTargetMsg:
-		return &MessageWraper{M_SetTargetMsg, message}
-	case *CastMsg:
-		return &MessageWraper{M_CastMsg, message}
-	case *DestroyMsg:
-		return &MessageWraper{M_DestroyMsg, message}
-	case *InventoryMsg:
-		return &MessageWraper{M_Inventory, message}
-	case *TargetDataMsg:
-		return &MessageWraper{M_TargetData, message}
-	case *ParametersMsg:
-		return &MessageWraper{M_Parameters, message}
-	case *ChatMsg:
-		return &MessageWraper{M_Chat, message}
-	case *ReplicaMsg:
-		return &MessageWraper{M_Replica, message}
-	}
-	log.Warningf("fail type %T %v", message, message)
-	return message
+	id := uint8(messages.For(message))
+	return &MessageWraper{id, message}
 }
 
 // form client
 func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
-	var message Message
-	switch _type {
-	case M_SetVelocityMsg:
-		message = &SetVelocityMsg{}
-	case M_SetTargetMsg:
-		message = &SetTargetMsg{}
-	case M_CastMsg:
-		message = &CastMsg{}
-	case M_DropItem:
-		message = &DropItemMsg{}
-	case M_PickupItem:
-		message = &PickupItemMsg{}
-	case M_RequestInventory:
-		message = &RequestInventoryMsg{}
-	case M_RequestParameters:
-		message = &RequestParametersMsg{}
-	case M_ChatPost:
-		message = &ChatPostMsg{}
-	default:
-		log.Error("ParseMessage fail type ", _type)
-		return nil, errors.New("fail type")
-	}
+	message := messages.Create(uint(_type)).(Message)
 
 	var md mapstructure.Metadata
 	config := &mapstructure.DecoderConfig{
@@ -218,7 +185,7 @@ func (m *CastMsg) Run(s MessageToMapInterface, obj interface{}) {
 		log.Error("cast FAIL: fail target type [TARGET_SELF] ", m)
 		return
 	case target.Race() == 0 && skill.Target&TARGET_MONSTER == 0:
-		log.Error("cast FAIL: fail target type [TARGET_MONSTER] ", m)
+		log.Error("cast FAIL: fail target type [TARGET_MONSTER] ", m, skill.Target, TARGET_MONSTER)
 		return
 	}
 
@@ -227,11 +194,11 @@ func (m *CastMsg) Run(s MessageToMapInterface, obj interface{}) {
 		return
 	}
 
-	caster.RecoverHP(-skill.HPused)
-	caster.RecoverMP(-skill.MPused)
-	caster.RecoverTP(-skill.TPused)
+	caster.RecoverHP(float64(-skill.HPused))
+	caster.RecoverMP(float64(-skill.MPused))
+	caster.RecoverTP(float64(-skill.TPused))
 
-	caster.sendMessage <- &ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills}
+	//caster.sendMessage <- &ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills}
 
 	if hp, _ := target.HPbar(); hp == 0 {
 		switch t := target.(type) {
@@ -297,7 +264,7 @@ func (m *DropItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 	pos := a.Position()
 	s.DropItem(pos.X, pos.Y, name)
 
-	a.sendMessage <- &InventoryMsg{Inventory: a.GetInventory(), Equip: a.GetEquip()}
+	SendInventory(a)
 }
 
 type PickupItemMsg struct {
@@ -311,7 +278,8 @@ func (m *PickupItemMsg) Run(s MessageToMapInterface, obj interface{}) {
 			err := a.AddItem(item.Item, 0, 0)
 			if err == nil {
 				s.Unregister(obj)
-				a.sendMessage <- &InventoryMsg{Inventory: a.GetInventory(), Equip: a.GetEquip()}
+
+				SendInventory(a)
 				return
 			}
 		}
@@ -326,7 +294,7 @@ type RequestInventoryMsg struct{}
 func (m *RequestInventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 	a := obj.(*Avatar)
 	log.Debugf("RequestInventoryMsg %v %v", a.Inventory, a.Equip)
-	a.sendMessage <- &InventoryMsg{Inventory: a.GetInventory(), Equip: a.GetEquip()}
+	SendInventory(a)
 }
 
 type InventoryMsg struct {
@@ -336,6 +304,41 @@ type InventoryMsg struct {
 
 func (m *InventoryMsg) Run(s MessageToMapInterface, obj interface{}) {
 	log.Panic("InventoryMsg Run")
+}
+
+type DataInvPos struct {
+	X, Y int
+	Item *Item
+}
+type DataSlot struct {
+	Item   *Item
+	Locked bool
+}
+
+func SendInventory(avatar *Avatar) {
+	items := []DataInvPos{}
+	for y, line := range avatar.Inventory {
+		for x, item := range line {
+			s := DataInvPos{x, y, nil}
+			i, err := ItemByName(item)
+			if err == nil {
+				s.Item = i
+			}
+			items = append(items, s)
+		}
+	}
+
+	equip := make(map[string]DataSlot)
+	for k, v := range avatar.Equip {
+		s := DataSlot{Locked: v.Locked}
+		i, err := ItemByName(v.Item)
+		if err == nil {
+			s.Item = i
+		}
+		equip[k] = s
+	}
+
+	avatar.sendMessage <- &InventoryMsg{items, equip}
 }
 
 type TargetDataMsg struct {

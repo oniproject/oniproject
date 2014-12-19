@@ -43,7 +43,7 @@ func (indexer *TypeIndexer) RegisterT(id uint, t reflect.Type) {
 
 func (indexer *TypeIndexer) Create(id uint) interface{} {
 	t := indexer.typeById[id]
-	return reflect.New(t).Interface()
+	return reflect.New(t.Elem()).Interface()
 }
 
 func (indexer *TypeIndexer) Test(obj interface{}) bool {

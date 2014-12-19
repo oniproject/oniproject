@@ -1,17 +1,18 @@
 package game
 
-import (
+/*import (
 	"strconv"
 	"strings"
-)
+)*/
 
 type FeatureReceiver interface {
-	AddATK(int)
-	AddDEF(int)
+	AddATK(float64)
+	AddDEF(float64)
 	AddSkill(string)
 	SealSkill(string)
 }
 
+/*
 type FeatureList []Feature
 
 func (list FeatureList) Run(r FeatureReceiver) {
@@ -37,4 +38,4 @@ func (f Feature) Run(r FeatureReceiver) {
 		r.SealSkill(args[1])
 	}
 	return
-}
+}*/

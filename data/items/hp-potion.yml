@@ -1,5 +1,9 @@
 name: HP potion +100
 type: potion
+
+use:
+    target.RecoverHP(100)
+
 #use:
 #    - skill _hp
 #    - hp +100

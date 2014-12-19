@@ -15,6 +15,8 @@ var items = []string{
 func Test_Inventory(t *testing.T) {
 	ITEM_PATH = "../" + ITEM_PATH
 
+	WipeCache()
+
 	hauberk := "hauberk"
 	bow := "bow"
 	inv := NewInventoryComponent(2, 2, []string{"left", "right", "body"})
@@ -82,17 +84,6 @@ func Test_Inventory(t *testing.T) {
 			"right": {},
 		})
 	})
-	/*
-		Convey("RemoveItem", t, func() {
-			item, err := sys.RemoveItem(e, 0, 0)
-			So(err, ShouldBeNil)
-			So(c.Inventory, ShouldResemble, [][]string{
-				{"", ""},
-				{"", ""},
-			})
-			Println(item)
-		})
-	*/
 
 	// TODO ApplyFeatures
 }

@@ -1,4 +1,4 @@
 name: Defence buff
 timing: 8000
-features:
-    - def +10
+features: |
+    target.AddDEF(+10)

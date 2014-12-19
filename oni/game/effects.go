@@ -1,18 +1,19 @@
 package game
 
 import (
-	"strconv"
-	"strings"
+//	"strconv"
+//	"strings"
 )
 
 type EffectReceiver interface {
-	RecoverHP(int)
-	RecoverMP(int)
-	RecoverTP(int)
+	RecoverHP(float64)
+	RecoverMP(float64)
+	RecoverTP(float64)
 	AddState(string)
 	RemoveState(string)
 }
 
+/*
 type EffectList []Effect
 
 func (list EffectList) ApplyTo(r EffectReceiver) {
@@ -40,4 +41,4 @@ func (e Effect) ApplyTo(r EffectReceiver) {
 		r.RemoveState(args[1])
 	}
 	return
-}
+}*/

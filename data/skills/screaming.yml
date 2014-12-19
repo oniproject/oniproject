@@ -1,8 +1,8 @@
 name: Screaming
 icon: screaming
 cast-dealy: 2000 # Millisecond
-target: 4 # to monster
+target: 3 # to monster
 mp: 3
-effects:
-    - hp -8
-    # TODO agressive in AI
+effect: |
+    target.RecoverHP(-8);
+    // TODO agressive in AI

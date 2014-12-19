@@ -37,7 +37,7 @@ func (_mr *_MockEffectReceiverRecorder) AddState(arg0 interface{}) *gomock.Call 
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "AddState", arg0)
 }
 
-func (_m *MockEffectReceiver) RecoverHP(_param0 int) {
+func (_m *MockEffectReceiver) RecoverHP(_param0 float64) {
 	_m.ctrl.Call(_m, "RecoverHP", _param0)
 }
 
@@ -45,7 +45,7 @@ func (_mr *_MockEffectReceiverRecorder) RecoverHP(arg0 interface{}) *gomock.Call
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RecoverHP", arg0)
 }
 
-func (_m *MockEffectReceiver) RecoverMP(_param0 int) {
+func (_m *MockEffectReceiver) RecoverMP(_param0 float64) {
 	_m.ctrl.Call(_m, "RecoverMP", _param0)
 }
 
@@ -53,7 +53,7 @@ func (_mr *_MockEffectReceiverRecorder) RecoverMP(arg0 interface{}) *gomock.Call
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RecoverMP", arg0)
 }
 
-func (_m *MockEffectReceiver) RecoverTP(_param0 int) {
+func (_m *MockEffectReceiver) RecoverTP(_param0 float64) {
 	_m.ctrl.Call(_m, "RecoverTP", _param0)
 }
 
@@ -90,7 +90,7 @@ func (_m *MockFeatureReceiver) EXPECT() *_MockFeatureReceiverRecorder {
 	return _m.recorder
 }
 
-func (_m *MockFeatureReceiver) AddATK(_param0 int) {
+func (_m *MockFeatureReceiver) AddATK(_param0 float64) {
 	_m.ctrl.Call(_m, "AddATK", _param0)
 }
 
@@ -98,7 +98,7 @@ func (_mr *_MockFeatureReceiverRecorder) AddATK(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "AddATK", arg0)
 }
 
-func (_m *MockFeatureReceiver) AddDEF(_param0 int) {
+func (_m *MockFeatureReceiver) AddDEF(_param0 float64) {
 	_m.ctrl.Call(_m, "AddDEF", _param0)
 }
 
@@ -161,7 +161,7 @@ func (_mr *_MockSkillTargetRecorder) Race() *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Race")
 }
 
-func (_m *MockSkillTarget) RecoverHP(_param0 int) {
+func (_m *MockSkillTarget) RecoverHP(_param0 float64) {
 	_m.ctrl.Call(_m, "RecoverHP", _param0)
 }
 
@@ -169,7 +169,7 @@ func (_mr *_MockSkillTargetRecorder) RecoverHP(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RecoverHP", arg0)
 }
 
-func (_m *MockSkillTarget) RecoverMP(_param0 int) {
+func (_m *MockSkillTarget) RecoverMP(_param0 float64) {
 	_m.ctrl.Call(_m, "RecoverMP", _param0)
 }
 
@@ -177,7 +177,7 @@ func (_mr *_MockSkillTargetRecorder) RecoverMP(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "RecoverMP", arg0)
 }
 
-func (_m *MockSkillTarget) RecoverTP(_param0 int) {
+func (_m *MockSkillTarget) RecoverTP(_param0 float64) {
 	_m.ctrl.Call(_m, "RecoverTP", _param0)
 }
 

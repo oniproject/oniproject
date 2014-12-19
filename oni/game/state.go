@@ -2,13 +2,19 @@ package game
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/robertkrimen/otto"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
+	"sync"
 	"time"
 )
 
-const STATE_PATH = "data/states"
+var (
+	STATE_PATH  = "data/states"
+	STATE_VM    = otto.New()
+	state_mutex = sync.Mutex{}
+)
 
 type StateComponent struct {
 	States map[string]*State
@@ -45,7 +51,8 @@ type State struct {
 
 	AutoRemovalTiming time.Duration `yaml:"timing"`
 
-	Features FeatureList
+	//Features FeatureList
+	Features string
 	//features FeatureList `db:"-"`
 }
 
@@ -69,7 +76,22 @@ func LoadStateYaml(fname string) (*State, error) {
 	return state, err
 }
 
-func (s *State) ApplyFeatures(r FeatureReceiver) { s.Features.Run(r) }
+func (s *State) ApplyFeatures(r FeatureReceiver) {
+	//s.Features.Run(r)
+
+	state_mutex.Lock()
+	defer state_mutex.Unlock()
+
+	err := STATE_VM.Set("target", r)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = STATE_VM.Run(s.Features)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func (s *State) CheckAutoRemoval(add_time, now time.Time) bool {
 	if s.AutoRemovalTiming == 0 {
