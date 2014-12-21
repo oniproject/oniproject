@@ -687,6 +687,16 @@ function Game(renderer, stage) {
 	this.avatars = {};
 
 	var net = this.net = new Net();
+
+	net.on('close', (function() {
+		if (this.map) {
+			this.container.removeChild(this.map);
+			// TODO remove all avatars
+			for (var k in this.avatars) {
+				this.destroyAvatar(k);
+			}
+		}
+	}).bind(this));
 	net.on('message', this.onmessage.bind(this));
 	//net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
@@ -694,8 +704,51 @@ function Game(renderer, stage) {
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 
+	net.on('AddMsg', (function(value) {
+		this.createAvatar(value);
+		var avatar = this.avatars[value.Id];
+		avatar.visible = 1;
+		avatar.addState(value);
+		console.log('add', value);
+	}).bind(this));
+
+	net.on('RemoveMsg', (function(value) {
+		this.destroyAvatar(value.Id);
+		console.log('rm', value);
+	}).bind(this));
+
+	net.on('UpdateMsg', (function(value) {
+		this.avatars[value.Id].addState(value);
+		//console.log('upd', value);
+	}).bind(this));
+
+
 	net.on('ReplicaMsg', (function(value) {
 		var tick = value.Tick;
+
+		for (var i = 0, l = value.Added.length; i < l; i++) {
+			var msg = value.Added[i];
+			this.createAvatar(msg);
+			var avatar = this.avatars[msg.Id];
+			avatar.visible = 1;
+			avatar.addState(msg);
+		}
+
+		for (var i = 0, l = value.Removed.length; i < l; i++) {
+			var id = value.Removed[i];
+			this.destroyAvatar(id);
+		}
+
+		for (var i = 0, l = value.Updated.length; i < l; i++) {
+			var msg = value.Updated[i];
+			this.avatars[msg.Id].addState(msg);
+		}
+		console.log('replica');
+
+
+
+
+		/*
 		var states = value.States;
 
 		var states_hash = {};
@@ -721,6 +774,7 @@ function Game(renderer, stage) {
 				avatar.rm_timer = setTimeout(this.destroyAvatar.bind(this, k), 3000);
 			}
 		}
+		*/
 	}).bind(this));
 }
 
@@ -1059,6 +1113,10 @@ GameObject.prototype.addState = function(state) {
 			break;
 	}
 
+	if (state.hasOwnProperty('Name')) {
+		this.name = state.Name;
+	}
+
 	this.state = state;
 };
 
@@ -1183,6 +1241,9 @@ var M_SetVelocityMsg = 1,
 	M_Chat = 12,
 	M_ChatPost = 13,
 	M_Replica = 14,
+	M_Add = 15,
+	M_Remove = 16,
+	M_Update = 17,
 	___ = 0;
 
 function Net(url) {
@@ -1271,6 +1332,16 @@ Net.prototype._ParseMessages = function(type, value, event) {
 			break;
 		case M_Replica:
 			this.emit('ReplicaMsg', value);
+			break;
+
+		case M_Add:
+			this.emit('AddMsg', value);
+			break;
+		case M_Remove:
+			this.emit('RemoveMsg', value);
+			break;
+		case M_Update:
+			this.emit('UpdateMsg', value);
 			break;
 		default:
 			this.emit('event', type, value, event);
@@ -3504,7 +3575,7 @@ var updateTransform = function() {
 module.exports = Tileset;
 
 },{}],"/home/lain/gocode/src/oniproject/public/animations.json":[function(require,module,exports){
-module.exports=module.exports={"idle":{"directions":{"↖":[{"name":"suika walk ↖ 1","t":0,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 1","t":0,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 1","t":0,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 1","t":0,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 1","t":0,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 1","t":0,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 1","t":0,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 1","t":0,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"walk":{"directions":{"↖":[{"name":"suika walk ↖ 0","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 2","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 0","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 2","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 0","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 2","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 0","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 2","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 0","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 2","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 0","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 2","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 0","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 2","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 0","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 2","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"boom":{"directions":{"↖":[{"name":"suika boom ↖ 0","t":300,"x":-44,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 1","t":100,"x":-52,"y":-98,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 2","t":400,"x":-50,"y":-98,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika boom ↑ 0","t":300,"x":-40,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 1","t":100,"x":-40,"y":-100,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 2","t":400,"x":-42,"y":-96,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika boom ↗ 0","t":300,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 1","t":100,"x":-36,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 2","t":400,"x":-34,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika boom ← 0","t":300,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 1","t":100,"x":-82,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 2","t":400,"x":-70,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika boom → 0","t":300,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 2","t":400,"x":-18,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika boom ↙ 0","t":300,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 1","t":100,"x":-50,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 2","t":400,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika boom ↓ 0","t":300,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 1","t":100,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 2","t":400,"x":-40,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika boom ↘ 0","t":300,"x":-44,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 2","t":400,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0}]}},"death":{"directions":{"↖":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}]}}}
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"idle":{"directions":{"↖":[{"name":"suika walk ↖ 1","t":0,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 1","t":0,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 1","t":0,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 1","t":0,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 1","t":0,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 1","t":0,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 1","t":0,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 1","t":0,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"walk":{"directions":{"↖":[{"name":"suika walk ↖ 0","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 2","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 0","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 2","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 0","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 2","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 0","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 2","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 0","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 2","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 0","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 2","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 0","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 2","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 0","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 2","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"boom":{"directions":{"↖":[{"name":"suika boom ↖ 0","t":300,"x":-44,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 1","t":100,"x":-52,"y":-98,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 2","t":400,"x":-50,"y":-98,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika boom ↑ 0","t":300,"x":-40,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 1","t":100,"x":-40,"y":-100,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 2","t":400,"x":-42,"y":-96,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika boom ↗ 0","t":300,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 1","t":100,"x":-36,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 2","t":400,"x":-34,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika boom ← 0","t":300,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 1","t":100,"x":-82,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 2","t":400,"x":-70,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika boom → 0","t":300,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 2","t":400,"x":-18,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika boom ↙ 0","t":300,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 1","t":100,"x":-50,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 2","t":400,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika boom ↓ 0","t":300,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 1","t":100,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 2","t":400,"x":-40,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika boom ↘ 0","t":300,"x":-44,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 2","t":400,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0}]}},"death":{"directions":{"↖":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}]}}}
 
 },{}]},{},["./js/main.js"])
 

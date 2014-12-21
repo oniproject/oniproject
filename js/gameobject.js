@@ -129,6 +129,10 @@ GameObject.prototype.addState = function(state) {
 			break;
 	}
 
+	if (state.hasOwnProperty('Name')) {
+		this.name = state.Name;
+	}
+
 	this.state = state;
 };
 

@@ -3,9 +3,11 @@ package game
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
+	"github.com/oniproject/geom"
 	. "oniproject/oni/game/inv"
 	"oniproject/oni/utils"
 	"strings"
+	"time"
 )
 
 type Sender interface {
@@ -52,6 +54,9 @@ func init() {
 		&ChatPostMsg{},
 
 		&ReplicaMsg{},
+		//&AddMsg{},
+		//&RemoveMsg{},
+		//&UpdateMsg{},
 	}
 	for id, obj := range m {
 		if id == 0 {
@@ -401,10 +406,77 @@ func (m *ChatPostMsg) Run(s MessageToMapInterface, obj interface{}) {
 }
 
 type ReplicaMsg struct {
-	Tick   uint
-	States []*GameObjectState
+	Tick    uint
+	Added   []*AddMsg
+	Removed []utils.Id
+	Updated []*UpdateMsg
 }
 
-func (m *ReplicaMsg) Run(s MessageToMapInterface, obj interface{}) {
-	log.Panic("ReplicaMsg Run")
+func (m *ReplicaMsg) ADD(obj GameObject) {
+	msg := &AddMsg{
+		//Tick:     r.tick,
+		Type:     STATE_IDLE,
+		Name:     obj.Name(),
+		Id:       obj.Id(),
+		Lag:      obj.Lag(),
+		Position: obj.Position(),
+		Velocity: obj.Velocity(),
+	}
+	if msg.Velocity.X != 0 || msg.Velocity.Y != 0 {
+		msg.Type = STATE_MOVE
+	}
+	msg.HP, msg.MHP = obj.HPbar()
+	m.Added = append(m.Added, msg)
 }
+
+func (m *ReplicaMsg) RM(obj GameObject) {
+	m.Removed = append(m.Removed, obj.Id())
+}
+func (m *ReplicaMsg) UPD(obj GameObject) {
+	msg := &UpdateMsg{
+		Type:     STATE_IDLE,
+		Id:       obj.Id(),
+		Lag:      obj.Lag(),
+		Position: obj.Position(),
+		Velocity: obj.Velocity(),
+	}
+	if msg.Velocity.X != 0 || msg.Velocity.Y != 0 {
+		msg.Type = STATE_MOVE
+	}
+	msg.HP, msg.MHP = obj.HPbar()
+	m.Updated = append(m.Updated, msg)
+}
+
+type AddMsg struct {
+	//Tick     uint
+	Type     uint8
+	Name     string
+	Id       utils.Id
+	Lag      time.Duration
+	Position geom.Coord
+	Velocity geom.Coord
+	HP, MHP  int
+	// TODO
+}
+
+//type RemoveMsg struct {
+//Tick uint
+//Id   utils.Id
+//}
+
+type UpdateMsg struct {
+	//Tick     uint
+	Type     uint8
+	Id       utils.Id
+	Lag      time.Duration
+	Position geom.Coord
+	Velocity geom.Coord
+	HP, MHP  int
+	// TODO
+}
+
+func (m *ReplicaMsg) Run(MessageToMapInterface, interface{}) { log.Panic("run") }
+
+//func (m *AddMsg) Run(MessageToMapInterface, interface{})     { log.Panic("run") }
+//func (m *RemoveMsg) Run(MessageToMapInterface, interface{})  { log.Panic("run") }
+//func (m *UpdateMsg) Run(MessageToMapInterface, interface{})  { log.Panic("run") }

@@ -22,13 +22,16 @@ type DroppedItem struct {
 	id utils.Id
 }
 
-func NewDroppedItem(x, y float64, item string) *DroppedItem {
+func NewDroppedItem(x, y float64, item string) (ii *DroppedItem) {
 	i, _ := ItemByName(item)
-	return &DroppedItem{
+	ii = &DroppedItem{
 		PositionComponent: NewPositionComponent(x, y),
 		Item:              item,
 		name:              i.Name,
 	}
+	// XXX set pos == lastpos
+	ii.lastpos = ii.position
+	return
 }
 
 func (item DroppedItem) Name() string       { return item.name }

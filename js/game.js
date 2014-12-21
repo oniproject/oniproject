@@ -67,6 +67,16 @@ function Game(renderer, stage) {
 	this.avatars = {};
 
 	var net = this.net = new Net();
+
+	net.on('close', (function() {
+		if (this.map) {
+			this.container.removeChild(this.map);
+			// TODO remove all avatars
+			for (var k in this.avatars) {
+				this.destroyAvatar(k);
+			}
+		}
+	}).bind(this));
 	net.on('message', this.onmessage.bind(this));
 	//net.on('close', alert.bind(null, 'close WS'));
 	net.on('event', this.onevent.bind(this));
@@ -74,8 +84,51 @@ function Game(renderer, stage) {
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 
+	net.on('AddMsg', (function(value) {
+		this.createAvatar(value);
+		var avatar = this.avatars[value.Id];
+		avatar.visible = 1;
+		avatar.addState(value);
+		console.log('add', value);
+	}).bind(this));
+
+	net.on('RemoveMsg', (function(value) {
+		this.destroyAvatar(value.Id);
+		console.log('rm', value);
+	}).bind(this));
+
+	net.on('UpdateMsg', (function(value) {
+		this.avatars[value.Id].addState(value);
+		//console.log('upd', value);
+	}).bind(this));
+
+
 	net.on('ReplicaMsg', (function(value) {
 		var tick = value.Tick;
+
+		for (var i = 0, l = value.Added.length; i < l; i++) {
+			var msg = value.Added[i];
+			this.createAvatar(msg);
+			var avatar = this.avatars[msg.Id];
+			avatar.visible = 1;
+			avatar.addState(msg);
+		}
+
+		for (var i = 0, l = value.Removed.length; i < l; i++) {
+			var id = value.Removed[i];
+			this.destroyAvatar(id);
+		}
+
+		for (var i = 0, l = value.Updated.length; i < l; i++) {
+			var msg = value.Updated[i];
+			this.avatars[msg.Id].addState(msg);
+		}
+		console.log('replica');
+
+
+
+
+		/*
 		var states = value.States;
 
 		var states_hash = {};
@@ -101,6 +154,7 @@ function Game(renderer, stage) {
 				avatar.rm_timer = setTimeout(this.destroyAvatar.bind(this, k), 3000);
 			}
 		}
+		*/
 	}).bind(this));
 }
 

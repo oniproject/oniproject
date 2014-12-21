@@ -46,6 +46,8 @@ type Map struct {
 	game                 *Game
 	lastLocalId          int64
 	tmxMap               tmx.Map
+
+	*Replicator
 }
 
 func NewMap(game *Game, name string) *Map {
@@ -79,6 +81,7 @@ func NewMap(game *Game, name string) *Map {
 		game:        game,
 		lastLocalId: -4,
 		tmxMap:      tmxMap,
+		Replicator:  NewReplicator(ReplicRange, float64(tmxMap.Width), float64(tmxMap.Height)),
 	}
 }
 
@@ -99,17 +102,6 @@ func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 	return gm.objects[id]
 }
 
-func (gm *Map) ObjectsAround(center geom.Coord, r float64, exclude func(GameObject) bool) []GameObject {
-	objects := []GameObject{}
-	for _, obj := range gm.objects {
-		d := center.DistanceFrom(obj.Position())
-		if d <= r && !exclude(obj) {
-			objects = append(objects, obj)
-		}
-	}
-	return objects
-}
-
 func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
 	c.PositionComponent = NewPositionComponent(c.X, c.Y)
 	m.register <- c
@@ -120,6 +112,7 @@ func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
 func (m *Map) SpawnMonster(x, y float64) {
 	monster := NewMonster()
 	monster.SetPosition(x, y)
+	monster.MonsterType = "Bat"
 	m.lastLocalId--
 	monster.id = utils.NewId(m.lastLocalId)
 	monster.HP, monster.MHP, monster.HRG = 20, 20, 1
@@ -151,6 +144,8 @@ func (gm *Map) Run() {
 		}()
 		close(avatar.sendMessage)
 	}
+
+	//noFilter := func(GameObject) bool { return false }
 
 	x, y := 20, 15
 	for i := 0; i < 4; i++ {
@@ -194,15 +189,18 @@ func (gm *Map) Run() {
 			gm.tick++
 
 			// update position
-			updated := map[utils.Id]bool{}
-			for id, obj := range gm.objects {
+			// pos is oldPos
+			var updated []GameObject
+			for _, obj := range gm.objects {
 				if ok := obj.Update(gm, gm.tick, TickRate); ok {
-					updated[id] = true
+					updated = append(updated, obj)
+					gm.tree.Remove(obj)
+					gm.tree.Insert(obj)
 				}
 			}
 
 			// XXX teleports
-			for _, obj := range gm.objects {
+			for _, obj := range updated {
 				if a, ok := obj.(*Avatar); ok {
 					pos := a.Position()
 					layer := gm.tmxMap.LayerByName("TELEPORTS", "objectgroup")
@@ -223,56 +221,23 @@ func (gm *Map) Run() {
 				}
 			}
 
-			// send states to obj
-
-			for _, a := range gm.objects {
-				if avatar, ok := a.(*Avatar); ok {
-					around := gm.ObjectsAround(
-						avatar.Position(), ReplicRange, func(GameObject) bool { return false })
-
-					msg := &ReplicaMsg{gm.tick, []*GameObjectState{}}
-					for _, obj := range around {
-						hp, mhp := obj.HPbar()
-						state := &GameObjectState{
-							STATE_IDLE, obj.Id(), obj.Lag(),
-							obj.Position(), obj.Velocity(),
-							hp, mhp}
-
-						if updated[obj.Id()] {
-							state.Type = STATE_MOVE
-						}
-						msg.States = append(msg.States, state)
-					}
-
-					send(avatar, msg)
-				}
+			for _, obj := range updated {
+				gm.Replicator.Update(obj)
 			}
-
-			/*for id, obj := range gm.objects {
-
-				pos := obj.Position()
-				around := gm.ObjectsAround(pos, ReplicRange, avatarFilter)
-
-				for _, a := range around {
-					avatar := a.(*Avatar)
-					send(avatar, gm.tick)
-					send(avatar, state)
-				}
-			}*/
+			gm.Replicator.Process()
 
 		// create/destroy GameObject's
 		case obj := <-gm.register:
-			/*if c, ok := obj.(*Avatar); ok {
-				send(c, gm.tick)
-			}*/
 			gm.objects[obj.Id()] = obj
-			log.Debug("register", obj.Id(), obj)
+			gm.Replicator.Add(obj)
+			log.Info("register", obj.Id(), obj.Position())
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
 			if avatar, ok := obj.(*Avatar); ok {
 				closeChan(avatar)
 				gm.game.adb.SaveAvatar(avatar)
 			}
+			gm.Replicator.Remove(obj)
 			log.Debug("unregister", obj)
 
 		// message system

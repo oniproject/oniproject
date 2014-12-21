@@ -29,6 +29,7 @@ type GameObjectState struct {
 type GameObject interface {
 	Update(w Walkabler, tick uint, t time.Duration) bool
 	Position() geom.Coord
+	LastPosition() geom.Coord
 	Velocity() geom.Coord
 	Lag() time.Duration
 	Id() utils.Id
@@ -45,6 +46,7 @@ type GameObject interface {
 
 type PositionComponent struct {
 	position geom.Coord
+	lastpos  geom.Coord
 	velocity geom.Coord
 	lastvel  geom.Coord
 }
@@ -54,6 +56,7 @@ func NewPositionComponent(x, y float64) PositionComponent {
 }
 
 func (c *PositionComponent) Position() geom.Coord     { return c.position }
+func (c *PositionComponent) LastPosition() geom.Coord { return c.lastpos }
 func (c *PositionComponent) Velocity() geom.Coord     { return c.velocity }
 func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{X: x, Y: y} }
 func (c *PositionComponent) SetVelocity(x, y float64) {
@@ -62,6 +65,8 @@ func (c *PositionComponent) SetVelocity(x, y float64) {
 }
 
 func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
+	c.lastpos = c.position
+
 	if c.velocity.X != 0 || c.velocity.Y != 0 {
 		delta := c.velocity.Times(t.Seconds())
 		pos := c.position.Plus(delta)
