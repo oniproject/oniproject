@@ -189,7 +189,6 @@ func (gm *Map) Run() {
 			gm.tick++
 
 			// update position
-			// pos is oldPos
 			var updated []GameObject
 			for _, obj := range gm.objects {
 				if ok := obj.Update(gm, gm.tick, TickRate); ok {

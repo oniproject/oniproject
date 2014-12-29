@@ -2,7 +2,6 @@ package game
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/mitchellh/mapstructure"
 	"github.com/oniproject/geom"
 	. "oniproject/oni/game/inv"
 	"oniproject/oni/utils"
@@ -27,8 +26,6 @@ type MessageToMapInterface interface {
 type Message interface {
 	Run(MessageToMapInterface, interface{})
 }
-
-var messages = utils.NewTypeIndexer()
 
 func init() {
 	m := []interface{}{
@@ -64,46 +61,6 @@ func init() {
 		}
 		messages.Register(uint(id), obj)
 	}
-}
-
-// to client
-func WrapMessage(message Message) interface{} {
-	type MessageWraper struct {
-		T uint8
-		V interface{}
-	}
-	id := uint8(messages.For(message))
-	return &MessageWraper{id, message}
-}
-
-// form client
-func ParseMessage(_type uint8, value map[string]interface{}) (Message, error) {
-	message := messages.Create(uint(_type)).(Message)
-
-	var md mapstructure.Metadata
-	config := &mapstructure.DecoderConfig{
-		Metadata:         &md,
-		WeaklyTypedInput: true,
-		Result:           message,
-	}
-	decoder, err := mapstructure.NewDecoder(config)
-	if err != nil {
-		log.Error("ParseMessage mapstructure ", err)
-		return nil, err
-	}
-
-	// init message form value
-	if err := decoder.Decode(value); err != nil {
-		log.Error("ParseMessage decode ", err)
-		return nil, err
-	}
-
-	// XXX debug
-	if len(md.Unused) != 0 {
-		log.Warn("have unused", md.Unused, value)
-	}
-
-	return message, nil
 }
 
 type SetVelocityMsg struct {
@@ -480,3 +437,12 @@ func (m *ReplicaMsg) Run(MessageToMapInterface, interface{}) { log.Panic("run") 
 //func (m *AddMsg) Run(MessageToMapInterface, interface{})     { log.Panic("run") }
 //func (m *RemoveMsg) Run(MessageToMapInterface, interface{})  { log.Panic("run") }
 //func (m *UpdateMsg) Run(MessageToMapInterface, interface{})  { log.Panic("run") }
+
+// TODO TODO TODO
+type DamageMsg struct {
+	Tick uint
+	Id   utils.Id
+	Text string // why string? How about MISS or BLOCK?
+}
+
+func (m *DamageMsg) Run(MessageToMapInterface, interface{}) { log.Panic("run") }
