@@ -1,8 +1,6 @@
 package game
 
 import (
-	"bytes"
-	"code.google.com/p/cbor/go"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -51,28 +49,18 @@ func (c *Connection) readPump(game ConnToMapInterface, avatar GameObject) {
 		return nil
 	})
 
-Loop:
 	for {
 		op, message, err := c.ws.ReadMessage()
 		if err != nil {
 			break
 		}
-		// TODO parse move message
 
 		switch op {
 		case websocket.TextMessage:
+			// pass
 		case websocket.BinaryMessage:
-			var val struct {
-				T uint8
-				V map[string]interface{}
-			}
-
-			buf := bytes.NewBuffer(message)
-			if err := cbor.NewDecoder(buf).Decode(&val); err != nil {
-				log.Error(err)
-				continue Loop
-			}
-			if m, err := ParseMessage(val.T, val.V); err == nil {
+			m, err := CurrentProtocol.DecodeMessage(message)
+			if err == nil {
 				game.Send(avatar.Id(), m)
 			} else {
 				log.Error(err)
@@ -115,14 +103,13 @@ func (c *Connection) writePump() {
 				return
 			}
 
-			buf := bytes.NewBuffer([]byte{})
-			encoder := cbor.NewEncoder(buf)
-			if err := encoder.Encode(WrapMessage(message)); err != nil {
-				log.Error("cbor encode: ", err)
+			b, err := CurrentProtocol.EncodeMessage(message)
+			if err != nil {
+				log.Error("wrap msg: ", err)
 				return
 			}
-
-			if err := c.write(websocket.BinaryMessage, buf.Bytes()); err != nil {
+			err = c.write(websocket.BinaryMessage, b)
+			if err != nil {
 				return
 			}
 		case <-ticker.C:
