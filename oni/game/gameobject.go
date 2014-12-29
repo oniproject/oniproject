@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/oniproject/geom"
+	"math"
 	"oniproject/oni/utils"
 	"time"
 )
@@ -15,6 +16,21 @@ const (
 
 type Walkabler interface {
 	Walkable(geom.Coord) bool
+}
+
+type EffectReceiver interface {
+	RecoverHP(float64)
+	RecoverMP(float64)
+	RecoverTP(float64)
+	AddState(string)
+	RemoveState(string)
+}
+
+type FeatureReceiver interface {
+	AddATK(float64)
+	AddDEF(float64)
+	AddSkill(string)
+	SealSkill(string)
 }
 
 type GameObjectState struct {
@@ -61,7 +77,14 @@ func (c *PositionComponent) Velocity() geom.Coord     { return c.velocity }
 func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{X: x, Y: y} }
 func (c *PositionComponent) SetVelocity(x, y float64) {
 	coord := geom.Coord{X: x, Y: y}
-	c.velocity = coord.Unit()
+	coord = coord.Unit()
+	if math.IsNaN(coord.X) {
+		coord.X = 0
+	}
+	if math.IsNaN(coord.Y) {
+		coord.Y = 0
+	}
+	c.velocity = coord
 }
 
 func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
@@ -77,7 +100,7 @@ func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
 			c.position = pos
 			return true
 		}
-		return false
+		//return false
 	}
 
 	if c.lastvel.X != 0 || c.lastvel.Y != 0 {
