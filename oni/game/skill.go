@@ -72,9 +72,6 @@ func (s *SkillComponent) Cast(name string, target SkillTarget) error {
 }
 
 type SkillTarget interface {
-	// race == 0 is a Monster
-	Race() int
-	//Position() geom.Coord
 	EffectReceiver
 }
 

@@ -2,15 +2,14 @@ package game
 
 import (
 	"github.com/oniproject/geom"
-	"math"
 	"oniproject/oni/utils"
 	"time"
 )
 
 const (
 	STATE_IDLE = iota
-	STATE_CREATE
-	STATE_DESTROY
+	STATE_CAST
+	STATE_DEAD
 	STATE_MOVE
 )
 
@@ -43,11 +42,17 @@ type GameObjectState struct {
 }
 
 type GameObject interface {
-	Update(w Walkabler, tick uint, t time.Duration) bool
+	GetPositionComponent() *PositionComponent
+
 	Position() geom.Coord
-	LastPosition() geom.Coord
 	Velocity() geom.Coord
-	Lag() time.Duration
+
+	LastPosition() geom.Coord
+	LastVelocity() geom.Coord
+
+	SetPosition(x, y float64)
+	SetVelocity(x, y float64)
+
 	Id() utils.Id
 
 	SkillTarget
@@ -58,55 +63,34 @@ type GameObject interface {
 	Regeneration()
 
 	Name() string
+
+	MessageToMapInterface
 }
 
 type PositionComponent struct {
-	position geom.Coord
-	lastpos  geom.Coord
-	velocity geom.Coord
-	lastvel  geom.Coord
+	Pos     geom.Coord
+	vel     geom.Coord
+	lastpos geom.Coord
+	lastvel geom.Coord
 }
 
 func NewPositionComponent(x, y float64) PositionComponent {
-	return PositionComponent{position: geom.Coord{X: x, Y: y}}
+	return PositionComponent{Pos: geom.Coord{X: x, Y: y}}
 }
 
-func (c *PositionComponent) Position() geom.Coord     { return c.position }
+func (c *PositionComponent) GetPositionComponent() *PositionComponent { return c }
+
+func (c *PositionComponent) Position() geom.Coord { return c.Pos }
+func (c *PositionComponent) Velocity() geom.Coord { return c.vel }
+
 func (c *PositionComponent) LastPosition() geom.Coord { return c.lastpos }
-func (c *PositionComponent) Velocity() geom.Coord     { return c.velocity }
-func (c *PositionComponent) SetPosition(x, y float64) { c.position = geom.Coord{X: x, Y: y} }
-func (c *PositionComponent) SetVelocity(x, y float64) {
-	coord := geom.Coord{X: x, Y: y}
-	coord = coord.Unit()
-	if math.IsNaN(coord.X) {
-		coord.X = 0
-	}
-	if math.IsNaN(coord.Y) {
-		coord.Y = 0
-	}
-	c.velocity = coord
+func (c *PositionComponent) LastVelocity() geom.Coord { return c.lastvel }
+
+func (c *PositionComponent) SetPosition(x, y float64) {
+	c.lastpos = c.Pos
+	c.Pos = geom.Coord{X: x, Y: y}
 }
-
-func (c *PositionComponent) Update(w Walkabler, t time.Duration) bool {
-	c.lastpos = c.position
-
-	if c.velocity.X != 0 || c.velocity.Y != 0 {
-		delta := c.velocity.Times(t.Seconds())
-		pos := c.position.Plus(delta)
-		c.lastvel = c.velocity.Times(1) // just copy
-
-		// XXX {nil} for testing
-		if w == nil || w.Walkable(pos) {
-			c.position = pos
-			return true
-		}
-		//return false
-	}
-
-	if c.lastvel.X != 0 || c.lastvel.Y != 0 {
-		c.lastvel = geom.Coord{X: 0, Y: 0}
-		return true
-	}
-
-	return false
+func (c *PositionComponent) SetVelocity(x, y float64) {
+	c.lastvel = c.vel
+	c.vel = geom.Coord{X: x, Y: y}
 }

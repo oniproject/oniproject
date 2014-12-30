@@ -6,20 +6,22 @@ import (
 	log "github.com/Sirupsen/logrus"
 	. "oniproject/oni/game/inv"
 	"oniproject/oni/utils"
-	"time"
 )
 
 type Avatar struct {
+	*Map `sql:"-"`
+
 	AvatarId int64 `gorm:"column:id; primary_key:yes"`
 
 	Nickname string
 	ClassId  int
 	RaceId   int
 	MapId    string
-	X, Y     float64
 
-	PositionComponent `sql:"-"`
-	//PositionComponentJson  []byte
+	state uint8
+
+	PositionComponent      `sql:"-"`
+	PositionComponentJson  []byte
 	Parameters             `sql:"-"`
 	ParametersJson         []byte
 	InventoryComponent     `sql:"-"`
@@ -36,8 +38,9 @@ type Avatar struct {
 	Target utils.Id `sql:"-"`
 }
 
-func NewAvatar() *Avatar {
+func NewAvatar(m *Map) *Avatar {
 	a := &Avatar{
+		Map:                m,
 		InventoryComponent: NewInventoryComponent(6, 8, []string{"body", "left", "right"}),
 		SkillComponent:     NewSkillComponent(),
 		StateComponent:     NewStateComponent(),
@@ -52,25 +55,18 @@ func (a Avatar) Race() int    { return 5 }
 // for debug print
 func (a *Avatar) String() string {
 	return fmt.Sprintf(`Avatar[%d]'%s' pos[%f:%f] param:%s inv:%s`,
-		a.AvatarId, a.Nickname, a.X, a.Y,
+		a.AvatarId, a.Nickname, a.Pos.X, a.Pos.Y,
 		string(a.ParametersJson), string(a.InventoryComponentJson))
-}
-
-func (a *Avatar) Update(w Walkabler, tick uint, t time.Duration) bool {
-	return a.PositionComponent.Update(w, t)
 }
 
 // db hooks
 func (a *Avatar) BeforeCreate() (err error) {
-	a.position.X, a.position.Y = a.X, a.Y
 	return a.marshal()
 }
 func (a *Avatar) BeforeUpdate() (err error) {
-	a.X, a.Y = a.position.X, a.position.Y
 	return a.marshal()
 }
 func (a *Avatar) AfterFind() (err error) {
-	a.position.X, a.position.Y = a.X, a.Y
 	err = a.unmarshal()
 	return
 }
@@ -81,11 +77,11 @@ func (a *Avatar) marshal() (err error) {
 		log.Error("BeforeSave ", err)
 		return
 	}
-	/*a.PositionComponentJson, err = json.Marshal(&(a.PositionComponent))
+	a.PositionComponentJson, err = json.Marshal(&(a.PositionComponent))
 	if err != nil {
 		log.Error("BeforeSave ", err)
 		return
-	}*/
+	}
 	a.InventoryComponentJson, err = json.Marshal(&(a.InventoryComponent))
 	if err != nil {
 		log.Error("BeforeSave ", err)
@@ -114,11 +110,11 @@ func (a *Avatar) unmarshal() (err error) {
 		log.Errorf("AfterFind Parameters %s '%s'", err, string(a.ParametersJson))
 		return
 	}
-	/*err = json.Unmarshal(a.PositionComponentJson, &(a.PositionComponent))
+	err = json.Unmarshal(a.PositionComponentJson, &(a.PositionComponent))
 	if err != nil {
 		log.Errorf("AfterFind PositionComponent %s '%s'", err, string(a.PositionComponentJson))
 		return
-	}*/
+	}
 	err = json.Unmarshal(a.InventoryComponentJson, &(a.InventoryComponent))
 	if err != nil {
 		log.Errorf("AfterFind InventoryComponentJson %s '%s'", err, string(a.InventoryComponentJson))

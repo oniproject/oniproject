@@ -7,6 +7,8 @@ import (
 )
 
 type Monster struct {
+	*Map
+
 	PositionComponent
 	StateComponent
 	Parameters
@@ -16,20 +18,15 @@ type Monster struct {
 	id utils.Id
 }
 
-func NewMonster() *Monster {
+func NewMonster(m *Map) *Monster {
 	return &Monster{
+		Map:            m,
 		StateComponent: NewStateComponent(),
 	}
 }
 
-func (a Monster) Name() string       { return a.MonsterType }
-func (a Monster) Lag() time.Duration { return 0 }
-func (a Monster) Id() utils.Id       { return a.id }
-func (a Monster) Race() int          { return 0 }
-
-func (m *Monster) Update(w Walkabler, tick uint, t time.Duration) bool {
-	return m.PositionComponent.Update(w, t)
-}
+func (a Monster) Name() string { return a.MonsterType }
+func (a Monster) Id() utils.Id { return a.id }
 
 func (m *Monster) RunAI() {
 	t := time.NewTicker(1 * time.Second)
@@ -39,6 +36,8 @@ func (m *Monster) RunAI() {
 			x := (rand.Float64() - 0.5) * 5
 			y := (rand.Float64() - 0.5) * 5
 			m.SetVelocity(x, y)
+			// XXX
+			m.Map.Physics.Sync(m)
 		}
 	}
 }

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	TickRate     = 50 * time.Millisecond
+	TickRate     = 60 * time.Millisecond
 	SpeedOfLight = 2
 	ReplicRange  = 4
 )
@@ -48,6 +48,7 @@ type Map struct {
 	tmxMap               tmx.Map
 
 	*Replicator
+	*Physics
 }
 
 func NewMap(game *Game, name string) *Map {
@@ -66,13 +67,17 @@ func NewMap(game *Game, name string) *Map {
 		log.Panicf("fail load data from COLLISION layer: ", fname, err)
 	}
 
+	p := NewPhysic(float64(tmxMap.Width), float64(tmxMap.Height))
 	grid := jps.NewGrid(tmxMap.Width, tmxMap.Height)
 	for k, v := range data {
 		x, y := k%tmxMap.Width, k/tmxMap.Width
 		grid.SetWalkable(x, y, v <= 0)
+		if v > 0 {
+			p.AddStaticBox(float64(x), float64(y), 1.0, 1.0)
+		}
 	}
 
-	return &Map{
+	m := &Map{
 		register:    make(chan GameObject),
 		unregister:  make(chan GameObject),
 		objects:     make(map[utils.Id]GameObject),
@@ -81,8 +86,11 @@ func NewMap(game *Game, name string) *Map {
 		game:        game,
 		lastLocalId: -4,
 		tmxMap:      tmxMap,
+		Physics:     p,
 		Replicator:  NewReplicator(ReplicRange, float64(tmxMap.Width), float64(tmxMap.Height)),
 	}
+
+	return m
 }
 
 func (m *Map) Walkable(c geom.Coord) bool {
@@ -103,14 +111,14 @@ func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
-	c.PositionComponent = NewPositionComponent(c.X, c.Y)
+	c.Map = m
 	m.register <- c
 	go c.writePump()
 	c.readPump(m, c)
 }
 
 func (m *Map) SpawnMonster(x, y float64) {
-	monster := NewMonster()
+	monster := NewMonster(m)
 	monster.SetPosition(x, y)
 	monster.MonsterType = "Bat"
 	m.lastLocalId--
@@ -121,7 +129,7 @@ func (m *Map) SpawnMonster(x, y float64) {
 }
 
 func (m *Map) DropItem(x, y float64, item string) {
-	ditem := NewDroppedItem(x, y, item)
+	ditem := NewDroppedItem(x, y, item, m)
 
 	m.lastLocalId--
 	ditem.id = utils.NewId(m.lastLocalId - 20000)
@@ -190,12 +198,18 @@ func (gm *Map) Run() {
 
 			// update position
 			var updated []GameObject
-			for _, obj := range gm.objects {
+			/*for _, obj := range gm.objects {
 				if ok := obj.Update(gm, gm.tick, TickRate); ok {
 					updated = append(updated, obj)
 					gm.tree.Remove(obj)
 					gm.tree.Insert(obj)
 				}
+			}*/
+
+			updated = gm.Physics.Process()
+			for _, obj := range updated {
+				gm.tree.Remove(obj)
+				gm.tree.Insert(obj)
 			}
 
 			// XXX teleports
@@ -229,6 +243,7 @@ func (gm *Map) Run() {
 		case obj := <-gm.register:
 			gm.objects[obj.Id()] = obj
 			gm.Replicator.Add(obj)
+			gm.Physics.Add(obj)
 			log.Info("register", obj.Id(), obj.Position())
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
@@ -237,12 +252,13 @@ func (gm *Map) Run() {
 				gm.game.adb.SaveAvatar(avatar)
 			}
 			gm.Replicator.Remove(obj)
+			gm.Physics.Remove(obj)
 			log.Debug("unregister", obj)
 
 		// message system
 		case s := <-gm.sendTo:
 			if obj, ok := gm.objects[s.id]; ok {
-				s.m.Run(gm, obj)
+				s.m.Run(obj)
 			} else {
 				log.Warningf("fail sendTo: broken ID %v %T", s, s.m)
 			}

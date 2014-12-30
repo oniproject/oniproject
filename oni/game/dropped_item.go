@@ -4,7 +4,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	. "oniproject/oni/game/inv"
 	"oniproject/oni/utils"
-	"time"
 )
 
 type Dropper interface {
@@ -12,6 +11,8 @@ type Dropper interface {
 }
 
 type DroppedItem struct {
+	*Map
+
 	PositionComponent
 	StateComponent
 	Parameters
@@ -22,24 +23,19 @@ type DroppedItem struct {
 	id utils.Id
 }
 
-func NewDroppedItem(x, y float64, item string) (ii *DroppedItem) {
+func NewDroppedItem(x, y float64, item string, m *Map) (ii *DroppedItem) {
 	i, _ := ItemByName(item)
 	ii = &DroppedItem{
-		PositionComponent: NewPositionComponent(x, y),
-		Item:              item,
-		name:              i.Name,
+		Map:  m,
+		Item: item,
+		name: i.Name,
 	}
-	// XXX set pos == lastpos
-	ii.lastpos = ii.position
+	ii.SetPosition(x, y)
 	return
 }
 
-func (item DroppedItem) Name() string       { return item.name }
-func (item DroppedItem) Lag() time.Duration { return 0 }
-func (item DroppedItem) Id() utils.Id       { return item.id }
-func (item DroppedItem) Race() int          { return 0 }
-
-func (item *DroppedItem) Update(w Walkabler, tick uint, t time.Duration) bool { return false }
+func (item DroppedItem) Name() string { return item.name }
+func (item DroppedItem) Id() utils.Id { return item.id }
 
 func (item *DroppedItem) AddState(name string) {
 	log.Panic("AddState to DroppedItem ", item)
