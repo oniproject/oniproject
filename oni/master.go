@@ -43,8 +43,8 @@ func (master *Master) Run() {
 	m := martini.Classic()
 	m.Map(utils.CreateMartiniLogger())
 	m.Use(acerender.Renderer(&acerender.Options{AceOptions: &ace.Options{
-		DynamicReload: true,
-		BaseDir:       "templates",
+		//DynamicReload: true,
+		BaseDir: "templates",
 	}}))
 
 	store := sessions.NewCookieStore([]byte("secret123"))
