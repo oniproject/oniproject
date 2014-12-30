@@ -4,18 +4,30 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
+	"sync"
 )
 
 var ITEM_PATH = "data/items"
 
-var cache = make(map[string]*Item)
+type itemCache struct {
+	items map[string]*Item
+	sync.Mutex
+}
+
+var cache = itemCache{items: make(map[string]*Item)}
 
 func WipeCache() {
-	cache = make(map[string]*Item)
+	cache.Lock()
+	defer cache.Unlock()
+
+	cache.items = make(map[string]*Item)
 }
 
 func ItemByName(name string) (item *Item, err error) {
-	item, ok := cache[name]
+	cache.Lock()
+	defer cache.Unlock()
+
+	item, ok := cache.items[name]
 	if ok {
 		return
 	}
@@ -33,7 +45,7 @@ func ItemByName(name string) (item *Item, err error) {
 		return nil, err
 	}
 
-	cache[name] = item
+	cache.items[name] = item
 
 	//item.Xfeatures = ParseFeatureList(item.Features)
 
