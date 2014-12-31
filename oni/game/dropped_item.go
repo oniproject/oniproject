@@ -34,8 +34,8 @@ func NewDroppedItem(x, y float64, item string, m *Map) (ii *DroppedItem) {
 	return
 }
 
-func (item DroppedItem) Name() string { return item.name }
-func (item DroppedItem) Id() utils.Id { return item.id }
+func (item *DroppedItem) Name() string { return item.name }
+func (item *DroppedItem) Id() utils.Id { return item.id }
 
 func (item *DroppedItem) AddState(name string) {
 	log.Panic("AddState to DroppedItem ", item)

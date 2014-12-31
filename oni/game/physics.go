@@ -2,9 +2,9 @@ package game
 
 import (
 	"fmt"
-	//"math"
 	"github.com/oniproject/chipmunk.go"
 	"github.com/oniproject/geom"
+	"math"
 	"runtime"
 	"sync"
 )
@@ -15,6 +15,8 @@ const (
 )
 
 type Physics struct {
+	*Map
+
 	bodiesByObject map[GameObject]cp.Struct_SS_cpBody
 	shapesByObject map[GameObject]cp.Struct_SS_cpShape
 
@@ -24,8 +26,9 @@ type Physics struct {
 	sync.Mutex
 }
 
-func NewPhysic(width, height float64) (p *Physics) {
+func NewPhysic(m *Map, width, height float64) (p *Physics) {
 	p = &Physics{
+		Map:            m,
 		space:          cp.SpaceNew(),
 		bodiesByObject: make(map[GameObject]cp.Struct_SS_cpBody),
 		shapesByObject: make(map[GameObject]cp.Struct_SS_cpShape),
@@ -67,23 +70,23 @@ func (p *Physics) Update(obj GameObject) {
 	defer p.Unlock()
 	p.update(obj)
 }
-func (p *Physics) Sync(obj GameObject) {
+func (p *Physics) SyncVelocity(obj GameObject) {
 	p.Lock()
 	defer p.Unlock()
-	p.sync(obj)
+	p.syncVel(obj)
 }
 
 func (p *Physics) Process() (updated []GameObject) {
 	p.Lock()
 	defer p.Unlock()
 
-	for i := 0; i < 4; i++ {
-		cp.SpaceStep(p.space, TIME_STEP)
+	for i := 0; i < 10; i++ {
+		cp.SpaceStep(p.space, TIME_STEP/10)
 	}
 
 	for obj := range p.bodiesByObject {
-		lastPos := obj.Position()
-		lastVel := obj.Velocity()
+		lastPos := obj.LastPosition()
+		lastVel := obj.LastVelocity()
 
 		p.update(obj)
 
@@ -109,7 +112,7 @@ func (p *Physics) AddStaticBox(x, y, w, h float64) {
 		{topL, topR}, // up
 		{botL, botR}, // down
 		{topL, botL}, // left
-		{topR, botR}, // left
+		{topR, botR}, // right
 	})
 }
 
@@ -138,8 +141,9 @@ func (p *Physics) add(obj GameObject) {
 	} else {
 		offset := cp.V(0, 0)
 		mass := float64(10.0)
-		moment := cp.MomentForCircle(mass, 0, OBJECT_RADIUS, offset)
-		//moment := math.Inf(+1)
+		//mass := math.Inf(+1)
+		//moment := cp.MomentForCircle(mass, 0, OBJECT_RADIUS, offset)
+		moment := math.Inf(+1)
 
 		body = cp.SpaceAddBody(p.space, cp.BodyNew(mass, moment))
 
@@ -151,8 +155,8 @@ func (p *Physics) add(obj GameObject) {
 
 	pos := obj.Position()
 	cp.BodySetPosition(body, cp.V(pos.X, pos.Y))
-	vel := obj.Velocity()
-	cp.BodySetVelocity(body, cp.V(vel.X, vel.Y))
+	//vel := obj.Velocity()
+	//cp.BodySetVelocity(body, cp.V(vel.X, vel.Y))
 	p.bodiesByObject[obj] = body
 }
 
@@ -177,10 +181,10 @@ func (p *Physics) update(obj GameObject) {
 	// sync pos and vel
 	pos := cp.BodyGetPosition(body)
 	obj.SetPosition(pos.GetX(), pos.GetY())
-	vel := cp.BodyGetVelocity(body)
-	obj.SetVelocity(vel.GetX(), vel.GetY())
+	//vel := cp.BodyGetVelocity(body)
+	//obj.SetVelocity(vel.GetX(), vel.GetY())
 }
-func (p *Physics) sync(obj GameObject) {
+func (p *Physics) syncVel(obj GameObject) {
 	body, ok := p.bodiesByObject[obj]
 	if !ok {
 		return

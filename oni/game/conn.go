@@ -4,6 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -31,9 +32,14 @@ type Connection struct {
 	sendMessage chan Message
 	ping_pong   time.Time
 	lag         time.Duration
+	sync.Mutex
 }
 
-func (c *Connection) Lag() time.Duration { return c.lag }
+func (c *Connection) Lag() time.Duration {
+	c.Lock()
+	defer c.Unlock()
+	return c.lag
+}
 
 func (c *Connection) readPump(game ConnToMapInterface, avatar GameObject) {
 	defer func() {
@@ -44,7 +50,12 @@ func (c *Connection) readPump(game ConnToMapInterface, avatar GameObject) {
 	c.ws.SetReadLimit(maxMessageSize)
 	c.ws.SetReadDeadline(time.Now().Add(pongWait))
 	c.ws.SetPongHandler(func(string) error {
+		c.Lock()
+		defer c.Unlock()
 		c.ws.SetReadDeadline(time.Now().Add(pongWait))
+		if c.ping_pong.IsZero() {
+			c.ping_pong = time.Now()
+		}
 		c.lag = time.Now().Sub(c.ping_pong)
 		return nil
 	})
@@ -78,6 +89,8 @@ func (c *Connection) write(mt int, payload []byte) error {
 	return c.ws.WriteMessage(mt, payload)
 }
 func (c *Connection) ping() error {
+	c.Lock()
+	defer c.Unlock()
 	c.ping_pong = time.Now()
 	return c.write(websocket.PingMessage, []byte{})
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/martini-contrib/sessions"
 	"net/http"
 	"oniproject/oni/utils"
-	"time"
 )
 
 type AvatarDB interface {
@@ -73,7 +72,6 @@ func (gm *Game) Run(addr string) {
 		a.Connection = Connection{
 			ws:          ws,
 			sendMessage: make(chan Message, 2560),
-			ping_pong:   time.Now(),
 		}
 		log.Debug(a)
 

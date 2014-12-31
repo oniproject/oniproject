@@ -48,9 +48,9 @@ func NewAvatar(m *Map) *Avatar {
 	return a
 }
 
-func (a Avatar) Name() string { return a.Nickname }
-func (a Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
-func (a Avatar) Race() int    { return 5 }
+func (a *Avatar) Name() string { return a.Nickname }
+func (a *Avatar) Id() utils.Id { return utils.Id(a.AvatarId) }
+func (a *Avatar) Race() int    { return 5 }
 
 // for debug print
 func (a *Avatar) String() string {

@@ -10,10 +10,9 @@ import (
 type Replicator struct {
 	tree *utils.Tree
 
-	all      map[GameObject]bool
 	watchers map[*Avatar]bool
 
-	added, removed, updated map[GameObject]bool
+	all, added, removed, updated GameObjectSet
 
 	distance  float64
 	distance2 float64
@@ -25,11 +24,11 @@ func NewReplicator(replicRange float64, w, h float64) *Replicator {
 	return &Replicator{
 		distance:  replicRange,
 		distance2: replicRange * replicRange,
-		all:       make(map[GameObject]bool),
 		watchers:  make(map[*Avatar]bool),
-		added:     make(map[GameObject]bool),
-		removed:   make(map[GameObject]bool),
-		updated:   make(map[GameObject]bool),
+		all:       NewGameObjectSet(),
+		added:     NewGameObjectSet(),
+		removed:   NewGameObjectSet(),
+		updated:   NewGameObjectSet(),
 		tree: utils.NewQTree(geom.Rect{
 			geom.Coord{0, 0},
 			geom.Coord{w, h},
@@ -55,15 +54,15 @@ func (r *Replicator) Add(obj GameObject) {
 	r.Lock()
 	defer r.Unlock()
 
-	r.added[obj] = true
+	r.added.Add(obj)
 
 	if avatar, ok := obj.(*Avatar); ok {
 		r.watchers[avatar] = true
 	}
-	r.all[obj] = true
+	r.all.Add(obj)
 
-	delete(r.removed, obj)
-	delete(r.updated, obj)
+	r.removed.Remove(obj)
+	r.updated.Remove(obj)
 
 	r.tree.Insert(obj)
 }
@@ -72,15 +71,15 @@ func (r *Replicator) Remove(obj GameObject) {
 	r.Lock()
 	defer r.Unlock()
 
-	r.removed[obj] = true
+	r.removed.Add(obj)
 
 	if avatar, ok := obj.(*Avatar); ok {
 		delete(r.watchers, avatar)
 	}
-	delete(r.all, obj)
 
-	delete(r.added, obj)
-	delete(r.updated, obj)
+	r.all.Remove(obj)
+	r.added.Remove(obj)
+	r.updated.Remove(obj)
 
 	r.tree.Remove(obj)
 }
@@ -90,7 +89,7 @@ func (r *Replicator) Update(obj GameObject) {
 	defer r.Unlock()
 
 	if _, ok := r.removed[obj]; !ok {
-		r.updated[obj] = true
+		r.updated.Add(obj)
 	}
 	r.tree.Remove(obj)
 	r.tree.Insert(obj)
@@ -151,7 +150,7 @@ func (r *Replicator) Process() {
 							continue
 						}
 
-						_, ok := r.updated[other]
+						ok := r.updated.Contains(other)
 						now := r.checkPos(watcher, other)
 						old := r.checkOld(watcher, other)
 
@@ -169,9 +168,9 @@ func (r *Replicator) Process() {
 		watcher.sendMessage <- replic
 	}
 
-	r.added = make(map[GameObject]bool)
-	r.removed = make(map[GameObject]bool)
-	r.updated = make(map[GameObject]bool)
+	r.added.Clear()
+	r.removed.Clear()
+	r.updated.Clear()
 }
 
 func (r *Replicator) checkPos(a, b GameObject) bool {

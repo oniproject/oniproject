@@ -19,6 +19,8 @@ type MessageToMapInterface interface {
 	GetObjById(utils.Id) GameObject
 	Unregister(GameObject)
 
+	SyncVelocity(GameObject)
+
 	Sender
 	Dropper
 }
@@ -64,26 +66,51 @@ func init() {
 	}
 }
 
+/*type SetPositionMsg struct {
+	X float64 `mapstructure:"x"`
+	Y float64 `mapstructure:"y"`
+	//Z float64 `mapstructure:"z"`
+}
+
+func (m *SetPositionMsg) Run(obj GameObject) {
+	coord := geom.Coord{X: m.X, Y: m.Y}
+	obj.SetPosition(coord.X, coord.Y)
+	// XXX
+}*/
+
 type SetVelocityMsg struct {
-	X       float64 `mapstructure:"x"`
-	Y       float64 `mapstructure:"y"`
-	NotUsed float64 `mapstructure:"z"`
+	X float64 `mapstructure:"x"`
+	Y float64 `mapstructure:"y"`
+	//Z float64 `mapstructure:"z"`
 }
 
 func (m *SetVelocityMsg) Run(obj GameObject) {
-	a := obj.(*Avatar)
-	if a.state == STATE_IDLE || a.state == STATE_MOVE {
-		coord := geom.Coord{X: m.X, Y: m.Y}
-		coord = coord.Unit()
-		if math.IsNaN(coord.X) {
-			coord.X = 0
+	defer obj.SyncVelocity(obj) // XXX
+
+	coord := geom.Coord{X: m.X, Y: m.Y}
+
+	if a, ok := obj.(*Avatar); ok {
+		if a.state == STATE_CAST || a.state == STATE_DEAD {
+			return
 		}
-		if math.IsNaN(coord.Y) {
-			coord.Y = 0
+		coord = coord.Unit().Times(4)
+		nox := math.IsNaN(coord.X) || coord.X == 0
+		noy := math.IsNaN(coord.Y) || coord.Y == 0
+		if nox && noy {
+			a.state = STATE_IDLE
+		} else {
+			a.state = STATE_MOVE
 		}
-		a.SetVelocity(coord.X, coord.Y)
-		a.Map.Physics.Sync(obj) // XXX
 	}
+
+	if math.IsNaN(coord.X) {
+		coord.X = 0
+	}
+	if math.IsNaN(coord.Y) {
+		coord.Y = 0
+	}
+
+	obj.SetVelocity(coord.X, coord.Y)
 }
 
 type SetTargetMsg struct {
@@ -184,17 +211,19 @@ func (m *CastMsg) Run(obj GameObject) {
 	caster.RecoverMP(float64(-skill.MPused))
 	caster.RecoverTP(float64(-skill.TPused))
 
-	caster.sendMessage <- &ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills}
-
 	if hp, _ := target.HPbar(); hp == 0 {
-		switch t := target.(type) {
+		switch target := target.(type) {
 		case *Avatar:
-			t.HRG = 0
+			target.HRG = 0 // FIXME
+			target.state = STATE_DEAD
 		case *Monster:
-			t.HRG = 0
+			target.HRG = 0 // FIXME
+			caster.Unregister(target)
 		}
-		caster.Unregister(target)
 	}
+
+	caster.sendMessage <- &ParametersMsg{Parameters: caster.Parameters, Skills: caster.Skills}
+	caster.Map.Replicator.Update(target)
 
 	log.Infof("cast OK: %v %d", m, caster.Target)
 }
@@ -391,11 +420,12 @@ func (m *ReplicaMsg) ADD(obj GameObject) {
 		Position: obj.Position(),
 		Velocity: obj.Velocity(),
 	}
-	if avatar, ok := obj.(*Avatar); ok {
-		msg.Lag = avatar.Lag()
-	}
 	if msg.Velocity.X != 0 || msg.Velocity.Y != 0 {
 		msg.Type = STATE_MOVE
+	}
+	if avatar, ok := obj.(*Avatar); ok {
+		msg.Lag = avatar.Lag()
+		msg.Type = avatar.state
 	}
 	msg.HP, msg.MHP = obj.HPbar()
 	m.Added = append(m.Added, msg)
@@ -411,11 +441,12 @@ func (m *ReplicaMsg) UPD(obj GameObject) {
 		Position: obj.Position(),
 		Velocity: obj.Velocity(),
 	}
-	if avatar, ok := obj.(*Avatar); ok {
-		msg.Lag = avatar.Lag()
-	}
 	if msg.Velocity.X != 0 || msg.Velocity.Y != 0 {
 		msg.Type = STATE_MOVE
+	}
+	if avatar, ok := obj.(*Avatar); ok {
+		msg.Lag = avatar.Lag()
+		msg.Type = avatar.state
 	}
 	msg.HP, msg.MHP = obj.HPbar()
 	m.Updated = append(m.Updated, msg)

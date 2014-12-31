@@ -41,6 +41,7 @@ type GameObjectState struct {
 	HP, MHP  int
 }
 
+// +gen set
 type GameObject interface {
 	GetPositionComponent() *PositionComponent
 

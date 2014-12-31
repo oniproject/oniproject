@@ -11,13 +11,14 @@ import (
 	"oniproject/oni/utils"
 	"path"
 	"runtime/debug"
+	//"sync"
 	"time"
 )
 
 const (
 	TickRate     = 60 * time.Millisecond
 	SpeedOfLight = 2
-	ReplicRange  = 4
+	ReplicRange  = 20
 )
 
 // for message system
@@ -38,17 +39,22 @@ func avatarFilter(obj GameObject) bool {
 }
 
 type Map struct {
-	tick                 uint
-	objects              map[utils.Id]GameObject
-	register, unregister chan GameObject
-	sendTo               chan sender
-	Grid                 *jps.Grid
-	game                 *Game
-	lastLocalId          int64
-	tmxMap               tmx.Map
+	tick                         uint
+	objects                      map[utils.Id]GameObject
+	register, unregister, update chan GameObject
+	sendTo                       chan sender
+	Grid                         *jps.Grid
+	game                         *Game
+	lastLocalId                  int64
+	tmxMap                       tmx.Map
+
+	updated GameObjectSet
 
 	*Replicator
 	*Physics
+	*AI
+
+	localIdPool utils.IdPool
 }
 
 func NewMap(game *Game, name string) *Map {
@@ -67,27 +73,29 @@ func NewMap(game *Game, name string) *Map {
 		log.Panicf("fail load data from COLLISION layer: ", fname, err)
 	}
 
-	p := NewPhysic(float64(tmxMap.Width), float64(tmxMap.Height))
-	grid := jps.NewGrid(tmxMap.Width, tmxMap.Height)
-	for k, v := range data {
-		x, y := k%tmxMap.Width, k/tmxMap.Width
-		grid.SetWalkable(x, y, v <= 0)
-		if v > 0 {
-			p.AddStaticBox(float64(x), float64(y), 1.0, 1.0)
-		}
-	}
-
 	m := &Map{
 		register:    make(chan GameObject),
 		unregister:  make(chan GameObject),
+		update:      make(chan GameObject),
 		objects:     make(map[utils.Id]GameObject),
+		updated:     NewGameObjectSet(),
 		sendTo:      make(chan sender),
-		Grid:        grid,
 		game:        game,
 		lastLocalId: -4,
 		tmxMap:      tmxMap,
-		Physics:     p,
 		Replicator:  NewReplicator(ReplicRange, float64(tmxMap.Width), float64(tmxMap.Height)),
+		AI:          NewAI(),
+	}
+
+	m.Physics = NewPhysic(m, float64(tmxMap.Width), float64(tmxMap.Height))
+	m.Grid = jps.NewGrid(tmxMap.Width, tmxMap.Height)
+
+	for k, v := range data {
+		x, y := k%tmxMap.Width, k/tmxMap.Width
+		m.Grid.SetWalkable(x, y, v <= 0)
+		if v > 0 {
+			m.Physics.AddStaticBox(float64(x), float64(y), 1.0, 1.0)
+		}
 	}
 
 	return m
@@ -96,18 +104,23 @@ func NewMap(game *Game, name string) *Map {
 func (m *Map) Walkable(c geom.Coord) bool {
 	return m.Grid.Walkable(int(c.X), int(c.Y))
 }
+
 func (m *Map) Register(a GameObject) {
 	go func() { m.register <- a }()
 }
 func (m *Map) Unregister(a GameObject) {
 	go func() { m.unregister <- a }()
 }
+func (m *Map) Update(a GameObject) {
+	go func() { m.update <- a }()
+}
+
 func (gm *Map) Send(id utils.Id, m Message) {
 	go func() { gm.sendTo <- sender{id, m} }()
 }
 
-func (gm *Map) GetObjById(id utils.Id) (obj GameObject) {
-	return gm.objects[id]
+func (m *Map) GetObjById(id utils.Id) (obj GameObject) {
+	return m.objects[id]
 }
 
 func (m *Map) RunAvatar(ws *websocket.Conn, c *Avatar) {
@@ -121,18 +134,16 @@ func (m *Map) SpawnMonster(x, y float64) {
 	monster := NewMonster(m)
 	monster.SetPosition(x, y)
 	monster.MonsterType = "Bat"
-	m.lastLocalId--
-	monster.id = utils.NewId(m.lastLocalId)
+	monster.id = -m.localIdPool.Get()
 	monster.HP, monster.MHP, monster.HRG = 20, 20, 1
-	m.register <- monster
-	monster.RunAI()
+	m.Register(monster)
+	//monster.RunAI()
 }
 
 func (m *Map) DropItem(x, y float64, item string) {
 	ditem := NewDroppedItem(x, y, item, m)
 
-	m.lastLocalId--
-	ditem.id = utils.NewId(m.lastLocalId - 20000)
+	ditem.id = -m.localIdPool.Get() - 20000
 	m.Register(ditem)
 }
 
@@ -152,6 +163,9 @@ func (gm *Map) Run() {
 		}()
 		close(avatar.sendMessage)
 	}
+
+	killAI := make(chan struct{})
+	go gm.AI.Run(killAI)
 
 	//noFilter := func(GameObject) bool { return false }
 
@@ -240,20 +254,27 @@ func (gm *Map) Run() {
 			gm.Replicator.Process()
 
 		// create/destroy GameObject's
+		case obj := <-gm.update:
+			gm.updated.Add(obj)
+
 		case obj := <-gm.register:
 			gm.objects[obj.Id()] = obj
 			gm.Replicator.Add(obj)
 			gm.Physics.Add(obj)
-			log.Info("register", obj.Id(), obj.Position())
+			gm.AI.Add(obj)
+			log.Debug("register", obj.Id(), obj.Position(), obj)
 		case obj := <-gm.unregister:
 			delete(gm.objects, obj.Id())
 			if avatar, ok := obj.(*Avatar); ok {
 				closeChan(avatar)
 				gm.game.adb.SaveAvatar(avatar)
+			} else {
+				gm.localIdPool.Put(obj.Id())
 			}
 			gm.Replicator.Remove(obj)
 			gm.Physics.Remove(obj)
-			log.Debug("unregister", obj)
+			gm.AI.Remove(obj)
+			log.Debug("unregister", obj.Id(), obj.Position(), obj)
 
 		// message system
 		case s := <-gm.sendTo:
@@ -264,4 +285,6 @@ func (gm *Map) Run() {
 			}
 		}
 	}
+
+	close(killAI)
 }
