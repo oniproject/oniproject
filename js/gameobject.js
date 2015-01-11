@@ -2,7 +2,16 @@
 
 var EventEmitter = require('events').EventEmitter;
 
+var STATE_IDLE = 0,
+	STATE_CAST = 1,
+	STATE_DEAD = 2,
+	STATE_MOVE = 3;
+
 function GameObject(obj, state) {
+	this.isAvatar = state.IsAvatar;
+	this.isMonster = state.IsMonster;
+	this.isItem = state.IsItem;
+
 	this.state = state;
 
 	this.lastvel = {
@@ -37,11 +46,11 @@ function GameObject(obj, state) {
 	});
 	name.anchor.x = name.anchor.y = 0.5;
 
-	if (this.isAvatar()) {
+	if (this.isAvatar) {
 		this.name = 'ava';
-	} else if (this.isItem()) {
+	} else if (this.isItem) {
 		this.name = 'item';
-	} else if (this.isMonster()) {
+	} else if (this.isMonster) {
 		this.name = 'monster';
 	}
 
@@ -54,7 +63,7 @@ function GameObject(obj, state) {
 
 	var hpBar = this._hpBar = new PIXI.Graphics();
 
-	var h = this.isAvatar() ? 48 : obj.height;
+	var h = this.isAvatar ? 48 : obj.height;
 	hpBar.y = -(h) | 0;
 	name.y = -(h + 6) | 0;
 	msg.y = -(h + 16) | 0;
@@ -64,6 +73,28 @@ function GameObject(obj, state) {
 	this.container.addChild(msg);
 	this.container.addChild(name);
 	this.container.addChild(hpBar);
+
+
+	var emitter = this.emitter = new Proton.BehaviourEmitter();
+	emitter.rate = new Proton.Rate(new Proton.Span(1, 1), new Proton.Span(.1, .25));
+	/*emitter.addInitialize(new Proton.Mass(1));
+	emitter.addInitialize(new Proton.ImageTarget(texture));
+    */
+	emitter.addInitialize(new Proton.Life(.1, .1));
+	/*
+	emitter.addInitialize(new Proton.Velocity(new Proton.Span(3, 9), new Proton.Span(0, 30, true), 'polar'));
+	*/
+
+	emitter.addBehaviour(new Proton.Gravity(-3));
+	//emitter.addBehaviour(new Proton.Scale(new Proton.Span(1, 3), 0.3));
+	emitter.addBehaviour(new Proton.Alpha(1, 0.5));
+	//emitter.addBehaviour(new Proton.Rotate(0, Proton.getSpan(-8, 9), 'add'));
+	//emitter.p.x = 1003 / 2;
+	//emitter.p.y = 500;
+
+	//emitter.addSelfBehaviour(new Proton.Gravity(5));
+	//emitter.addSelfBehaviour(new Proton.RandomDrift(.1, 0, 1.1));
+	//emitter.addSelfBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, 53, 10), 'bound'));
 }
 
 GameObject.prototype = Object.create(EventEmitter.prototype);
@@ -90,27 +121,9 @@ Object.defineProperty(GameObject.prototype, 'name', {
 	},
 });
 
-GameObject.prototype.isAvatar = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id > 0;
-	}
-};
-GameObject.prototype.isMonster = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id < 0 && this.state.Id > -10000;
-	}
-};
-GameObject.prototype.isItem = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id < -10000;
-	}
-};
-
 GameObject.prototype.addState = function(state) {
 	switch (state.Type) {
-		//case 2: // destroy
-		//case 1: // create
-		case 3: // move
+		case STATE_MOVE: // move
 			var x = this.state.Velocity.X;
 			var y = this.state.Velocity.Y;
 			if (!isNaN(x) && !isNaN(y)) {
@@ -120,17 +133,41 @@ GameObject.prototype.addState = function(state) {
 				}
 		}
 
-		case 0: // idle
+		case STATE_IDLE:
+		case STATE_CAST:
+		case STATE_DEAD:
 			if (state.Position && !isNaN(state.Position.X) && !isNaN(state.Position.Y)) {
-				this.container.position.x = state.Position.X * 32 | 0;
-				this.container.position.y = state.Position.Y * 32 | 0;
+				this.container.x = state.Position.X * 32 | 0;
+				this.container.y = state.Position.Y * 32 | 0;
 			}
 
 			break;
 	}
+	if (this.obj.currentAnimation) {
+		switch (state.Type) {
+			case STATE_IDLE:
+				this.obj.currentAnimation = 'idle';
+				break;
+			case STATE_CAST:
+				this.obj.currentAnimation = 'boom';
+				break;
+			case STATE_DEAD:
+				this.obj.currentAnimation = 'death';
+				console.log('death');
+				break;
+			case STATE_MOVE:
+				this.obj.currentAnimation = 'walk';
+				break;
+		}
+	}
 
 	if (state.hasOwnProperty('Name')) {
 		this.name = state.Name;
+	}
+
+	var damage = state.HP - this.state.HP;
+	if (damage != 0) {
+		this.damage(damage);
 	}
 
 	this.state = state;
@@ -162,14 +199,14 @@ GameObject.prototype.update = function(time) {
 
 		if (!obj.currentAnimation) return;
 
-		obj.currentAnimation = 'idle';
+		//obj.currentAnimation = 'idle';
 		var x = state.Velocity.X;
 		var y = state.Velocity.Y;
 		var dir;
 		if (!isNaN(x) && !isNaN(y)) {
 			if (!!x || !!y) {
 				dir = Math.atan2(x, y);
-				obj.currentAnimation = 'walk';
+				//obj.currentAnimation = 'walk';
 			}
 		} else {
 			dir = Math.atan2(this.lastvel.x, this.lastvel.y);
@@ -187,6 +224,24 @@ GameObject.prototype.update = function(time) {
 			obj.currentDirection = dir;
 		}
 	}
+};
+
+GameObject.prototype.damage = function(text) {
+	if (text === undefined) {
+		text = Math.random() * 20 - 15 | 0;
+	}
+	console.log('damage', text);
+	this.emitter.createParticle([
+		{
+			life: 0.6,
+			dead: false,
+			target: {
+				text: text,
+				container: this.container
+			}
+		},
+		new Proton.Position(new Proton.LineZone(-10, 0, 10, 0)),
+	]);
 };
 
 module.exports = GameObject;

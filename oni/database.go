@@ -27,7 +27,7 @@ func NewDatabase(config *Config) AvatarDB {
 
 func (db *Database) AvatarById(id utils.Id) (*game.Avatar, error) {
 	// TODO choice database by Id
-	a := game.NewAvatar()
+	a := game.NewAvatar(nil)
 	//err := db.db.First(&a, map[string]interface{}{"id": id}).Error
 	err := db.db.First(a, int64(id)).Error
 	if err != nil {
@@ -43,8 +43,8 @@ func (db *Database) SaveAvatar(a *game.Avatar) error {
 }
 
 func (db *Database) CreateAvatar() (*game.Avatar, error) {
-	a := game.NewAvatar()
-	a.X, a.Y = 10, 35
+	a := game.NewAvatar(nil)
+	a.Pos.X, a.Pos.Y = 10, 35
 
 	// XXX
 	a.MapId = "test"

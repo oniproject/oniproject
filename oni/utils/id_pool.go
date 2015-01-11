@@ -2,15 +2,29 @@ package utils
 
 import "sync"
 
-type Local uint
+type IdPool struct {
+	pool         []Id
+	nextAvilable Id
+	sync.Mutex
+}
 
-func NewIdPool() sync.Pool {
-	maxId := Local(0)
-	return sync.Pool{
-		New: func() interface{} {
-			maxId++
-			id := maxId
-			return id
-		},
+func (p *IdPool) Get() (id Id) {
+	p.Lock()
+	defer p.Unlock()
+
+	if len(p.pool) != 0 {
+		id = p.pool[0]
+		p.pool = p.pool[1:]
+		return
 	}
+
+	p.nextAvilable++
+	return p.nextAvilable
+}
+
+func (p *IdPool) Put(id Id) {
+	p.Lock()
+	defer p.Unlock()
+
+	p.pool = append(p.pool, id)
 }

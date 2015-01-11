@@ -36,6 +36,7 @@ func NewPhysic(m *Map, width, height float64) (p *Physics) {
 	}
 
 	cp.SpaceSetGravity(p.space, cp.V(0, 0))
+	cp.SpaceSetIterations(p.space, 1)
 
 	p.AddStaticBox(0, 0, width, height)
 

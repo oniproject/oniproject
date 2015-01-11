@@ -26,7 +26,7 @@ html lang=en
           .img v-repeat="inventory" v-style="left: 20+X*38+'px', top: 17+ Y*36+'px'" v-on="click: drop($index)"
             img v-if="Item" v-attr="src:'/icons/lorc/originals/svg/'+ Item.Icon +'.svg'"
             .img-over
-          #gold 12345678
+          #gold v-text="money"
         .close v-on="click: showInventory = !showInventory"
 
       / .window v-component="draggable" style="top: 150px; left: 10px"
@@ -116,6 +116,8 @@ html lang=en
         input v-model="msg" v-on="keyup: chatMsg | key enter, focus: focus, blur: blur"
 
     script src="/js/pixi.dev.js"
+    script src="/js/proton-1.0.0.js"
+    script src="/js/dat.gui.js"
     script src="/js/keypress-2.0.2.min.js"
     script src="/js/cbor.js"
     script src="/js/vue.js"

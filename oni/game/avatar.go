@@ -34,8 +34,6 @@ type Avatar struct {
 	SoulJson               []byte
 
 	Connection `sql:"-"`
-
-	Target utils.Id `sql:"-"`
 }
 
 func NewAvatar(m *Map) *Avatar {
@@ -134,6 +132,11 @@ func (a *Avatar) unmarshal() (err error) {
 	if err != nil {
 		log.Errorf("AfterFind Soul %s '%s'", err, string(a.SoulJson))
 		return
+	}
+
+	// XXX
+	if a.HP == 0 {
+		a.state = STATE_DEAD
 	}
 	return
 }

@@ -2,9 +2,11 @@
 
 require('insert-css')(require('./game.styl'));
 
+
 var Vue = window.Vue;
 var requestAnimFrame = window.requestAnimFrame;
 
+var Mode7 = require('./mode7');
 var Stats = require('./Stats');
 var stats = new Stats();
 stats.setMode(1); // 0: fps, 1: ms
@@ -29,6 +31,61 @@ var w = window.innerWidth,
 	});
 document.body.appendChild(renderer.view);
 
+var proton = new Proton();
+var protonRenderer = new Proton.Renderer('other', proton);
+protonRenderer.onProtonUpdate = function() {};
+protonRenderer.onParticleCreated = function(particle) {
+	// TODO not only damage
+	var target = particle.target;
+
+	if (target.hasOwnProperty('text')) {
+		var style = {
+			font: '12px Helvetica',
+			fill: 'white',
+			stroke: 'black',
+			strokeThickness: 2,
+			align: 'center',
+		};
+
+		var text = target.text;
+		if (text < 0) {
+			style.fill = 'red';
+		} else if (text > 0) {
+			style.fill = 'green';
+		} else {
+			text = 'miss';
+		}
+		var particleSprite = new PIXI.Text("" + text, style);
+		particle.sprite = particleSprite;
+	}
+
+	if (target.hasOwnProperty('container')) {
+		target.container.addChild(particle.sprite);
+	} else {
+		stage.addChild(particle.sprite);
+	}
+};
+protonRenderer.onParticleUpdate = function(particle) {
+	var sprite = particle.sprite;
+	sprite.position.x = particle.p.x;
+	sprite.position.y = particle.p.y;
+	sprite.scale.x = particle.scale;
+	sprite.scale.y = particle.scale;
+	sprite.anchor.x = 0.5;
+	sprite.anchor.y = 0.5;
+	sprite.alpha = particle.alpha;
+	sprite.rotation = particle.rotation * Math.PI / 180;
+};
+protonRenderer.onParticleDead = function(particle) {
+	var target = particle.target;
+	if (target.hasOwnProperty('container')) {
+		target.container.removeChild(particle.sprite);
+	} else {
+		stage.removeChild(particle.sprite);
+	}
+};
+protonRenderer.start();
+
 window.onresize = function() {
 	w = window.innerWidth;
 	h = window.innerHeight;
@@ -39,6 +96,8 @@ window.onresize();
 var Game = require('./game');
 var game = window.game = new Game(renderer, stage, UI);
 
+game.proton = proton;
+
 var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 colorMatrixFilter.matrix = [
 	0.4, 0, 0, 0,
@@ -46,7 +105,19 @@ colorMatrixFilter.matrix = [
 	0, 0, 0.7, 0,
 	0, 0, 0, 1,
 ];
-game.container.filters = [colorMatrixFilter];
+var m7 = new Mode7();
+//game.container.filters = [colorMatrixFilter];
+/*
+var gui = new dat.GUI();
+var c = function() {};
+gui.add(m7, 'pos_x').onFinishChange(c);
+gui.add(m7, 'pos_y').onFinishChange(c);
+gui.add(m7, 'ang').onFinishChange(c);
+gui.add(m7, 'horizon').onFinishChange(c);
+gui.add(m7, 'fov').onFinishChange(c);
+gui.add(m7, 'scale_x').onFinishChange(c);
+gui.add(m7, 'scale_y').onFinishChange(c);
+*/
 
 requestAnimFrame(render);
 var updateT = 1000 / 50;
@@ -55,13 +126,17 @@ function render() {
 	requestAnimFrame(render);
 	stats.begin();
 
+	proton.update();
+
 	var t = window.performance.now();
 	if (t - lastTime > updateT) {
 		game.update(updateT);
 		lastTime += updateT;
 	}
+
 	game.render();
 	renderer.render(stage);
+	game.postrender();
 
 	stats.end();
 }
@@ -87,6 +162,7 @@ game.net.on('TargetDataMsg', function(target) {
 game.net.on('InventoryMsg', function(inv) {
 	UI.inventory = inv.Inventory;
 	UI.equip = inv.Equip;
+	UI.money = inv.Money;
 });
 game.net.on('ParametersMsg', function(p) {
 	UI.hp = p.Parameters.HP;
@@ -143,6 +219,7 @@ var UI = window.UI = new Vue({
 		}],
 		equip: {},
 		inventory: [],
+		money: 0,
 		target: {
 			Id: 0,
 			Race: 0,
@@ -150,73 +227,8 @@ var UI = window.UI = new Vue({
 			MHP: 0,
 			Name: 'vnfdjsk'
 		},
-		invTest: [
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-		],
-		spells: [
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-
-
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-		],
+		invTest: [],
+		spells: [],
 	},
 	computed: {
 		showTargetBar: function() {
@@ -299,7 +311,7 @@ var UI = window.UI = new Vue({
 	methods: {
 		cast: function(spell) {
 			console.info('cast', spell);
-			game.net.FireMsg('' + spell);
+			game.net.FireMsg('' + spell, game.target);
 		},
 		drop: function(index) {
 			game.net.DropItemMsg(index);

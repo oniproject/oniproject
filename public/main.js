@@ -3,9 +3,11 @@
 
 require('insert-css')(require('./game.styl'));
 
+
 var Vue = window.Vue;
 var requestAnimFrame = window.requestAnimFrame;
 
+var Mode7 = require('./mode7');
 var Stats = require('./Stats');
 var stats = new Stats();
 stats.setMode(1); // 0: fps, 1: ms
@@ -30,6 +32,61 @@ var w = window.innerWidth,
 	});
 document.body.appendChild(renderer.view);
 
+var proton = new Proton();
+var protonRenderer = new Proton.Renderer('other', proton);
+protonRenderer.onProtonUpdate = function() {};
+protonRenderer.onParticleCreated = function(particle) {
+	// TODO not only damage
+	var target = particle.target;
+
+	if (target.hasOwnProperty('text')) {
+		var style = {
+			font: '12px Helvetica',
+			fill: 'white',
+			stroke: 'black',
+			strokeThickness: 2,
+			align: 'center',
+		};
+
+		var text = target.text;
+		if (text < 0) {
+			style.fill = 'red';
+		} else if (text > 0) {
+			style.fill = 'green';
+		} else {
+			text = 'miss';
+		}
+		var particleSprite = new PIXI.Text("" + text, style);
+		particle.sprite = particleSprite;
+	}
+
+	if (target.hasOwnProperty('container')) {
+		target.container.addChild(particle.sprite);
+	} else {
+		stage.addChild(particle.sprite);
+	}
+};
+protonRenderer.onParticleUpdate = function(particle) {
+	var sprite = particle.sprite;
+	sprite.position.x = particle.p.x;
+	sprite.position.y = particle.p.y;
+	sprite.scale.x = particle.scale;
+	sprite.scale.y = particle.scale;
+	sprite.anchor.x = 0.5;
+	sprite.anchor.y = 0.5;
+	sprite.alpha = particle.alpha;
+	sprite.rotation = particle.rotation * Math.PI / 180;
+};
+protonRenderer.onParticleDead = function(particle) {
+	var target = particle.target;
+	if (target.hasOwnProperty('container')) {
+		target.container.removeChild(particle.sprite);
+	} else {
+		stage.removeChild(particle.sprite);
+	}
+};
+protonRenderer.start();
+
 window.onresize = function() {
 	w = window.innerWidth;
 	h = window.innerHeight;
@@ -40,6 +97,8 @@ window.onresize();
 var Game = require('./game');
 var game = window.game = new Game(renderer, stage, UI);
 
+game.proton = proton;
+
 var colorMatrixFilter = new PIXI.ColorMatrixFilter();
 colorMatrixFilter.matrix = [
 	0.4, 0, 0, 0,
@@ -47,7 +106,19 @@ colorMatrixFilter.matrix = [
 	0, 0, 0.7, 0,
 	0, 0, 0, 1,
 ];
-game.container.filters = [colorMatrixFilter];
+var m7 = new Mode7();
+//game.container.filters = [colorMatrixFilter];
+/*
+var gui = new dat.GUI();
+var c = function() {};
+gui.add(m7, 'pos_x').onFinishChange(c);
+gui.add(m7, 'pos_y').onFinishChange(c);
+gui.add(m7, 'ang').onFinishChange(c);
+gui.add(m7, 'horizon').onFinishChange(c);
+gui.add(m7, 'fov').onFinishChange(c);
+gui.add(m7, 'scale_x').onFinishChange(c);
+gui.add(m7, 'scale_y').onFinishChange(c);
+*/
 
 requestAnimFrame(render);
 var updateT = 1000 / 50;
@@ -56,13 +127,17 @@ function render() {
 	requestAnimFrame(render);
 	stats.begin();
 
+	proton.update();
+
 	var t = window.performance.now();
 	if (t - lastTime > updateT) {
 		game.update(updateT);
 		lastTime += updateT;
 	}
+
 	game.render();
 	renderer.render(stage);
+	game.postrender();
 
 	stats.end();
 }
@@ -88,6 +163,7 @@ game.net.on('TargetDataMsg', function(target) {
 game.net.on('InventoryMsg', function(inv) {
 	UI.inventory = inv.Inventory;
 	UI.equip = inv.Equip;
+	UI.money = inv.Money;
 });
 game.net.on('ParametersMsg', function(p) {
 	UI.hp = p.Parameters.HP;
@@ -144,6 +220,7 @@ var UI = window.UI = new Vue({
 		}],
 		equip: {},
 		inventory: [],
+		money: 0,
 		target: {
 			Id: 0,
 			Race: 0,
@@ -151,73 +228,8 @@ var UI = window.UI = new Vue({
 			MHP: 0,
 			Name: 'vnfdjsk'
 		},
-		invTest: [
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-		],
-		spells: [
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-
-
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-			{
-				Icon: 'spiral-thrust'
-			},
-			{
-				Icon: 'rune-sword'
-			},
-			{
-				Icon: 'all-for-one'
-			},
-			{
-				Icon: 'screaming'
-			},
-		],
+		invTest: [],
+		spells: [],
 	},
 	computed: {
 		showTargetBar: function() {
@@ -300,7 +312,7 @@ var UI = window.UI = new Vue({
 	methods: {
 		cast: function(spell) {
 			console.info('cast', spell);
-			game.net.FireMsg('' + spell);
+			game.net.FireMsg('' + spell, game.target);
 		},
 		drop: function(index) {
 			game.net.DropItemMsg(index);
@@ -339,7 +351,7 @@ function getConnectionData() {
 
 getConnectionData();
 
-},{"./Stats":"/home/lain/gocode/src/oniproject/js/Stats.js","./game":"/home/lain/gocode/src/oniproject/js/game.js","./game.styl":"/home/lain/gocode/src/oniproject/js/game.styl","insert-css":"/home/lain/gocode/src/oniproject/node_modules/insert-css/index.js"}],"/home/lain/gocode/src/oniproject/js/Stats.js":[function(require,module,exports){
+},{"./Stats":"/home/lain/gocode/src/oniproject/js/Stats.js","./game":"/home/lain/gocode/src/oniproject/js/game.js","./game.styl":"/home/lain/gocode/src/oniproject/js/game.styl","./mode7":"/home/lain/gocode/src/oniproject/js/mode7.js","insert-css":"/home/lain/gocode/src/oniproject/node_modules/insert-css/index.js"}],"/home/lain/gocode/src/oniproject/js/Stats.js":[function(require,module,exports){
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -649,14 +661,14 @@ function Game(renderer, stage) {
 			loop: true,
 		}),
 	};
-	this.sounds.bg.play();
+	//this.sounds.bg.play();
 
 	this.container.click = this.container.tap = function(event) {
 		console.log('TAPPED', event);
 		var p1 = event.getLocalPosition(this.container);
 		var player = this.avatars[this.player];
 		if (player) {
-			var p2 = player.container.position;
+			/*var p2 = player.container.position;
 			var v = {
 				x: p1.x - p2.x,
 				y: p1.y - p2.y
@@ -668,7 +680,7 @@ function Game(renderer, stage) {
 			}
 			if (v.y !== 0) {
 				this.inputAxesVector.y = v.y < 0 ? -1 : 1;
-			}
+			}*/
 		}
 	}.bind(this);
 	this.container.hitArea = new PIXI.Rectangle(-99999, -99999, 999999, 999999);
@@ -704,25 +716,6 @@ function Game(renderer, stage) {
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 
-	net.on('AddMsg', (function(value) {
-		this.createAvatar(value);
-		var avatar = this.avatars[value.Id];
-		avatar.visible = 1;
-		avatar.addState(value);
-		console.log('add', value);
-	}).bind(this));
-
-	net.on('RemoveMsg', (function(value) {
-		this.destroyAvatar(value.Id);
-		console.log('rm', value);
-	}).bind(this));
-
-	net.on('UpdateMsg', (function(value) {
-		this.avatars[value.Id].addState(value);
-		//console.log('upd', value);
-	}).bind(this));
-
-
 	net.on('ReplicaMsg', (function(value) {
 		var tick = value.Tick;
 
@@ -743,38 +736,6 @@ function Game(renderer, stage) {
 			var msg = value.Updated[i];
 			this.avatars[msg.Id].addState(msg);
 		}
-		console.log('replica');
-
-
-
-
-		/*
-		var states = value.States;
-
-		var states_hash = {};
-
-		for (var i = 0, len = states.length; i < len; i++) {
-			var state = states[i];
-			states_hash[state.Id] = state;
-			if (!this.avatars.hasOwnProperty(state.Id)) {
-				this.createAvatar(state);
-			}
-			this.avatars[state.Id].addState(state);
-		}
-
-		var ids = Object.keys(this.avatars);
-		for (var k in this.avatars) {
-			var avatar = this.avatars[k];
-			avatar.container.visible = 1;
-			if (avatar.rm_timer) {
-				clearTimeout(avatar.rm_timer);
-			}
-			if (!states_hash.hasOwnProperty(k)) {
-				avatar.container.visible = 0;
-				avatar.rm_timer = setTimeout(this.destroyAvatar.bind(this, k), 3000);
-			}
-		}
-		*/
 	}).bind(this));
 }
 
@@ -802,30 +763,31 @@ Game.prototype.run = function(player, host, mapName) {
 Game.prototype.createAvatar = function(state) {
 	// create Avatar
 	var obj;
-	if (state.Id > 0) {
+	if (state.IsAvatar) {
 		//obj = new Suika();
 		obj = new Actor(this.suika_anim);
 		obj.scale.x = obj.scale.y = 0.5;
-	} else if (state.Id > -20000) {
+	} else if (state.IsMonster) {
 		obj = new Bat();
-	} else {
+	} else if (state.IsItem) {
 		obj = new Item(13);
 	}
+
 	var avatar = this.avatars[state.Id] = new GameObject(obj, state);
 	avatar.on('tapped', (function(id) {
 		console.info('tapped', id);
-		this.net.SetTargetMsg(id);
-		if (this.target == id) {
-			var obj = this.avatars[id];
-			if (obj.isItem()) {
-				this.net.PickupItemMsg();
-				this.sounds.pickup.play();
-			}
+		var obj = this.avatars[id];
+		if (obj.isItem) {
+			this.net.PickupItemMsg(id);
+			this.sounds.pickup.play();
+		} else {
+			this.net.SetTargetMsg(id);
+			this.target = id;
 		}
-		this.target = id;
 	}).bind(this));
 
 	this.map.AVATARS.addChild(avatar.container);
+	this.proton.addEmitter(avatar.emitter);
 };
 
 Game.prototype.destroyAvatar = function(id) {
@@ -930,6 +892,12 @@ Game.prototype.update = function() {
 	}
 };
 
+Game.prototype.postrender = function() {
+	this.map.AVATARS.children.sort(function(a, b) {
+		return a.y - b.y;
+	});
+}
+
 Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {
 		var player = this.avatars[this.player];
@@ -986,7 +954,16 @@ module.exports = ".scrollbar-wrap {\n  width: 100%;\n  height: 100%;\n  overflow
 
 var EventEmitter = require('events').EventEmitter;
 
+var STATE_IDLE = 0,
+	STATE_CAST = 1,
+	STATE_DEAD = 2,
+	STATE_MOVE = 3;
+
 function GameObject(obj, state) {
+	this.isAvatar = state.IsAvatar;
+	this.isMonster = state.IsMonster;
+	this.isItem = state.IsItem;
+
 	this.state = state;
 
 	this.lastvel = {
@@ -1021,11 +998,11 @@ function GameObject(obj, state) {
 	});
 	name.anchor.x = name.anchor.y = 0.5;
 
-	if (this.isAvatar()) {
+	if (this.isAvatar) {
 		this.name = 'ava';
-	} else if (this.isItem()) {
+	} else if (this.isItem) {
 		this.name = 'item';
-	} else if (this.isMonster()) {
+	} else if (this.isMonster) {
 		this.name = 'monster';
 	}
 
@@ -1038,7 +1015,7 @@ function GameObject(obj, state) {
 
 	var hpBar = this._hpBar = new PIXI.Graphics();
 
-	var h = this.isAvatar() ? 48 : obj.height;
+	var h = this.isAvatar ? 48 : obj.height;
 	hpBar.y = -(h) | 0;
 	name.y = -(h + 6) | 0;
 	msg.y = -(h + 16) | 0;
@@ -1048,6 +1025,28 @@ function GameObject(obj, state) {
 	this.container.addChild(msg);
 	this.container.addChild(name);
 	this.container.addChild(hpBar);
+
+
+	var emitter = this.emitter = new Proton.BehaviourEmitter();
+	emitter.rate = new Proton.Rate(new Proton.Span(1, 1), new Proton.Span(.1, .25));
+	/*emitter.addInitialize(new Proton.Mass(1));
+	emitter.addInitialize(new Proton.ImageTarget(texture));
+    */
+	emitter.addInitialize(new Proton.Life(.1, .1));
+	/*
+	emitter.addInitialize(new Proton.Velocity(new Proton.Span(3, 9), new Proton.Span(0, 30, true), 'polar'));
+	*/
+
+	emitter.addBehaviour(new Proton.Gravity(-3));
+	//emitter.addBehaviour(new Proton.Scale(new Proton.Span(1, 3), 0.3));
+	emitter.addBehaviour(new Proton.Alpha(1, 0.5));
+	//emitter.addBehaviour(new Proton.Rotate(0, Proton.getSpan(-8, 9), 'add'));
+	//emitter.p.x = 1003 / 2;
+	//emitter.p.y = 500;
+
+	//emitter.addSelfBehaviour(new Proton.Gravity(5));
+	//emitter.addSelfBehaviour(new Proton.RandomDrift(.1, 0, 1.1));
+	//emitter.addSelfBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, 53, 10), 'bound'));
 }
 
 GameObject.prototype = Object.create(EventEmitter.prototype);
@@ -1074,27 +1073,9 @@ Object.defineProperty(GameObject.prototype, 'name', {
 	},
 });
 
-GameObject.prototype.isAvatar = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id > 0;
-	}
-};
-GameObject.prototype.isMonster = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id < 0 && this.state.Id > -10000;
-	}
-};
-GameObject.prototype.isItem = function() {
-	if (this.hasOwnProperty('state')) {
-		return this.state.Id < -10000;
-	}
-};
-
 GameObject.prototype.addState = function(state) {
 	switch (state.Type) {
-		//case 2: // destroy
-		//case 1: // create
-		case 3: // move
+		case STATE_MOVE: // move
 			var x = this.state.Velocity.X;
 			var y = this.state.Velocity.Y;
 			if (!isNaN(x) && !isNaN(y)) {
@@ -1104,17 +1085,41 @@ GameObject.prototype.addState = function(state) {
 				}
 		}
 
-		case 0: // idle
+		case STATE_IDLE:
+		case STATE_CAST:
+		case STATE_DEAD:
 			if (state.Position && !isNaN(state.Position.X) && !isNaN(state.Position.Y)) {
-				this.container.position.x = state.Position.X * 32 | 0;
-				this.container.position.y = state.Position.Y * 32 | 0;
+				this.container.x = state.Position.X * 32 | 0;
+				this.container.y = state.Position.Y * 32 | 0;
 			}
 
 			break;
 	}
+	if (this.obj.currentAnimation) {
+		switch (state.Type) {
+			case STATE_IDLE:
+				this.obj.currentAnimation = 'idle';
+				break;
+			case STATE_CAST:
+				this.obj.currentAnimation = 'boom';
+				break;
+			case STATE_DEAD:
+				this.obj.currentAnimation = 'death';
+				console.log('death');
+				break;
+			case STATE_MOVE:
+				this.obj.currentAnimation = 'walk';
+				break;
+		}
+	}
 
 	if (state.hasOwnProperty('Name')) {
 		this.name = state.Name;
+	}
+
+	var damage = state.HP - this.state.HP;
+	if (damage != 0) {
+		this.damage(damage);
 	}
 
 	this.state = state;
@@ -1146,14 +1151,14 @@ GameObject.prototype.update = function(time) {
 
 		if (!obj.currentAnimation) return;
 
-		obj.currentAnimation = 'idle';
+		//obj.currentAnimation = 'idle';
 		var x = state.Velocity.X;
 		var y = state.Velocity.Y;
 		var dir;
 		if (!isNaN(x) && !isNaN(y)) {
 			if (!!x || !!y) {
 				dir = Math.atan2(x, y);
-				obj.currentAnimation = 'walk';
+				//obj.currentAnimation = 'walk';
 			}
 		} else {
 			dir = Math.atan2(this.lastvel.x, this.lastvel.y);
@@ -1171,6 +1176,24 @@ GameObject.prototype.update = function(time) {
 			obj.currentDirection = dir;
 		}
 	}
+};
+
+GameObject.prototype.damage = function(text) {
+	if (text === undefined) {
+		text = Math.random() * 20 - 15 | 0;
+	}
+	console.log('damage', text);
+	this.emitter.createParticle([
+		{
+			life: 0.6,
+			dead: false,
+			target: {
+				text: text,
+				container: this.container
+			}
+		},
+		new Proton.Position(new Proton.LineZone(-10, 0, 10, 0)),
+	]);
 };
 
 module.exports = GameObject;
@@ -1222,6 +1245,150 @@ Object.defineProperty(Item.prototype, 'type', {
 
 module.exports = Item;
 
+},{}],"/home/lain/gocode/src/oniproject/js/mode7.js":[function(require,module,exports){
+'use strict';
+
+var Mode7 = function() {
+	PIXI.AbstractFilter.call(this);
+	this.passes = [this];
+	this.uniforms = {
+		pos_x: {
+			type: '1f',
+			value: 0.5
+		},
+		pos_y: {
+			type: '1f',
+			value: 0.5
+		},
+		ang: {
+			type: '1f',
+			value: 0.7
+		}, // FIXME
+		horizon: {
+			type: '1f',
+			value: -0.5
+		},
+		fov: {
+			type: '1f',
+			value: 1.0
+		},
+		scale_x: {
+			type: '1f',
+			value: -1.0
+		},
+		scale_y: {
+			type: '1f',
+			value: 1.0
+		},
+	};
+	this.fragmentSrc = [
+		'precision mediump float;',
+		'varying vec2 vTextureCoord;',
+		'varying vec4 vColor;',
+		'uniform vec4 dimensions;',
+		'uniform sampler2D uSampler;',
+
+		'precision highp float;',
+		'uniform highp float pos_x;',
+		'uniform highp float pos_y;',
+		'uniform highp float ang;',
+		'uniform highp float horizon;',
+		'uniform highp float fov;',
+		'uniform highp float scale_x;',
+		'uniform highp float scale_y;',
+
+		'void main(void) {',
+		'    float px = vTextureCoord.x-0.5;',
+		'    float py = vTextureCoord.y-0.5 - horizon - fov;',
+		'    float pz = vTextureCoord.y-0.5 + horizon;',
+
+		'    //projection',
+		'    float sx = px / pz;',
+		'    float sy = py / pz;',
+
+		'    float sin_ang = sin(radians(ang));',
+		'    float cos_ang = cos(radians(ang));',
+
+		'    float xx = + sx * cos_ang - sy * sin_ang;',
+		'    float yy = + sx * sin_ang - sy * cos_ang;',
+
+		'    float tx = xx * scale_x + pos_x;',
+		'    float ty = yy * scale_y + pos_y;',
+
+		'    if (tx > 1.0 || tx < 0.0 || ty > 1.0 || ty < 0.0) {',
+		'        gl_FragColor = vec4(0.0,0.0,0.0,0.0);',
+		'    } else {',
+		'        gl_FragColor = texture2D(uSampler, vec2(tx, ty));',
+		'    }',
+
+
+		'}',
+	];
+};
+
+Mode7.prototype = Object.create(PIXI.AbstractFilter.prototype);
+Mode7.prototype.constructor = Mode7;
+
+Object.defineProperty(Mode7.prototype, 'pos_x', {
+	get: function() {
+		return this.uniforms.pos_x.value;
+	},
+	set: function(v) {
+		this.uniforms.pos_x.value = v;
+	},
+});
+Object.defineProperty(Mode7.prototype, 'pos_y', {
+	get: function() {
+		return this.uniforms.pos_y.value;
+	},
+	set: function(v) {
+		this.uniforms.pos_y.value = v;
+	},
+});
+Object.defineProperty(Mode7.prototype, 'ang', {
+	get: function() {
+		return this.uniforms.ang.value;
+	},
+	set: function(v) {
+		this.uniforms.ang.value = v;
+	},
+});
+Object.defineProperty(Mode7.prototype, 'horizon', {
+	get: function() {
+		return this.uniforms.horizon.value;
+	},
+	set: function(v) {
+		this.uniforms.horizon.value = v;
+	},
+});
+Object.defineProperty(Mode7.prototype, 'fov', {
+	get: function() {
+		return this.uniforms.fov.value;
+	},
+	set: function(v) {
+		this.uniforms.fov.value = v;
+	},
+});
+Object.defineProperty(Mode7.prototype, 'scale_x', {
+	get: function() {
+		return this.uniforms.scale_x.value;
+	},
+	set: function(v) {
+		this.uniforms.scale_x.value = v;
+	},
+});
+Object.defineProperty(Mode7.prototype, 'scale_y', {
+	get: function() {
+		return this.uniforms.scale_y.value;
+	},
+	set: function(v) {
+		this.uniforms.scale_y.value = v;
+	},
+});
+
+
+module.exports = Mode7;
+
 },{}],"/home/lain/gocode/src/oniproject/js/net.js":[function(require,module,exports){
 'use strict';
 
@@ -1241,9 +1408,6 @@ var M_SetVelocityMsg = 1,
 	M_Chat = 12,
 	M_ChatPost = 13,
 	M_Replica = 14,
-	M_Add = 15,
-	M_Remove = 16,
-	M_Update = 17,
 	___ = 0;
 
 function Net(url) {
@@ -1333,16 +1497,6 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_Replica:
 			this.emit('ReplicaMsg', value);
 			break;
-
-		case M_Add:
-			this.emit('AddMsg', value);
-			break;
-		case M_Remove:
-			this.emit('RemoveMsg', value);
-			break;
-		case M_Update:
-			this.emit('UpdateMsg', value);
-			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -1362,11 +1516,12 @@ Net.prototype.SetTargetMsg = function(id) {
 		},
 	});
 };
-Net.prototype.FireMsg = function(name) {
+Net.prototype.FireMsg = function(name, to) {
 	this.send({
 		T: M_CastMsg,
 		V: {
-			t: name
+			s: name,
+			t: to,
 		}
 	});
 };
@@ -1382,10 +1537,12 @@ Net.prototype.RequestParametersMsg = function() {
 		V: {}
 	});
 };
-Net.prototype.PickupItemMsg = function() {
+Net.prototype.PickupItemMsg = function(id) {
 	this.send({
 		T: M_PickupItem,
-		V: {}
+		V: {
+			t: id
+		}
 	});
 };
 Net.prototype.DropItemMsg = function(index) {
@@ -3575,7 +3732,7 @@ var updateTransform = function() {
 module.exports = Tileset;
 
 },{}],"/home/lain/gocode/src/oniproject/public/animations.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={"idle":{"directions":{"↖":[{"name":"suika walk ↖ 1","t":0,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 1","t":0,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 1","t":0,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 1","t":0,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 1","t":0,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 1","t":0,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 1","t":0,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 1","t":0,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"walk":{"directions":{"↖":[{"name":"suika walk ↖ 0","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 2","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 0","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 2","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 0","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 2","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 0","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 2","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 0","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 2","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 0","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 2","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 0","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 2","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 0","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 2","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"boom":{"directions":{"↖":[{"name":"suika boom ↖ 0","t":300,"x":-44,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 1","t":100,"x":-52,"y":-98,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 2","t":400,"x":-50,"y":-98,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika boom ↑ 0","t":300,"x":-40,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 1","t":100,"x":-40,"y":-100,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 2","t":400,"x":-42,"y":-96,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika boom ↗ 0","t":300,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 1","t":100,"x":-36,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 2","t":400,"x":-34,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika boom ← 0","t":300,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 1","t":100,"x":-82,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 2","t":400,"x":-70,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika boom → 0","t":300,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 2","t":400,"x":-18,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika boom ↙ 0","t":300,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 1","t":100,"x":-50,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 2","t":400,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika boom ↓ 0","t":300,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 1","t":100,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 2","t":400,"x":-40,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika boom ↘ 0","t":300,"x":-44,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 2","t":400,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0}]}},"death":{"directions":{"↖":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}]}}}
+module.exports={"idle":{"directions":{"↖":[{"name":"suika walk ↖ 1","t":0,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 1","t":0,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 1","t":0,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 1","t":0,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 1","t":0,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 1","t":0,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 1","t":0,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 1","t":0,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"walk":{"directions":{"↖":[{"name":"suika walk ↖ 0","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 2","t":100,"x":-42,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↖ 1","t":100,"x":-42,"y":-86,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika walk ↑ 0","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 2","t":100,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↑ 1","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika walk ↗ 0","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 2","t":100,"x":-32,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↗ 1","t":100,"x":-32,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika walk ← 0","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 2","t":100,"x":-30,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ← 1","t":100,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika walk → 0","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 2","t":100,"x":-24,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika walk ↙ 0","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 2","t":100,"x":-38,"y":-86,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↙ 1","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika walk ↓ 0","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 2","t":100,"x":-38,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↓ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika walk ↘ 0","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 2","t":100,"x":-36,"y":-90,"sx":1,"sy":1,"rot":0},{"name":"suika walk ↘ 1","t":100,"x":-36,"y":-88,"sx":1,"sy":1,"rot":0}]}},"boom":{"directions":{"↖":[{"name":"suika boom ↖ 0","t":300,"x":-44,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 1","t":100,"x":-52,"y":-98,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↖ 2","t":400,"x":-50,"y":-98,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika boom ↑ 0","t":300,"x":-40,"y":-82,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 1","t":100,"x":-40,"y":-100,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↑ 2","t":400,"x":-42,"y":-96,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika boom ↗ 0","t":300,"x":-36,"y":-92,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 1","t":100,"x":-36,"y":-94,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↗ 2","t":400,"x":-34,"y":-92,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika boom ← 0","t":300,"x":-30,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 1","t":100,"x":-82,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ← 2","t":400,"x":-70,"y":-88,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika boom → 0","t":300,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 1","t":100,"x":-24,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom → 2","t":400,"x":-18,"y":-88,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika boom ↙ 0","t":300,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 1","t":100,"x":-50,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↙ 2","t":400,"x":-42,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika boom ↓ 0","t":300,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 1","t":100,"x":-44,"y":-84,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↓ 2","t":400,"x":-40,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika boom ↘ 0","t":300,"x":-44,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 1","t":100,"x":-38,"y":-88,"sx":1,"sy":1,"rot":0},{"name":"suika boom ↘ 2","t":400,"x":-32,"y":-88,"sx":1,"sy":1,"rot":0}]}},"death":{"directions":{"↖":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↑":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↗":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"←":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"→":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↙":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↓":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}],"↘":[{"name":"suika death 2","t":100,"x":-38,"y":-84,"sx":1,"sy":1,"rot":0}]}}}
 
 },{}]},{},["./js/main.js"])
 

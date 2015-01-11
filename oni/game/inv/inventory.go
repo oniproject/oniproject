@@ -21,9 +21,62 @@ type Slot struct {
 	Locked bool
 }
 
+type Inventory [][]string
+
+func (inv *Inventory) Height() int { return len(*inv) }
+func (inv *Inventory) Width() int  { return len((*inv)[0]) }
+func (inv *Inventory) Get(x, y int) (string, error) {
+	if x < 0 || x >= inv.Width() || y < 0 || y >= inv.Height() {
+		return "", InventoryBadPlace
+	}
+
+	return (*inv)[y][x], nil
+}
+
+func (inv *Inventory) Add(name string, x, y int) (err error) {
+	other, err := inv.Get(x, y)
+	if err != nil {
+		return
+	}
+	if other != "" {
+		// move found item to another place
+		x, y, ok := inv.FindFree()
+		if !ok {
+			err = InventoryFull
+			return
+		}
+		(*inv)[y][x] = other
+	}
+	(*inv)[y][x] = name
+	return
+}
+
+func (inv *Inventory) Remove(x, y int) (name string, err error) {
+	name, err = inv.Get(x, y)
+	if err == nil {
+		(*inv)[y][x] = ""
+	}
+	return
+}
+
+func (inv *Inventory) FindFree() (x, y int, ok bool) {
+	w, h := inv.Width(), inv.Height()
+	for ; y < h; y++ {
+		for x = 0; x < w; x++ {
+			item := (*inv)[y][x]
+			if item == "" {
+				ok = true
+				return
+			}
+		}
+	}
+	return
+}
+
 type InventoryComponent struct {
-	Inventory [][]string
+	Inventory Inventory
 	Equip     map[string]*Slot
+	Money     int
 }
 
 func NewInventoryComponent(width, height int, slots []string) InventoryComponent {
@@ -38,59 +91,20 @@ func NewInventoryComponent(width, height int, slots []string) InventoryComponent
 		equip[slot] = &Slot{"", false}
 	}
 
-	return InventoryComponent{inv, equip}
+	return InventoryComponent{inv, equip, 0}
 }
 
-func (inv *InventoryComponent) Height() int { return len(inv.Inventory) }
-func (inv *InventoryComponent) Width() int  { return len(inv.Inventory[0]) }
-
+func (inv *InventoryComponent) Height() int { return inv.Inventory.Height() }
+func (inv *InventoryComponent) Width() int  { return inv.Inventory.Width() }
 func (inv *InventoryComponent) GetItem(x, y int) (string, error) {
-	if x < 0 || x >= inv.Width() || y < 0 || y >= inv.Height() {
-		return "", InventoryBadPlace
-	}
-
-	return inv.Inventory[y][x], nil
+	return inv.Inventory.Get(x, y)
 }
-
 func (inv *InventoryComponent) AddItem(name string, x, y int) (err error) {
-	other, err := inv.GetItem(x, y)
-	if err != nil {
-		return
-	}
-	if other != "" {
-		// move found item to another place
-		x, y, ok := inv.findFree()
-		if !ok {
-			err = InventoryFull
-			return
-		}
-		inv.Inventory[y][x] = other
-	}
-
-	inv.Inventory[y][x] = name
-	return
+	return inv.Inventory.Add(name, x, y)
 }
 
 func (inv *InventoryComponent) RemoveItem(x, y int) (name string, err error) {
-	name, err = inv.GetItem(x, y)
-	if err == nil {
-		inv.Inventory[y][x] = ""
-	}
-	return
-}
-
-func (inv *InventoryComponent) findFree() (x, y int, ok bool) {
-	w, h := inv.Width(), inv.Height()
-	for ; y < h; y++ {
-		for x = 0; x < w; x++ {
-			item := inv.Inventory[y][x]
-			if item == "" {
-				ok = true
-				return
-			}
-		}
-	}
-	return
+	return inv.Inventory.Remove(x, y)
 }
 
 // TODO func (sys *InventorySystem) TransferItem(from, to Entity) {}
@@ -157,26 +171,6 @@ func (inv *InventoryComponent) UnequipItem(name string) (err error) {
 		inv.Equip[item.Lock].Locked = false
 	}
 	inv.Equip[name] = &Slot{"", false}
-
-	return
-	//
-	/*
-		if slot.Item == "" {
-			return
-		}
-
-		x, y, ok := inv.findFree()
-		if !ok {
-			err = InventoryFull
-			return
-		}
-
-		item, err = sys.AddItem(e, name, x, y)
-		if err == nil {
-			inv.Equip[item.Slot] = ""
-			inv.EquipLocks[item.Lock] = false
-		}
-	*/
 
 	return
 }

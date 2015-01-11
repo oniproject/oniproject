@@ -56,7 +56,7 @@ func (s *SkillComponent) AddSkill(name string) {
 func (s *SkillComponent) SealSkill(name string) {
 	delete(s.Skills, name)
 }
-func (s *SkillComponent) Cast(name string, target SkillTarget) error {
+func (s *SkillComponent) Cast(name string, target EffectReceiver) error {
 	skill, ok := s.Skills[name]
 	if !ok {
 		err := errors.New("skill notfound")
@@ -69,10 +69,6 @@ func (s *SkillComponent) Cast(name string, target SkillTarget) error {
 	}
 	s.skills_lastCast[name] = time.Now()
 	return nil
-}
-
-type SkillTarget interface {
-	EffectReceiver
 }
 
 type Skill struct {

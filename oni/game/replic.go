@@ -103,74 +103,79 @@ func (r *Replicator) Process() {
 
 	// обработать все аватары
 	for watcher := range r.watchers {
-		replic := &ReplicaMsg{
-			Tick: r.tick,
-		}
-		// отсылаем новые
-		for obj := range r.added {
-			// если это мы сами себя добавили
-			if obj == watcher {
-				// то отсылаем всё, что вокруг
-				for other := range r.all {
-					if r.checkPos(watcher, other) {
-						replic.ADD(other)
-					}
-				}
-				continue
-			}
-
-			// простая рассылка
-			if r.checkPos(watcher, obj) {
-				replic.ADD(obj)
-			}
-		}
-
-		// отсылаем удаления
-		for obj := range r.removed {
-			if r.checkPos(watcher, obj) {
-				replic.RM(obj)
-			}
-			// TODO а если мы себя удаляем? Авотхуй
-		}
-
-		for obj := range r.updated {
-			now := r.checkPos(watcher, obj)
-			old := r.checkOld(watcher, obj)
-			switch {
-			case now && !old:
-				replic.ADD(obj)
-			case !now && old:
-				replic.RM(obj)
-			case now && old:
-				replic.UPD(obj)
-				// если сами обновились
-				if watcher == obj {
-					for other := range r.all {
-						if watcher == other {
-							continue
-						}
-
-						ok := r.updated.Contains(other)
-						now := r.checkPos(watcher, other)
-						old := r.checkOld(watcher, other)
-
-						switch {
-						case now && !old && !ok:
-							replic.ADD(other)
-						case !now && old:
-							replic.RM(other)
-						}
-					}
-				}
-			}
-		}
-
-		watcher.sendMessage <- replic
+		r.processWatcher(watcher)
 	}
 
 	r.added.Clear()
 	r.removed.Clear()
 	r.updated.Clear()
+}
+
+func (r *Replicator) processWatcher(watcher *Avatar) {
+	replic := &ReplicaMsg{
+		Tick: r.tick,
+	}
+
+	// отсылаем новые
+	for obj := range r.added {
+		// если это мы сами себя добавили
+		if obj == watcher {
+			// то отсылаем всё, что вокруг
+			for other := range r.all {
+				if r.checkPos(watcher, other) {
+					replic.ADD(other)
+				}
+			}
+			continue
+		}
+
+		// простая рассылка
+		if r.checkPos(watcher, obj) {
+			replic.ADD(obj)
+		}
+	}
+
+	// отсылаем удаления
+	for obj := range r.removed {
+		if r.checkPos(watcher, obj) {
+			replic.RM(obj)
+		}
+		// TODO а если мы себя удаляем? Авотхуй
+	}
+
+	for obj := range r.updated {
+		now := r.checkPos(watcher, obj)
+		old := r.checkOld(watcher, obj)
+		switch {
+		case now && !old:
+			replic.ADD(obj)
+		case !now && old:
+			replic.RM(obj)
+		case now && old:
+			replic.UPD(obj)
+			// если сами обновились
+			if watcher == obj {
+				for other := range r.all {
+					if watcher == other {
+						continue
+					}
+
+					ok := r.updated.Contains(other)
+					now := r.checkPos(watcher, other)
+					old := r.checkOld(watcher, other)
+
+					switch {
+					case now && !old && !ok:
+						replic.ADD(other)
+					case !now && old:
+						replic.RM(other)
+					}
+				}
+			}
+		}
+	}
+
+	watcher.sendMessage <- replic
 }
 
 func (r *Replicator) checkPos(a, b GameObject) bool {

@@ -29,14 +29,14 @@ function Game(renderer, stage) {
 			loop: true,
 		}),
 	};
-	this.sounds.bg.play();
+	//this.sounds.bg.play();
 
 	this.container.click = this.container.tap = function(event) {
 		console.log('TAPPED', event);
 		var p1 = event.getLocalPosition(this.container);
 		var player = this.avatars[this.player];
 		if (player) {
-			var p2 = player.container.position;
+			/*var p2 = player.container.position;
 			var v = {
 				x: p1.x - p2.x,
 				y: p1.y - p2.y
@@ -48,7 +48,7 @@ function Game(renderer, stage) {
 			}
 			if (v.y !== 0) {
 				this.inputAxesVector.y = v.y < 0 ? -1 : 1;
-			}
+			}*/
 		}
 	}.bind(this);
 	this.container.hitArea = new PIXI.Rectangle(-99999, -99999, 999999, 999999);
@@ -84,25 +84,6 @@ function Game(renderer, stage) {
 	net.on('DestroyMsg', this.ondestroy.bind(this));
 	net.on('SetTargetMsg', this.ontarget.bind(this));
 
-	net.on('AddMsg', (function(value) {
-		this.createAvatar(value);
-		var avatar = this.avatars[value.Id];
-		avatar.visible = 1;
-		avatar.addState(value);
-		console.log('add', value);
-	}).bind(this));
-
-	net.on('RemoveMsg', (function(value) {
-		this.destroyAvatar(value.Id);
-		console.log('rm', value);
-	}).bind(this));
-
-	net.on('UpdateMsg', (function(value) {
-		this.avatars[value.Id].addState(value);
-		//console.log('upd', value);
-	}).bind(this));
-
-
 	net.on('ReplicaMsg', (function(value) {
 		var tick = value.Tick;
 
@@ -123,38 +104,6 @@ function Game(renderer, stage) {
 			var msg = value.Updated[i];
 			this.avatars[msg.Id].addState(msg);
 		}
-		console.log('replica');
-
-
-
-
-		/*
-		var states = value.States;
-
-		var states_hash = {};
-
-		for (var i = 0, len = states.length; i < len; i++) {
-			var state = states[i];
-			states_hash[state.Id] = state;
-			if (!this.avatars.hasOwnProperty(state.Id)) {
-				this.createAvatar(state);
-			}
-			this.avatars[state.Id].addState(state);
-		}
-
-		var ids = Object.keys(this.avatars);
-		for (var k in this.avatars) {
-			var avatar = this.avatars[k];
-			avatar.container.visible = 1;
-			if (avatar.rm_timer) {
-				clearTimeout(avatar.rm_timer);
-			}
-			if (!states_hash.hasOwnProperty(k)) {
-				avatar.container.visible = 0;
-				avatar.rm_timer = setTimeout(this.destroyAvatar.bind(this, k), 3000);
-			}
-		}
-		*/
 	}).bind(this));
 }
 
@@ -182,30 +131,31 @@ Game.prototype.run = function(player, host, mapName) {
 Game.prototype.createAvatar = function(state) {
 	// create Avatar
 	var obj;
-	if (state.Id > 0) {
+	if (state.IsAvatar) {
 		//obj = new Suika();
 		obj = new Actor(this.suika_anim);
 		obj.scale.x = obj.scale.y = 0.5;
-	} else if (state.Id > -20000) {
+	} else if (state.IsMonster) {
 		obj = new Bat();
-	} else {
+	} else if (state.IsItem) {
 		obj = new Item(13);
 	}
+
 	var avatar = this.avatars[state.Id] = new GameObject(obj, state);
 	avatar.on('tapped', (function(id) {
 		console.info('tapped', id);
-		this.net.SetTargetMsg(id);
-		if (this.target == id) {
-			var obj = this.avatars[id];
-			if (obj.isItem()) {
-				this.net.PickupItemMsg();
-				this.sounds.pickup.play();
-			}
+		var obj = this.avatars[id];
+		if (obj.isItem) {
+			this.net.PickupItemMsg(id);
+			this.sounds.pickup.play();
+		} else {
+			this.net.SetTargetMsg(id);
+			this.target = id;
 		}
-		this.target = id;
 	}).bind(this));
 
 	this.map.AVATARS.addChild(avatar.container);
+	this.proton.addEmitter(avatar.emitter);
 };
 
 Game.prototype.destroyAvatar = function(id) {
@@ -309,6 +259,12 @@ Game.prototype.update = function() {
 		this.avatars[i].update(0.05);
 	}
 };
+
+Game.prototype.postrender = function() {
+	this.map.AVATARS.children.sort(function(a, b) {
+		return a.y - b.y;
+	});
+}
 
 Game.prototype.render = function() {
 	if (this.avatars.hasOwnProperty(this.player)) {

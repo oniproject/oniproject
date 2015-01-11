@@ -16,9 +16,6 @@ var M_SetVelocityMsg = 1,
 	M_Chat = 12,
 	M_ChatPost = 13,
 	M_Replica = 14,
-	M_Add = 15,
-	M_Remove = 16,
-	M_Update = 17,
 	___ = 0;
 
 function Net(url) {
@@ -108,16 +105,6 @@ Net.prototype._ParseMessages = function(type, value, event) {
 		case M_Replica:
 			this.emit('ReplicaMsg', value);
 			break;
-
-		case M_Add:
-			this.emit('AddMsg', value);
-			break;
-		case M_Remove:
-			this.emit('RemoveMsg', value);
-			break;
-		case M_Update:
-			this.emit('UpdateMsg', value);
-			break;
 		default:
 			this.emit('event', type, value, event);
 	}
@@ -137,11 +124,12 @@ Net.prototype.SetTargetMsg = function(id) {
 		},
 	});
 };
-Net.prototype.FireMsg = function(name) {
+Net.prototype.FireMsg = function(name, to) {
 	this.send({
 		T: M_CastMsg,
 		V: {
-			t: name
+			s: name,
+			t: to,
 		}
 	});
 };
@@ -157,10 +145,12 @@ Net.prototype.RequestParametersMsg = function() {
 		V: {}
 	});
 };
-Net.prototype.PickupItemMsg = function() {
+Net.prototype.PickupItemMsg = function(id) {
 	this.send({
 		T: M_PickupItem,
-		V: {}
+		V: {
+			t: id
+		}
 	});
 };
 Net.prototype.DropItemMsg = function(index) {

@@ -142,8 +142,7 @@ func (m *Map) SpawnMonster(x, y float64) {
 
 func (m *Map) DropItem(x, y float64, item string) {
 	ditem := NewDroppedItem(x, y, item, m)
-
-	ditem.id = -m.localIdPool.Get() - 20000
+	ditem.id = -m.localIdPool.Get()
 	m.Register(ditem)
 }
 
@@ -199,11 +198,6 @@ func (gm *Map) Run() {
 					})
 					avatars = append(avatars, avatar)
 				}
-			}
-
-			// target data
-			for _, avatar := range avatars {
-				gm.Send(avatar.Id(), &SetTargetMsg{avatar.Target})
 			}
 
 		// replication
