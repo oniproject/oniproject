@@ -2,13 +2,14 @@ addr: ":8000"
 game: ":2000"
 
 driver: sqlite3
-db: ../data/development.bin
+db: development.bin
+#db: ../data/development.bin
 
 level: info
 
 games:
-    #- addr: "localhost:3000"
-    - addr: "oniproject-lain.rhcloud.com:8000"
+    - addr: "localhost:8000"
+    #- addr: "oniproject-lain.rhcloud.com:8000"
       rpc: ":1234"
       minid: 10
       maxid: 100000

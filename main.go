@@ -14,7 +14,7 @@ import (
 	"syscall"
 )
 
-var config = flag.String("conf", "../data/config.yml", "config file")
+var config = flag.String("conf", "config.yml", "config file")
 
 var masterService = flag.Bool("master", false, "this is a master")
 var gameService = flag.Bool("game", false, "this is a game mechanic")
@@ -25,6 +25,10 @@ func main() {
 	stdlog.SetFlags(stdlog.Llongfile)
 	stdlog.SetPrefix("\033[01;07;38;05;196m[WAT?]\033[0m ")
 	flag.Parse()
+
+	if c := os.Getenv("CONFIG"); c != "" {
+		*config = c
+	}
 
 	conf := oni.NewConfig(*config)
 
